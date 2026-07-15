@@ -136,6 +136,8 @@ import com.blazify.music.playback.queues.YouTubeQueue
 import com.blazify.music.ui.component.AlbumGridItem
 import com.blazify.music.ui.component.ArtistGridItem
 import com.blazify.music.ui.component.BlazeHomeHeader
+import com.blazify.music.BuildConfig
+import com.blazify.music.ui.component.AccountSettingsDialog
 import com.blazify.music.ui.component.ChipsRow
 import com.blazify.music.ui.component.HideOnScrollFAB
 import com.blazify.music.ui.component.LocalBottomSheetPageState
@@ -689,6 +691,13 @@ fun HomeScreen(
         remember(innerTubeCookie) {
             "SAPISID" in parseCookieString(innerTubeCookie)
         }
+    var showAccountDialog by remember { mutableStateOf(false) }
+    if (showAccountDialog) {
+        AccountSettingsDialog(
+            onDismiss = { showAccountDialog = false },
+            latestVersionName = BuildConfig.VERSION_NAME,
+        )
+    }
     val url = if (isLoggedIn) accountImageUrl else null
 
     // Extract unique podcasts from episodes for "Podcast Channels" row
@@ -1177,8 +1186,11 @@ fun HomeScreen(
                 // greeting card with overflowing hero image, and search bar
                 item(key = "blaze_header") {
                     BlazeHomeHeader(
-                        // Profile: account details when logged in, login page otherwise
-                        onAccountClick = { navController.navigate(if (isLoggedIn) "account" else "login") },
+                        // Profile: account sheet (logout / token / settings) when
+                        // logged in, login page otherwise
+                        onAccountClick = {
+                            if (isLoggedIn) showAccountDialog = true else navController.navigate("login")
+                        },
                         onSettingsClick = { navController.navigate("settings") },
                         onSearchClick = { navController.navigate(Screens.Search.route) },
                         onMicClick = { navController.navigate("recognition") },
