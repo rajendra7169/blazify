@@ -12,6 +12,7 @@ package com.blazify.music.ui.screens
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
@@ -21,15 +22,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.blazify.music.LocalNavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
@@ -131,16 +139,16 @@ fun YoursScreen(
             BlazeCategoryGrid(
                 categories = listOf(
                     BlazeCategory(stringResource(R.string.songs), R.drawable.music_note, Color(0xFFFF6B6B)) {
-                        navController.navigate(Screens.Library.route)
+                        navController.navigate("yours/songs")
                     },
                     BlazeCategory(stringResource(R.string.albums), R.drawable.album, Color(0xFF4ECDC4)) {
-                        navController.navigate(Screens.Library.route)
+                        navController.navigate("yours/albums")
                     },
                     BlazeCategory(stringResource(R.string.artists), R.drawable.artist, Color(0xFFFFBE0B)) {
-                        navController.navigate(Screens.Library.route)
+                        navController.navigate("yours/artists")
                     },
                     BlazeCategory(stringResource(R.string.playlists), R.drawable.playlist_play, Color(0xFF8B5CF6)) {
-                        navController.navigate(Screens.Library.route)
+                        navController.navigate("yours/playlists")
                     },
                     BlazeCategory(stringResource(R.string.downloads), R.drawable.download, Color(0xFFEC4899)) {
                         navController.navigate("auto_playlist/downloaded")
@@ -158,7 +166,7 @@ fun YoursScreen(
             item("pl_header") {
                 BlazeSectionHeader(
                     title = stringResource(R.string.your_playlists),
-                    onSeeMore = { navController.navigate(Screens.Library.route) },
+                    onSeeMore = { navController.navigate("yours/playlists") },
                 )
             }
             item("pl_rail") {
@@ -240,7 +248,7 @@ fun YoursScreen(
             item("artist_header") {
                 BlazeSectionHeader(
                     title = stringResource(R.string.favorite_artists),
-                    onSeeMore = { navController.navigate(Screens.Library.route) },
+                    onSeeMore = { navController.navigate("yours/artists") },
                 )
             }
             item("artist_rail") {
@@ -266,5 +274,33 @@ fun YoursScreen(
         item("bottom_spacer") {
             Spacer(Modifier.height(12.dp))
         }
+    }
+}
+
+/**
+ * Hosts a reused library list/grid as a pushed screen with its own back button,
+ * so browse-category tiles open a dedicated page and Back returns to Yours
+ * (instead of switching to the Library tab).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun YoursCategoryScreen(
+    navController: NavController,
+    titleRes: Int,
+    content: @Composable () -> Unit,
+) {
+    Box(Modifier.fillMaxSize()) {
+        content()
+        TopAppBar(
+            title = { Text(stringResource(titleRes)) },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        painter = painterResource(R.drawable.arrow_back),
+                        contentDescription = stringResource(R.string.cd_back),
+                    )
+                }
+            },
+        )
     }
 }

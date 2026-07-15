@@ -31,7 +31,12 @@ import com.blazify.music.ui.screens.artist.ArtistScreen
 import com.blazify.music.ui.screens.artist.ArtistSongsScreen
 import com.blazify.music.ui.screens.equalizer.EqScreen
 import com.blazify.music.ui.screens.equalizer.wizard.WizardScreen
+import com.blazify.music.R
+import com.blazify.music.ui.screens.library.LibraryAlbumsScreen
+import com.blazify.music.ui.screens.library.LibraryArtistsScreen
+import com.blazify.music.ui.screens.library.LibraryPlaylistsScreen
 import com.blazify.music.ui.screens.library.LibraryScreen
+import com.blazify.music.ui.screens.library.LibrarySongsScreen
 import com.blazify.music.ui.screens.playlist.AutoPlaylistScreen
 import com.blazify.music.ui.screens.playlist.CachePlaylistScreen
 import com.blazify.music.ui.screens.playlist.LocalPlaylistScreen
@@ -102,6 +107,27 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable(Screens.Yours.route) {
         YoursScreen()
+    }
+
+    composable("yours/playlists") {
+        YoursCategoryScreen(navController, R.string.playlists) {
+            LibraryPlaylistsScreen(navController, filterContent = {})
+        }
+    }
+    composable("yours/songs") {
+        YoursCategoryScreen(navController, R.string.songs) {
+            LibrarySongsScreen(navController, onDeselect = {})
+        }
+    }
+    composable("yours/albums") {
+        YoursCategoryScreen(navController, R.string.albums) {
+            LibraryAlbumsScreen(navController, onDeselect = {})
+        }
+    }
+    composable("yours/artists") {
+        YoursCategoryScreen(navController, R.string.artists) {
+            LibraryArtistsScreen(navController, onDeselect = {})
+        }
     }
 
     composable(Screens.ListenTogether.route) {

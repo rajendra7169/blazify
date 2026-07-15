@@ -275,10 +275,10 @@ fun BlazeCategoryGrid(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         categories.chunked(3).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 row.forEach { category ->
                     BlazeCategoryTile(
                         category = category,
