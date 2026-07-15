@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -160,7 +162,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDateTime
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun LocalPlaylistScreen(
     navController: NavController,
@@ -235,6 +237,22 @@ fun LocalPlaylistScreen(
         inSelectMode = false
         selection.clear()
         selectionAnchorMapId = null
+    }
+
+    // Single-press exit from search: the soft keyboard swallows the first
+    // system-back, so once it has hidden (and there is no query to preserve)
+    // drop out of search instead of forcing a second back press.
+    val imeVisible = WindowInsets.isImeVisible
+    var searchKeyboardShown by remember { mutableStateOf(false) }
+    LaunchedEffect(isSearching) { if (!isSearching) searchKeyboardShown = false }
+    LaunchedEffect(imeVisible, isSearching) {
+        if (isSearching) {
+            if (imeVisible) {
+                searchKeyboardShown = true
+            } else if (searchKeyboardShown && query.text.isEmpty()) {
+                isSearching = false
+            }
+        }
     }
 
     if (isSearching) {
@@ -1070,9 +1088,9 @@ fun LocalPlaylistHeader(
                                 .size(240.dp)
                                 .shadow(
                                     elevation = 16.dp,
-                                    shape = RoundedCornerShape(3.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                 ),
-                        shape = RoundedCornerShape(3.dp),
+                        shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant,
                     ) {
                         Box(
@@ -1096,10 +1114,10 @@ fun LocalPlaylistHeader(
                                 .size(240.dp)
                                 .shadow(
                                     elevation = 24.dp,
-                                    shape = RoundedCornerShape(3.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                                 ),
-                        shape = RoundedCornerShape(3.dp),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         AsyncImage(
                             model = overrideThumbnail.value ?: playlist.thumbnails[0],
@@ -1165,10 +1183,10 @@ fun LocalPlaylistHeader(
                                 .size(240.dp)
                                 .shadow(
                                     elevation = 24.dp,
-                                    shape = RoundedCornerShape(3.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                                 ),
-                        shape = RoundedCornerShape(3.dp),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             listOf(
