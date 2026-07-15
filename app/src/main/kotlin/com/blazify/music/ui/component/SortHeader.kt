@@ -5,12 +5,15 @@
 
 package com.blazify.music.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -48,19 +51,31 @@ inline fun <reified T : Enum<T>> SortHeader(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(vertical = 8.dp),
     ) {
-        Text(
-            text = stringResource(sortTypeText(sortType)),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelLarge,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier =
             Modifier
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(bounded = false),
+                    indication = ripple(bounded = true),
                 ) {
                     menuExpanded = !menuExpanded
-                }.padding(horizontal = 4.dp, vertical = 8.dp),
-        )
+                }.padding(start = 14.dp, end = 8.dp, top = 7.dp, bottom = 7.dp),
+        ) {
+            Text(
+                text = stringResource(sortTypeText(sortType)),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Icon(
+                painter = painterResource(R.drawable.expand_more),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 4.dp).size(18.dp),
+            )
+        }
 
         DropdownMenu(
             expanded = menuExpanded,

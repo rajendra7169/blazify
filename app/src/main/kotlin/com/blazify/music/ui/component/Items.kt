@@ -582,8 +582,9 @@ fun SongListItem(
                      isSelected = isSelected,
                      isActive = isActive,
                      isPlaying = isPlaying,
-                     shape = RoundedCornerShape(ThumbnailCornerRadius),
-                     modifier = Modifier.size(ListThumbnailSize)
+                     // Blaze/BlazePlayer song rows: larger, clearly-rounded art.
+                     shape = RoundedCornerShape(14.dp),
+                     modifier = Modifier.size(56.dp)
                  )
              },
              trailingContent = trailingContent,

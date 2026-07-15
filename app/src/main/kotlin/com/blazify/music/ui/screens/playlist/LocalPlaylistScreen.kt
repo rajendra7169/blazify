@@ -20,8 +20,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
@@ -552,13 +555,43 @@ fun LocalPlaylistScreen(
                                 modifier = Modifier.weight(1f),
                             )
                             if (editable) {
-                                IconButton(
-                                    onClick = { locked = !locked },
-                                    modifier = Modifier.padding(horizontal = 6.dp),
+                                // "Arrange" toggle: amber-lit when drag-reorder
+                                // is on, neutral when the order is locked.
+                                val arranging = !locked
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .clip(RoundedCornerShape(50))
+                                        .background(
+                                            if (arranging) {
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+                                            } else {
+                                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                                            },
+                                        )
+                                        .clickable { locked = !locked }
+                                        .padding(start = 12.dp, end = 14.dp, top = 7.dp, bottom = 7.dp),
                                 ) {
                                     Icon(
-                                        painter = painterResource(if (locked) R.drawable.lock else R.drawable.lock_open),
-                                        contentDescription = null,
+                                        painter = painterResource(R.drawable.drag_handle),
+                                        contentDescription = stringResource(R.string.arrange),
+                                        tint = if (arranging) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.arrange),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = if (arranging) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
                                     )
                                 }
                             }
