@@ -450,7 +450,7 @@ fun OnlineSearchResult(
         // Main content area below search bar
         Box(modifier = Modifier.weight(1f)) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 val visibleChips =
                     listOf(
@@ -489,7 +489,9 @@ fun OnlineSearchResult(
 
                 LazyColumn(
                     state = lazyListState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                 ) {
                     if (searchFilter == null) {
                         searchSummary?.summaries?.forEach { summary ->
