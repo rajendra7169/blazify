@@ -597,6 +597,7 @@ fun BottomSheetPlayer(
         remember(
             playerConnection.service.sleepTimer?.triggerTime,
             playerConnection.service.sleepTimer?.pauseWhenSongEnd,
+            playerConnection.service.sleepTimer?.songsLeft,
         ) {
             playerConnection.service.sleepTimer?.isActive ?: false
         }
@@ -640,6 +641,7 @@ fun BottomSheetPlayer(
             sleepTimerEnabled = sleepTimerEnabled,
             sleepTimerTimeLeft = sleepTimerTimeLeft,
             pauseWhenSongEnd = playerConnection.service.sleepTimer?.pauseWhenSongEnd == true,
+            sleepTimerSongsLeft = playerConnection.service.sleepTimer?.songsLeft ?: 0,
             initialMinutes = sleepTimerDefault,
             onDismiss = { showSleepTimerDialog = false },
             onStart = { minutes ->
@@ -653,6 +655,10 @@ fun BottomSheetPlayer(
             onStartEndOfSong = {
                 showSleepTimerDialog = false
                 playerConnection.service.sleepTimer?.start(minute = -1)
+            },
+            onStartAfterSongs = { count ->
+                showSleepTimerDialog = false
+                playerConnection.service.sleepTimer?.startAfterSongs(count)
             },
             onClear = { playerConnection.service.sleepTimer?.clear() },
         )

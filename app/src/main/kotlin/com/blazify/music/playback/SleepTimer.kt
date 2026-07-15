@@ -7,6 +7,7 @@ package com.blazify.music.playback
 
 import androidx.media3.common.C
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -37,8 +38,10 @@ class SleepTimer(
         private set
     var fadeOutEnabled by mutableStateOf(false)
         private set
+    var songsLeft by mutableIntStateOf(-1)
+        private set
     val isActive: Boolean
-        get() = triggerTime != -1L || pauseWhenSongEnd
+        get() = triggerTime != -1L || pauseWhenSongEnd || songsLeft > 0
 
     fun start(minute: Int) {
         start(
@@ -57,6 +60,7 @@ class SleepTimer(
         sleepTimerJob = null
         updateVolumeMultiplier(1f)
         fadeOutEnabled = fadeOut
+        songsLeft = -1
 
         if (minute == -1) {
             pauseWhenSongEnd = true
@@ -105,12 +109,34 @@ class SleepTimer(
         }
     }
 
+    /** Stop playback after [count] more songs have finished. */
+    fun startAfterSongs(count: Int) {
+        sleepTimerJob?.cancel()
+        sleepTimerJob = null
+        updateVolumeMultiplier(1f)
+        fadeOutEnabled = false
+        pauseWhenSongEnd = false
+        stopAfterCurrentSongOnTimeout = false
+        triggerTime = -1L
+        songsLeft = count.coerceAtLeast(1)
+    }
+
+    private fun onSongAdvanced() {
+        if (songsLeft > 0) {
+            songsLeft -= 1
+            if (songsLeft <= 0) {
+                completeTimerAndPause()
+            }
+        }
+    }
+
     /**
      * Notify the sleep timer that a song transition has occurred outside of normal
      * player callbacks (e.g. during crossfade player swap). If "end of song" mode
      * is active, this will pause the player and deactivate the timer.
      */
     fun notifySongTransition() {
+        onSongAdvanced()
         if (pauseWhenSongEnd) {
             completeTimerAndPause()
         }
@@ -122,6 +148,7 @@ class SleepTimer(
         pauseWhenSongEnd = false
         stopAfterCurrentSongOnTimeout = false
         fadeOutEnabled = false
+        songsLeft = -1
         triggerTime = -1L
         updateVolumeMultiplier(1f)
     }
@@ -130,6 +157,7 @@ class SleepTimer(
         mediaItem: MediaItem?,
         reason: Int,
     ) {
+        onSongAdvanced()
         if (pauseWhenSongEnd) {
             completeTimerAndPause()
         }
@@ -149,6 +177,7 @@ class SleepTimer(
         pauseWhenSongEnd = false
         stopAfterCurrentSongOnTimeout = false
         fadeOutEnabled = false
+        songsLeft = -1
         triggerTime = -1L
         updateVolumeMultiplier(1f)
         player.pause()

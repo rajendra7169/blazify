@@ -538,6 +538,7 @@ fun Queue(
                     sleepTimerEnabled = sleepTimerEnabled,
                     sleepTimerTimeLeft = sleepTimerTimeLeft,
                     pauseWhenSongEnd = playerConnection.service.sleepTimer?.pauseWhenSongEnd == true,
+                    sleepTimerSongsLeft = playerConnection.service.sleepTimer?.songsLeft ?: 0,
                     initialMinutes = sleepTimerDefault,
                     onDismiss = { showSleepTimerDialog = false },
                     onStart = { minutes ->
@@ -551,6 +552,10 @@ fun Queue(
                     onStartEndOfSong = {
                         showSleepTimerDialog = false
                         playerConnection.service.sleepTimer?.start(minute = -1)
+                    },
+                    onStartAfterSongs = { count ->
+                        showSleepTimerDialog = false
+                        playerConnection.service.sleepTimer?.startAfterSongs(count)
                     },
                     onClear = { playerConnection.service.sleepTimer?.clear() },
                 )

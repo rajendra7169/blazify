@@ -7,15 +7,18 @@ package com.blazify.music.ui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -30,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,8 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -56,13 +62,16 @@ fun BlazeSleepTimerDialog(
     sleepTimerEnabled: Boolean,
     sleepTimerTimeLeft: Long,
     pauseWhenSongEnd: Boolean,
+    sleepTimerSongsLeft: Int = 0,
     initialMinutes: Float,
     onDismiss: () -> Unit,
     onStart: (Int) -> Unit,
     onStartEndOfSong: () -> Unit,
+    onStartAfterSongs: (Int) -> Unit = {},
     onClear: () -> Unit,
 ) {
     var sleepTimerValue by remember { mutableFloatStateOf(initialMinutes) }
+    var songCount by remember { mutableIntStateOf(1) }
     val accent = MaterialTheme.colorScheme.primary
 
     AlertDialog(
@@ -91,7 +100,7 @@ fun BlazeSleepTimerDialog(
                     val selectedMinutes = sleepTimerValue.roundToInt()
                     Text(
                         text = String.format("%02d:%02d:00", selectedMinutes / 60, selectedMinutes % 60),
-                        fontSize = 44.sp,
+                        fontSize = 34.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp,
                     )
@@ -139,20 +148,59 @@ fun BlazeSleepTimerDialog(
                         }
                     }
 
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(10.dp))
 
-                    OutlinedButton(
-                        onClick = onStartEndOfSong,
-                        shape = RoundedCornerShape(28.dp),
-                        border = BorderStroke(2.dp, accent),
+                    // End of song (left) · sleep-after-N-songs stepper (right)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = stringResource(R.string.end_of_song),
-                            fontWeight = FontWeight.Bold,
-                        )
+                        OutlinedButton(
+                            onClick = onStartEndOfSong,
+                            shape = RoundedCornerShape(24.dp),
+                            border = BorderStroke(2.dp, accent),
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(46.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.end_of_song),
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(46.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .border(2.dp, accent, RoundedCornerShape(24.dp))
+                                .padding(horizontal = 2.dp),
+                        ) {
+                            StepButton(R.drawable.remove, accent) {
+                                songCount = (songCount - 1).coerceAtLeast(1)
+                            }
+                            Text(
+                                text = pluralStringResource(R.plurals.n_song, songCount, songCount),
+                                fontWeight = FontWeight.Bold,
+                                color = accent,
+                                maxLines = 1,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .clickable { onStartAfterSongs(songCount) }
+                                    .padding(vertical = 8.dp),
+                            )
+                            StepButton(R.drawable.add, accent) { songCount++ }
+                        }
                     }
 
-                    Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(14.dp))
 
                     Row(modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(
@@ -162,7 +210,7 @@ fun BlazeSleepTimerDialog(
                             modifier =
                                 Modifier
                                     .weight(1f)
-                                    .height(54.dp),
+                                    .height(46.dp),
                         ) {
                             Text(
                                 text = stringResource(android.R.string.cancel).uppercase(),
@@ -170,7 +218,7 @@ fun BlazeSleepTimerDialog(
                             )
                         }
 
-                        Spacer(Modifier.width(24.dp))
+                        Spacer(Modifier.width(12.dp))
 
                         Button(
                             onClick = { onStart(sleepTimerValue.roundToInt()) },
@@ -182,7 +230,7 @@ fun BlazeSleepTimerDialog(
                             modifier =
                                 Modifier
                                     .weight(1f)
-                                    .height(54.dp),
+                                    .height(46.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.sleep_timer_start),
@@ -193,12 +241,14 @@ fun BlazeSleepTimerDialog(
                 } else {
                     Text(
                         text =
-                            if (pauseWhenSongEnd) {
+                            if (sleepTimerSongsLeft > 0) {
+                                pluralStringResource(R.plurals.n_song, sleepTimerSongsLeft, sleepTimerSongsLeft)
+                            } else if (pauseWhenSongEnd) {
                                 stringResource(R.string.end_of_song)
                             } else {
                                 makeTimeString(sleepTimerTimeLeft)
                             },
-                        fontSize = 44.sp,
+                        fontSize = 34.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp,
                     )
@@ -216,7 +266,7 @@ fun BlazeSleepTimerDialog(
                             modifier =
                                 Modifier
                                     .weight(1f)
-                                    .height(54.dp),
+                                    .height(46.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.sleep_timer_end),
@@ -224,7 +274,7 @@ fun BlazeSleepTimerDialog(
                             )
                         }
 
-                        Spacer(Modifier.width(24.dp))
+                        Spacer(Modifier.width(12.dp))
 
                         Button(
                             onClick = {
@@ -240,7 +290,7 @@ fun BlazeSleepTimerDialog(
                             modifier =
                                 Modifier
                                     .weight(1f)
-                                    .height(54.dp),
+                                    .height(46.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.sleep_timer_reset),
@@ -252,4 +302,22 @@ fun BlazeSleepTimerDialog(
             }
         },
     )
+}
+
+@Composable
+private fun StepButton(iconRes: Int, tint: Color, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .clip(RoundedCornerShape(50))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(18.dp),
+        )
+    }
 }
