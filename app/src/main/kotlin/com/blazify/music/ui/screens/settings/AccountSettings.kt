@@ -80,7 +80,8 @@ import com.blazify.music.viewmodels.HomeViewModel
 fun AccountSettings(
     navController: NavController,
     onClose: () -> Unit,
-    latestVersionName: String
+    latestVersionName: String,
+    showSettings: Boolean = true,
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -381,6 +382,20 @@ fun AccountSettings(
                 .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             PreferenceEntry(
+                title = { Text(stringResource(R.string.together)) },
+                icon = { Icon(painterResource(R.drawable.group_outlined), null) },
+                onClick = {
+                    onClose()
+                    navController.navigate("listen_together_from_topbar")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            PreferenceEntry(
                 title = { Text(stringResource(R.string.integrations)) },
                 icon = { Icon(painterResource(R.drawable.integration), null) },
                 onClick = {
@@ -394,29 +409,31 @@ fun AccountSettings(
 
             Spacer(Modifier.height(4.dp))
 
-            PreferenceEntry(
-                title = { Text(stringResource(R.string.settings)) },
-                icon = {
-                    BadgedBox(
-                        badge = {
-                            if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
-                                Badge()
+            if (showSettings) {
+                PreferenceEntry(
+                    title = { Text(stringResource(R.string.settings)) },
+                    icon = {
+                        BadgedBox(
+                            badge = {
+                                if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
+                                    Badge()
+                                }
                             }
+                        ) {
+                            Icon(painterResource(R.drawable.settings), contentDescription = null)
                         }
-                    ) {
-                        Icon(painterResource(R.drawable.settings), contentDescription = null)
-                    }
-                },
-                onClick = {
-                    onClose()
-                    navController.navigate("settings")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-            )
+                    },
+                    onClick = {
+                        onClose()
+                        navController.navigate("settings")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                )
 
-            Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(4.dp))
+            }
 
             if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
                 val releaseInfo = Updater.getCachedLatestRelease()

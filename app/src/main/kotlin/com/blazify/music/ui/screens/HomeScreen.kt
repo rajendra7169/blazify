@@ -696,6 +696,7 @@ fun HomeScreen(
         AccountSettingsDialog(
             onDismiss = { showAccountDialog = false },
             latestVersionName = BuildConfig.VERSION_NAME,
+            showSettings = false,
         )
     }
     val url = if (isLoggedIn) accountImageUrl else null

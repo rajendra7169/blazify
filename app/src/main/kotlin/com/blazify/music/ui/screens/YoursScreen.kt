@@ -82,6 +82,8 @@ fun YoursScreen(
     val favoriteArtists by viewModel.favoriteArtists.collectAsStateWithLifecycle()
     val accountPlaylists by viewModel.accountPlaylists.collectAsStateWithLifecycle()
     val moodAndGenres by viewModel.moodAndGenres.collectAsStateWithLifecycle()
+    val trendingSongs by viewModel.trendingSongs.collectAsStateWithLifecycle()
+    val trendingArtists by viewModel.trendingArtists.collectAsStateWithLifecycle()
 
     val seed = MaterialTheme.colorScheme.primary
 
@@ -223,6 +225,63 @@ fun YoursScreen(
                                 navController.navigate("online_playlist/${playlist.id.removePrefix("VL")}")
                             },
                         )
+                    }
+                }
+            }
+        }
+
+        // ---- Trending (most-played songs + artists, interleaved) ----
+        if (trendingSongs.isNotEmpty() || trendingArtists.isNotEmpty()) {
+            item("trending_header") {
+                BlazeSectionHeader(
+                    title = stringResource(R.string.trending),
+                    onSeeMore = { navController.navigate("stats") },
+                )
+            }
+            item("trending_rail") {
+                val railTitle = stringResource(R.string.trending)
+                val songsWord = stringResource(R.string.songs).lowercase()
+                // Interleave: song, artist, song, artist …
+                val mixed = buildList {
+                    val n = maxOf(trendingSongs.size, trendingArtists.size)
+                    for (i in 0 until n) {
+                        trendingSongs.getOrNull(i)?.let { add(it) }
+                        trendingArtists.getOrNull(i)?.let { add(it) }
+                    }
+                }
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(
+                        mixed,
+                        key = { item ->
+                            when (item) {
+                                is com.blazify.music.db.entities.Song -> "t_song_${item.id}"
+                                is com.blazify.music.db.entities.Artist -> "t_artist_${item.id}"
+                                else -> item.hashCode()
+                            }
+                        },
+                    ) { item ->
+                        when (item) {
+                            is com.blazify.music.db.entities.Song -> BlazeMusicCard(
+                                title = item.title,
+                                subtitle = item.artists.joinToString { it.name },
+                                thumbnailUrl = item.thumbnailUrl,
+                                onClick = {
+                                    playSongsAt(railTitle, trendingSongs, trendingSongs.indexOf(item).coerceAtLeast(0))
+                                },
+                            )
+                            is com.blazify.music.db.entities.Artist -> BlazeMusicCard(
+                                title = item.title,
+                                subtitle = if (item.songCount > 0) "${item.songCount} $songsWord" else "",
+                                thumbnailUrl = item.thumbnailUrl,
+                                isCircular = true,
+                                fallbackIcon = R.drawable.artist,
+                                onClick = { navController.navigate("artist/${item.id}") },
+                            )
+                            else -> {}
+                        }
                     }
                 }
             }

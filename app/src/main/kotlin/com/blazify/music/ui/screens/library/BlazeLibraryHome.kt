@@ -59,6 +59,11 @@ fun BlazeLibraryHome(
     val cachedThumbs by viewModel.cachedThumbnails.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
 
+    // Featured user playlists surfaced as system-style cards (by name).
+    val weeklyMost = playlists.firstOrNull { it.title.contains("weekly most", ignoreCase = true) }
+    val monthlyMost = playlists.firstOrNull { it.title.contains("monthly most", ignoreCase = true) }
+    val userPlaylists = playlists.filter { it !== weeklyMost && it !== monthlyMost }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
@@ -78,6 +83,56 @@ fun BlazeLibraryHome(
                     aspectRatio = LONG_RATIO,
                     iconRes = R.drawable.favorite,
                     onClick = { navController.navigate("auto_playlist/liked") },
+                )
+            }
+        }
+        if (weeklyMost != null || monthlyMost != null) {
+            item("weekly_monthly") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    if (weeklyMost != null) {
+                        BlazePlaylistCard(
+                            title = weeklyMost.title,
+                            subtitle = "${weeklyMost.songCount} $songsWord",
+                            thumbnails = weeklyMost.thumbnails.take(4),
+                            seedColor = Color(0xFFC2185B),
+                            aspectRatio = BOX_RATIO,
+                            onClick = { navController.navigate("local_playlist/${weeklyMost.id}") },
+                            modifier = Modifier.weight(1f),
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                    if (monthlyMost != null) {
+                        BlazePlaylistCard(
+                            title = monthlyMost.title,
+                            subtitle = "${monthlyMost.songCount} $songsWord",
+                            thumbnails = monthlyMost.thumbnails.take(4),
+                            seedColor = Color(0xFF512DA8),
+                            aspectRatio = BOX_RATIO,
+                            onClick = { navController.navigate("local_playlist/${monthlyMost.id}") },
+                            modifier = Modifier.weight(1f),
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+        item("top") {
+            LongPad {
+                BlazePlaylistCard(
+                    title = stringResource(R.string.your_top_50),
+                    subtitle = "",
+                    thumbnails = topThumbs,
+                    seedColor = Color(0xFFEF6C00),
+                    aspectRatio = LONG_RATIO,
+                    iconRes = R.drawable.trending_up,
+                    onClick = { navController.navigate("top_playlist/50") },
                 )
             }
         }
@@ -110,19 +165,6 @@ fun BlazeLibraryHome(
                 )
             }
         }
-        item("top") {
-            LongPad {
-                BlazePlaylistCard(
-                    title = stringResource(R.string.your_top_50),
-                    subtitle = "",
-                    thumbnails = topThumbs,
-                    seedColor = Color(0xFFEF6C00),
-                    aspectRatio = LONG_RATIO,
-                    iconRes = R.drawable.trending_up,
-                    onClick = { navController.navigate("top_playlist/50") },
-                )
-            }
-        }
         item("uploaded") {
             LongPad {
                 BlazePlaylistCard(
@@ -138,12 +180,12 @@ fun BlazeLibraryHome(
         }
 
         // ---- Created by you ----
-        if (playlists.isNotEmpty()) {
+        if (userPlaylists.isNotEmpty()) {
             item("cby_head") {
                 Spacer(Modifier.height(8.dp))
                 BlazeSectionHeader(stringResource(R.string.created_by_you))
             }
-            itemsIndexed(playlists.chunked(2), key = { _, row -> "cby_${row.first().id}" }) { rowIndex, rowItems ->
+            itemsIndexed(userPlaylists.chunked(2), key = { _, row -> "cby_${row.first().id}" }) { rowIndex, rowItems ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

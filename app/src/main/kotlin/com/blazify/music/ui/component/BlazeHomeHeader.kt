@@ -97,7 +97,7 @@ fun BlazeHomeHeader(
                     text = "Blazify",
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    letterSpacing = 3.sp,
                     maxLines = 1,
                     style = androidx.compose.ui.text.TextStyle(
                         brush = if (isDark) {

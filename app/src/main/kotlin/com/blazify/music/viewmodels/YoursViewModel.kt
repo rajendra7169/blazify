@@ -75,6 +75,14 @@ class YoursViewModel @Inject constructor(
     // Cached covers: scanned once from the player/download caches.
     val cachedThumbnails = MutableStateFlow<List<String>>(emptyList())
 
+    // Trending = most-played songs & artists (drives the Yours "Trending" rail).
+    val trendingSongs = database
+        .mostPlayedSongs(fromTimeStamp = java.time.LocalDateTime.of(1970, 1, 1, 0, 0), limit = 12)
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val trendingArtists = database
+        .mostPlayedArtists(fromTimeStamp = java.time.LocalDateTime.of(1970, 1, 1, 0, 0), limit = 12)
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
     // Local playlists, most-recently-updated first.
     val playlists: kotlinx.coroutines.flow.StateFlow<List<Playlist>> =
         database.playlistsByUpdatedDateAsc()
