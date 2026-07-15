@@ -23,10 +23,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.blazify.music.ui.theme.BlazeGradientEnd
+import com.blazify.music.ui.theme.BlazeThemeColor
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -278,39 +283,43 @@ fun BlazePlaylistCard(
     seedColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    aspectRatio: Float = 1.6f,
     @DrawableRes iconRes: Int? = null,
 ) {
+    val hasArt = thumbnails.any { it.isNotEmpty() }
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(1.6f)
+            .aspectRatio(aspectRatio)
             .clip(RoundedCornerShape(18.dp))
             .background(seedColor)
             .clickable(onClick = onClick),
     ) {
-        // Artwork on the right half.
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .fillMaxWidth(0.5f),
-        ) {
-            PlaylistArtwork(thumbnails)
-        }
-        // Left→right gradient blends artwork into the card colour.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        0.0f to seedColor,
-                        0.45f to seedColor,
-                        0.62f to seedColor.copy(alpha = 0.88f),
-                        0.78f to seedColor.copy(alpha = 0.5f),
-                        1.0f to seedColor.copy(alpha = 0.05f),
+        if (hasArt) {
+            // Artwork on the right half.
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.5f),
+            ) {
+                PlaylistArtwork(thumbnails)
+            }
+            // Left→right gradient blends artwork into the card colour.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            0.0f to seedColor,
+                            0.45f to seedColor,
+                            0.62f to seedColor.copy(alpha = 0.88f),
+                            0.78f to seedColor.copy(alpha = 0.5f),
+                            1.0f to seedColor.copy(alpha = 0.05f),
+                        ),
                     ),
-                ),
-        )
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -338,11 +347,11 @@ fun BlazePlaylistCard(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
-                tint = Color.White,
+                tint = Color.White.copy(alpha = if (hasArt) 1f else 0.92f),
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(12.dp)
-                    .size(22.dp),
+                    .align(if (hasArt) Alignment.TopEnd else Alignment.BottomEnd)
+                    .padding(14.dp)
+                    .size(if (hasArt) 22.dp else 34.dp),
             )
         }
     }
@@ -457,6 +466,51 @@ private fun BlazeCategoryTile(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+    }
+}
+
+/**
+ * Horizontal amber pill filter chips (Library / search-style filters). The
+ * selected chip fills with the Blaze amber→orange gradient.
+ */
+@Composable
+fun <T> BlazeFilterChips(
+    chips: List<Pair<T, String>>,
+    currentValue: T,
+    onSelect: (T) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(chips) { (value, label) ->
+            val selected = value == currentValue
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .then(
+                        if (selected) {
+                            Modifier.background(
+                                Brush.linearGradient(listOf(BlazeThemeColor, BlazeGradientEnd)),
+                            )
+                        } else {
+                            Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                        },
+                    )
+                    .clickable { onSelect(value) }
+                    .padding(horizontal = 16.dp, vertical = 9.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = label,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (selected) Color(0xFF241500) else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

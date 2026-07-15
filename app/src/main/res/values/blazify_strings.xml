@@ -1042,4 +1042,8 @@
     <string name="coffee_dialog_subtitle">Scan the code to support Blazify</string>
     <string name="made_with_love">Made with ❤️ by Rajendra Pandey</string>
     <string name="arrange">Arrange</string>
+    <!-- Library redesign -->
+    <string name="created_by_you">Created by you</string>
+    <string name="artists_you_liked">Artists you liked</string>
+    <string name="your_top_50">Your Top 50</string>
 </resources>
