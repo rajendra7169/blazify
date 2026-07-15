@@ -47,6 +47,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -62,8 +65,6 @@ import com.blazify.music.BuildConfig
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
 import com.blazify.music.ui.component.IconButton
-import com.blazify.music.ui.theme.BlazeGradientEnd
-import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.ui.utils.backToMain
 import java.util.Locale
 
@@ -92,13 +93,16 @@ fun AboutScreen(
         Spacer(Modifier.windowInsetsPadding(windowInsets.only(WindowInsetsSides.Top)))
         Spacer(Modifier.height(16.dp))
 
-        // ---- Brand hero (amber gradient) ----
+        // ---- Brand hero (theme-aware gradient) ----
+        val heroStart = MaterialTheme.colorScheme.primary
+        val heroEnd = lerp(heroStart, Color.Black, 0.24f)
+        val onHero = if (heroStart.luminance() > 0.6f) Color.Black else Color.White
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(32.dp))
                 .background(
-                    Brush.linearGradient(listOf(BlazeThemeColor, BlazeGradientEnd)),
+                    Brush.linearGradient(listOf(heroStart, heroEnd)),
                 )
                 .padding(vertical = 32.dp),
             contentAlignment = Alignment.Center,
@@ -107,6 +111,7 @@ fun AboutScreen(
                 Image(
                     painter = painterResource(R.drawable.blaze_logo_white),
                     contentDescription = null,
+                    colorFilter = ColorFilter.tint(onHero),
                     modifier = Modifier.size(88.dp),
                 )
                 Spacer(Modifier.height(12.dp))
@@ -117,14 +122,14 @@ fun AboutScreen(
                     text = blazifyName,
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Black,
-                    color = Color.White,
+                    color = onHero,
                     letterSpacing = (-0.5).sp,
                 )
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HeroChip(BuildConfig.VERSION_NAME)
-                    HeroChip("STABLE")
-                    if (BuildConfig.DEBUG) HeroChip("DEBUG")
+                    HeroChip(BuildConfig.VERSION_NAME, onHero)
+                    HeroChip("STABLE", onHero)
+                    if (BuildConfig.DEBUG) HeroChip("DEBUG", onHero)
                 }
             }
         }
@@ -208,8 +213,8 @@ fun AboutScreen(
                         .height(52.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = BlazeThemeColor,
-                        contentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                 ) {
                     Icon(
@@ -262,16 +267,16 @@ fun AboutScreen(
 }
 
 @Composable
-private fun HeroChip(text: String) {
+private fun HeroChip(text: String, ink: Color = Color.White) {
     Surface(
         shape = RoundedCornerShape(8.dp),
-        color = Color.White.copy(alpha = 0.22f),
+        color = ink.copy(alpha = 0.22f),
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = ink,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
     }

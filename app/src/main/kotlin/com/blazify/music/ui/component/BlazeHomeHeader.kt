@@ -31,7 +31,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -120,7 +123,11 @@ fun BlazeHomeHeader(
 
         Spacer(Modifier.height(8.dp))
 
-        // Greeting card: gradient background, text left, hero image overflowing the top
+        // Greeting card: theme-aware gradient (follows the dynamic album-art
+        // colour), text left, hero image overflowing the top.
+        val cardStart = MaterialTheme.colorScheme.primary
+        val cardEnd = lerp(cardStart, Color.Black, if (isDark) 0.30f else 0.20f)
+        val onCard = if (cardStart.luminance() > 0.6f) Color.Black else Color.White
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -133,13 +140,7 @@ fun BlazeHomeHeader(
                     .height(160.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(
-                        Brush.linearGradient(
-                            colors = if (isDark) {
-                                listOf(Color(0xFFFFA726), Color(0xFFFF8F00))
-                            } else {
-                                listOf(Color(0xFFFFA726), Color(0xFFFF7043))
-                            },
-                        ),
+                        Brush.linearGradient(listOf(cardStart, cardEnd)),
                     ),
             )
 
@@ -152,7 +153,7 @@ fun BlazeHomeHeader(
             ) {
                 Text(
                     text = greeting(),
-                    color = Color.White,
+                    color = onCard,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.3.sp,
@@ -161,7 +162,7 @@ fun BlazeHomeHeader(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     text = userName,
-                    color = Color.White.copy(alpha = 0.95f),
+                    color = onCard.copy(alpha = 0.95f),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.3.sp,
@@ -171,7 +172,7 @@ fun BlazeHomeHeader(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     text = "Enjoy the music 🎵",
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = onCard.copy(alpha = 0.85f),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 0.2.sp,

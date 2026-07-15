@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.blazify.music.R
-import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.utils.makeTimeString
 import kotlin.math.roundToInt
 
@@ -64,6 +63,7 @@ fun BlazeSleepTimerDialog(
     onClear: () -> Unit,
 ) {
     var sleepTimerValue by remember { mutableFloatStateOf(initialMinutes) }
+    val accent = MaterialTheme.colorScheme.primary
 
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -72,7 +72,7 @@ fun BlazeSleepTimerDialog(
             Icon(
                 painter = painterResource(R.drawable.bedtime),
                 contentDescription = null,
-                tint = BlazeThemeColor,
+                tint = accent,
             )
         },
         title = {
@@ -102,8 +102,8 @@ fun BlazeSleepTimerDialog(
                         valueRange = 5f..120f,
                         steps = (120 - 5) / 5 - 1,
                         colors = SliderDefaults.colors(
-                            thumbColor = BlazeThemeColor,
-                            activeTrackColor = BlazeThemeColor,
+                            thumbColor = accent,
+                            activeTrackColor = accent,
                             activeTickColor = Color.Transparent,
                             inactiveTickColor = Color.Transparent,
                         ),
@@ -122,7 +122,7 @@ fun BlazeSleepTimerDialog(
                                     Modifier
                                         .clip(RoundedCornerShape(18.dp))
                                         .background(
-                                            if (selected) BlazeThemeColor
+                                            if (selected) accent
                                             else MaterialTheme.colorScheme.surfaceContainerHighest,
                                         )
                                         .clickable { sleepTimerValue = minutes.toFloat() }
@@ -144,7 +144,7 @@ fun BlazeSleepTimerDialog(
                     OutlinedButton(
                         onClick = onStartEndOfSong,
                         shape = RoundedCornerShape(28.dp),
-                        border = BorderStroke(2.dp, BlazeThemeColor),
+                        border = BorderStroke(2.dp, accent),
                     ) {
                         Text(
                             text = stringResource(R.string.end_of_song),
@@ -158,7 +158,7 @@ fun BlazeSleepTimerDialog(
                         OutlinedButton(
                             onClick = onDismiss,
                             shape = RoundedCornerShape(28.dp),
-                            border = BorderStroke(2.dp, BlazeThemeColor),
+                            border = BorderStroke(2.dp, accent),
                             modifier =
                                 Modifier
                                     .weight(1f)
@@ -176,7 +176,7 @@ fun BlazeSleepTimerDialog(
                             onClick = { onStart(sleepTimerValue.roundToInt()) },
                             shape = RoundedCornerShape(28.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = BlazeThemeColor,
+                                containerColor = accent,
                                 contentColor = Color.White,
                             ),
                             modifier =
@@ -212,7 +212,7 @@ fun BlazeSleepTimerDialog(
                                 onDismiss()
                             },
                             shape = RoundedCornerShape(28.dp),
-                            border = BorderStroke(2.dp, BlazeThemeColor),
+                            border = BorderStroke(2.dp, accent),
                             modifier =
                                 Modifier
                                     .weight(1f)
@@ -234,7 +234,7 @@ fun BlazeSleepTimerDialog(
                             },
                             shape = RoundedCornerShape(28.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = BlazeThemeColor,
+                                containerColor = accent,
                                 contentColor = Color.White,
                             ),
                             modifier =

@@ -63,7 +63,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blazify.music.db.entities.SearchHistory
-import com.blazify.music.ui.theme.BlazeThemeColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.blazify.music.LocalNavController
 import com.blazify.innertube.models.AlbumItem
@@ -731,10 +730,10 @@ private fun RecentSearchChip(
             Modifier
                 .height(38.dp)
                 .clip(RoundedCornerShape(percent = 50))
-                .background(BlazeThemeColor.copy(alpha = 0.12f))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                 .border(
                     width = 1.dp,
-                    color = BlazeThemeColor.copy(alpha = 0.40f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.40f),
                     shape = RoundedCornerShape(percent = 50),
                 )
                 .clickable(onClick = onClick)
