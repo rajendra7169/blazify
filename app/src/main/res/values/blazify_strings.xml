@@ -1035,4 +1035,10 @@
     <string name="downloads">Downloads</string>
     <string name="no_recently_played">No recently played songs yet.</string>
     <string name="no_recommendations">No recommendations yet.</string>
+    <!-- About page -->
+    <string name="about_developer_role">Developer</string>
+    <string name="about_me_body">I\'m Rajendra Pandey, an independent app developer from Nepal who loves turning ideas into polished, everyday experiences. Blazify is my take on music streaming — fast, beautiful and personal — crafted from the ground up with Kotlin and Jetpack Compose. I care about the little details that make an app feel effortless, and I\'m always tinkering to make it better. Thanks for being here and letting my work be part of your day.</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
+    <string name="coffee_dialog_subtitle">Scan the code to support Blazify</string>
+    <string name="made_with_love">Made with ❤️ by Rajendra Pandey</string>
 </resources>
