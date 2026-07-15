@@ -180,12 +180,13 @@ fun BlazeGradientCard(
     seedColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    width: Dp = 160.dp,
     height: Dp = 160.dp,
     @DrawableRes iconRes: Int? = null,
 ) {
     Box(
         modifier = modifier
-            .width(160.dp)
+            .width(width)
             .height(height)
             .clip(RoundedCornerShape(16.dp))
             .background(seedColor)
@@ -237,7 +238,8 @@ fun BlazeGradientCard(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = onSeed,
-                maxLines = 1,
+                maxLines = 2,
+                lineHeight = 19.sp,
                 overflow = TextOverflow.Ellipsis,
             )
             if (subtitle.isNotEmpty()) {
@@ -254,8 +256,8 @@ fun BlazeGradientCard(
         if (iconRes != null) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
+                    .align(Alignment.TopEnd)
+                    .padding(14.dp),
             ) {
                 // Soft drop shadow behind the glyph.
                 Icon(

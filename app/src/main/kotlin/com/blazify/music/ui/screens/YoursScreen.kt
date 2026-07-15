@@ -251,7 +251,8 @@ fun YoursScreen(
                             subtitle = "",
                             thumbnailUrl = null,
                             seedColor = Color(mood.stripeColor or 0xFF000000L),
-                            height = 190.dp,
+                            width = 138.dp,
+                            height = 208.dp,
                             iconRes = MoodIcons[index % MoodIcons.size],
                             onClick = {
                                 navController.navigate(
