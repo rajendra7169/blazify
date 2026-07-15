@@ -7,10 +7,13 @@ package com.blazify.music.ui.screens.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,11 +24,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -49,9 +57,13 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.blazify.music.db.entities.SearchHistory
+import com.blazify.music.ui.theme.BlazeThemeColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.blazify.music.LocalNavController
 import com.blazify.innertube.models.AlbumItem
@@ -375,25 +387,48 @@ fun OnlineSearchScreen(
             }
         }
 
-        items(viewState.history, key = { "history_${it.query}" }) { history ->
-            SuggestionItem(
-                query = history.query,
-                online = false,
-                onClick = {
-                    onSearch(history.query)
-                    onDismiss()
-                },
-                onDelete = {
-                    database.query {
-                        delete(history)
-                    }
-                },
-                onFillTextField = {
-                    onQueryChange(TextFieldValue(history.query, TextRange(history.query.length)))
-                },
-                modifier = Modifier.animateItem(),
-                pureBlack = pureBlack,
-            )
+        // Blazify: when the box is empty, show recent searches as a horizontal
+        // "Recent Searches" chip rail (ported from the Flutter app). While typing,
+        // fall back to the standard vertical history rows.
+        if (query.isEmpty()) {
+            if (viewState.history.isNotEmpty()) {
+                item(key = "recent_searches_rail") {
+                    RecentSearchesRail(
+                        history = viewState.history,
+                        onSearch = {
+                            onSearch(it)
+                            onDismiss()
+                        },
+                        onDelete = { history ->
+                            database.query {
+                                delete(history)
+                            }
+                        },
+                        modifier = Modifier.animateItem(),
+                    )
+                }
+            }
+        } else {
+            items(viewState.history, key = { "history_${it.query}" }) { history ->
+                SuggestionItem(
+                    query = history.query,
+                    online = false,
+                    onClick = {
+                        onSearch(history.query)
+                        onDismiss()
+                    },
+                    onDelete = {
+                        database.query {
+                            delete(history)
+                        }
+                    },
+                    onFillTextField = {
+                        onQueryChange(TextFieldValue(history.query, TextRange(history.query.length)))
+                    },
+                    modifier = Modifier.animateItem(),
+                    pureBlack = pureBlack,
+                )
+            }
         }
 
         items(viewState.suggestions, key = { "suggestion_$it" }) { query ->
@@ -635,6 +670,98 @@ fun OnlineSearchScreen(
                             },
                         ).background(if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface)
                         .animateItem(),
+            )
+        }
+    }
+}
+
+/**
+ * Blazify: horizontal "Recent Searches" rail shown when the search box is empty.
+ * Ported from the Flutter reference app — recent queries render as amber Blaze
+ * chips; tapping a chip runs the search, the ✕ removes it from history.
+ */
+@Composable
+fun RecentSearchesRail(
+    history: List<SearchHistory>,
+    onSearch: (String) -> Unit,
+    onDelete: (SearchHistory) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
+    ) {
+        Text(
+            text = stringResource(R.string.recent_searches),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            items(history.take(10), key = { "recent_chip_${it.query}" }) { entry ->
+                RecentSearchChip(
+                    query = entry.query,
+                    onClick = { onSearch(entry.query) },
+                    onDelete = { onDelete(entry) },
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun RecentSearchChip(
+    query: String,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier
+                .height(38.dp)
+                .clip(RoundedCornerShape(percent = 50))
+                .background(BlazeThemeColor.copy(alpha = 0.12f))
+                .border(
+                    width = 1.dp,
+                    color = BlazeThemeColor.copy(alpha = 0.40f),
+                    shape = RoundedCornerShape(percent = 50),
+                )
+                .clickable(onClick = onClick)
+                .padding(start = 16.dp, end = 8.dp),
+    ) {
+        Text(
+            text = query,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.widthIn(max = 200.dp),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .padding(start = 6.dp)
+                    .size(20.dp)
+                    .clip(RoundedCornerShape(percent = 50))
+                    .clickable(onClick = onDelete),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.close),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.size(16.dp),
             )
         }
     }
