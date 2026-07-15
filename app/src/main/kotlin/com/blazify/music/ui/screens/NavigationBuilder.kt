@@ -34,7 +34,6 @@ import com.blazify.music.ui.screens.equalizer.wizard.WizardScreen
 import com.blazify.music.R
 import com.blazify.music.ui.screens.library.LibraryAlbumsScreen
 import com.blazify.music.ui.screens.library.LibraryArtistsScreen
-import com.blazify.music.ui.screens.library.LibraryPlaylistsScreen
 import com.blazify.music.ui.screens.library.LibraryScreen
 import com.blazify.music.ui.screens.library.LibrarySongsScreen
 import com.blazify.music.ui.screens.playlist.AutoPlaylistScreen
@@ -111,7 +110,7 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("yours/playlists") {
         YoursCategoryScreen(navController, R.string.playlists) {
-            LibraryPlaylistsScreen(navController, filterContent = {})
+            YoursPlaylistsGrid(navController)
         }
     }
     composable("yours/songs") {

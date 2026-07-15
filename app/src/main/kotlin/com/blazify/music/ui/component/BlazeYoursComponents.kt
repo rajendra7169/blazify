@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -251,6 +252,131 @@ fun BlazeGradientCard(
             )
         }
     }
+}
+
+/** Blaze palette cycled across playlist cards (BlazePlayer-style). */
+val BlazePlaylistPalette = listOf(
+    Color(0xFFB71C5A), // magenta
+    Color(0xFF00838F), // teal
+    Color(0xFF283593), // indigo
+    Color(0xFF8D6E63), // brown
+    Color(0xFF6A1B9A), // purple
+    Color(0xFFEF6C00), // deep orange
+)
+
+/**
+ * Wide playlist card ported from BlazePlayer: a coloured tile with the artwork
+ * (single or 2x2 collage) filling the right half, blended into the card colour
+ * by a left→right gradient, title + subtitle on the coloured left, an optional
+ * glyph top-right.
+ */
+@Composable
+fun BlazePlaylistCard(
+    title: String,
+    subtitle: String,
+    thumbnails: List<String>,
+    seedColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int? = null,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1.6f)
+            .clip(RoundedCornerShape(18.dp))
+            .background(seedColor)
+            .clickable(onClick = onClick),
+    ) {
+        // Artwork on the right half.
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .fillMaxWidth(0.5f),
+        ) {
+            PlaylistArtwork(thumbnails)
+        }
+        // Left→right gradient blends artwork into the card colour.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.horizontalGradient(
+                        0.0f to seedColor,
+                        0.45f to seedColor,
+                        0.62f to seedColor.copy(alpha = 0.88f),
+                        0.78f to seedColor.copy(alpha = 0.5f),
+                        1.0f to seedColor.copy(alpha = 0.05f),
+                    ),
+                ),
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(0.66f),
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = subtitle,
+                fontSize = 12.sp,
+                color = Color.White.copy(alpha = 0.75f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        if (iconRes != null) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(12.dp)
+                    .size(22.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlaylistArtwork(thumbnails: List<String>) {
+    val urls = thumbnails.filter { it.isNotEmpty() }
+    when {
+        urls.size >= 4 -> {
+            Column(Modifier.fillMaxSize()) {
+                Row(Modifier.weight(1f).fillMaxWidth()) {
+                    ArtCell(urls[0], Modifier.weight(1f).fillMaxHeight())
+                    ArtCell(urls[1], Modifier.weight(1f).fillMaxHeight())
+                }
+                Row(Modifier.weight(1f).fillMaxWidth()) {
+                    ArtCell(urls[2], Modifier.weight(1f).fillMaxHeight())
+                    ArtCell(urls[3], Modifier.weight(1f).fillMaxHeight())
+                }
+            }
+        }
+        urls.isNotEmpty() -> ArtCell(urls[0], Modifier.fillMaxSize())
+        else -> Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.15f)))
+    }
+}
+
+@Composable
+private fun ArtCell(url: String, modifier: Modifier) {
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier,
+    )
 }
 
 /** A single browse-category entry for [BlazeCategoryGrid]. */

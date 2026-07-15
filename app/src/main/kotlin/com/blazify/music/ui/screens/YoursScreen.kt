@@ -22,6 +22,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +51,8 @@ import com.blazify.music.ui.component.BlazeCategory
 import com.blazify.music.ui.component.BlazeCategoryGrid
 import com.blazify.music.ui.component.BlazeGradientCard
 import com.blazify.music.ui.component.BlazeMusicCard
+import com.blazify.music.ui.component.BlazePlaylistCard
+import com.blazify.music.ui.component.BlazePlaylistPalette
 import com.blazify.music.ui.component.BlazeSectionHeader
 import com.blazify.music.viewmodels.YoursViewModel
 
@@ -273,6 +278,100 @@ fun YoursScreen(
 
         item("bottom_spacer") {
             Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+/**
+ * BlazePlayer-style playlists grid: wide colour+artwork gradient cards for
+ * Favorites, Downloads, your local playlists and (if signed in) your account
+ * playlists. Tapping opens the playlist's own detail page.
+ */
+@Composable
+fun YoursPlaylistsGrid(
+    navController: NavController,
+    viewModel: YoursViewModel = hiltViewModel(),
+) {
+    val playlists by viewModel.playlists.collectAsStateWithLifecycle()
+    val accountPlaylists by viewModel.accountPlaylists.collectAsStateWithLifecycle()
+    val likedSongs by viewModel.likedSongs.collectAsStateWithLifecycle()
+    val songsWord = stringResource(R.string.songs).lowercase()
+
+    data class PlaylistCard(
+        val title: String,
+        val subtitle: String,
+        val thumbnails: List<String>,
+        val iconRes: Int?,
+        val route: String,
+    )
+
+    val favLabel = stringResource(R.string.favorites)
+    val downloadsLabel = stringResource(R.string.downloads)
+    val cards = buildList {
+        add(
+            PlaylistCard(
+                title = favLabel,
+                subtitle = "${likedSongs.size} $songsWord",
+                thumbnails = likedSongs.mapNotNull { it.thumbnailUrl }.take(4),
+                iconRes = R.drawable.favorite,
+                route = "auto_playlist/liked",
+            ),
+        )
+        add(
+            PlaylistCard(
+                title = downloadsLabel,
+                subtitle = "",
+                thumbnails = emptyList(),
+                iconRes = R.drawable.download,
+                route = "auto_playlist/downloaded",
+            ),
+        )
+        playlists.forEach { pl ->
+            add(
+                PlaylistCard(
+                    title = pl.title,
+                    subtitle = "${pl.songCount} $songsWord",
+                    thumbnails = pl.thumbnails.take(4),
+                    iconRes = null,
+                    route = "local_playlist/${pl.id}",
+                ),
+            )
+        }
+        accountPlaylists.orEmpty().forEach { pl ->
+            add(
+                PlaylistCard(
+                    title = pl.title,
+                    subtitle = pl.songCountText ?: "",
+                    thumbnails = listOfNotNull(pl.thumbnail),
+                    iconRes = null,
+                    route = "online_playlist/${pl.id.removePrefix("VL")}",
+                ),
+            )
+        }
+    }
+
+    val insets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = insets.calculateTopPadding() + 8.dp,
+            bottom = insets.calculateBottomPadding() + 8.dp,
+        ),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        gridItemsIndexed(cards, key = { _, c -> c.route }) { index, card ->
+            BlazePlaylistCard(
+                title = card.title,
+                subtitle = card.subtitle,
+                thumbnails = card.thumbnails,
+                seedColor = BlazePlaylistPalette[index % BlazePlaylistPalette.size],
+                iconRes = card.iconRes,
+                onClick = { navController.navigate(card.route) },
+            )
         }
     }
 }
