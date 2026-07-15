@@ -294,7 +294,6 @@ fun YoursPlaylistsGrid(
 ) {
     val playlists by viewModel.playlists.collectAsStateWithLifecycle()
     val accountPlaylists by viewModel.accountPlaylists.collectAsStateWithLifecycle()
-    val likedSongs by viewModel.likedSongs.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
 
     data class PlaylistCard(
@@ -305,27 +304,9 @@ fun YoursPlaylistsGrid(
         val route: String,
     )
 
-    val favLabel = stringResource(R.string.favorites)
-    val downloadsLabel = stringResource(R.string.downloads)
+    // Favorites & Downloads intentionally excluded here — they are their own
+    // browse-category tiles; this grid shows real playlists only.
     val cards = buildList {
-        add(
-            PlaylistCard(
-                title = favLabel,
-                subtitle = "${likedSongs.size} $songsWord",
-                thumbnails = likedSongs.mapNotNull { it.thumbnailUrl }.take(4),
-                iconRes = R.drawable.favorite,
-                route = "auto_playlist/liked",
-            ),
-        )
-        add(
-            PlaylistCard(
-                title = downloadsLabel,
-                subtitle = "",
-                thumbnails = emptyList(),
-                iconRes = R.drawable.download,
-                route = "auto_playlist/downloaded",
-            ),
-        )
         playlists.forEach { pl ->
             add(
                 PlaylistCard(
