@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="local_history">Plaaslik</string>
+    <string name="remote_history">Afstandsbediening</string>
+    <string name="charts">Grafieks</string>
+    <string name="back_button_desc">Terug</string>
+    <string name="album_cover_desc">Albumomslag</string>
+    <string name="top_music_videos">Top musiekvideo\'s</string>
+    <string name="trending">Tendens</string>
+    <string name="parsed_from_link">Ontleed vanaf skakel</string>
+    <string name="weeks">Weke</string>
+    <string name="months">Maande</string>
+    <string name="years">Yare</string>
+</resources>
