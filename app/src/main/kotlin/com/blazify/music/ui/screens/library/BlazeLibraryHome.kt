@@ -53,6 +53,10 @@ fun BlazeLibraryHome(
     val playlists by viewModel.playlists.collectAsStateWithLifecycle()
     val artists by viewModel.favoriteArtists.collectAsStateWithLifecycle()
     val likedSongs by viewModel.likedSongs.collectAsStateWithLifecycle()
+    val likedThumbs by viewModel.likedThumbnails.collectAsStateWithLifecycle()
+    val downloadedThumbs by viewModel.downloadedThumbnails.collectAsStateWithLifecycle()
+    val uploadedThumbs by viewModel.uploadedThumbnails.collectAsStateWithLifecycle()
+    val topThumbs by viewModel.topThumbnails.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
 
     LazyColumn(
@@ -71,7 +75,7 @@ fun BlazeLibraryHome(
                 BlazePlaylistCard(
                     title = stringResource(R.string.liked),
                     subtitle = "${likedSongs.size} $songsWord",
-                    thumbnails = emptyList(),
+                    thumbnails = likedThumbs,
                     seedColor = Color(0xFFB71C5A),
                     aspectRatio = LONG_RATIO,
                     iconRes = R.drawable.favorite,
@@ -99,7 +103,7 @@ fun BlazeLibraryHome(
                 BlazePlaylistCard(
                     title = stringResource(R.string.offline),
                     subtitle = "",
-                    thumbnails = emptyList(),
+                    thumbnails = downloadedThumbs,
                     seedColor = Color(0xFF283593),
                     aspectRatio = BOX_RATIO,
                     iconRes = R.drawable.download,
@@ -113,7 +117,7 @@ fun BlazeLibraryHome(
                 BlazePlaylistCard(
                     title = stringResource(R.string.your_top_50),
                     subtitle = "",
-                    thumbnails = emptyList(),
+                    thumbnails = topThumbs,
                     seedColor = Color(0xFFEF6C00),
                     aspectRatio = LONG_RATIO,
                     iconRes = R.drawable.trending_up,
@@ -126,7 +130,7 @@ fun BlazeLibraryHome(
                 BlazePlaylistCard(
                     title = stringResource(R.string.uploaded_playlist),
                     subtitle = "",
-                    thumbnails = emptyList(),
+                    thumbnails = uploadedThumbs,
                     seedColor = Color(0xFF6A1B9A),
                     aspectRatio = LONG_RATIO,
                     iconRes = R.drawable.upload,
