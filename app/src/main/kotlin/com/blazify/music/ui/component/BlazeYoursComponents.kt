@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
@@ -41,7 +42,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,7 +67,7 @@ fun BlazeSectionHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -177,12 +180,13 @@ fun BlazeGradientCard(
     seedColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    height: Dp = 160.dp,
     @DrawableRes iconRes: Int? = null,
 ) {
     Box(
         modifier = modifier
             .width(160.dp)
-            .height(160.dp)
+            .height(height)
             .clip(RoundedCornerShape(16.dp))
             .background(seedColor)
             .clickable(onClick = onClick),
@@ -207,12 +211,14 @@ fun BlazeGradientCard(
                     ),
             )
         } else {
+            // No artwork (mood cards): a lighter tint up top fading to the full
+            // seed colour at the bottom, so the card still reads top-light → colour.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            listOf(seedColor, seedColor.copy(alpha = 0.7f)),
+                            listOf(lerp(seedColor, Color.White, 0.24f), seedColor),
                         ),
                     ),
             )
@@ -246,15 +252,27 @@ fun BlazeGradientCard(
             }
         }
         if (iconRes != null) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = onSeed.copy(alpha = 0.9f),
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .size(32.dp),
-            )
+                    .padding(16.dp),
+            ) {
+                // Soft drop shadow behind the glyph.
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = Color.Black.copy(alpha = 0.30f),
+                    modifier = Modifier
+                        .offset(x = 1.5.dp, y = 2.dp)
+                        .size(36.dp),
+                )
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = onSeed,
+                    modifier = Modifier.size(36.dp),
+                )
+            }
         }
     }
 }

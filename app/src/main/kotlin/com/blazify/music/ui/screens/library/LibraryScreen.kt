@@ -5,60 +5,11 @@
 
 package com.blazify.music.ui.screens.library
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.blazify.music.LocalNavController
-import com.blazify.music.R
-import com.blazify.music.constants.ChipSortTypeKey
-import com.blazify.music.constants.LibraryFilter
-import com.blazify.music.ui.component.BlazeFilterChips
-import com.blazify.music.utils.rememberEnumPreference
 
 @Composable
 fun LibraryScreen() {
     val navController = LocalNavController.current
-    var filterType by rememberEnumPreference(ChipSortTypeKey, LibraryFilter.LIBRARY)
-
-    val filterContent = @Composable {
-        BlazeFilterChips(
-            chips = listOf(
-                LibraryFilter.LIBRARY to stringResource(R.string.filter_all),
-                LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
-                LibraryFilter.SONGS to stringResource(R.string.filter_songs),
-                LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
-                LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
-                LibraryFilter.PODCASTS to stringResource(R.string.filter_podcasts),
-            ),
-            currentValue = filterType,
-            onSelect = { filterType = it },
-        )
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (filterType) {
-            LibraryFilter.LIBRARY -> BlazeLibraryHome(navController, filterContent)
-            LibraryFilter.PLAYLISTS -> LibraryPlaylistsScreen(navController, filterContent)
-            LibraryFilter.SONGS -> LibrarySongsScreen(
-                navController,
-                { filterType = LibraryFilter.LIBRARY },
-            )
-            LibraryFilter.ALBUMS -> LibraryAlbumsScreen(
-                navController,
-                { filterType = LibraryFilter.LIBRARY },
-            )
-            LibraryFilter.ARTISTS -> LibraryArtistsScreen(
-                navController,
-                { filterType = LibraryFilter.LIBRARY },
-            )
-            LibraryFilter.PODCASTS -> LibraryPodcastsScreen(
-                navController,
-                { filterType = LibraryFilter.LIBRARY },
-            )
-        }
-    }
+    BlazeLibraryHome(navController)
 }

@@ -56,6 +56,18 @@ import com.blazify.music.ui.component.BlazePlaylistPalette
 import com.blazify.music.ui.component.BlazeSectionHeader
 import com.blazify.music.viewmodels.YoursViewModel
 
+/** Distinct glyphs cycled across mood cards. */
+private val MoodIcons = listOf(
+    R.drawable.graphic_eq,
+    R.drawable.radio,
+    R.drawable.equalizer,
+    R.drawable.star,
+    R.drawable.favorite,
+    R.drawable.bedtime,
+    R.drawable.music_note,
+    R.drawable.speed,
+)
+
 @Composable
 fun YoursScreen(
     viewModel: YoursViewModel = hiltViewModel(),
@@ -230,13 +242,17 @@ fun YoursScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(moodItems.take(15), key = { "mood_${it.endpoint.browseId}_${it.title}" }) { mood ->
+                    itemsIndexed(
+                        moodItems.take(15),
+                        key = { _, it -> "mood_${it.endpoint.browseId}_${it.title}" },
+                    ) { index, mood ->
                         BlazeGradientCard(
                             title = mood.title,
                             subtitle = "",
                             thumbnailUrl = null,
                             seedColor = Color(mood.stripeColor or 0xFF000000L),
-                            iconRes = R.drawable.music_note,
+                            height = 190.dp,
+                            iconRes = MoodIcons[index % MoodIcons.size],
                             onClick = {
                                 navController.navigate(
                                     "youtube_browse/${mood.endpoint.browseId}?params=${mood.endpoint.params}",

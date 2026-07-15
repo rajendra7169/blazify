@@ -12,11 +12,14 @@ package com.blazify.music.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.datasource.cache.Cache
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.PlaylistItem
 import com.blazify.innertube.pages.MoodAndGenres
 import com.blazify.innertube.utils.completed
 import com.blazify.music.db.MusicDatabase
+import com.blazify.music.di.DownloadCache
+import com.blazify.music.di.PlayerCache
 import com.blazify.music.db.entities.Artist
 import com.blazify.music.db.entities.Playlist
 import com.blazify.music.db.entities.Song
@@ -35,6 +38,8 @@ import javax.inject.Inject
 class YoursViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     database: MusicDatabase,
+    @PlayerCache private val playerCache: Cache,
+    @DownloadCache private val downloadCache: Cache,
 ) : ViewModel() {
 
     // Recently played: distinct songs from the play-event log, newest first.
@@ -67,6 +72,9 @@ class YoursViewModel @Inject constructor(
         .map { it.mapNotNull(Song::thumbnailUrl).take(4) }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    // Cached covers: scanned once from the player/download caches.
+    val cachedThumbnails = MutableStateFlow<List<String>>(emptyList())
+
     // Local playlists, most-recently-updated first.
     val playlists: kotlinx.coroutines.flow.StateFlow<List<Playlist>> =
         database.playlistsByUpdatedDateAsc()
@@ -97,6 +105,24 @@ class YoursViewModel @Inject constructor(
             YouTube.moodAndGenres().onSuccess {
                 moodAndGenres.value = it
             }.onFailure { reportException(it) }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            // Retry briefly — the caches may still be warming up when the VM loads.
+            repeat(5) {
+                val ids = (playerCache.keys + downloadCache.keys).toList()
+                if (ids.isNotEmpty()) {
+                    val covers = database.getSongsByIds(ids)
+                        .filter { it.song.dateDownload != null }
+                        .sortedByDescending { it.song.dateDownload }
+                        .mapNotNull { it.thumbnailUrl }
+                        .take(4)
+                    if (covers.isNotEmpty()) {
+                        cachedThumbnails.value = covers
+                        return@launch
+                    }
+                }
+                kotlinx.coroutines.delay(600)
+            }
         }
     }
 }

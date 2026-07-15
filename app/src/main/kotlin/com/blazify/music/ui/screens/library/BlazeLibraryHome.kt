@@ -47,7 +47,6 @@ private const val USER_RATIO = 1.55f
 @Composable
 fun BlazeLibraryHome(
     navController: NavController,
-    filterContent: @Composable () -> Unit,
     viewModel: YoursViewModel = hiltViewModel(),
 ) {
     val playlists by viewModel.playlists.collectAsStateWithLifecycle()
@@ -57,19 +56,18 @@ fun BlazeLibraryHome(
     val downloadedThumbs by viewModel.downloadedThumbnails.collectAsStateWithLifecycle()
     val uploadedThumbs by viewModel.uploadedThumbnails.collectAsStateWithLifecycle()
     val topThumbs by viewModel.topThumbnails.collectAsStateWithLifecycle()
+    val cachedThumbs by viewModel.cachedThumbnails.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
     ) {
-        item("chips") {
-            Spacer(Modifier.height(4.dp))
-            filterContent()
-            Spacer(Modifier.height(12.dp))
+        item("top_gap") {
+            Spacer(Modifier.height(8.dp))
         }
 
-        // ---- System playlists (colour + glyph) ----
+        // ---- System playlists ----
         item("liked") {
             LongPad {
                 BlazePlaylistCard(
@@ -93,7 +91,7 @@ fun BlazeLibraryHome(
                 BlazePlaylistCard(
                     title = stringResource(R.string.cached_playlist),
                     subtitle = "",
-                    thumbnails = emptyList(),
+                    thumbnails = cachedThumbs,
                     seedColor = Color(0xFF00838F),
                     aspectRatio = BOX_RATIO,
                     iconRes = R.drawable.cached,
