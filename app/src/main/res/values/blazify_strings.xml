@@ -1022,4 +1022,17 @@
     <string name="stream_source_android_creator">ANDROID_CREATOR</string>
     <string name="stream_source_android_creator_desc">Android creator client. Off by default; needs DroidGuard.</string>
     <string name="recent_searches">Recent Searches</string>
+    <!-- Yours tab -->
+    <string name="yours">Yours</string>
+    <string name="recently_played">Recently Played</string>
+    <string name="recommended_for_you">Recommended for You</string>
+    <string name="browse_categories">Browse Categories</string>
+    <string name="your_playlists">Your Playlists</string>
+    <string name="mood_playlists">Mood Playlists</string>
+    <string name="favorite_artists">Favorite Artists</string>
+    <string name="see_more">See More</string>
+    <string name="favorites">Favorites</string>
+    <string name="downloads">Downloads</string>
+    <string name="no_recently_played">No recently played songs yet.</string>
+    <string name="no_recommendations">No recommendations yet.</string>
 </resources>

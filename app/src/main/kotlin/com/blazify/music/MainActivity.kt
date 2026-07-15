@@ -728,6 +728,7 @@ class MainActivity : ComponentActivity() {
                         listOf(
                             Screens.Home.route,
                             Screens.Library.route,
+                            Screens.Yours.route,
                             Screens.ListenTogether.route,
                             "settings",
                         )
@@ -974,6 +975,7 @@ class MainActivity : ComponentActivity() {
                             Screens.Home.route -> R.string.home
                             Screens.Search.route -> R.string.search
                             Screens.Library.route -> R.string.filter_library
+                            Screens.Yours.route -> R.string.yours
                             Screens.ListenTogether.route -> R.string.together
                             else -> null
                         }
