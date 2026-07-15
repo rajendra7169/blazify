@@ -1046,4 +1046,24 @@
     <string name="created_by_you">Created by you</string>
     <string name="artists_you_liked">Artists you liked</string>
     <string name="your_top_50">Your Top 50</string>
+    <!-- Settings redesign -->
+    <string name="settings_group_personalize">Personalize</string>
+    <string name="settings_group_playback">Playback</string>
+    <string name="settings_group_content">Content</string>
+    <string name="settings_group_privacy_data">Privacy &amp; data</string>
+    <string name="settings_group_about">About</string>
+    <string name="search_settings">Search settings</string>
+    <string name="hint_appearance">Theme, colors, dark mode, layout</string>
+    <string name="hint_player">Quality, gapless, normalization, EQ</string>
+    <string name="hint_stream">Where audio is fetched from</string>
+    <string name="hint_content">Region, explicit, video songs</string>
+    <string name="hint_lyrics">Lyric sources and auto-translate</string>
+    <string name="hint_android_auto">In-car layout</string>
+    <string name="hint_privacy">History, pauses, listening data</string>
+    <string name="hint_storage">Cache, downloads, clear data</string>
+    <string name="hint_backup">Export or import your library</string>
+    <string name="hint_about">Version and developer</string>
+    <string name="hint_changelog">What\'s new in this version</string>
+    <string name="hint_links">Handle Blazify links by default</string>
+    <string name="hint_updater">Check for updates</string>
 </resources>
