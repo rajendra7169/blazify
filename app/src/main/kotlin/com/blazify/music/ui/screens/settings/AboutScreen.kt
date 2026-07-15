@@ -123,7 +123,7 @@ fun AboutScreen(
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     HeroChip(BuildConfig.VERSION_NAME)
-                    HeroChip(BuildConfig.ARCHITECTURE.uppercase())
+                    HeroChip("STABLE")
                     if (BuildConfig.DEBUG) HeroChip("DEBUG")
                 }
             }
