@@ -1889,19 +1889,35 @@ fun BottomSheetPlayer(
                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             modifier = Modifier.fillMaxSize(),
                         )
-                        // "Now Playing" header centred at the top, over the artwork.
-                        Text(
-                            text = stringResource(R.string.now_playing),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                shadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f),
-                            ),
-                            fontWeight = FontWeight.Bold,
-                            color = TextBackgroundColor,
+                        // "Now Playing" + source header centred at the top, over the artwork
+                        // (same as the classic ThumbnailHeader, with shadows for readability).
+                        val fullArtQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
+                        val fullArtShadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
                                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-                                .padding(top = 14.dp),
-                        )
+                                .padding(top = 14.dp, start = 48.dp, end = 48.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.now_playing),
+                                style = MaterialTheme.typography.titleMedium.copy(shadow = fullArtShadow),
+                                fontWeight = FontWeight.Bold,
+                                color = TextBackgroundColor,
+                            )
+                            val fullArtPlayingFrom = fullArtQueueTitle ?: mediaMetadata?.album?.title
+                            if (!fullArtPlayingFrom.isNullOrBlank()) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = fullArtPlayingFrom,
+                                    style = MaterialTheme.typography.titleMedium.copy(shadow = fullArtShadow),
+                                    color = TextBackgroundColor.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    modifier = Modifier.basicMarquee(),
+                                )
+                            }
+                        }
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier =
@@ -1978,6 +1994,7 @@ fun BottomSheetPlayer(
                     )
                 } else if (playerDesign == PlayerDesign.RECORD && !showInlineLyrics) {
                     // RECORD: spinning vinyl + tonearm as the artwork; classic controls below.
+                    val recordQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier =
@@ -1986,6 +2003,36 @@ fun BottomSheetPlayer(
                                 .padding(bottom = bottomPadding)
                                 .animateContentSize(),
                     ) {
+                        // "Now Playing" + source header, like the classic ThumbnailHeader.
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                                    .padding(top = 8.dp, start = 48.dp, end = 48.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.now_playing),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextBackgroundColor,
+                            )
+                            val recordPlayingFrom = recordQueueTitle ?: mediaMetadata?.album?.title
+                            if (!recordPlayingFrom.isNullOrBlank()) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = recordPlayingFrom,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextBackgroundColor.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    modifier = Modifier.basicMarquee(),
+                                )
+                            }
+                        }
+
+                        // Push the turntable a little lower.
+                        Spacer(Modifier.height(14.dp))
+
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.weight(1f).fillMaxWidth(),

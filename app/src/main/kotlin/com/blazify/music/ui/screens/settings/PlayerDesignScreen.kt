@@ -651,6 +651,9 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+        meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
+            Text(it, fontSize = 9.sp, color = textColor.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
         Spacer(Modifier.weight(0.3f))
         VinylTurntable(
             thumbnailUrl = meta?.thumbnailUrl,
@@ -684,15 +687,30 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     Box(Modifier.fillMaxSize()) {
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
-        // "Now Playing" centred at the top (no minimize / more icons here).
-        Text(
-            text = stringResource(R.string.now_playing),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            style = LocalTextStyle.current.copy(shadow = Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f)),
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp),
-        )
+        // "Now Playing" + source centred at the top (no minimize / more icons here).
+        val fullArtShadow = Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp, start = 20.dp, end = 20.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.now_playing),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                style = LocalTextStyle.current.copy(shadow = fullArtShadow),
+            )
+            meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
+                Text(
+                    it,
+                    fontSize = 9.sp,
+                    color = Color.White.copy(alpha = 0.8f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = LocalTextStyle.current.copy(shadow = fullArtShadow),
+                )
+            }
+        }
         Column(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
