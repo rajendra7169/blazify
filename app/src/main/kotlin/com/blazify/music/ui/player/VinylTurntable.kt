@@ -2,12 +2,9 @@
  * Blazify Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  *
- * RECORD design centrepiece, modelled on the reference mock: the vinyl sits
- * slightly left with a belt pulley at top-left, and a straight tonearm hangs
- * vertically at rest on the right (big counterweight at the top). On play the
- * arm swings in so the stylus lands on the OUTER-MID grooves (never the
- * label), and the record spins; on pause the record freezes and the arm
- * swings back out. Drawn in Compose Canvas — no assets; shared by the player
+ * RECORD design centrepiece: a spinning vinyl record (album art as the label)
+ * with a tonearm that drops onto the record while playing and swings out when
+ * paused. Drawn in Compose Canvas so it needs no assets; shared by the player
  * and the design-preview so they always match.
  */
 
@@ -23,7 +20,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -33,9 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -44,15 +38,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-
-// Layout constants (fractions of the square stage) — tuned to the reference mock.
-private const val DISC_CENTER_X = 0.44f   // record sits slightly left
-private const val DISC_RADIUS = 0.40f
-private const val ARM_X = 0.88f           // arm rests vertically at this x
-private const val ARM_PIVOT_Y = 0.16f
-private const val ARM_TIP_Y = 0.70f
-private const val ARM_PLAY_ANGLE = 20f    // clockwise swing that lands the stylus on outer-mid grooves
 
 @Composable
 fun VinylTurntable(
@@ -61,7 +48,7 @@ fun VinylTurntable(
     modifier: Modifier = Modifier,
     fallbackBrush: Brush? = null,
 ) {
-    // Continuous rotation while playing; freezes (keeps its angle) when paused.
+    // Continuous rotation while playing; freezes (keeps angle) when paused.
     val rotation = remember { Animatable(0f) }
     LaunchedEffect(isPlaying) {
         if (!isPlaying) return@LaunchedEffect
@@ -73,42 +60,16 @@ fun VinylTurntable(
         }
     }
 
-    // Tonearm: vertical at rest (paused), swings clockwise onto the grooves when playing.
+    // Tonearm swings onto the record (0°) when playing, and out (-26°) when paused.
     val armAngle by animateFloatAsState(
-        targetValue = if (isPlaying) ARM_PLAY_ANGLE else 0f,
-        animationSpec = spring(dampingRatio = 0.72f, stiffness = 60f),
+        targetValue = if (isPlaying) 0f else -26f,
+        animationSpec = spring(dampingRatio = 0.7f, stiffness = 80f),
         label = "tonearm",
     )
 
     BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
         val dim = minOf(maxWidth, maxHeight)
-        val discSize = dim * (DISC_RADIUS * 2f)
-        val discOffsetX = dim * (DISC_CENTER_X - 0.5f)
-
-        // Static turntable deco behind the disc: belt pulley knob at top-left + belt lines.
-        Canvas(modifier = Modifier.size(dim)) {
-            val d = size.minDimension
-            val knob = Offset(d * 0.10f, d * 0.12f)
-            val discC = Offset(d * DISC_CENTER_X, d * 0.5f)
-            val r = d * DISC_RADIUS
-            // Belt lines to the record edge (upper-left tangents).
-            val p1 = Offset(discC.x - r * 0.87f, discC.y - r * 0.50f)
-            val p2 = Offset(discC.x - r * 0.50f, discC.y - r * 0.87f)
-            drawLine(Color.White.copy(alpha = 0.22f), knob, p1, strokeWidth = d * 0.004f)
-            drawLine(Color.White.copy(alpha = 0.22f), knob, p2, strokeWidth = d * 0.004f)
-            // Pulley knob.
-            drawCircle(
-                brush = Brush.radialGradient(
-                    listOf(Color(0xFF57575C), Color(0xFF232326)),
-                    center = knob - Offset(d * 0.008f, d * 0.008f),
-                    radius = d * 0.05f,
-                ),
-                radius = d * 0.038f,
-                center = knob,
-            )
-            drawCircle(Color.White.copy(alpha = 0.18f), radius = d * 0.038f, center = knob, style = Stroke(width = d * 0.004f))
-            drawCircle(Color(0xFF0E0E10), radius = d * 0.012f, center = knob)
-        }
+        val discSize = dim * 0.82f
 
         // Spinning disc (grooves + art label).
         VinylDisc(
@@ -116,12 +77,11 @@ fun VinylTurntable(
             fallbackBrush = fallbackBrush,
             modifier = Modifier
                 .size(discSize)
-                .offset(x = discOffsetX)
                 .graphicsLayer { rotationZ = rotation.value },
         )
 
         // Fixed light sheen over the disc (does NOT rotate — sells the spin).
-        Canvas(modifier = Modifier.size(discSize).offset(x = discOffsetX)) {
+        Canvas(modifier = Modifier.size(discSize)) {
             drawCircle(
                 brush = Brush.linearGradient(
                     colors = listOf(
@@ -137,7 +97,7 @@ fun VinylTurntable(
             )
         }
 
-        // Tonearm on top (vertical at rest, swings in while playing).
+        // Tonearm on top.
         Tonearm(
             armAngle = armAngle,
             modifier = Modifier.size(dim),
@@ -166,27 +126,18 @@ private fun VinylDisc(
                 center = c,
             )
             // Concentric grooves.
-            var gr = r * 0.46f
-            while (gr < r * 0.97f) {
+            var gr = r * 0.40f
+            while (gr < r * 0.98f) {
                 drawCircle(
                     color = Color.White.copy(alpha = 0.05f),
                     radius = gr,
                     center = c,
                     style = Stroke(width = 1.2f),
                 )
-                gr += r * 0.016f
-            }
-            // Brighter track-separator rings (like real pressings).
-            for (sep in listOf(0.56f, 0.72f, 0.88f)) {
-                drawCircle(
-                    color = Color.White.copy(alpha = 0.10f),
-                    radius = r * sep,
-                    center = c,
-                    style = Stroke(width = 1.6f),
-                )
+                gr += r * 0.018f
             }
             // Outer rim highlight.
-            drawCircle(color = Color.White.copy(alpha = 0.12f), radius = r * 0.99f, center = c, style = Stroke(width = 2f))
+            drawCircle(color = Color.White.copy(alpha = 0.10f), radius = r * 0.99f, center = c, style = Stroke(width = 2f))
         }
 
         // Album art as the center label.
@@ -212,11 +163,6 @@ private fun VinylDisc(
     }
 }
 
-/**
- * Straight tonearm like the reference: big round counterweight at the very top,
- * bearing collar at the pivot, a vertical tube, and an angled headshell at the
- * bottom. Rotation happens around the pivot (top of the tube).
- */
 @Composable
 private fun Tonearm(
     armAngle: Float,
@@ -226,64 +172,46 @@ private fun Tonearm(
     Canvas(
         modifier = modifier.graphicsLayer {
             rotationZ = armAngle
-            transformOrigin = TransformOrigin(ARM_X, ARM_PIVOT_Y)
+            transformOrigin = TransformOrigin(0.82f, 0.14f)
         },
     ) {
-        val d = size.minDimension
-        val pivot = Offset(d * ARM_X, d * ARM_PIVOT_Y)
-        val tip = Offset(d * ARM_X, d * ARM_TIP_Y)
-        val weight = Offset(d * ARM_X, d * 0.075f)
-        val tube = d * 0.015f
+        val w = size.width
+        val h = size.height
+        val pivot = Offset(w * 0.82f, h * 0.14f)
+        val elbow = Offset(w * 0.76f, h * 0.40f)
+        // Stylus rests on the OUTER-MID grooves (~0.69 of the disc radius), never the label/centre.
+        val head = Offset(w * 0.70f, h * 0.70f)
+        val counter = Offset(w * 0.90f, h * 0.05f)
+        val armWidth = h * 0.017f
 
-        // Short shaft up to the counterweight.
-        drawLine(brush = armMetal, start = pivot, end = weight, strokeWidth = tube * 0.9f, cap = StrokeCap.Round)
+        // Counterweight arm + weight (behind the pivot).
+        drawLine(brush = armMetal, start = pivot, end = counter, strokeWidth = h * 0.020f, cap = StrokeCap.Round)
+        drawCircle(color = Color(0xFF3C3C40), radius = h * 0.026f, center = counter)
+        drawCircle(color = Color(0xFF57575C), radius = h * 0.026f, center = counter, style = Stroke(width = 2f))
 
-        // Big counterweight (stacked discs, like the reference).
-        drawCircle(
-            brush = Brush.radialGradient(
-                listOf(Color(0xFF8E8E94), Color(0xFF3F3F44)),
-                center = weight - Offset(d * 0.012f, d * 0.012f),
-                radius = d * 0.07f,
-            ),
-            radius = d * 0.052f,
-            center = weight,
-        )
-        drawCircle(Color.White.copy(alpha = 0.25f), radius = d * 0.052f, center = weight, style = Stroke(width = d * 0.004f))
-        drawCircle(Color(0xFF232327), radius = d * 0.030f, center = weight)
-        drawCircle(
-            brush = Brush.radialGradient(listOf(Color(0xFFD9D9DD), Color(0xFF6E6E74)), center = weight, radius = d * 0.02f),
-            radius = d * 0.014f,
-            center = weight,
-        )
+        // Main arm (pivot → elbow → headshell).
+        drawLine(brush = armMetal, start = pivot, end = elbow, strokeWidth = armWidth, cap = StrokeCap.Round)
+        drawLine(brush = armMetal, start = elbow, end = head, strokeWidth = armWidth, cap = StrokeCap.Round)
 
-        // Bearing collar at the pivot.
+        // Pivot base (mount).
         drawCircle(
-            brush = Brush.radialGradient(listOf(Color(0xFFE6E6E8), Color(0xFF8A8A90)), center = pivot, radius = d * 0.035f),
-            radius = d * 0.026f,
+            brush = Brush.radialGradient(listOf(Color(0xFFE6E6E8), Color(0xFF8A8A90)), center = pivot, radius = h * 0.06f),
+            radius = h * 0.05f,
             center = pivot,
         )
-        drawCircle(Color(0xFF303034), radius = d * 0.010f, center = pivot)
+        drawCircle(color = Color(0xFF303034), radius = h * 0.02f, center = pivot)
 
-        // Main vertical tube (dark outline + metal core for depth).
-        drawLine(Color(0xFF2A2A2E), pivot, tip, strokeWidth = tube * 1.5f, cap = StrokeCap.Round)
-        drawLine(brush = armMetal, start = pivot, end = tip, strokeWidth = tube, cap = StrokeCap.Round)
-
-        // Headshell: dark cartridge block angled down-left, with stylus tip.
-        rotate(degrees = -38f, pivot = tip) {
-            drawRoundRect(
-                color = Color(0xFF26262A),
-                topLeft = Offset(tip.x - d * 0.060f, tip.y - d * 0.015f),
-                size = Size(d * 0.062f, d * 0.030f),
-                cornerRadius = CornerRadius(d * 0.008f, d * 0.008f),
-            )
+        // Headshell + stylus.
+        val headAngle = Math.toDegrees(Math.atan2((head.y - elbow.y).toDouble(), (head.x - elbow.x).toDouble())).toFloat()
+        rotate(degrees = headAngle, pivot = head) {
             drawRoundRect(
                 brush = armMetal,
-                topLeft = Offset(tip.x - d * 0.060f, tip.y - d * 0.015f),
-                size = Size(d * 0.062f, d * 0.010f),
-                cornerRadius = CornerRadius(d * 0.005f, d * 0.005f),
+                topLeft = Offset(head.x - h * 0.03f, head.y - h * 0.022f),
+                size = androidx.compose.ui.geometry.Size(h * 0.075f, h * 0.044f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(h * 0.01f, h * 0.01f),
             )
-            // Stylus.
-            drawCircle(Color(0xFF111114), radius = d * 0.006f, center = Offset(tip.x - d * 0.052f, tip.y + d * 0.018f))
         }
+        // Stylus tip on the record.
+        drawCircle(color = Color(0xFF111114), radius = h * 0.008f, center = head + Offset(-w * 0.012f, h * 0.018f))
     }
 }
