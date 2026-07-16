@@ -51,9 +51,9 @@ sealed class LyricsListItem {
 }
 
 /**
- * Instrumental-break indicator: a group of three music notes that gently bounce
- * in a wave and fill up with white left-to-right as the interlude progresses —
- * Blazify's own loader, in the dynamic theme colour, instead of a plain ring.
+ * Instrumental-break indicator: Blazify's own treble-clef mark that gently
+ * breathes and fills up white from the bottom as the interlude progresses
+ * toward the next sung line (dim base in the dynamic theme colour).
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -109,29 +109,19 @@ internal fun IntervalIndicator(
             },
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val baseColor = color.copy(alpha = 0.28f)
-            repeat(3) { i ->
-                // Each note fills over its third of the interlude.
-                val noteFill = ((animatedProgress - i / 3f) * 3f).coerceIn(0f, 1f)
-                val phase = (t + i * 0.18f) % 1f
-                val hop = abs(sin(phase * PI)).toFloat()
-                val scale = 1f + 0.16f * hop
-                NoteFill(
-                    fill = noteFill,
-                    baseColor = baseColor,
-                    fillColor = Color.White,
-                    scale = scale,
-                )
-            }
-        }
+        // Gentle breathing pulse so it reads as "loading" through the whole gap.
+        val hop = abs(sin(((t) % 1f) * PI)).toFloat()
+        val scale = 1f + 0.08f * hop
+        NoteFill(
+            fill = animatedProgress,
+            baseColor = color.copy(alpha = 0.28f),
+            fillColor = Color.White,
+            scale = scale,
+        )
     }
 }
 
-/** A music note drawn dim, then filled white bottom-up to [fill] (0..1). */
+/** The treble-clef mark drawn dim, then filled white bottom-up to [fill] (0..1). */
 @Composable
 private fun NoteFill(
     fill: Float,
@@ -141,20 +131,20 @@ private fun NoteFill(
 ) {
     Box(
         modifier = Modifier
-            .size(24.dp)
+            .size(40.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             }
     ) {
         Icon(
-            painter = painterResource(R.drawable.music_note),
+            painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
             tint = baseColor,
             modifier = Modifier.fillMaxSize()
         )
         Icon(
-            painter = painterResource(R.drawable.music_note),
+            painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
             tint = fillColor,
             modifier = Modifier
