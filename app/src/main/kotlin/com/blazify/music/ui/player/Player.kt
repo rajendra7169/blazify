@@ -2014,30 +2014,36 @@ fun BottomSheetPlayer(
                 onToggleLyrics = {
                     showInlineLyrics = !showInlineLyrics
                 },
+                // Hide the collapsed queue peek for RING (its lyrics card owns the bottom);
+                // queue is still reachable via the RING queue icon.
+                showCollapsedContent = playerDesign != PlayerDesign.RING,
             )
         }
 
         // RING design: bottom overlay (sleep+more row + lyrics card) drawn on top
         // of the queue peek so the lyrics card starts from the very bottom.
-        if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics) {
+        // Fades out as the queue is dragged open so it doesn't cover the queue.
+        if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics &&
+            queueSheetState.progress < 0.999f
+        ) {
             val overlayLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
             Column(
                 modifier =
                     Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
+                        .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f))
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                 horizontalAlignment = Alignment.Start,
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                    horizontalArrangement = Arrangement.Start,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RingIconButton(R.drawable.bedtime, TextBackgroundColor, size = 24) {
                         showSleepTimerDialog = true
                     }
-                    Spacer(Modifier.width(4.dp))
                     mediaMetadata?.let {
                         RingMoreButton(mediaMetadata = it, state = state, tint = TextBackgroundColor)
                     }

@@ -159,6 +159,9 @@ fun Queue(
     showInlineLyrics: Boolean,
     playerBackground: PlayerBackgroundStyle = PlayerBackgroundStyle.DEFAULT,
     onToggleLyrics: () -> Unit = {},
+    // When false, the collapsed peek bar (queue/sleep/lyrics quick buttons) is hidden.
+    // The queue is still reachable by expanding it (e.g. the RING design's queue icon).
+    showCollapsedContent: Boolean = true,
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
@@ -262,7 +265,8 @@ fun Queue(
         background = {
             Box(Modifier.fillMaxSize().background(Color.Unspecified))
         },
-        collapsedContent = {
+        collapsedContent = collapsed@{
+            if (!showCollapsedContent) return@collapsed
             if (useNewPlayerDesign) {
                 // New design
                 Row(

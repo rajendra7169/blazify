@@ -451,10 +451,9 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
         Spacer(Modifier.height(10.dp))
         if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
         Spacer(Modifier.height(8.dp))
-        // sleep timer + more (left, above the lyrics card)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+        // sleep timer (left) + more (right), above the lyrics card
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             MiniIcon(R.drawable.bedtime, cs.onSurface, 18)
-            Spacer(Modifier.width(8.dp))
             MiniIcon(R.drawable.more_horiz, cs.onSurface, 18)
         }
         Spacer(Modifier.height(8.dp))
