@@ -11,9 +11,9 @@
 
 package com.blazify.music.ui.screens.settings
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -45,16 +45,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -77,10 +79,9 @@ import com.blazify.music.models.MediaMetadata
 import com.blazify.music.playback.PlayerConnection
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.player.PlayerDesign
-import com.blazify.music.ui.player.SeekableAlbumRing
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberPreference
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -255,39 +256,29 @@ private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () ->
     }
 }
 
-/* ---------- live preview (real song, real controls) ---------- */
+
+/* ---------- static design previews (faithful, non-interactive) ---------- */
+
+private const val PREVIEW_PROGRESS = 0.35f
 
 @Composable
 private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
+    val meta by remember(pc) { pc?.mediaMetadata ?: MutableStateFlow(null) }.collectAsState()
     when (design) {
-        PlayerDesign.CLASSIC -> LiveClassic(pc)
-        PlayerDesign.RING -> LiveRing(pc)
-        PlayerDesign.FULL_ART -> LiveFullArt(pc)
+        PlayerDesign.CLASSIC -> ClassicPreview(meta)
+        PlayerDesign.RING -> RingPreview(meta)
+        PlayerDesign.FULL_ART -> FullArtPreview(meta)
     }
 }
 
-/** Poll real playback position → 0..1 fraction. */
 @Composable
-private fun rememberLiveProgress(pc: PlayerConnection?): Float {
-    var frac by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(pc) {
-        while (pc != null) {
-            val d = pc.player.duration
-            frac = if (d > 0) (pc.player.currentPosition.toFloat() / d).coerceIn(0f, 1f) else 0f
-            delay(500)
-        }
-    }
-    return frac
-}
-
-@Composable
-private fun mockArtBrush(): Brush {
+private fun previewArtBrush(): Brush {
     val cs = MaterialTheme.colorScheme
     return Brush.linearGradient(listOf(cs.primary, cs.tertiary))
 }
 
 @Composable
-private fun LiveArt(url: String?, shape: Shape, modifier: Modifier = Modifier) {
+private fun PreviewArt(url: String?, shape: Shape, modifier: Modifier = Modifier) {
     if (url != null) {
         AsyncImage(
             model = url,
@@ -296,14 +287,14 @@ private fun LiveArt(url: String?, shape: Shape, modifier: Modifier = Modifier) {
             modifier = modifier.clip(shape),
         )
     } else {
-        Box(modifier.clip(shape).background(mockArtBrush()))
+        Box(modifier.clip(shape).background(previewArtBrush()))
     }
 }
 
 @Composable
-private fun LiveTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorScheme.onSurface) {
+private fun PreviewTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorScheme.onSurface) {
     Text(
-        text = meta?.title ?: "—",
+        text = meta?.title ?: "Song title",
         fontSize = 13.sp,
         fontWeight = FontWeight.Bold,
         maxLines = 1,
@@ -312,7 +303,7 @@ private fun LiveTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorSc
     )
     Spacer(Modifier.height(3.dp))
     Text(
-        text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "",
+        text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
         fontSize = 10.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -320,85 +311,55 @@ private fun LiveTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorSc
     )
 }
 
+/** Apple-Music-style slim bar matching the app's default slider look. */
 @Composable
-private fun LiveProgressBar(progress: Float, trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)) {
-    Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(trackColor)) {
-        Box(
-            Modifier
-                .fillMaxWidth(progress.coerceIn(0f, 1f))
-                .height(4.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-        )
+private fun PreviewSlider(activeColor: Color, inactiveColor: Color) {
+    Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(inactiveColor)) {
+        Box(Modifier.fillMaxWidth(PREVIEW_PROGRESS).height(6.dp).clip(CircleShape).background(activeColor))
     }
 }
 
 @Composable
-private fun MiniIcon(res: Int, tint: Color, size: Int = 18, onClick: (() -> Unit)? = null) {
-    val base = Modifier.size(size.dp)
-    Icon(
-        painter = painterResource(res),
-        contentDescription = null,
-        tint = tint,
-        modifier = if (onClick != null) base.clip(CircleShape).clickable(onClick = onClick) else base,
-    )
+private fun PreviewTimes(color: Color) {
+    Row(Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("1:02", fontSize = 9.sp, color = color)
+        Text("2:59", fontSize = 9.sp, color = color)
+    }
 }
 
 @Composable
-private fun LiveTransport(pc: PlayerConnection?, onColor: Color = MaterialTheme.colorScheme.onSurface) {
+private fun MiniIcon(res: Int, tint: Color, size: Int = 18) {
+    Icon(painter = painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(size.dp))
+}
+
+@Composable
+private fun PreviewTransport(onColor: Color, big: Boolean = false) {
     val cs = MaterialTheme.colorScheme
-    val isPlaying by (pc?.isPlaying ?: return StaticTransport(onColor)).collectAsState()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MiniIcon(R.drawable.shuffle, onColor)
-        MiniIcon(R.drawable.skip_previous, onColor, 22) { pc?.player?.seekToPreviousMediaItem() }
+        MiniIcon(R.drawable.shuffle, onColor, 18)
+        MiniIcon(R.drawable.skip_previous, onColor, 22)
         Box(
-            Modifier.size(46.dp).clip(CircleShape).background(cs.primary).clickable { pc?.togglePlayPause() },
+            Modifier.size(if (big) 52.dp else 46.dp).clip(CircleShape).background(cs.primary),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                contentDescription = null,
-                tint = cs.onPrimary,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        MiniIcon(R.drawable.skip_next, onColor, 22) { pc?.player?.seekToNext() }
-        MiniIcon(R.drawable.repeat, onColor)
-    }
-}
-
-/** Non-interactive transport when there is no playing song. */
-@Composable
-private fun StaticTransport(onColor: Color) {
-    val cs = MaterialTheme.colorScheme
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MiniIcon(R.drawable.shuffle, onColor)
-        MiniIcon(R.drawable.skip_previous, onColor, 22)
-        Box(Modifier.size(46.dp).clip(CircleShape).background(cs.primary), contentAlignment = Alignment.Center) {
-            Icon(painterResource(R.drawable.play), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
+            Icon(painterResource(R.drawable.pause), null, tint = cs.onPrimary, modifier = Modifier.size(if (big) 24.dp else 22.dp))
         }
         MiniIcon(R.drawable.skip_next, onColor, 22)
-        MiniIcon(R.drawable.repeat, onColor)
+        MiniIcon(R.drawable.repeat, onColor, 18)
     }
 }
 
 /* ---------- CLASSIC ---------- */
 
 @Composable
-private fun LiveClassic(pc: PlayerConnection?) {
-    val meta by (pc?.mediaMetadata ?: return ClassicFallback()).collectAsState()
-    val progress = rememberLiveProgress(pc)
+private fun ClassicPreview(meta: MediaMetadata?) {
     val onColor = MaterialTheme.colorScheme.onSurface
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 18.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -406,58 +367,29 @@ private fun LiveClassic(pc: PlayerConnection?) {
             MiniIcon(R.drawable.more_horiz, onColor)
         }
         Spacer(Modifier.weight(0.4f))
-        LiveArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
-        Spacer(Modifier.height(18.dp))
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) { LiveTitle(meta) }
-        Spacer(Modifier.height(14.dp))
-        LiveProgressBar(progress)
-        Spacer(Modifier.weight(0.5f))
-        LiveTransport(pc, onColor)
-    }
-}
-
-@Composable
-private fun ClassicFallback() {
-    val onColor = MaterialTheme.colorScheme.onSurface
-    Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniIcon(R.drawable.expand_more, onColor)
-            MiniIcon(R.drawable.more_horiz, onColor)
+        PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
+        Spacer(Modifier.height(16.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta) }
+            MiniIcon(R.drawable.favorite_border, onColor, 20)
         }
-        Spacer(Modifier.weight(0.4f))
-        LiveArt(null, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
-        Spacer(Modifier.height(18.dp))
-        Column(Modifier.fillMaxWidth()) { LiveTitle(null) }
         Spacer(Modifier.height(14.dp))
-        LiveProgressBar(0.35f)
+        PreviewSlider(MaterialTheme.colorScheme.primary, onColor.copy(alpha = 0.22f))
+        PreviewTimes(onColor.copy(alpha = 0.7f))
         Spacer(Modifier.weight(0.5f))
-        StaticTransport(onColor)
+        PreviewTransport(onColor)
     }
 }
 
 /* ---------- RING ---------- */
 
 @Composable
-private fun LiveRing(pc: PlayerConnection?) {
-    val meta by (pc?.mediaMetadata ?: return RingBody(null, 0.35f, null)).collectAsState()
-    val progress = rememberLiveProgress(pc)
-    RingBody(meta, progress, pc)
-}
-
-@Composable
-private fun RingFallback() = RingBody(null, 0.35f, null)
-
-@Composable
-private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection?) {
+private fun RingPreview(meta: MediaMetadata?) {
     val cs = MaterialTheme.colorScheme
     Column(
         modifier = Modifier.fillMaxSize().padding(start = 14.dp, end = 14.dp, top = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // top bar: minimize / Now Playing / theme
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             MiniIcon(R.drawable.expand_more, cs.onSurface, 22)
             Text(
@@ -473,39 +405,23 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
             MiniIcon(R.drawable.palette, cs.onSurface, 20)
         }
         Spacer(Modifier.weight(0.4f))
-        SeekableAlbumRing(
-            thumbnailUrl = meta?.thumbnailUrl,
-            progress = progress,
-            ringColor = cs.primary,
-            trackColor = cs.onSurface.copy(alpha = 0.18f),
-            onSeek = { f ->
-                val d = pc?.player?.duration ?: 0L
-                if (d > 0) pc?.player?.seekTo((f * d).toLong())
-            },
-            modifier = Modifier.fillMaxWidth(0.66f).aspectRatio(1f),
-            ringStrokeDp = 5f,
-            artPaddingDp = 9f,
-            fallbackBrush = mockArtBrush(),
-            thumbColor = cs.primary,
-        )
+        StaticRing(meta?.thumbnailUrl, Modifier.fillMaxWidth(0.66f).aspectRatio(1f))
         Spacer(Modifier.weight(0.4f))
-        // queue + favourite
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             MiniIcon(R.drawable.queue_music, cs.onSurface, 20)
-            MiniIcon(R.drawable.favorite, MaterialTheme.colorScheme.error, 20)
+            MiniIcon(R.drawable.favorite, cs.error, 20)
         }
         Spacer(Modifier.height(6.dp))
-        LiveProgressBar(progress)
-        Spacer(Modifier.height(10.dp))
-        if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
+        PreviewSlider(cs.primary, cs.onSurface.copy(alpha = 0.22f))
+        PreviewTimes(cs.onSurface.copy(alpha = 0.7f))
         Spacer(Modifier.height(8.dp))
-        // sleep timer (left) + more (right), above the lyrics card
+        PreviewTransport(cs.onSurface)
+        Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             MiniIcon(R.drawable.bedtime, cs.onSurface, 18)
             MiniIcon(R.drawable.more_horiz, cs.onSurface, 18)
         }
         Spacer(Modifier.height(8.dp))
-        // lyrics card (from the bottom): header + partial lines (current highlighted)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -533,14 +449,39 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
     }
 }
 
+/** Static (non-interactive) circular art + progress ring + thumb for the RING preview. */
+@Composable
+private fun StaticRing(thumbnailUrl: String?, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    val trackColor = cs.onSurface.copy(alpha = 0.18f)
+    val ringColor = cs.primary
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        if (thumbnailUrl != null) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().padding(9.dp).clip(CircleShape),
+            )
+        } else {
+            Box(Modifier.fillMaxSize().padding(9.dp).clip(CircleShape).background(previewArtBrush()))
+        }
+        Canvas(Modifier.fillMaxSize()) {
+            val stroke = 5.dp.toPx()
+            val d = size.minDimension - stroke
+            val topLeft = Offset((size.width - d) / 2f, (size.height - d) / 2f)
+            drawArc(color = trackColor, startAngle = -90f, sweepAngle = 360f, useCenter = false, topLeft = topLeft, size = Size(d, d), style = Stroke(width = stroke, cap = StrokeCap.Round))
+            drawArc(color = ringColor, startAngle = -90f, sweepAngle = 360f * PREVIEW_PROGRESS, useCenter = false, topLeft = topLeft, size = Size(d, d), style = Stroke(width = stroke, cap = StrokeCap.Round))
+        }
+    }
+}
+
 /* ---------- FULL ART ---------- */
 
 @Composable
-private fun LiveFullArt(pc: PlayerConnection?) {
-    val meta by (pc?.mediaMetadata ?: return FullArtFallback()).collectAsState()
-    val progress = rememberLiveProgress(pc)
+private fun FullArtPreview(meta: MediaMetadata?) {
     Box(Modifier.fillMaxSize()) {
-        LiveArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
+        PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
         Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             MiniIcon(R.drawable.expand_more, Color.White)
@@ -550,29 +491,15 @@ private fun LiveFullArt(pc: PlayerConnection?) {
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(Modifier.fillMaxWidth()) { LiveTitle(meta, Color.White) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White) }
+                MiniIcon(R.drawable.favorite_border, Color.White, 20)
+            }
             Spacer(Modifier.height(12.dp))
-            LiveProgressBar(progress, trackColor = Color.White.copy(alpha = 0.25f))
-            Spacer(Modifier.height(14.dp))
-            LiveTransport(pc, Color.White)
-        }
-    }
-}
-
-@Composable
-private fun FullArtFallback() {
-    Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize().background(mockArtBrush()))
-        FullArtScrim()
-        Column(
-            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Column(Modifier.fillMaxWidth()) { LiveTitle(null, Color.White) }
+            PreviewSlider(MaterialTheme.colorScheme.primary, Color.White.copy(alpha = 0.25f))
+            PreviewTimes(Color.White.copy(alpha = 0.8f))
             Spacer(Modifier.height(12.dp))
-            LiveProgressBar(0.35f, trackColor = Color.White.copy(alpha = 0.25f))
-            Spacer(Modifier.height(14.dp))
-            StaticTransport(Color.White)
+            PreviewTransport(Color.White)
         }
     }
 }
