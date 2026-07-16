@@ -60,6 +60,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -408,16 +409,17 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
         modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // top bar: minimize / title / theme
+        // top bar: minimize / Now Playing / theme
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             MiniIcon(R.drawable.expand_more, cs.onSurface, 22)
             Text(
-                text = meta?.title ?: "—",
+                text = stringResource(R.string.now_playing),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = cs.onSurface,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
             )
             MiniIcon(R.drawable.palette, cs.onSurface, 20)
@@ -444,28 +446,42 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
             MiniIcon(R.drawable.queue_music, cs.onSurface, 20)
             MiniIcon(R.drawable.favorite, MaterialTheme.colorScheme.error, 20)
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         LiveProgressBar(progress)
-        Spacer(Modifier.height(12.dp))
-        if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
         Spacer(Modifier.height(10.dp))
-        // show lyrics bar
-        Row(
+        if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
+        Spacer(Modifier.height(8.dp))
+        // sleep timer + more (above the lyrics card)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+            MiniIcon(R.drawable.bedtime, cs.onSurface, 18)
+            Spacer(Modifier.width(10.dp))
+            MiniIcon(R.drawable.more_horiz, cs.onSurface, 18)
+        }
+        Spacer(Modifier.height(6.dp))
+        // lyrics card: header + partial lines (current highlighted)
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(cs.onSurface.copy(alpha = 0.08f))
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.Black.copy(alpha = 0.30f))
                 .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(R.string.show_lyrics),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = cs.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            MiniIcon(R.drawable.expand_less, cs.onSurface, 16)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.show_lyrics),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = cs.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                MiniIcon(R.drawable.expand_less, cs.onSurface, 16)
+            }
+            Spacer(Modifier.height(6.dp))
+            Text("In the stillness of the night", fontSize = 9.sp, color = cs.onSurface.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            Spacer(Modifier.height(2.dp))
+            Text("I feel the weight, the empty sight", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            Spacer(Modifier.height(2.dp))
+            Text("Whispers in my mind, they call", fontSize = 9.sp, color = cs.onSurface.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
     }
 }

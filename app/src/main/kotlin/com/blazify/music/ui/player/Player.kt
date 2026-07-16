@@ -166,6 +166,7 @@ import com.blazify.music.constants.SquigglySliderKey
 import com.blazify.music.constants.ThumbnailCornerRadius
 import com.blazify.music.constants.UseNewPlayerDesignKey
 import com.blazify.music.db.entities.LyricsEntity
+import com.blazify.music.lyrics.LyricsUtils
 import com.blazify.music.extensions.metadata
 import com.blazify.music.extensions.togglePlayPause
 import com.blazify.music.extensions.toggleRepeatMode
@@ -1880,6 +1881,8 @@ fun BottomSheetPlayer(
                 } else if (playerDesign == PlayerDesign.RING && !showInlineLyrics) {
                     val ringNav = LocalNavController.current
                     val ringShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+                    val ringQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
+                    val ringLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
                     val ringIsEpisode = currentSong?.song?.isEpisode == true
                     val ringIsFavorite =
                         if (ringIsEpisode) {
@@ -1889,6 +1892,8 @@ fun BottomSheetPlayer(
                         }
                     RingPlayerLayout(
                         mediaMetadata = mediaMetadata,
+                        nowPlayingFrom = ringQueueTitle ?: mediaMetadata?.album?.title,
+                        lyricsText = ringLyrics?.lyrics,
                         isFavorite = ringIsFavorite,
                         position = sliderPosition ?: effectivePosition,
                         duration = duration,
@@ -1898,7 +1903,6 @@ fun BottomSheetPlayer(
                         textColor = TextBackgroundColor,
                         buttonBgColor = textButtonColor,
                         buttonFgColor = iconButtonColor,
-                        sliderColors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
                         onSeek = { pos ->
                             playerConnection.player.seekTo(pos)
                             position = pos
@@ -1925,6 +1929,17 @@ fun BottomSheetPlayer(
                         },
                         onToggleShuffle = {
                             playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
+                        },
+                        onOpenSleepTimer = { showSleepTimerDialog = true },
+                        moreButton = {
+                            mediaMetadata?.let {
+                                PlayerMoreMenuButton(
+                                    mediaMetadata = it,
+                                    state = state,
+                                    textButtonColor = textButtonColor,
+                                    iconButtonColor = iconButtonColor,
+                                )
+                            }
                         },
                         modifier =
                             Modifier
@@ -2196,13 +2211,16 @@ fun MoreActionsButton(
 
 /**
  * RING design — a distinct full-player layout (see the "Remedy Vibe" reference):
- * top bar (minimize · title/artist · theme), circular art wrapped by a seekable
- * progress ring, a queue+favourite row, slim progress bar with times, transport,
- * and a "Show Lyrics" bar at the bottom. Colours stay album-art dynamic.
+ * top bar (minimize · "Now Playing" · theme), circular art wrapped by a seekable
+ * progress ring, a queue+favourite row, an image-style progress bar with times,
+ * transport, a sleep-timer + more row, and a partial synced-lyrics card that
+ * expands to full lyrics on tap. Colours stay album-art dynamic.
  */
 @Composable
 private fun RingPlayerLayout(
     mediaMetadata: MediaMetadata?,
+    nowPlayingFrom: String?,
+    lyricsText: String?,
     isFavorite: Boolean,
     position: Long,
     duration: Long,
@@ -2212,7 +2230,6 @@ private fun RingPlayerLayout(
     textColor: Color,
     buttonBgColor: Color,
     buttonFgColor: Color,
-    sliderColors: androidx.compose.material3.SliderColors,
     onSeek: (Long) -> Unit,
     onScrub: (Long) -> Unit,
     onScrubFinished: () -> Unit,
@@ -2226,6 +2243,8 @@ private fun RingPlayerLayout(
     onCollapse: () -> Unit,
     onOpenTheme: () -> Unit,
     onToggleShuffle: () -> Unit,
+    onOpenSleepTimer: () -> Unit,
+    moreButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
@@ -2248,21 +2267,23 @@ private fun RingPlayerLayout(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = mediaMetadata?.title.orEmpty(),
+                    text = stringResource(R.string.now_playing),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = textColor,
-                    modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
                 )
-                Text(
-                    text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = textColor.copy(alpha = 0.7f),
-                )
+                if (!nowPlayingFrom.isNullOrBlank()) {
+                    Text(
+                        text = nowPlayingFrom,
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = textColor.copy(alpha = 0.7f),
+                        modifier = Modifier.basicMarquee(),
+                    )
+                }
             }
             Box(
                 modifier = Modifier
@@ -2321,13 +2342,17 @@ private fun RingPlayerLayout(
 
         Spacer(Modifier.height(6.dp))
 
-        // --- progress + times ---
+        // --- progress + times (image style: primary track + round thumb) ---
         Slider(
-            value = position.toFloat(),
+            value = position.toFloat().coerceAtLeast(0f),
             valueRange = 0f..(if (duration == C.TIME_UNSET || duration <= 0) 1f else duration.toFloat()),
             onValueChange = { onScrub(it.toLong()) },
             onValueChangeFinished = onScrubFinished,
-            colors = sliderColors,
+            colors = androidx.compose.material3.SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = textColor.copy(alpha = 0.22f),
+            ),
             modifier = Modifier.fillMaxWidth(),
         )
         Row(
@@ -2381,18 +2406,56 @@ private fun RingPlayerLayout(
             )
         }
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(10.dp))
 
-        // --- show lyrics ---
+        // --- sleep timer + more (above the lyrics card) ---
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
-                .background(textColor.copy(alpha = 0.08f))
-                .clickable(onClick = onShowLyrics)
-                .padding(horizontal = 18.dp, vertical = 14.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            RingIconButton(R.drawable.bedtime, textColor, size = 24, onClick = onOpenSleepTimer)
+            Spacer(Modifier.width(8.dp))
+            moreButton()
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // --- partial lyrics card (tap to expand to full lyrics) ---
+        RingLyricsCard(
+            lyricsText = lyricsText,
+            position = position,
+            textColor = textColor,
+            onClick = onShowLyrics,
+        )
+
+        Spacer(Modifier.height(12.dp))
+    }
+}
+
+/** Bottom lyrics card: header + up-to-three synced partial lines (current highlighted). */
+@Composable
+private fun RingLyricsCard(
+    lyricsText: String?,
+    position: Long,
+    textColor: Color,
+    onClick: () -> Unit,
+) {
+    val entries = remember(lyricsText) {
+        if (lyricsText.isNullOrBlank()) emptyList() else LyricsUtils.parseLyrics(lyricsText)
+    }
+    val currentIndex = remember(entries, position) {
+        if (entries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(entries, position)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.Black.copy(alpha = 0.30f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 18.dp, vertical = 14.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.show_lyrics),
                 style = MaterialTheme.typography.titleSmall,
@@ -2407,8 +2470,50 @@ private fun RingPlayerLayout(
                 modifier = Modifier.size(22.dp),
             )
         }
-
-        Spacer(Modifier.height(16.dp))
+        if (currentIndex >= 0) {
+            val prev = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() }
+            val curr = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() }
+            val next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() }
+            if (prev != null || curr != null || next != null) {
+                Spacer(Modifier.height(10.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    if (prev != null) {
+                        Text(
+                            text = prev,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor.copy(alpha = 0.5f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                    }
+                    Text(
+                        text = curr ?: "♪",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                    )
+                    if (next != null) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = next,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor.copy(alpha = 0.5f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
