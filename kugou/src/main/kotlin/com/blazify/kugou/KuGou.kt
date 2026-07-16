@@ -83,11 +83,36 @@ object KuGou {
     ): SearchLyricsResponse.Candidate? {
         searchSongs(keyword).data.info.forEach { song ->
             if (duration == -1 || abs(song.duration - duration) <= DURATION_TOLERANCE) { // if duration == -1, we don't care duration
-                val candidate = searchLyricsByHash(song.hash).candidates.firstOrNull()
-                if (candidate != null) return candidate
+                // Verify the candidate actually IS the searched song — duration alone
+                // lets similar-length wrong songs through (the wrong-lyrics bug).
+                if (isTitleSimilar(keyword.title, song.songname)) {
+                    val candidate = searchLyricsByHash(song.hash).candidates.firstOrNull()
+                    if (candidate != null) return candidate
+                }
             }
         }
-        return searchLyricsByKeyword(keyword, duration).candidates.firstOrNull()
+        // NOTE: no blind keyword fallback — it returned wrong-song lyrics whenever
+        // nothing matched properly. Better to return nothing than the wrong song.
+        return null
+    }
+
+    /**
+     * True when at least half of the query-title's words appear in the candidate
+     * name (case/punctuation-insensitive). KuGou names often look like
+     * "Artist - Title" or carry extra CJK text, so token overlap on the query side
+     * is the robust direction to test.
+     */
+    private fun isTitleSimilar(queryTitle: String, candidateName: String): Boolean {
+        fun tokens(s: String) = s.lowercase()
+            .replace(Regex("[^\\p{L}\\p{N}]+"), " ")
+            .split(" ")
+            .filter { it.length > 1 }
+            .toSet()
+        val q = tokens(queryTitle)
+        val c = tokens(candidateName)
+        if (q.isEmpty() || c.isEmpty()) return false
+        val overlap = q.count { it in c }
+        return overlap.toFloat() / q.size >= 0.5f
     }
 
     suspend fun searchSongs(keyword: Keyword) =

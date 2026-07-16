@@ -17,6 +17,9 @@ data class SearchSongResponse(
         data class Info(
             val duration: Int,
             val hash: String,
+            // Used to verify the candidate actually IS the searched song.
+            val songname: String = "",
+            val singername: String = "",
         )
     }
 }
