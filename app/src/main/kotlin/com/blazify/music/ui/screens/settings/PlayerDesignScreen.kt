@@ -644,10 +644,15 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     Box(Modifier.fillMaxSize()) {
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
-        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniIcon(R.drawable.expand_more, Color.White)
-            MiniIcon(R.drawable.more_horiz, Color.White)
-        }
+        // "Now Playing" centred at the top (no minimize / more icons here).
+        Text(
+            text = stringResource(R.string.now_playing),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            style = LocalTextStyle.current.copy(shadow = Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f)),
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp),
+        )
         Column(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

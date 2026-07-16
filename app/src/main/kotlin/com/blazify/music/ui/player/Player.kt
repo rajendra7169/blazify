@@ -97,6 +97,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -1888,6 +1889,19 @@ fun BottomSheetPlayer(
                         FullArtBackground(
                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             modifier = Modifier.fillMaxSize(),
+                        )
+                        // "Now Playing" header centred at the top, over the artwork.
+                        Text(
+                            text = stringResource(R.string.now_playing),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                shadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f),
+                            ),
+                            fontWeight = FontWeight.Bold,
+                            color = TextBackgroundColor,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                                .padding(top = 14.dp),
                         )
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
