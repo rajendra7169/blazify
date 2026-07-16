@@ -220,8 +220,8 @@ private fun VinylDisc(
 private fun DrawScope.drawTonearm() {
     val d = size.minDimension
     val b = Offset(d * ARM_BX, d * ARM_BY)     // bearing / pivot
-    val e = Offset(d * ARM_BX, d * 0.60f)      // elbow start (tube is straight until here)
-    val h = Offset(d * 0.70f, d * 0.75f)       // stylus point: ~0.74 × disc radius, lower-right grooves
+    val e = Offset(d * ARM_BX, d * 0.66f)      // elbow starts LOW (tube stays straight past mid)
+    val h = Offset(d * 0.69f, d * 0.76f)       // stylus point: ~0.80 × disc radius, lower-right grooves
 
     val chrome = Brush.linearGradient(
         listOf(Color(0xFF6E6F75), Color(0xFFEDEEF2), Color(0xFF93949A), Color(0xFF45464C)),
@@ -229,11 +229,12 @@ private fun DrawScope.drawTonearm() {
         end = Offset(d * 0.90f, 0f),
     )
 
-    // The J-arm path: straight down, then one smooth elbow onto the record.
+    // The J-arm path: straight down for most of its length, then one short,
+    // tight elbow onto the record (less sweep, like the reference).
     val tube = Path().apply {
         moveTo(b.x, b.y)
         lineTo(e.x, e.y)
-        cubicTo(d * ARM_BX, d * 0.70f, d * 0.76f, d * 0.71f, h.x, h.y)
+        cubicTo(d * ARM_BX, d * 0.72f, d * 0.759f, d * 0.72f, h.x, h.y)
     }
 
     /* --- shadows first (light from top-left → shadows fall down-right) --- */
@@ -242,7 +243,7 @@ private fun DrawScope.drawTonearm() {
         drawPath(tube, Color.Black.copy(alpha = 0.10f), style = Stroke(width = d * 0.036f, cap = StrokeCap.Round))
         drawPath(tube, Color.Black.copy(alpha = 0.20f), style = Stroke(width = d * 0.020f, cap = StrokeCap.Round))
         // Gimbal + counterweight shadow.
-        drawCircle(Color.Black.copy(alpha = 0.22f), radius = d * 0.078f, center = b)
+        drawCircle(Color.Black.copy(alpha = 0.22f), radius = d * 0.098f, center = b)
         // Headshell shadow blob on the record.
         drawCircle(
             brush = Brush.radialGradient(
@@ -260,79 +261,109 @@ private fun DrawScope.drawTonearm() {
     drawPath(tube, brush = chrome, style = Stroke(width = d * 0.014f, cap = StrokeCap.Round))
     drawPath(tube, Color.White.copy(alpha = 0.85f), style = Stroke(width = d * 0.0045f, cap = StrokeCap.Round))
 
-    /* --- counterweight cap stacked vertically on top of the bearing --- */
-    // Stub between bearing and weight.
-    drawLine(brush = chrome, start = b, end = Offset(b.x, d * 0.10f), strokeWidth = d * 0.013f, cap = StrokeCap.Round)
-    // Cylinder body (horizontal chrome banding = vertical cylinder).
+    /* --- counterweight stack on top of the bearing (flat cap → neck → collar) --- */
+    val chromeStack = Brush.horizontalGradient(
+        colors = listOf(Color(0xFF8E8F95), Color(0xFFF7F8FA), Color(0xFFB9BAC0), Color(0xFF4A4B50)),
+        startX = b.x - d * 0.030f,
+        endX = b.x + d * 0.030f,
+    )
+    // Collar entering the bearing.
     drawRoundRect(
-        brush = Brush.horizontalGradient(
-            colors = listOf(Color(0xFF9FA0A6), Color(0xFFF4F5F7), Color(0xFF6B6C72), Color(0xFF3A3B40)),
-            startX = b.x - d * 0.026f,
-            endX = b.x + d * 0.026f,
-        ),
-        topLeft = Offset(b.x - d * 0.026f, d * 0.035f),
-        size = Size(d * 0.052f, d * 0.065f),
-        cornerRadius = CornerRadius(d * 0.010f, d * 0.010f),
+        brush = chromeStack,
+        topLeft = Offset(b.x - d * 0.018f, d * 0.052f),
+        size = Size(d * 0.036f, d * 0.030f),
+        cornerRadius = CornerRadius(d * 0.006f, d * 0.006f),
     )
-    // Knurling.
-    for (i in 0..3) {
-        val ky = d * 0.043f + i * d * 0.012f
-        drawLine(Color.Black.copy(alpha = 0.25f), Offset(b.x - d * 0.024f, ky), Offset(b.x + d * 0.024f, ky), strokeWidth = d * 0.0022f)
-    }
-    // Dome cap on top.
-    drawCircle(
-        brush = Brush.radialGradient(
-            listOf(Color(0xFFEDEEF2), Color(0xFF8A8B91)),
-            center = Offset(b.x - d * 0.005f, d * 0.024f),
-            radius = d * 0.020f,
-        ),
-        radius = d * 0.015f,
-        center = Offset(b.x, d * 0.028f),
+    // Dark neck.
+    drawRoundRect(
+        color = Color(0xFF3E3F44),
+        topLeft = Offset(b.x - d * 0.011f, d * 0.038f),
+        size = Size(d * 0.022f, d * 0.016f),
+        cornerRadius = CornerRadius(d * 0.004f, d * 0.004f),
+    )
+    // Wide flat cap (screw-head look) with edge shading + catch light.
+    drawRoundRect(
+        brush = chromeStack,
+        topLeft = Offset(b.x - d * 0.029f, d * 0.017f),
+        size = Size(d * 0.058f, d * 0.022f),
+        cornerRadius = CornerRadius(d * 0.008f, d * 0.008f),
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.25f),
+        topLeft = Offset(b.x - d * 0.029f, d * 0.033f),
+        size = Size(d * 0.058f, d * 0.006f),
+        cornerRadius = CornerRadius(d * 0.003f, d * 0.003f),
+    )
+    drawLine(
+        Color.White.copy(alpha = 0.55f),
+        Offset(b.x - d * 0.024f, d * 0.020f),
+        Offset(b.x + d * 0.020f, d * 0.020f),
+        strokeWidth = d * 0.0025f,
+        cap = StrokeCap.Round,
     )
 
-    /* --- gimbal bearing housing --- */
+    /* --- gimbal bearing: big dark ring with a flat grey disc inside --- */
+    // Outer dark donut.
     drawCircle(
         brush = Brush.radialGradient(
-            listOf(Color(0xFF4A4A4F), Color(0xFF1A1A1D), Color(0xFF0D0D0F)),
-            center = b - Offset(d * 0.018f, d * 0.018f),
-            radius = d * 0.105f,
+            listOf(Color(0xFF46464B), Color(0xFF1C1C1F), Color(0xFF0C0C0E)),
+            center = b - Offset(d * 0.022f, d * 0.022f),
+            radius = d * 0.135f,
         ),
-        radius = d * 0.072f,
+        radius = d * 0.095f,
         center = b,
     )
-    drawCircle(Color.White.copy(alpha = 0.15f), radius = d * 0.072f, center = b, style = Stroke(width = d * 0.003f))
-    // Grey centre disc (like the reference).
-    drawCircle(
-        brush = Brush.radialGradient(
-            listOf(Color(0xFFB9BAC0), Color(0xFF7C7D83), Color(0xFF4E4F55)),
-            center = b - Offset(d * 0.012f, d * 0.012f),
-            radius = d * 0.055f,
-        ),
-        radius = d * 0.040f,
-        center = b,
-    )
-    drawCircle(Color.Black.copy(alpha = 0.30f), radius = d * 0.040f, center = b, style = Stroke(width = d * 0.0025f))
-    // Top-left catch light on the housing.
+    // Rim light (top-left) + bottom shade for 3D depth.
     drawArc(
-        color = Color.White.copy(alpha = 0.22f),
-        startAngle = -160f,
-        sweepAngle = 70f,
+        color = Color.White.copy(alpha = 0.30f),
+        startAngle = -165f,
+        sweepAngle = 80f,
         useCenter = false,
-        topLeft = b - Offset(d * 0.063f, d * 0.063f),
-        size = Size(d * 0.126f, d * 0.126f),
-        style = Stroke(width = d * 0.005f, cap = StrokeCap.Round),
+        topLeft = b - Offset(d * 0.091f, d * 0.091f),
+        size = Size(d * 0.182f, d * 0.182f),
+        style = Stroke(width = d * 0.004f, cap = StrokeCap.Round),
     )
-    // Pivot cap.
+    drawArc(
+        color = Color.Black.copy(alpha = 0.35f),
+        startAngle = 20f,
+        sweepAngle = 80f,
+        useCenter = false,
+        topLeft = b - Offset(d * 0.091f, d * 0.091f),
+        size = Size(d * 0.182f, d * 0.182f),
+        style = Stroke(width = d * 0.004f, cap = StrokeCap.Round),
+    )
+    // Flat grey inner disc (matte, like the reference).
     drawCircle(
-        brush = Brush.radialGradient(listOf(Color(0xFFE6E6E8), Color(0xFF77777D)), center = b, radius = d * 0.018f),
-        radius = d * 0.013f,
+        brush = Brush.linearGradient(
+            listOf(Color(0xFFC6C7CD), Color(0xFFA7A8AE), Color(0xFF87888E)),
+            start = b - Offset(d * 0.045f, d * 0.045f),
+            end = b + Offset(d * 0.045f, d * 0.045f),
+        ),
+        radius = d * 0.058f,
         center = b,
     )
-    drawCircle(Color(0xFF232327), radius = d * 0.005f, center = b)
+    drawCircle(Color.Black.copy(alpha = 0.35f), radius = d * 0.058f, center = b, style = Stroke(width = d * 0.003f))
+    drawCircle(
+        Color.White.copy(alpha = 0.25f),
+        radius = d * 0.052f,
+        center = b - Offset(d * 0.004f, d * 0.004f),
+        style = Stroke(width = d * 0.0022f),
+    )
+    // Centre screw.
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFFEDEEF2), Color(0xFF6E6F75)),
+            center = b - Offset(d * 0.003f, d * 0.003f),
+            radius = d * 0.012f,
+        ),
+        radius = d * 0.009f,
+        center = b,
+    )
+    drawCircle(Color(0xFF2A2B2F), radius = d * 0.0035f, center = b)
 
-    /* --- headshell: black cartridge along the elbow's tangent (~146°) --- */
+    /* --- headshell: black cartridge along the elbow's tangent (~150°) --- */
     drawCircle(brush = chrome, radius = d * 0.011f, center = h)
-    rotate(degrees = 146f, pivot = h) {
+    rotate(degrees = 150f, pivot = h) {
         // Cartridge body.
         drawRoundRect(
             color = Color(0xFF131316),
