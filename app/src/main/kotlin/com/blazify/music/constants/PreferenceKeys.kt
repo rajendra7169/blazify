@@ -462,6 +462,8 @@ val LyricsCacheCleanupV4Key = booleanPreferencesKey("lyricsCacheCleanupV4")
 // Fifth cleanup: clears NOT_FOUND entries + wrong KuGou matches cached before
 // title-verified KuGou and no-NOT_FOUND-caching existed.
 val LyricsCacheCleanupV5Key = booleanPreferencesKey("lyricsCacheCleanupV5")
+// Sixth cleanup: refetch everything now that the Better Lyrics aggregator works.
+val LyricsCacheCleanupV6Key = booleanPreferencesKey("lyricsCacheCleanupV6")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

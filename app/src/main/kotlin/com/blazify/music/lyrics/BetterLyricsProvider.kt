@@ -6,11 +6,17 @@
 package com.blazify.music.lyrics
 
 import android.content.Context
-import com.blazify.music.betterlyrics.BetterLyrics
 import com.blazify.music.constants.EnableBetterLyricsKey
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.get
 
+/**
+ * Better Lyrics via the aggregator API the browser extension uses
+ * (Musixmatch, Better Lyrics, BiniLyrics, Portato/Legato, LRCLib), matched by
+ * the exact YouTube video id. The old lyrics-api.boidu.dev endpoint now
+ * returns 401 for everyone; [BetterLyricsClient] handles the Turnstile auth
+ * the new API requires.
+ */
 object BetterLyricsProvider : LyricsProvider {
     override val name = "BetterLyrics"
 
@@ -23,5 +29,12 @@ object BetterLyricsProvider : LyricsProvider {
         artist: String,
         duration: Int,
         album: String?,
-    ): Result<String> = BetterLyrics.getLyrics(title, artist, duration, album)
+    ): Result<String> {
+        val lyrics = BetterLyricsClient.getLyrics(context, id, title, artist, duration, album)
+        return if (lyrics != null) {
+            Result.success(lyrics)
+        } else {
+            Result.failure(IllegalStateException("No lyrics from Better Lyrics"))
+        }
+    }
 }

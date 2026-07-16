@@ -165,7 +165,7 @@ import com.blazify.music.constants.ShuffleModeKey
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
-import com.blazify.music.constants.LyricsCacheCleanupV5Key
+import com.blazify.music.constants.LyricsCacheCleanupV6Key
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.db.MusicDatabase
@@ -192,6 +192,7 @@ import com.blazify.music.extensions.toEnum
 import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.extensions.toPersistQueue
 import com.blazify.music.extensions.toQueue
+import com.blazify.music.lyrics.BetterLyricsClient
 import com.blazify.music.lyrics.LyricsHelper
 import com.blazify.music.models.PersistPlayerState
 import com.blazify.music.models.PersistQueue
@@ -870,11 +871,17 @@ class MusicService :
         // duration was known, letting fuzzy providers cache WRONG lyrics in the
         // DB. Wipe the lyrics cache once so everything refetches correctly.
         scope.launch {
-            val cleaned = dataStore.data.map { it[LyricsCacheCleanupV5Key] ?: false }.first()
+            val cleaned = dataStore.data.map { it[LyricsCacheCleanupV6Key] ?: false }.first()
             if (!cleaned) {
                 database.query { clearAllLyrics() }
-                dataStore.edit { it[LyricsCacheCleanupV5Key] = true }
+                dataStore.edit { it[LyricsCacheCleanupV6Key] = true }
             }
+        }
+
+        // Warm the Better Lyrics JWT (solves the Turnstile challenge once in the
+        // background) so lyric fetches don't pay that cost on first use.
+        scope.launch {
+            runCatching { BetterLyricsClient.warmUp(this@MusicService) }
         }
 
         // Lyrics preloading: fetch the CURRENT song's lyrics as soon as it starts
