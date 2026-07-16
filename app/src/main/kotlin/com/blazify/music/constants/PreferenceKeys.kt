@@ -464,6 +464,8 @@ val LyricsCacheCleanupV4Key = booleanPreferencesKey("lyricsCacheCleanupV4")
 val LyricsCacheCleanupV5Key = booleanPreferencesKey("lyricsCacheCleanupV5")
 // Sixth cleanup: refetch everything now that the Better Lyrics aggregator works.
 val LyricsCacheCleanupV6Key = booleanPreferencesKey("lyricsCacheCleanupV6")
+// Seventh cleanup: clears literal-"null" lyrics cached by the optString(null) bug.
+val LyricsCacheCleanupV7Key = booleanPreferencesKey("lyricsCacheCleanupV7")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

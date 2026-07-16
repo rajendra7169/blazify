@@ -16,10 +16,13 @@ import com.blazify.music.utils.reportException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -47,7 +50,25 @@ constructor(
     private val cache = LruCache<String, List<LyricsResult>>(MAX_CACHE_SIZE)
     private var currentLyricsJob: Job? = null
 
+    // The service preload and the player view often request the same song at the
+    // same moment — share one in-flight fetch instead of hitting every provider twice.
+    private val fetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val inFlight = ConcurrentHashMap<String, Deferred<LyricsWithProvider>>()
+
     suspend fun getLyrics(mediaMetadata: MediaMetadata): LyricsWithProvider {
+        val deferred = inFlight.computeIfAbsent(mediaMetadata.id) {
+            fetchScope.async {
+                try {
+                    fetchLyrics(mediaMetadata)
+                } finally {
+                    inFlight.remove(mediaMetadata.id)
+                }
+            }
+        }
+        return deferred.await()
+    }
+
+    private suspend fun fetchLyrics(mediaMetadata: MediaMetadata): LyricsWithProvider {
         currentLyricsJob?.cancel()
 
         val cached = cache.get(mediaMetadata.id)?.firstOrNull()

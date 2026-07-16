@@ -54,6 +54,12 @@ object BetterLyricsClient {
     private val JwtKey = stringPreferencesKey("betterLyricsJwt")
     private val jwtMutex = Mutex()
 
+    // Back off after a failed Turnstile solve instead of hammering retries.
+    private const val SOLVE_BACKOFF_MS = 120_000L
+
+    @Volatile
+    private var lastSolveFailureAt = 0L
+
     private val http by lazy {
         OkHttpClient.Builder()
             .connectTimeout(8, TimeUnit.SECONDS)
@@ -113,6 +119,13 @@ object BetterLyricsClient {
                 val data = StringBuilder()
                 val deadline = System.currentTimeMillis() + STREAM_BUDGET_MS
 
+                // org.json turns an explicit JSON null into the STRING "null" via
+                // optString — guard against it or we show literal "null" as lyrics.
+                fun JSONObject.lyricsField(key: String): String? {
+                    if (!has(key) || isNull(key)) return null
+                    return optString(key).takeIf { it.isNotBlank() && it != "null" }
+                }
+
                 fun flushBlock() {
                     val payload = data.toString()
                     data.setLength(0)
@@ -122,10 +135,10 @@ object BetterLyricsClient {
                         val json = JSONObject(payload)
                         val provider = json.optString("provider")
                         val res = json.optJSONObject("results") ?: return
-                        res.optString("wordByWord").takeIf { it.isNotBlank() }?.let { results["rich:$provider"] = it }
-                        res.optString("synced").takeIf { it.isNotBlank() }?.let { results["sync:$provider"] = it }
-                        res.optString("plainLyrics").takeIf { it.isNotBlank() }?.let { results["plain:$provider"] = it }
-                        res.optString("plain").takeIf { it.isNotBlank() }?.let { results["plain:$provider"] = it }
+                        res.lyricsField("wordByWord")?.let { results["rich:$provider"] = it }
+                        res.lyricsField("synced")?.let { results["sync:$provider"] = it }
+                        res.lyricsField("plainLyrics")?.let { results["plain:$provider"] = it }
+                        res.lyricsField("plain")?.let { results["plain:$provider"] = it }
                     } catch (e: Exception) {
                         Timber.tag(TAG).w("Bad SSE payload: ${e.message}")
                     }
@@ -162,10 +175,19 @@ object BetterLyricsClient {
             "rich:musixmatch",
             "sync:musixmatch", "sync:blyrics", "sync:binimum", "sync:portato", "sync:legato", "sync:lrclib",
         )
-        for (key in order) results[key]?.let { return it }
-        // Any other synced source, then any plain text.
-        results.entries.firstOrNull { it.key.startsWith("sync:") }?.let { return it.value }
-        results.entries.firstOrNull { it.key.startsWith("plain:") }?.let { return it.value }
+        // Timed candidates must actually parse as synced lyrics with our parser
+        // (guards against formats we can't render being classified as plain).
+        fun parsesSynced(lyrics: String): Boolean =
+            try {
+                LyricsUtils.parseLyrics(lyrics).isNotEmpty()
+            } catch (e: Exception) {
+                false
+            }
+
+        for (key in order) results[key]?.let { if (parsesSynced(it)) return it }
+        results.entries.firstOrNull { it.key.startsWith("sync:") && parsesSynced(it.value) }?.let { return it.value }
+        // Fall back to plain text (min length filters out junk fragments).
+        results.entries.firstOrNull { it.key.startsWith("plain:") && it.value.length > 40 }?.let { return it.value }
         return null
     }
 
@@ -174,9 +196,18 @@ object BetterLyricsClient {
     private suspend fun getJwt(context: Context): String? = jwtMutex.withLock {
         val cached = context.dataStore.data.map { it[JwtKey] }.first()
         if (cached != null && !isJwtExpired(cached)) return cached
+        if (System.currentTimeMillis() - lastSolveFailureAt < SOLVE_BACKOFF_MS) return null
 
-        val turnstileToken = solveTurnstile(context) ?: return null
-        val jwt = exchangeToken(turnstileToken) ?: return null
+        val turnstileToken = solveTurnstile(context)
+        if (turnstileToken == null) {
+            lastSolveFailureAt = System.currentTimeMillis()
+            return null
+        }
+        val jwt = exchangeToken(turnstileToken)
+        if (jwt == null) {
+            lastSolveFailureAt = System.currentTimeMillis()
+            return null
+        }
         context.dataStore.edit { it[JwtKey] = jwt }
         Timber.tag(TAG).i("Obtained fresh JWT")
         jwt
