@@ -1877,13 +1877,12 @@ fun BottomSheetPlayer(
                     label = "bottomPadding",
                 )
                 if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
-                    // FULL_ART: album art fills the stage, controls float over a bottom scrim.
+                    // FULL_ART: album art fills the WHOLE screen (even behind the bottom
+                    // queue peek) for a seamless look; controls float over the bottom scrim.
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxSize()
-                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                                .padding(bottom = bottomPadding)
                                 .animateContentSize(),
                     ) {
                         FullArtBackground(
@@ -1908,7 +1907,9 @@ fun BottomSheetPlayer(
                             modifier =
                                 Modifier
                                     .align(Alignment.BottomCenter)
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                    .padding(bottom = bottomPadding),
                         ) {
                             mediaMetadata?.let {
                                 controlsContent(it)
