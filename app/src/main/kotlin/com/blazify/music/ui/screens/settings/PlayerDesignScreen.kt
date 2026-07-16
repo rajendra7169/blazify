@@ -2,17 +2,20 @@
  * Blazify Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  *
- * Player-design gallery: swipe through player LAYOUTS in a phone frame, each a
- * live mini mock rendered with the current dynamic colours; Apply persists the
- * choice. Colours stay album-art dynamic — only the layout changes.
+ * Player-design gallery: swipe through player LAYOUTS inside a phone frame. Each
+ * page is a LIVE preview of the real player rendered with the currently-playing
+ * song — real album art, working transport buttons and a real (seekable on Ring)
+ * progress bar. Apply persists the choice. Colours stay album-art dynamic; only
+ * the layout changes. Reached from the full player's top-right theme icon.
  */
 
 package com.blazify.music.ui.screens.settings
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -41,34 +44,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
+import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.PlayerDesignKey
+import com.blazify.music.models.MediaMetadata
+import com.blazify.music.playback.PlayerConnection
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.player.PlayerDesign
+import com.blazify.music.ui.player.SeekableAlbumRing
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberPreference
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerDesignScreen(navController: NavController) {
     val designs = remember { PlayerDesign.entries.toList() }
+    val playerConnection = LocalPlayerConnection.current
     val (activeId, setActiveId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
 
     val pagerState = rememberPagerState(
@@ -100,23 +114,24 @@ fun PlayerDesignScreen(navController: NavController) {
         ) {
             HorizontalPager(
                 state = pagerState,
-                contentPadding = PaddingValues(horizontal = 54.dp),
-                pageSpacing = 14.dp,
+                contentPadding = PaddingValues(horizontal = 62.dp),
+                pageSpacing = 16.dp,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
             ) { page ->
                 val design = designs[page]
                 val focused = page == pagerState.currentPage
-                PhoneFrame(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(vertical = if (focused) 8.dp else 26.dp),
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(vertical = 18.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    when (design) {
-                        PlayerDesign.CLASSIC -> ClassicMock()
-                        PlayerDesign.RING -> RingMock()
-                        PlayerDesign.FULL_ART -> FullArtMock()
+                    PhoneFrame(
+                        modifier = Modifier
+                            .fillMaxHeight(if (focused) 0.94f else 0.82f),
+                    ) {
+                        LivePreview(design, playerConnection)
                     }
                 }
             }
@@ -126,7 +141,7 @@ fun PlayerDesignScreen(navController: NavController) {
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = 14.dp, bottom = 2.dp),
             )
 
             Row(
@@ -191,159 +206,322 @@ private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () ->
     }
 }
 
-/* ---------- shared mock pieces ---------- */
+/* ---------- live preview (real song, real controls) ---------- */
 
 @Composable
-private fun MockIcon(res: Int, tint: Color = MaterialTheme.colorScheme.onSurface, size: Int = 18) {
-    Icon(painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(size.dp))
+private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
+    when (design) {
+        PlayerDesign.CLASSIC -> LiveClassic(pc)
+        PlayerDesign.RING -> LiveRing(pc)
+        PlayerDesign.FULL_ART -> LiveFullArt(pc)
+    }
+}
+
+/** Poll real playback position → 0..1 fraction. */
+@Composable
+private fun rememberLiveProgress(pc: PlayerConnection?): Float {
+    var frac by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(pc) {
+        while (pc != null) {
+            val d = pc.player.duration
+            frac = if (d > 0) (pc.player.currentPosition.toFloat() / d).coerceIn(0f, 1f) else 0f
+            delay(500)
+        }
+    }
+    return frac
 }
 
 @Composable
-private fun MockTitleLines() {
+private fun mockArtBrush(): Brush {
     val cs = MaterialTheme.colorScheme
-    Box(Modifier.fillMaxWidth(0.7f).height(11.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.85f)))
-    Spacer(Modifier.height(6.dp))
-    Box(Modifier.fillMaxWidth(0.45f).height(8.dp).clip(CircleShape).background(cs.onSurfaceVariant.copy(alpha = 0.6f)))
+    return Brush.linearGradient(listOf(cs.primary, cs.tertiary))
 }
 
 @Composable
-private fun MockSlider() {
-    val cs = MaterialTheme.colorScheme
-    Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.2f))) {
-        Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(CircleShape).background(cs.primary))
+private fun LiveArt(url: String?, shape: Shape, modifier: Modifier = Modifier) {
+    if (url != null) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = modifier.clip(shape),
+        )
+    } else {
+        Box(modifier.clip(shape).background(mockArtBrush()))
     }
 }
 
 @Composable
-private fun MockTransport(onColor: Color = MaterialTheme.colorScheme.onSurface) {
+private fun LiveTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorScheme.onSurface) {
+    Text(
+        text = meta?.title ?: "—",
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        color = color,
+    )
+    Spacer(Modifier.height(3.dp))
+    Text(
+        text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "",
+        fontSize = 10.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        color = color.copy(alpha = 0.6f),
+    )
+}
+
+@Composable
+private fun LiveProgressBar(progress: Float, trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)) {
+    Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(trackColor)) {
+        Box(
+            Modifier
+                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                .height(4.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+        )
+    }
+}
+
+@Composable
+private fun MiniIcon(res: Int, tint: Color, size: Int = 18, onClick: (() -> Unit)? = null) {
+    val base = Modifier.size(size.dp)
+    Icon(
+        painter = painterResource(res),
+        contentDescription = null,
+        tint = tint,
+        modifier = if (onClick != null) base.clip(CircleShape).clickable(onClick = onClick) else base,
+    )
+}
+
+@Composable
+private fun LiveTransport(pc: PlayerConnection?, onColor: Color = MaterialTheme.colorScheme.onSurface) {
+    val cs = MaterialTheme.colorScheme
+    val isPlaying by (pc?.isPlaying ?: return StaticTransport(onColor)).collectAsState()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MiniIcon(R.drawable.shuffle, onColor)
+        MiniIcon(R.drawable.skip_previous, onColor, 22) { pc?.player?.seekToPreviousMediaItem() }
+        Box(
+            Modifier.size(46.dp).clip(CircleShape).background(cs.primary).clickable { pc?.togglePlayPause() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                contentDescription = null,
+                tint = cs.onPrimary,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+        MiniIcon(R.drawable.skip_next, onColor, 22) { pc?.player?.seekToNext() }
+        MiniIcon(R.drawable.repeat, onColor)
+    }
+}
+
+/** Non-interactive transport when there is no playing song. */
+@Composable
+private fun StaticTransport(onColor: Color) {
     val cs = MaterialTheme.colorScheme
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MockIcon(R.drawable.shuffle, onColor)
-        MockIcon(R.drawable.skip_previous, onColor)
+        MiniIcon(R.drawable.shuffle, onColor)
+        MiniIcon(R.drawable.skip_previous, onColor, 22)
         Box(Modifier.size(46.dp).clip(CircleShape).background(cs.primary), contentAlignment = Alignment.Center) {
-            Icon(painterResource(R.drawable.pause), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
+            Icon(painterResource(R.drawable.play), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
         }
-        MockIcon(R.drawable.skip_next, onColor)
-        MockIcon(R.drawable.repeat, onColor)
+        MiniIcon(R.drawable.skip_next, onColor, 22)
+        MiniIcon(R.drawable.repeat, onColor)
     }
-}
-
-@Composable
-private fun MockArtBrush(): Brush {
-    val cs = MaterialTheme.colorScheme
-    return Brush.linearGradient(listOf(cs.primary, cs.tertiary))
 }
 
 /* ---------- CLASSIC ---------- */
 
 @Composable
-private fun ClassicMock() {
+private fun LiveClassic(pc: PlayerConnection?) {
+    val meta by (pc?.mediaMetadata ?: return ClassicFallback()).collectAsState()
+    val progress = rememberLiveProgress(pc)
+    val onColor = MaterialTheme.colorScheme.onSurface
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MockIcon(R.drawable.expand_more)
-            MockIcon(R.drawable.more_horiz)
+            MiniIcon(R.drawable.expand_more, onColor)
+            MiniIcon(R.drawable.more_horiz, onColor)
         }
         Spacer(Modifier.weight(0.4f))
-        Box(Modifier.fillMaxWidth(0.82f).aspectRatio(1f).clip(RoundedCornerShape(20.dp)).background(MockArtBrush()))
+        LiveArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
         Spacer(Modifier.height(18.dp))
-        MockTitleLines()
-        Spacer(Modifier.height(16.dp))
-        MockSlider()
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) { LiveTitle(meta) }
+        Spacer(Modifier.height(14.dp))
+        LiveProgressBar(progress)
         Spacer(Modifier.weight(0.5f))
-        MockTransport()
+        LiveTransport(pc, onColor)
+    }
+}
+
+@Composable
+private fun ClassicFallback() {
+    val onColor = MaterialTheme.colorScheme.onSurface
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 18.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            MiniIcon(R.drawable.expand_more, onColor)
+            MiniIcon(R.drawable.more_horiz, onColor)
+        }
+        Spacer(Modifier.weight(0.4f))
+        LiveArt(null, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
+        Spacer(Modifier.height(18.dp))
+        Column(Modifier.fillMaxWidth()) { LiveTitle(null) }
+        Spacer(Modifier.height(14.dp))
+        LiveProgressBar(0.35f)
+        Spacer(Modifier.weight(0.5f))
+        StaticTransport(onColor)
     }
 }
 
 /* ---------- RING ---------- */
 
 @Composable
-private fun RingMock() {
+private fun LiveRing(pc: PlayerConnection?) {
+    val meta by (pc?.mediaMetadata ?: return RingBody(null, 0.35f, null)).collectAsState()
+    val progress = rememberLiveProgress(pc)
+    RingBody(meta, progress, pc)
+}
+
+@Composable
+private fun RingFallback() = RingBody(null, 0.35f, null)
+
+@Composable
+private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection?) {
     val cs = MaterialTheme.colorScheme
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 18.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MockIcon(R.drawable.expand_more)
-            MockIcon(R.drawable.more_horiz)
+        // top bar: minimize / title / theme
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            MiniIcon(R.drawable.expand_more, cs.onSurface, 22)
+            Text(
+                text = meta?.title ?: "—",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = cs.onSurface,
+                modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
+            )
+            MiniIcon(R.drawable.palette, cs.onSurface, 20)
         }
-        Spacer(Modifier.weight(0.5f))
-        Box(contentAlignment = Alignment.Center) {
-            // circular art
-            Box(Modifier.fillMaxWidth(0.62f).aspectRatio(1f).clip(CircleShape).background(MockArtBrush()))
-            // progress ring around it
-            Canvas(Modifier.fillMaxWidth(0.72f).aspectRatio(1f)) {
-                val stroke = 6.dp.toPx()
-                drawArc(
-                    color = cs.onSurface.copy(alpha = 0.18f),
-                    startAngle = 0f, sweepAngle = 360f, useCenter = false,
-                    topLeft = Offset(stroke / 2, stroke / 2),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    style = Stroke(width = stroke, cap = StrokeCap.Round),
-                )
-                drawArc(
-                    color = cs.primary,
-                    startAngle = -90f, sweepAngle = 250f, useCenter = false,
-                    topLeft = Offset(stroke / 2, stroke / 2),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    style = Stroke(width = stroke, cap = StrokeCap.Round),
-                )
-            }
+        Spacer(Modifier.weight(0.4f))
+        SeekableAlbumRing(
+            thumbnailUrl = meta?.thumbnailUrl,
+            progress = progress,
+            ringColor = cs.primary,
+            trackColor = cs.onSurface.copy(alpha = 0.18f),
+            onSeek = { f ->
+                val d = pc?.player?.duration ?: 0L
+                if (d > 0) pc?.player?.seekTo((f * d).toLong())
+            },
+            modifier = Modifier.fillMaxWidth(0.66f).aspectRatio(1f),
+            ringStrokeDp = 5f,
+            artPaddingDp = 9f,
+            fallbackBrush = mockArtBrush(),
+            thumbColor = cs.primary,
+        )
+        Spacer(Modifier.weight(0.4f))
+        // queue + favourite
+        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            MiniIcon(R.drawable.queue_music, cs.onSurface, 20)
+            MiniIcon(R.drawable.favorite, MaterialTheme.colorScheme.error, 20)
         }
-        Spacer(Modifier.height(20.dp))
-        MockTitleLines()
-        Spacer(Modifier.weight(0.6f))
-        MockTransport()
+        Spacer(Modifier.height(8.dp))
+        LiveProgressBar(progress)
+        Spacer(Modifier.height(12.dp))
+        if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
+        Spacer(Modifier.height(10.dp))
+        // show lyrics bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(cs.onSurface.copy(alpha = 0.08f))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.show_lyrics),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = cs.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            MiniIcon(R.drawable.expand_less, cs.onSurface, 16)
+        }
     }
 }
 
 /* ---------- FULL ART ---------- */
 
 @Composable
-private fun FullArtMock() {
-    val cs = MaterialTheme.colorScheme
+private fun LiveFullArt(pc: PlayerConnection?) {
+    val meta by (pc?.mediaMetadata ?: return FullArtFallback()).collectAsState()
+    val progress = rememberLiveProgress(pc)
     Box(Modifier.fillMaxSize()) {
-        // art fills the whole frame
-        Box(Modifier.fillMaxSize().background(MockArtBrush()))
-        // bottom scrim
-        Box(
-            Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    0.35f to Color.Transparent,
-                    1.0f to Color.Black.copy(alpha = 0.72f),
-                ),
-            ),
-        )
-        Row(
-            Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            MockIcon(R.drawable.expand_more, Color.White)
-            MockIcon(R.drawable.more_horiz, Color.White)
+        LiveArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
+        FullArtScrim()
+        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            MiniIcon(R.drawable.expand_more, Color.White)
+            MiniIcon(R.drawable.more_horiz, Color.White)
         }
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Box(Modifier.fillMaxWidth(0.7f).height(11.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f)))
-            Spacer(Modifier.height(6.dp))
-            Box(Modifier.fillMaxWidth(0.45f).height(8.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.6f)))
+            Column(Modifier.fillMaxWidth()) { LiveTitle(meta, Color.White) }
+            Spacer(Modifier.height(12.dp))
+            LiveProgressBar(progress, trackColor = Color.White.copy(alpha = 0.25f))
             Spacer(Modifier.height(14.dp))
-            Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.25f))) {
-                Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(CircleShape).background(cs.primary))
-            }
-            Spacer(Modifier.height(16.dp))
-            MockTransport(onColor = Color.White)
+            LiveTransport(pc, Color.White)
         }
     }
+}
+
+@Composable
+private fun FullArtFallback() {
+    Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().background(mockArtBrush()))
+        FullArtScrim()
+        Column(
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(Modifier.fillMaxWidth()) { LiveTitle(null, Color.White) }
+            Spacer(Modifier.height(12.dp))
+            LiveProgressBar(0.35f, trackColor = Color.White.copy(alpha = 0.25f))
+            Spacer(Modifier.height(14.dp))
+            StaticTransport(Color.White)
+        }
+    }
+}
+
+@Composable
+private fun FullArtScrim() {
+    Box(
+        Modifier.fillMaxSize().background(
+            Brush.verticalGradient(
+                0.30f to Color.Transparent,
+                1.0f to Color.Black.copy(alpha = 0.78f),
+            ),
+        ),
+    )
 }

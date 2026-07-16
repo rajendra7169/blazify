@@ -1072,14 +1072,6 @@ fun AppearanceSettings(
                             onClick = { navController.navigate("settings/appearance/theme") },
                         ),
                     )
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.play),
-                            title = { Text(stringResource(R.string.player_theme)) },
-                            description = { Text(stringResource(R.string.player_theme_desc)) },
-                            onClick = { navController.navigate("settings/appearance/player_design") },
-                        ),
-                    )
                 },
         )
 

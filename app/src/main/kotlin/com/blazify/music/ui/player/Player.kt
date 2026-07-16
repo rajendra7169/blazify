@@ -145,12 +145,8 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
@@ -1248,6 +1244,7 @@ fun BottomSheetPlayer(
                     PlayerThemeButton(
                         textButtonColor = textButtonColor,
                         iconButtonColor = iconButtonColor,
+                        state = state,
                     )
 
                     Spacer(modifier = Modifier.size(12.dp))
@@ -1880,6 +1877,60 @@ fun BottomSheetPlayer(
                             Spacer(Modifier.height(30.dp))
                         }
                     }
+                } else if (playerDesign == PlayerDesign.RING && !showInlineLyrics) {
+                    val ringNav = LocalNavController.current
+                    val ringShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+                    val ringIsEpisode = currentSong?.song?.isEpisode == true
+                    val ringIsFavorite =
+                        if (ringIsEpisode) {
+                            currentSong?.song?.inLibrary != null
+                        } else {
+                            currentSong?.song?.liked == true
+                        }
+                    RingPlayerLayout(
+                        mediaMetadata = mediaMetadata,
+                        isFavorite = ringIsFavorite,
+                        position = sliderPosition ?: effectivePosition,
+                        duration = duration,
+                        isPlaying = effectiveIsPlaying,
+                        repeatMode = repeatMode,
+                        shuffleOn = ringShuffle,
+                        textColor = TextBackgroundColor,
+                        buttonBgColor = textButtonColor,
+                        buttonFgColor = iconButtonColor,
+                        sliderColors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                        onSeek = { pos ->
+                            playerConnection.player.seekTo(pos)
+                            position = pos
+                        },
+                        onScrub = { pos -> sliderPosition = pos },
+                        onScrubFinished = {
+                            sliderPosition?.let {
+                                playerConnection.player.seekTo(it)
+                                position = it
+                            }
+                            sliderPosition = null
+                        },
+                        onTogglePlay = { playerConnection.togglePlayPause() },
+                        onNext = { playerConnection.seekToNext() },
+                        onPrevious = { playerConnection.seekToPrevious() },
+                        onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
+                        onToggleLike = { playerConnection.toggleLike() },
+                        onOpenQueue = { queueSheetState.expandSoft() },
+                        onShowLyrics = { showInlineLyrics = true },
+                        onCollapse = { state.collapseSoft() },
+                        onOpenTheme = {
+                            state.collapseSoft()
+                            ringNav.navigate("settings/appearance/player_design")
+                        },
+                        onToggleShuffle = {
+                            playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
+                        },
+                        modifier =
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding),
+                    )
                 } else {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -1907,16 +1958,6 @@ fun BottomSheetPlayer(
                                         mediaMetadata = mediaMetadata,
                                         showLyrics = showLyrics,
                                         positionProvider = { effectivePosition },
-                                    )
-                                } else if (playerDesign == PlayerDesign.RING) {
-                                    val progress =
-                                        if (duration > 0) effectivePosition.toFloat() / duration else 0f
-                                    RingArt(
-                                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                                        progress = progress,
-                                        cropAlbumArt = cropAlbumArt,
-                                        ringColor = MaterialTheme.colorScheme.primary,
-                                        trackColor = TextBackgroundColor.copy(alpha = 0.18f),
                                     )
                                 } else {
                                     Thumbnail(
@@ -2153,56 +2194,244 @@ fun MoreActionsButton(
     }
 }
 
-/** RING design: circular album art wrapped by a dynamic progress ring ("CD-player" look). */
+/**
+ * RING design — a distinct full-player layout (see the "Remedy Vibe" reference):
+ * top bar (minimize · title/artist · theme), circular art wrapped by a seekable
+ * progress ring, a queue+favourite row, slim progress bar with times, transport,
+ * and a "Show Lyrics" bar at the bottom. Colours stay album-art dynamic.
+ */
 @Composable
-private fun RingArt(
-    thumbnailUrl: String?,
-    progress: Float,
-    cropAlbumArt: Boolean,
-    ringColor: Color,
-    trackColor: Color,
+private fun RingPlayerLayout(
+    mediaMetadata: MediaMetadata?,
+    isFavorite: Boolean,
+    position: Long,
+    duration: Long,
+    isPlaying: Boolean,
+    repeatMode: Int,
+    shuffleOn: Boolean,
+    textColor: Color,
+    buttonBgColor: Color,
+    buttonFgColor: Color,
+    sliderColors: androidx.compose.material3.SliderColors,
+    onSeek: (Long) -> Unit,
+    onScrub: (Long) -> Unit,
+    onScrubFinished: () -> Unit,
+    onTogglePlay: () -> Unit,
+    onNext: () -> Unit,
+    onPrevious: () -> Unit,
+    onToggleRepeat: () -> Unit,
+    onToggleLike: () -> Unit,
+    onOpenQueue: () -> Unit,
+    onShowLyrics: () -> Unit,
+    onCollapse: () -> Unit,
+    onOpenTheme: () -> Unit,
+    onToggleShuffle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    val progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+            .padding(horizontal = PlayerHorizontalPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val side = minOf(maxWidth, maxHeight) * 0.82f
-        Box(modifier = Modifier.size(side), contentAlignment = Alignment.Center) {
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = null,
-                contentScale = if (cropAlbumArt) ContentScale.Crop else ContentScale.Crop,
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .clip(CircleShape),
-            )
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val strokeWidth = 8.dp.toPx()
-                val d = size.minDimension - strokeWidth
-                val topLeft = Offset((size.width - d) / 2f, (size.height - d) / 2f)
-                drawArc(
-                    color = trackColor,
-                    startAngle = -90f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = Size(d, d),
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+        // --- top bar: minimize · title/artist · theme ---
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RingIconButton(R.drawable.expand_more, textColor, size = 28, onClick = onCollapse)
+            Column(
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = mediaMetadata?.title.orEmpty(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = textColor,
+                    modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
                 )
-                drawArc(
-                    color = ringColor,
-                    startAngle = -90f,
-                    sweepAngle = 360f * progress.coerceIn(0f, 1f),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = Size(d, d),
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                Text(
+                    text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = textColor.copy(alpha = 0.7f),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(buttonBgColor)
+                    .clickable(onClick = onOpenTheme),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.palette),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(buttonFgColor),
+                    modifier = Modifier.size(22.dp),
                 )
             }
         }
+
+        // --- ring ---
+        Box(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            BoxWithConstraints(contentAlignment = Alignment.Center) {
+                val side = minOf(maxWidth, maxHeight) * 0.92f
+                SeekableAlbumRing(
+                    thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                    progress = progress,
+                    ringColor = MaterialTheme.colorScheme.primary,
+                    trackColor = textColor.copy(alpha = 0.16f),
+                    onSeek = { f -> if (duration > 0) onSeek((f * duration).toLong()) },
+                    modifier = Modifier.size(side),
+                    ringStrokeDp = 7f,
+                    artPaddingDp = 18f,
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // --- queue + favourite ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RingIconButton(R.drawable.queue_music, textColor, size = 26, onClick = onOpenQueue)
+            RingIconButton(
+                res = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
+                tint = if (isFavorite) MaterialTheme.colorScheme.error else textColor,
+                size = 26,
+                onClick = onToggleLike,
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+        // --- progress + times ---
+        Slider(
+            value = position.toFloat(),
+            valueRange = 0f..(if (duration == C.TIME_UNSET || duration <= 0) 1f else duration.toFloat()),
+            onValueChange = { onScrub(it.toLong()) },
+            onValueChangeFinished = onScrubFinished,
+            colors = sliderColors,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
+            Text(
+                text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
+                style = MaterialTheme.typography.labelMedium,
+                color = textColor,
+            )
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        // --- transport ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RingIconButton(
+                res = if (repeatMode == Player.REPEAT_MODE_ONE) R.drawable.repeat_one else R.drawable.repeat,
+                tint = if (repeatMode != Player.REPEAT_MODE_OFF) BlazeThemeColor else textColor,
+                size = 24,
+                onClick = onToggleRepeat,
+            )
+            RingIconButton(R.drawable.skip_previous, textColor, size = 34, onClick = onPrevious)
+            Box(
+                modifier = Modifier
+                    .size(66.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable(onClick = onTogglePlay),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+            RingIconButton(R.drawable.skip_next, textColor, size = 34, onClick = onNext)
+            RingIconButton(
+                res = R.drawable.shuffle,
+                tint = if (shuffleOn) BlazeThemeColor else textColor,
+                size = 24,
+                onClick = onToggleShuffle,
+            )
+        }
+
+        Spacer(Modifier.height(14.dp))
+
+        // --- show lyrics ---
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(18.dp))
+                .background(textColor.copy(alpha = 0.08f))
+                .clickable(onClick = onShowLyrics)
+                .padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.show_lyrics),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = textColor,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                painter = painterResource(R.drawable.expand_less),
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun RingIconButton(
+    res: Int,
+    tint: Color,
+    size: Int = 26,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size((size + 18).dp)
+            .clip(CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(res),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(size.dp),
+        )
     }
 }
 
@@ -2241,6 +2470,7 @@ private fun FullArtBackground(
 private fun PlayerThemeButton(
     textButtonColor: Color,
     iconButtonColor: Color,
+    state: BottomSheetState,
 ) {
     val navController = LocalNavController.current
     Box(
@@ -2250,7 +2480,11 @@ private fun PlayerThemeButton(
                 .size(40.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(textButtonColor)
-                .clickable { navController.navigate("settings/appearance/player_design") },
+                .clickable {
+                    // Collapse the player so the design gallery isn't hidden behind the sheet.
+                    state.collapseSoft()
+                    navController.navigate("settings/appearance/player_design")
+                },
     ) {
         Image(
             painter = painterResource(R.drawable.palette),
