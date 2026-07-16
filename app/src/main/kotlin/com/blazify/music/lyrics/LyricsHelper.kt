@@ -101,38 +101,49 @@ constructor(
                     }
                 }
 
-                // Prefer SYNCED (scrolling) lyrics: take the first valid synced result
-                // in priority order; remember the best plain result only as a fallback
-                // for songs where no source has a synced match.
-                var synced: LyricsWithProvider? = null
-                var plainFallback: LyricsWithProvider? = null
+                // Trust tiers: results from TRUSTED sources (exact-id or strict
+                // duration+title matching) always beat results from FUZZY keyword
+                // sources (KuGou/Paxsenix/LyricsPlus), even when the trusted result
+                // is plain text and the fuzzy one is synced — a correct plain lyric
+                // beats a wrong scrolling one. Within each tier, synced > plain.
+                var trustedSynced: LyricsWithProvider? = null
+                var trustedPlain: LyricsWithProvider? = null
+                var fuzzySynced: LyricsWithProvider? = null
+                var fuzzyPlain: LyricsWithProvider? = null
                 for ((index, attempt) in attempts.withIndex()) {
+                    val providerName = enabledProviders[index].name
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
                         val raw = providerResult.getOrNull()!!
                         // Reject results whose synced timeline doesn't fit this song —
                         // that's the signature of a wrong-song fuzzy match.
                         if (!isPlausible(raw, mediaMetadata.duration)) {
-                            Timber.tag("LyricsHelper").w("${enabledProviders[index].name} returned implausible lyrics (timeline/duration mismatch) — skipping")
+                            Timber.tag("LyricsHelper").w("$providerName returned implausible lyrics (timeline/duration mismatch) — skipping")
                             continue
                         }
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
-                        if (isSynced(filtered)) {
-                            Timber.tag("LyricsHelper").i("Got SYNCED lyrics from ${enabledProviders[index].name}")
-                            synced = LyricsWithProvider(filtered, enabledProviders[index].name)
-                            break
+                        val synced = isSynced(filtered)
+                        val trusted = providerName in TRUSTED_PROVIDERS
+                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"})")
+                        when {
+                            trusted && synced && trustedSynced == null -> trustedSynced = LyricsWithProvider(filtered, providerName)
+                            trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
+                            !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
+                            !trusted && !synced && fuzzyPlain == null -> fuzzyPlain = LyricsWithProvider(filtered, providerName)
                         }
-                        if (plainFallback == null) {
-                            Timber.tag("LyricsHelper").i("Got plain lyrics from ${enabledProviders[index].name} — holding as fallback, still looking for synced")
-                            plainFallback = LyricsWithProvider(filtered, enabledProviders[index].name)
-                        }
+                        // Best possible outcome reached — stop early.
+                        if (trustedSynced != null) break
                     }
                 }
                 // Cancel any still-running lower-priority attempts.
                 attempts.forEach { it.cancel() }
 
-                val chosen = synced ?: plainFallback
-                if (chosen == null) Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
+                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain
+                if (chosen == null) {
+                    Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
+                } else {
+                    Timber.tag("LyricsHelper").i("Chose lyrics from ${chosen.provider}")
+                }
                 chosen ?: LyricsWithProvider(LYRICS_NOT_FOUND, PROVIDER_NONE)
             }
         }
@@ -263,6 +274,11 @@ constructor(
 
     companion object {
         private const val MAX_CACHE_SIZE = 3
+
+        // Sources that identify the song exactly (video id) or match strictly on
+        // title+artist+duration. Everything else is fuzzy keyword search and can
+        // return wrong-song lyrics (KuGou, Paxsenix, LyricsPlus).
+        private val TRUSTED_PROVIDERS = setOf("LrcLib", "BetterLyrics", "YouTube", "YouTubeSubtitle")
     }
 }
 

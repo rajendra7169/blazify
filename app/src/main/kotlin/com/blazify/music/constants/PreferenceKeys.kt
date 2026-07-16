@@ -457,6 +457,8 @@ val LyricsCacheCleanupV1Key = booleanPreferencesKey("lyricsCacheCleanupV1")
 val LyricsCacheCleanupV2Key = booleanPreferencesKey("lyricsCacheCleanupV2")
 // Third cleanup: entries cached before synced-lyrics preference existed.
 val LyricsCacheCleanupV3Key = booleanPreferencesKey("lyricsCacheCleanupV3")
+// Fourth cleanup: entries cached before trust tiers + title cleaning existed.
+val LyricsCacheCleanupV4Key = booleanPreferencesKey("lyricsCacheCleanupV4")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

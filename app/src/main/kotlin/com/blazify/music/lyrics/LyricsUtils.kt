@@ -31,8 +31,27 @@ private val BACKGROUND_REGEX = "^\\{bg\\}".toRegex()
 
 @Suppress("RegExpRedundantEscape")
 object LyricsUtils {
+    // Junk phrases YouTube video titles carry that poison lyrics search.
+    private val TITLE_JUNK_PHRASES = listOf(
+        "lyrical video song", "official music video", "full video song",
+        "official video", "official audio", "official song", "lyrical video",
+        "lyrics video", "lyric video", "video song", "full video", "full song",
+        "full audio", "audio song", "title track", "with lyrics",
+    )
+    private val TITLE_JUNK_WORDS = Regex("(?i)\\b(4k|8k|1080p|720p|hdr|hd)\\b")
+
     fun cleanTitleForSearch(title: String): String {
-        return title.replace(Regex("\\s*[(\\[].*?[)\\]]"), "").trim()
+        // Everything after the first pipe is credits/junk on YouTube titles:
+        // "Deewana Hai Ye Mann | Chori Chori ... | Salman Khan | ... #4kvideo"
+        var t = title.substringBefore('|').trim()
+        t = t.replace(Regex("\\s*[(\\[].*?[)\\]]"), "")
+        t = t.replace(Regex("#\\S+"), "")
+        for (phrase in TITLE_JUNK_PHRASES) {
+            t = t.replace(Regex("(?i)\\b" + Regex.escape(phrase) + "\\b"), "")
+        }
+        t = t.replace(TITLE_JUNK_WORDS, "")
+        t = t.replace(Regex("\\s{2,}"), " ").trim(' ', '-', '–', '—', ':', ',')
+        return t.ifBlank { title.trim() }
     }
 
     fun filterLyricsCreditLines(lyrics: String): String {
