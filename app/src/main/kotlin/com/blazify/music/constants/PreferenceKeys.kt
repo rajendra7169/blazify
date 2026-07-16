@@ -466,6 +466,9 @@ val LyricsCacheCleanupV5Key = booleanPreferencesKey("lyricsCacheCleanupV5")
 val LyricsCacheCleanupV6Key = booleanPreferencesKey("lyricsCacheCleanupV6")
 // Seventh cleanup: clears literal-"null" lyrics cached by the optString(null) bug.
 val LyricsCacheCleanupV7Key = booleanPreferencesKey("lyricsCacheCleanupV7")
+// Eighth cleanup: clears NOT_FOUND entries pinned while trusted lyrics were
+// being wrongly rejected by the plausibility check.
+val LyricsCacheCleanupV8Key = booleanPreferencesKey("lyricsCacheCleanupV8")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

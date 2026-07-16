@@ -31,8 +31,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val MAX_LYRICS_FETCH_MS = 15000L
-private const val PER_PROVIDER_TIMEOUT_MS = 8000L
+private const val MAX_LYRICS_FETCH_MS = 16000L
+private const val PER_PROVIDER_TIMEOUT_MS = 12000L
 private const val PROVIDER_NONE = ""
 
 class LyricsHelper
@@ -137,8 +137,11 @@ constructor(
                     if (providerResult != null && providerResult.isSuccess) {
                         val raw = providerResult.getOrNull()!!
                         // Reject results whose synced timeline doesn't fit this song —
-                        // that's the signature of a wrong-song fuzzy match.
-                        if (!isPlausible(raw, mediaMetadata.duration)) {
+                        // that's the signature of a wrong-song FUZZY match. Trusted
+                        // sources match by exact id / strict search, so a timeline
+                        // mismatch there just means a different EDIT of the right song
+                        // (video vs album cut) — keep those, drift beats nothing.
+                        if (providerName !in TRUSTED_PROVIDERS && !isPlausible(raw, mediaMetadata.duration)) {
                             Timber.tag("LyricsHelper").w("$providerName returned implausible lyrics (timeline/duration mismatch) — skipping")
                             continue
                         }

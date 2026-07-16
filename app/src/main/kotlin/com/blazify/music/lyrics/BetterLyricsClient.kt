@@ -49,7 +49,7 @@ object BetterLyricsClient {
     private const val API = "https://lyrics.api.dacubeking.com/"
     private const val CHALLENGE_URL = API + "challenge"
     private const val SOLVE_TIMEOUT_MS = 45_000L
-    private const val STREAM_BUDGET_MS = 9_000L
+    private const val STREAM_BUDGET_MS = 10_000L
 
     private val JwtKey = stringPreferencesKey("betterLyricsJwt")
     private val jwtMutex = Mutex()
