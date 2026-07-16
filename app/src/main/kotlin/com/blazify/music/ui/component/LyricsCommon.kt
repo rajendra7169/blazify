@@ -55,10 +55,10 @@ sealed class LyricsListItem {
 }
 
 /**
- * Instrumental-break indicator — Blazify's own composition: a large treble clef
- * that breathes and fills with a white→accent gradient as the interlude
- * progresses, with little music notes rising and fading upward around it.
- * Everything is in the dynamic theme colour.
+ * Instrumental-break indicator — Blazify's own composition: the Blaze logo that
+ * breathes and fills bottom-up with a white→accent gradient as the interlude
+ * progresses (like the flame lighting up), with little music notes rising and
+ * fading upward around it. Everything is in the dynamic theme colour.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -116,9 +116,9 @@ internal fun IntervalIndicator(
     ) {
         FloatingNotes(color = color, t = t)
 
-        // Breathing clef, driven by a slow sine on the loop phase.
+        // Breathing logo, driven by a slow sine on the loop phase.
         val breathe = 1f + 0.06f * abs(sin(t * PI)).toFloat()
-        TrebleClefFill(
+        BlazeLogoFill(
             fill = animatedProgress,
             accent = color,
             scale = breathe,
@@ -126,16 +126,16 @@ internal fun IntervalIndicator(
     }
 }
 
-/** Treble clef: soft glow behind, dim base, filled bottom-up with a white→accent gradient. */
+/** Blaze logo: dim base glyph, filled bottom-up with a white→accent gradient. */
 @Composable
-private fun TrebleClefFill(
+private fun BlazeLogoFill(
     fill: Float,
     accent: Color,
     scale: Float,
 ) {
     Box(
         modifier = Modifier
-            .size(60.dp)
+            .size(64.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -143,14 +143,14 @@ private fun TrebleClefFill(
     ) {
         // Dim base glyph.
         Icon(
-            painter = painterResource(R.drawable.treble_clef),
+            painter = painterResource(R.drawable.blaze_logo_white),
             contentDescription = null,
             tint = accent.copy(alpha = 0.26f),
             modifier = Modifier.fillMaxSize()
         )
         // Filled portion: white icon, recoloured with a vertical gradient, clipped to progress.
         Icon(
-            painter = painterResource(R.drawable.treble_clef),
+            painter = painterResource(R.drawable.blaze_logo_white),
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier
