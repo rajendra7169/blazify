@@ -3,11 +3,12 @@
  * Licensed under GPL-3.0 | See git history for contributors
  *
  * RECORD design centrepiece: a spinning vinyl record (album art as the label)
- * with a realistic tonearm modelled on a Technics-style arm — circular gimbal
- * bearing, angled knurled counterweight, anti-skate dial, gently curved chrome
- * tube (no hard S-bend) and a black cartridge headshell with finger lift and
- * stylus. The arm rides the outer-mid grooves while playing and lifts off when
- * paused; the record freezes in place. Drawn in Compose Canvas, no assets;
+ * with a realistic J-shaped tonearm — circular gimbal bearing with a vertical
+ * counterweight cap on top, a straight chrome tube that elbows smoothly onto
+ * the record near the bottom, and a black cartridge headshell with finger lift
+ * and stylus. Both the record and the arm cast soft drop shadows (light from
+ * top-left). The arm rides the outer-mid grooves while playing and lifts off
+ * when paused; the record freezes in place. Pure Compose Canvas, no assets;
  * shared by the player and the design-preview so they always match.
  */
 
@@ -44,18 +45,18 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
-import kotlin.math.cos
-import kotlin.math.sin
 
 /* ---- layout (fractions of the square stage) ---- */
-private const val DISC_CY = 0.56f        // record sits a little lower
-private const val DISC_R = 0.38f         // record radius
-private const val ARM_BX = 0.80f         // gimbal bearing centre
-private const val ARM_BY = 0.16f
-private const val ARM_REST_ANGLE = -22f  // CCW swing that lifts the stylus off the record
+private const val DISC_CX = 0.46f        // record slightly left — gives the arm its lane
+private const val DISC_CY = 0.56f        // and a little lower
+private const val DISC_R = 0.38f
+private const val ARM_BX = 0.84f         // gimbal bearing centre
+private const val ARM_BY = 0.155f
+private const val ARM_REST_ANGLE = -16f  // CCW swing that lifts the stylus off the record
 
 @Composable
 fun VinylTurntable(
@@ -86,7 +87,23 @@ fun VinylTurntable(
     BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
         val dim = minOf(maxWidth, maxHeight)
         val discSize = dim * (DISC_R * 2f)
+        val discOffsetX = dim * (DISC_CX - 0.5f)
         val discOffsetY = dim * (DISC_CY - 0.5f)
+
+        // Drop shadow under the record (light from top-left).
+        Canvas(modifier = Modifier.size(dim)) {
+            val d = size.minDimension
+            val c = Offset(d * DISC_CX + d * 0.020f, d * DISC_CY + d * 0.030f)
+            drawCircle(
+                brush = Brush.radialGradient(
+                    listOf(Color.Black.copy(alpha = 0.45f), Color.Black.copy(alpha = 0.18f), Color.Transparent),
+                    center = c,
+                    radius = d * DISC_R * 1.12f,
+                ),
+                radius = d * DISC_R * 1.12f,
+                center = c,
+            )
+        }
 
         // Spinning disc (grooves + art label).
         VinylDisc(
@@ -94,12 +111,12 @@ fun VinylTurntable(
             fallbackBrush = fallbackBrush,
             modifier = Modifier
                 .size(discSize)
-                .offset(y = discOffsetY)
+                .offset(x = discOffsetX, y = discOffsetY)
                 .graphicsLayer { rotationZ = rotation.value },
         )
 
         // Fixed light sheen over the disc (does NOT rotate — sells the spin).
-        Canvas(modifier = Modifier.size(discSize).offset(y = discOffsetY)) {
+        Canvas(modifier = Modifier.size(discSize).offset(x = discOffsetX, y = discOffsetY)) {
             drawCircle(
                 brush = Brush.linearGradient(
                     colors = listOf(
@@ -115,7 +132,7 @@ fun VinylTurntable(
             )
         }
 
-        // Realistic tonearm on top.
+        // Realistic J-shaped tonearm on top (casts its own shadow).
         Canvas(
             modifier = Modifier
                 .size(dim)
@@ -195,93 +212,83 @@ private fun VinylDisc(
 }
 
 /**
- * Ultra-real tonearm (reference: Technics-style arm — only the arm, no deck):
- * circular gimbal bearing housing, knurled chrome counterweight angled up-right,
- * anti-skate dial, gently curved chrome tube (single soft bow, no S), black
- * cartridge headshell with finger lift and stylus. Drawn in its playing pose;
- * the whole layer rotates around the bearing to lift off when paused.
+ * J-shaped tonearm like the reference: straight chrome tube hanging from the
+ * gimbal, one smooth elbow near the bottom turning onto the record, vertical
+ * counterweight cap stacked on top of the bearing, black cartridge headshell.
+ * Drawn in its playing pose; the layer rotates around the bearing when paused.
  */
 private fun DrawScope.drawTonearm() {
     val d = size.minDimension
-    val b = Offset(d * ARM_BX, d * ARM_BY)                 // bearing / pivot
-    val h = Offset(d * 0.67f, d * 0.75f)                   // stylus point: ~0.70 × disc radius, lower-right grooves
-    val q = Offset(d * 0.794f, d * 0.468f)                 // control point → gentle rightward bow
+    val b = Offset(d * ARM_BX, d * ARM_BY)     // bearing / pivot
+    val e = Offset(d * ARM_BX, d * 0.60f)      // elbow start (tube is straight until here)
+    val h = Offset(d * 0.70f, d * 0.75f)       // stylus point: ~0.74 × disc radius, lower-right grooves
 
-    val chromeTube = Brush.linearGradient(
+    val chrome = Brush.linearGradient(
         listOf(Color(0xFF6E6F75), Color(0xFFEDEEF2), Color(0xFF93949A), Color(0xFF45464C)),
-        start = Offset(d * 0.60f, 0f),
-        end = Offset(d * 0.86f, 0f),
+        start = Offset(d * 0.66f, 0f),
+        end = Offset(d * 0.90f, 0f),
     )
 
-    /* --- soft shadows first --- */
-    // Gimbal shadow.
-    drawCircle(
-        brush = Brush.radialGradient(
-            listOf(Color.Black.copy(alpha = 0.35f), Color.Transparent),
-            center = b + Offset(d * 0.008f, d * 0.016f),
-            radius = d * 0.105f,
-        ),
-        radius = d * 0.105f,
-        center = b + Offset(d * 0.008f, d * 0.016f),
-    )
-    // Headshell shadow on the record.
-    drawCircle(
-        brush = Brush.radialGradient(
-            listOf(Color.Black.copy(alpha = 0.25f), Color.Transparent),
-            center = h + Offset(-d * 0.018f, d * 0.022f),
-            radius = d * 0.055f,
-        ),
-        radius = d * 0.055f,
-        center = h + Offset(-d * 0.018f, d * 0.022f),
-    )
-
-    /* --- chrome tube: gentle single curve (outline → metal → specular core) --- */
+    // The J-arm path: straight down, then one smooth elbow onto the record.
     val tube = Path().apply {
         moveTo(b.x, b.y)
-        quadraticBezierTo(q.x, q.y, h.x, h.y)
+        lineTo(e.x, e.y)
+        cubicTo(d * ARM_BX, d * 0.70f, d * 0.76f, d * 0.71f, h.x, h.y)
     }
+
+    /* --- shadows first (light from top-left → shadows fall down-right) --- */
+    translate(left = d * 0.014f, top = d * 0.022f) {
+        // Soft, wide pass then a tighter darker pass.
+        drawPath(tube, Color.Black.copy(alpha = 0.10f), style = Stroke(width = d * 0.036f, cap = StrokeCap.Round))
+        drawPath(tube, Color.Black.copy(alpha = 0.20f), style = Stroke(width = d * 0.020f, cap = StrokeCap.Round))
+        // Gimbal + counterweight shadow.
+        drawCircle(Color.Black.copy(alpha = 0.22f), radius = d * 0.078f, center = b)
+        // Headshell shadow blob on the record.
+        drawCircle(
+            brush = Brush.radialGradient(
+                listOf(Color.Black.copy(alpha = 0.28f), Color.Transparent),
+                center = h,
+                radius = d * 0.055f,
+            ),
+            radius = d * 0.055f,
+            center = h,
+        )
+    }
+
+    /* --- chrome tube: outline → metal → bright specular core --- */
     drawPath(tube, Color(0xFF1B1B1E), style = Stroke(width = d * 0.019f, cap = StrokeCap.Round))
-    drawPath(tube, brush = chromeTube, style = Stroke(width = d * 0.014f, cap = StrokeCap.Round))
+    drawPath(tube, brush = chrome, style = Stroke(width = d * 0.014f, cap = StrokeCap.Round))
     drawPath(tube, Color.White.copy(alpha = 0.85f), style = Stroke(width = d * 0.0045f, cap = StrokeCap.Round))
 
-    /* --- counterweight: knurled chrome cylinder angled up-right behind the bearing --- */
-    val cwAngleDeg = -40f
-    val cwDir = Offset(cos(Math.toRadians(cwAngleDeg.toDouble())).toFloat(), sin(Math.toRadians(cwAngleDeg.toDouble())).toFloat())
-    val cwC = b + Offset(cwDir.x * d * 0.115f, cwDir.y * d * 0.115f)
-    // Stub shaft between bearing and weight.
-    drawLine(brush = chromeTube, start = b, end = b + Offset(cwDir.x * d * 0.07f, cwDir.y * d * 0.07f), strokeWidth = d * 0.013f, cap = StrokeCap.Round)
-    rotate(degrees = cwAngleDeg, pivot = cwC) {
-        // Cylinder body with perpendicular chrome banding.
-        drawRoundRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF9FA0A6), Color(0xFFF4F5F7), Color(0xFF6B6C72), Color(0xFF3A3B40)),
-                startY = cwC.y - d * 0.028f,
-                endY = cwC.y + d * 0.028f,
-            ),
-            topLeft = cwC - Offset(d * 0.043f, d * 0.028f),
-            size = Size(d * 0.086f, d * 0.056f),
-            cornerRadius = CornerRadius(d * 0.010f, d * 0.010f),
-        )
-        // Knurling on the outer half.
-        for (i in 0..4) {
-            val kx = cwC.x + d * 0.004f + i * d * 0.008f
-            drawLine(Color.Black.copy(alpha = 0.28f), Offset(kx, cwC.y - d * 0.026f), Offset(kx, cwC.y + d * 0.026f), strokeWidth = d * 0.0025f)
-        }
-        // End cap + rim light.
-        drawRoundRect(
-            color = Color(0xFF2C2C30),
-            topLeft = cwC + Offset(d * 0.036f, -d * 0.028f),
-            size = Size(d * 0.008f, d * 0.056f),
-            cornerRadius = CornerRadius(d * 0.004f, d * 0.004f),
-        )
-        drawRoundRect(
-            color = Color.White.copy(alpha = 0.14f),
-            topLeft = cwC - Offset(d * 0.043f, d * 0.028f),
-            size = Size(d * 0.086f, d * 0.056f),
-            cornerRadius = CornerRadius(d * 0.010f, d * 0.010f),
-            style = Stroke(width = d * 0.0025f),
-        )
+    /* --- counterweight cap stacked vertically on top of the bearing --- */
+    // Stub between bearing and weight.
+    drawLine(brush = chrome, start = b, end = Offset(b.x, d * 0.10f), strokeWidth = d * 0.013f, cap = StrokeCap.Round)
+    // Cylinder body (horizontal chrome banding = vertical cylinder).
+    drawRoundRect(
+        brush = Brush.horizontalGradient(
+            colors = listOf(Color(0xFF9FA0A6), Color(0xFFF4F5F7), Color(0xFF6B6C72), Color(0xFF3A3B40)),
+            startX = b.x - d * 0.026f,
+            endX = b.x + d * 0.026f,
+        ),
+        topLeft = Offset(b.x - d * 0.026f, d * 0.035f),
+        size = Size(d * 0.052f, d * 0.065f),
+        cornerRadius = CornerRadius(d * 0.010f, d * 0.010f),
+    )
+    // Knurling.
+    for (i in 0..3) {
+        val ky = d * 0.043f + i * d * 0.012f
+        drawLine(Color.Black.copy(alpha = 0.25f), Offset(b.x - d * 0.024f, ky), Offset(b.x + d * 0.024f, ky), strokeWidth = d * 0.0022f)
     }
+    // Dome cap on top.
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFFEDEEF2), Color(0xFF8A8B91)),
+            center = Offset(b.x - d * 0.005f, d * 0.024f),
+            radius = d * 0.020f,
+        ),
+        radius = d * 0.015f,
+        center = Offset(b.x, d * 0.028f),
+    )
 
     /* --- gimbal bearing housing --- */
     drawCircle(
@@ -290,44 +297,42 @@ private fun DrawScope.drawTonearm() {
             center = b - Offset(d * 0.018f, d * 0.018f),
             radius = d * 0.105f,
         ),
-        radius = d * 0.075f,
+        radius = d * 0.072f,
         center = b,
     )
-    drawCircle(Color.White.copy(alpha = 0.15f), radius = d * 0.075f, center = b, style = Stroke(width = d * 0.003f))
-    drawCircle(Color(0xFF202024), radius = d * 0.048f, center = b)
-    drawCircle(Color.White.copy(alpha = 0.08f), radius = d * 0.048f, center = b, style = Stroke(width = d * 0.0025f))
+    drawCircle(Color.White.copy(alpha = 0.15f), radius = d * 0.072f, center = b, style = Stroke(width = d * 0.003f))
+    // Grey centre disc (like the reference).
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFFB9BAC0), Color(0xFF7C7D83), Color(0xFF4E4F55)),
+            center = b - Offset(d * 0.012f, d * 0.012f),
+            radius = d * 0.055f,
+        ),
+        radius = d * 0.040f,
+        center = b,
+    )
+    drawCircle(Color.Black.copy(alpha = 0.30f), radius = d * 0.040f, center = b, style = Stroke(width = d * 0.0025f))
     // Top-left catch light on the housing.
     drawArc(
         color = Color.White.copy(alpha = 0.22f),
         startAngle = -160f,
         sweepAngle = 70f,
         useCenter = false,
-        topLeft = b - Offset(d * 0.066f, d * 0.066f),
-        size = Size(d * 0.132f, d * 0.132f),
+        topLeft = b - Offset(d * 0.063f, d * 0.063f),
+        size = Size(d * 0.126f, d * 0.126f),
         style = Stroke(width = d * 0.005f, cap = StrokeCap.Round),
     )
-    // Yoke screws.
-    drawCircle(Color(0xFF6E6E74), radius = d * 0.006f, center = b + Offset(-d * 0.030f, 0f))
-    drawCircle(Color(0xFF6E6E74), radius = d * 0.006f, center = b + Offset(d * 0.030f, 0f))
-
-    /* --- anti-skate dial --- */
-    val dial = b + Offset(d * 0.065f, d * 0.055f)
-    drawCircle(Color(0xFF0F0F11), radius = d * 0.021f, center = dial)
-    drawCircle(Color.White.copy(alpha = 0.25f), radius = d * 0.021f, center = dial, style = Stroke(width = d * 0.0025f))
-    drawLine(Color.White.copy(alpha = 0.6f), dial, dial + Offset(0f, -d * 0.014f), strokeWidth = d * 0.0025f)
-
-    /* --- pivot cap --- */
+    // Pivot cap.
     drawCircle(
-        brush = Brush.radialGradient(listOf(Color(0xFFE6E6E8), Color(0xFF77777D)), center = b, radius = d * 0.022f),
-        radius = d * 0.016f,
+        brush = Brush.radialGradient(listOf(Color(0xFFE6E6E8), Color(0xFF77777D)), center = b, radius = d * 0.018f),
+        radius = d * 0.013f,
         center = b,
     )
-    drawCircle(Color(0xFF232327), radius = d * 0.006f, center = b)
+    drawCircle(Color(0xFF232327), radius = d * 0.005f, center = b)
 
-    /* --- headshell: black cartridge along the groove tangent --- */
-    // Collar joining tube to headshell.
-    drawCircle(brush = chromeTube, radius = d * 0.011f, center = h)
-    rotate(degrees = 130f, pivot = h) {
+    /* --- headshell: black cartridge along the elbow's tangent (~146°) --- */
+    drawCircle(brush = chrome, radius = d * 0.011f, center = h)
+    rotate(degrees = 146f, pivot = h) {
         // Cartridge body.
         drawRoundRect(
             color = Color(0xFF131316),
@@ -337,14 +342,14 @@ private fun DrawScope.drawTonearm() {
         )
         // Metal top strip.
         drawRoundRect(
-            brush = chromeTube,
+            brush = chrome,
             topLeft = Offset(h.x, h.y - d * 0.014f),
             size = Size(d * 0.075f, d * 0.008f),
             cornerRadius = CornerRadius(d * 0.004f, d * 0.004f),
         )
         // Finger lift.
         drawLine(
-            brush = chromeTube,
+            brush = chrome,
             start = Offset(h.x + d * 0.008f, h.y - d * 0.012f),
             end = Offset(h.x - d * 0.010f, h.y - d * 0.026f),
             strokeWidth = d * 0.0045f,
