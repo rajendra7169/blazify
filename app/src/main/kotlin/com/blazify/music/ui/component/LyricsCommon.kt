@@ -12,23 +12,27 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -51,9 +55,10 @@ sealed class LyricsListItem {
 }
 
 /**
- * Instrumental-break indicator: Blazify's own treble-clef mark that gently
- * breathes and fills up white from the bottom as the interlude progresses
- * toward the next sung line (dim base in the dynamic theme colour).
+ * Instrumental-break indicator — Blazify's own composition: a large treble clef
+ * that breathes and fills with a white→accent gradient (over a soft glow) as the
+ * interlude progresses, with little music notes drifting up and fading around it.
+ * Everything is in the dynamic theme colour.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -70,15 +75,15 @@ internal fun IntervalIndicator(
 
     LaunchedEffect(visible) {
         if (visible) {
-            rowHeightPx.animateTo(1f, tween(200))
-            alpha.animateTo(1f, tween(200))
+            rowHeightPx.animateTo(1f, tween(220))
+            alpha.animateTo(1f, tween(220))
         } else {
             alpha.animateTo(0f, tween(200))
             rowHeightPx.animateTo(0f, tween(200))
         }
     }
 
-    val targetHeightDp = 72.dp
+    val targetHeightDp = 108.dp
 
     val progress = if (gapEndMs > gapStartMs) {
         ((currentPositionMs - gapStartMs).toFloat() / (gapEndMs - gapStartMs).toFloat()).coerceIn(0f, 1f)
@@ -90,13 +95,12 @@ internal fun IntervalIndicator(
         label = "intervalProgress"
     )
 
-    // Continuous staggered bounce so it reads as "loading" through the whole gap.
-    val transition = rememberInfiniteTransition(label = "notesBounce")
+    val transition = rememberInfiniteTransition(label = "interludeAnim")
     val t by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = 900, easing = LinearEasing)),
-        label = "notesPhase"
+        animationSpec = infiniteRepeatable(tween(durationMillis = 2600, easing = LinearEasing)),
+        label = "interludePhase"
     )
 
     Box(
@@ -109,51 +113,113 @@ internal fun IntervalIndicator(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Gentle breathing pulse so it reads as "loading" through the whole gap.
-        val hop = abs(sin(((t) % 1f) * PI)).toFloat()
-        val scale = 1f + 0.08f * hop
-        NoteFill(
+        FloatingNotes(color = color, t = t)
+
+        // Breathing clef, driven by a slow sine on the loop phase.
+        val breathe = 1f + 0.06f * abs(sin(t * PI)).toFloat()
+        TrebleClefFill(
             fill = animatedProgress,
-            baseColor = color.copy(alpha = 0.28f),
-            fillColor = Color.White,
-            scale = scale,
+            accent = color,
+            scale = breathe,
         )
     }
 }
 
-/** The treble-clef mark drawn dim, then filled white bottom-up to [fill] (0..1). */
+/** Treble clef: soft glow behind, dim base, filled bottom-up with a white→accent gradient. */
 @Composable
-private fun NoteFill(
+private fun TrebleClefFill(
     fill: Float,
-    baseColor: Color,
-    fillColor: Color,
+    accent: Color,
     scale: Float,
 ) {
     Box(
         modifier = Modifier
-            .size(40.dp)
+            .size(60.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             }
+            .drawBehind {
+                // Soft accent halo.
+                val r = size.minDimension * 0.62f
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(accent.copy(alpha = 0.20f), Color.Transparent),
+                        center = center,
+                        radius = r,
+                    ),
+                    radius = r,
+                    center = center,
+                )
+            }
     ) {
+        // Dim base glyph.
         Icon(
             painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
-            tint = baseColor,
+            tint = accent.copy(alpha = 0.26f),
             modifier = Modifier.fillMaxSize()
         )
+        // Filled portion: white icon, recoloured with a vertical gradient, clipped to progress.
         Icon(
             painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
-            tint = fillColor,
+            tint = Color.White,
             modifier = Modifier
                 .fillMaxSize()
+                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithContent {
-                    // Reveal the filled fraction from the bottom of the glyph upward.
                     clipRect(top = size.height * (1f - fill.coerceIn(0f, 1f))) {
                         this@drawWithContent.drawContent()
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                listOf(Color.White, accent.copy(alpha = 0.95f)),
+                            ),
+                            blendMode = BlendMode.SrcAtop,
+                        )
                     }
+                }
+        )
+    }
+}
+
+private data class FloatingNote(
+    val xDp: Float,
+    val sizeDp: Float,
+    val phase: Float,
+    val driftDp: Float,
+)
+
+/** Small music notes rising and fading around the clef, continuously and staggered. */
+@Composable
+private fun BoxScope.FloatingNotes(color: Color, t: Float) {
+    val notes = remember {
+        listOf(
+            FloatingNote(xDp = -54f, sizeDp = 13f, phase = 0.00f, driftDp = -6f),
+            FloatingNote(xDp = -36f, sizeDp = 10f, phase = 0.42f, driftDp = 5f),
+            FloatingNote(xDp = 40f, sizeDp = 12f, phase = 0.68f, driftDp = 6f),
+            FloatingNote(xDp = 58f, sizeDp = 14f, phase = 0.20f, driftDp = -5f),
+            FloatingNote(xDp = -18f, sizeDp = 9f, phase = 0.85f, driftDp = 4f),
+            FloatingNote(xDp = 22f, sizeDp = 9f, phase = 0.55f, driftDp = -4f),
+        )
+    }
+    notes.forEach { n ->
+        val p = (t + n.phase) % 1f
+        // Rise from just below centre to above, fading in then out.
+        val y = (16f - 44f * p)
+        val x = n.xDp + n.driftDp * sin(p * 2f * PI).toFloat()
+        val a = (sin(p * PI).toFloat()) * 0.5f
+        Icon(
+            painter = painterResource(R.drawable.music_note),
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .offset(x = x.dp, y = y.dp)
+                .size(n.sizeDp.dp)
+                .graphicsLayer {
+                    this.alpha = a
+                    rotationZ = 8f * sin((p + n.phase) * 2f * PI).toFloat()
                 }
         )
     }
