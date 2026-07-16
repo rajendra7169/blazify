@@ -19,6 +19,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -147,6 +148,10 @@ import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.ui.unit.Dp
 import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
@@ -237,6 +242,9 @@ fun BottomSheetPlayer(
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
     val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
     val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
+    // Height reserved at the bottom of the RING layout for its lyrics-card overlay.
+    val ringNavBottomInset = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
+    val ringBottomOverlayHeight = 172.dp + ringNavBottomInset
 
     var showInlineLyrics by rememberSaveable {
         mutableStateOf(false)
@@ -1882,7 +1890,6 @@ fun BottomSheetPlayer(
                     val ringNav = LocalNavController.current
                     val ringShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
                     val ringQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
-                    val ringLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
                     val ringIsEpisode = currentSong?.song?.isEpisode == true
                     val ringIsFavorite =
                         if (ringIsEpisode) {
@@ -1893,7 +1900,6 @@ fun BottomSheetPlayer(
                     RingPlayerLayout(
                         mediaMetadata = mediaMetadata,
                         nowPlayingFrom = ringQueueTitle ?: mediaMetadata?.album?.title,
-                        lyricsText = ringLyrics?.lyrics,
                         isFavorite = ringIsFavorite,
                         position = sliderPosition ?: effectivePosition,
                         duration = duration,
@@ -1903,6 +1909,7 @@ fun BottomSheetPlayer(
                         textColor = TextBackgroundColor,
                         buttonBgColor = textButtonColor,
                         buttonFgColor = iconButtonColor,
+                        bottomReserve = ringBottomOverlayHeight,
                         onSeek = { pos ->
                             playerConnection.player.seekTo(pos)
                             position = pos
@@ -1930,11 +1937,9 @@ fun BottomSheetPlayer(
                         onToggleShuffle = {
                             playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
                         },
-                        onOpenSleepTimer = { showSleepTimerDialog = true },
                         modifier =
                             Modifier
-                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                                .padding(bottom = bottomPadding),
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                     )
                 } else {
                     Column(
@@ -2010,6 +2015,43 @@ fun BottomSheetPlayer(
                     showInlineLyrics = !showInlineLyrics
                 },
             )
+        }
+
+        // RING design: bottom overlay (sleep+more row + lyrics card) drawn on top
+        // of the queue peek so the lyrics card starts from the very bottom.
+        if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics) {
+            val overlayLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
+            Column(
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RingIconButton(R.drawable.bedtime, TextBackgroundColor, size = 24) {
+                        showSleepTimerDialog = true
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    mediaMetadata?.let {
+                        RingMoreButton(mediaMetadata = it, state = state, tint = TextBackgroundColor)
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                RingLyricsCard(
+                    lyricsText = overlayLyrics?.lyrics,
+                    isLoading = overlayLyrics == null,
+                    position = sliderPosition ?: effectivePosition,
+                    textColor = TextBackgroundColor,
+                    bottomInset = ringNavBottomInset,
+                    onClick = { showInlineLyrics = true },
+                )
+            }
         }
     }
 }
@@ -2210,7 +2252,6 @@ fun MoreActionsButton(
 private fun RingPlayerLayout(
     mediaMetadata: MediaMetadata?,
     nowPlayingFrom: String?,
-    lyricsText: String?,
     isFavorite: Boolean,
     position: Long,
     duration: Long,
@@ -2220,6 +2261,7 @@ private fun RingPlayerLayout(
     textColor: Color,
     buttonBgColor: Color,
     buttonFgColor: Color,
+    bottomReserve: Dp,
     onSeek: (Long) -> Unit,
     onScrub: (Long) -> Unit,
     onScrubFinished: () -> Unit,
@@ -2233,7 +2275,6 @@ private fun RingPlayerLayout(
     onCollapse: () -> Unit,
     onOpenTheme: () -> Unit,
     onToggleShuffle: () -> Unit,
-    onOpenSleepTimer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
@@ -2395,37 +2436,24 @@ private fun RingPlayerLayout(
             )
         }
 
-        Spacer(Modifier.height(10.dp))
-
-        // --- sleep timer (left, above the lyrics card) ---
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            RingIconButton(R.drawable.bedtime, textColor, size = 24, onClick = onOpenSleepTimer)
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        // --- partial lyrics card (tap to expand to full lyrics) ---
-        RingLyricsCard(
-            lyricsText = lyricsText,
-            position = position,
-            textColor = textColor,
-            onClick = onShowLyrics,
-        )
-
-        Spacer(Modifier.height(12.dp))
+        // Reserve room for the bottom overlay (sleep+more row + lyrics card),
+        // which is drawn separately so it can sit above the shared queue peek.
+        Spacer(Modifier.height(bottomReserve))
     }
 }
 
-/** Bottom lyrics card: header + up-to-three synced partial lines (current highlighted). */
+/**
+ * Bottom lyrics panel: a full-width, top-rounded card anchored to the screen
+ * bottom (covers the shared queue peek). Shows a skeleton while lyrics load,
+ * then up to three synced partial lines (current highlighted). Tap to expand.
+ */
 @Composable
 private fun RingLyricsCard(
     lyricsText: String?,
+    isLoading: Boolean,
     position: Long,
     textColor: Color,
+    bottomInset: Dp,
     onClick: () -> Unit,
 ) {
     val entries = remember(lyricsText) {
@@ -2437,10 +2465,10 @@ private fun RingLyricsCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.Black.copy(alpha = 0.30f))
+            .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+            .background(Color.Black.copy(alpha = 0.55f))
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = bottomInset + 14.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -2457,50 +2485,117 @@ private fun RingLyricsCard(
                 modifier = Modifier.size(22.dp),
             )
         }
-        if (currentIndex >= 0) {
+        Spacer(Modifier.height(10.dp))
+        if (isLoading) {
+            LyricsSkeleton(textColor)
+        } else if (currentIndex >= 0) {
             val prev = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() }
             val curr = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() }
             val next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() }
-            if (prev != null || curr != null || next != null) {
-                Spacer(Modifier.height(10.dp))
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    if (prev != null) {
-                        Text(
-                            text = prev,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = textColor.copy(alpha = 0.5f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                    }
-                    Text(
-                        text = curr ?: "♪",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                    )
-                    if (next != null) {
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = next,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = textColor.copy(alpha = 0.5f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = prev ?: " ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.45f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = curr ?: "♪",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = next ?: " ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.45f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
+    }
+}
+
+/** Shimmering placeholder bars shown while lyrics are still loading. */
+@Composable
+private fun LyricsSkeleton(textColor: Color) {
+    val transition = rememberInfiniteTransition(label = "lyricsSkeleton")
+    val alpha by transition.animateFloat(
+        initialValue = 0.25f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "skeletonAlpha",
+    )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        listOf(0.55f, 0.8f, 0.5f).forEachIndexed { i, frac ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(frac)
+                    .height(11.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(textColor.copy(alpha = if (i == 1) alpha else alpha * 0.7f)),
+            )
+            if (i < 2) Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+
+/** Plain 3-dots more button (matches the sleep-timer icon styling) that opens the player menu. */
+@Composable
+private fun RingMoreButton(
+    mediaMetadata: MediaMetadata,
+    state: BottomSheetState,
+    tint: Color,
+    size: Int = 24,
+) {
+    val menuState = LocalMenuState.current
+    val bottomSheetPageState = LocalBottomSheetPageState.current
+    Box(
+        modifier = Modifier
+            .size((size + 18).dp)
+            .clip(CircleShape)
+            .clickable {
+                menuState.show {
+                    PlayerMenu(
+                        mediaMetadata = mediaMetadata,
+                        playerBottomSheetState = state,
+                        onShowDetailsDialog = {
+                            mediaMetadata.id.let {
+                                bottomSheetPageState.show {
+                                    ShowMediaInfo(it)
+                                }
+                            }
+                        },
+                        onDismiss = menuState::dismiss,
+                    )
+                }
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.more_horiz),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(size.dp),
+        )
     }
 }
 

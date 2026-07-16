@@ -406,7 +406,7 @@ private fun RingFallback() = RingBody(null, 0.35f, null)
 private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection?) {
     val cs = MaterialTheme.colorScheme
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxSize().padding(start = 14.dp, end = 14.dp, top = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // top bar: minimize / Now Playing / theme
@@ -451,18 +451,20 @@ private fun RingBody(meta: MediaMetadata?, progress: Float, pc: PlayerConnection
         Spacer(Modifier.height(10.dp))
         if (pc != null) LiveTransport(pc, cs.onSurface) else StaticTransport(cs.onSurface)
         Spacer(Modifier.height(8.dp))
-        // sleep timer (left, above the lyrics card)
+        // sleep timer + more (left, above the lyrics card)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
             MiniIcon(R.drawable.bedtime, cs.onSurface, 18)
+            Spacer(Modifier.width(8.dp))
+            MiniIcon(R.drawable.more_horiz, cs.onSurface, 18)
         }
-        Spacer(Modifier.height(6.dp))
-        // lyrics card: header + partial lines (current highlighted)
+        Spacer(Modifier.height(8.dp))
+        // lyrics card (from the bottom): header + partial lines (current highlighted)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.Black.copy(alpha = 0.30f))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .background(Color.Black.copy(alpha = 0.55f))
+                .padding(horizontal = 12.dp, vertical = 12.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
