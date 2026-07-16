@@ -2014,9 +2014,9 @@ fun BottomSheetPlayer(
                 onToggleLyrics = {
                     showInlineLyrics = !showInlineLyrics
                 },
-                // Hide the collapsed queue peek for RING (its lyrics card owns the bottom);
-                // queue is still reachable via the RING queue icon.
-                showCollapsedContent = playerDesign != PlayerDesign.RING,
+                // Hide the collapsed queue peek only on the RING front player (its lyrics
+                // card owns the bottom). The full lyrics page keeps the peek as usual.
+                showCollapsedContent = !(playerDesign == PlayerDesign.RING && !showInlineLyrics),
             )
         }
 

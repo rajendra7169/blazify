@@ -178,6 +178,7 @@ import com.blazify.music.ui.component.BottomSheetMenu
 import com.blazify.music.ui.component.BottomSheetPage
 import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
+import com.blazify.music.ui.component.BottomSheetState
 import com.blazify.music.ui.component.rememberBottomSheetState
 import com.blazify.music.ui.component.shimmer.ShimmerTheme
 import com.blazify.music.ui.menu.YouTubeSongMenu
@@ -1000,6 +1001,7 @@ class MainActivity : ComponentActivity() {
                     LocalNavController provides navController,
                     LocalContentColor provides if (pureBlack) Color.White else contentColorFor(MaterialTheme.colorScheme.surface),
                     LocalPlayerConnection provides playerConnection,
+                    LocalPlayerBottomSheetState provides playerBottomSheetState,
                     LocalPlayerAwareWindowInsets provides playerAwareWindowInsets,
                     LocalDownloadUtil provides downloadUtil,
                     LocalShimmerTheme provides ShimmerTheme,
@@ -1602,6 +1604,7 @@ class MainActivity : ComponentActivity() {
 val LocalDatabase = staticCompositionLocalOf<MusicDatabase> { error("No database provided") }
 val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController provided") }
 val LocalPlayerConnection = staticCompositionLocalOf<PlayerConnection?> { error("No PlayerConnection provided") }
+val LocalPlayerBottomSheetState = staticCompositionLocalOf<BottomSheetState?> { null }
 val LocalPlayerAwareWindowInsets = compositionLocalOf<WindowInsets> { error("No WindowInsets provided") }
 val LocalDownloadUtil = staticCompositionLocalOf<DownloadUtil> { error("No DownloadUtil provided") }
 val LocalSyncUtils = staticCompositionLocalOf<SyncUtils> { error("No SyncUtils provided") }

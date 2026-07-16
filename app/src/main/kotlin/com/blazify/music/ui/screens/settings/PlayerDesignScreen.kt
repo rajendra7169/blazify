@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
+import com.blazify.music.LocalPlayerBottomSheetState
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.PlayerDesignKey
@@ -84,6 +85,7 @@ import kotlinx.coroutines.delay
 fun PlayerDesignScreen(navController: NavController) {
     val designs = remember { PlayerDesign.entries.toList() }
     val playerConnection = LocalPlayerConnection.current
+    val playerSheetState = LocalPlayerBottomSheetState.current
     val (activeId, setActiveId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
 
     val pagerState = rememberPagerState(
@@ -166,7 +168,12 @@ fun PlayerDesignScreen(navController: NavController) {
             val currentId = designs[pagerState.currentPage].id
             val applied = currentId == activeId
             Button(
-                onClick = { setActiveId(currentId) },
+                onClick = {
+                    setActiveId(currentId)
+                    // Close the preview and reopen the full player with the applied design.
+                    navController.navigateUp()
+                    playerSheetState?.expandSoft()
+                },
                 enabled = !applied,
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
