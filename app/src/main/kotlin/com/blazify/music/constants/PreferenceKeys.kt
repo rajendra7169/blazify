@@ -469,6 +469,8 @@ val LyricsCacheCleanupV7Key = booleanPreferencesKey("lyricsCacheCleanupV7")
 // Eighth cleanup: clears NOT_FOUND entries pinned while trusted lyrics were
 // being wrongly rejected by the plausibility check.
 val LyricsCacheCleanupV8Key = booleanPreferencesKey("lyricsCacheCleanupV8")
+// Ninth cleanup: refetch with Paxsenix (Apple Music) as the primary source.
+val LyricsCacheCleanupV9Key = booleanPreferencesKey("lyricsCacheCleanupV9")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

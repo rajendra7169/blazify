@@ -34,17 +34,20 @@ object LyricsProviderRegistry {
         return providers.filter { it in providerNames }.joinToString(",")
     }
 
-    // Ordered by match precision: LrcLib (strict duration match) and BetterLyrics
-    // first, then the exact-video YouTube sources (always the right song), and the
-    // fuzzy keyword-search providers (KuGou/Paxsenix/LyricsPlus) last — they are
-    // the ones that can return wrong-song lyrics.
+    // Ordered by real-world match quality on this catalog:
+    // - Paxsenix (Apple Music): scores candidates by duration AND title before
+    //   accepting — the most reliable synced source in practice
+    // - LrcLib: strict duration match, often timed to the exact video edit
+    // - BetterLyrics aggregator (Musixmatch et al., exact video id)
+    // - YouTube sources: exact video, subtitles synced / lyrics plain
+    // - KuGou (title-verified) and LyricsPlus last
     fun getDefaultProviderOrder(): List<String> = listOf(
+        "Paxsenix",
         "LrcLib",
         "BetterLyrics",
-        "YouTube",
         "YouTubeSubtitle",
+        "YouTube",
         "KuGou",
-        "Paxsenix",
         "LyricsPlus",
     )
 

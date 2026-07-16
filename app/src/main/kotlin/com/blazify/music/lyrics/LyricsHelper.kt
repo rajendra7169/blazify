@@ -299,10 +299,11 @@ constructor(
     companion object {
         private const val MAX_CACHE_SIZE = 3
 
-        // Sources that identify the song exactly (video id) or match strictly on
-        // title+artist+duration. Everything else is fuzzy keyword search and can
-        // return wrong-song lyrics (KuGou, Paxsenix, LyricsPlus).
-        private val TRUSTED_PROVIDERS = setOf("LrcLib", "BetterLyrics", "YouTube", "YouTubeSubtitle")
+        // Sources that identify the song exactly (video id) or verify candidates
+        // by duration AND title before accepting (Paxsenix scores Apple Music
+        // results; LrcLib matches duration strictly). Everything else is fuzzy
+        // keyword search and can return wrong-song lyrics (KuGou, LyricsPlus).
+        private val TRUSTED_PROVIDERS = setOf("Paxsenix", "LrcLib", "BetterLyrics", "YouTube", "YouTubeSubtitle")
     }
 }
 
