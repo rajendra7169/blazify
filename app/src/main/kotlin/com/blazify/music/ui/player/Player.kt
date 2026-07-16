@@ -145,7 +145,14 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import com.blazify.music.constants.HidePlayerThumbnailKey
+import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
 import com.blazify.music.constants.KeepScreenOn
 import com.blazify.music.constants.PlayerBackgroundStyle
@@ -231,6 +238,8 @@ fun BottomSheetPlayer(
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) = rememberPreference(HidePlayerThumbnailKey, false)
     val (hideStatusBarOnFullscreen) = rememberPreference(HideStatusBarOnFullscreenKey, false)
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
+    val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
 
     var showInlineLyrics by rememberSaveable {
         mutableStateOf(false)
@@ -1236,6 +1245,12 @@ fun BottomSheetPlayer(
                     }
 
                     Spacer(modifier = Modifier.size(12.dp))
+                    PlayerThemeButton(
+                        textButtonColor = textButtonColor,
+                        iconButtonColor = iconButtonColor,
+                    )
+
+                    Spacer(modifier = Modifier.size(12.dp))
 
                     AnimatedContent(targetState = showInlineLyrics, label = "LikeButton") { showLyrics ->
                         if (showLyrics) {
@@ -1838,49 +1853,88 @@ fun BottomSheetPlayer(
                     targetValue = if (isFullScreen) 0.dp else queueSheetState.collapsedBound,
                     label = "bottomPadding",
                 )
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier =
-                        Modifier
-                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                            .padding(bottom = bottomPadding)
-                            .animateContentSize(),
-                ) {
+                if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
+                    // FULL_ART: album art fills the stage, controls float over a bottom scrim.
                     Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.weight(1f),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding)
+                                .animateContentSize(),
                     ) {
-                        // Remember lambdas to prevent unnecessary recomposition
-                        val currentSliderPosition by rememberUpdatedState(sliderPosition)
-                        val sliderPositionProvider = remember { { currentSliderPosition } }
-                        val isExpandedProvider = remember(state) { { state.isExpanded } }
-                        AnimatedContent(
-                            targetState = showInlineLyrics,
-                            label = "Lyrics",
-                            transitionSpec = { fadeIn() togetherWith fadeOut() },
-                        ) { showLyrics ->
-                            if (showLyrics) {
-                                InlineLyricsView(
-                                    mediaMetadata = mediaMetadata,
-                                    showLyrics = showLyrics,
-                                    positionProvider = { effectivePosition },
-                                )
-                            } else {
-                                Thumbnail(
-                                    sliderPositionProvider = sliderPositionProvider,
-                                    modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection),
-                                    isPlayerExpanded = isExpandedProvider,
-                                    isListenTogetherGuest = isListenTogetherGuest,
-                                )
+                        FullArtBackground(
+                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier =
+                                Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth(),
+                        ) {
+                            mediaMetadata?.let {
+                                controlsContent(it)
                             }
+                            Spacer(Modifier.height(30.dp))
                         }
                     }
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier =
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding)
+                                .animateContentSize(),
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            // Remember lambdas to prevent unnecessary recomposition
+                            val currentSliderPosition by rememberUpdatedState(sliderPosition)
+                            val sliderPositionProvider = remember { { currentSliderPosition } }
+                            val isExpandedProvider = remember(state) { { state.isExpanded } }
+                            AnimatedContent(
+                                targetState = showInlineLyrics,
+                                label = "Lyrics",
+                                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                            ) { showLyrics ->
+                                if (showLyrics) {
+                                    InlineLyricsView(
+                                        mediaMetadata = mediaMetadata,
+                                        showLyrics = showLyrics,
+                                        positionProvider = { effectivePosition },
+                                    )
+                                } else if (playerDesign == PlayerDesign.RING) {
+                                    val progress =
+                                        if (duration > 0) effectivePosition.toFloat() / duration else 0f
+                                    RingArt(
+                                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                        progress = progress,
+                                        cropAlbumArt = cropAlbumArt,
+                                        ringColor = MaterialTheme.colorScheme.primary,
+                                        trackColor = TextBackgroundColor.copy(alpha = 0.18f),
+                                    )
+                                } else {
+                                    Thumbnail(
+                                        sliderPositionProvider = sliderPositionProvider,
+                                        modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection),
+                                        isPlayerExpanded = isExpandedProvider,
+                                        isListenTogetherGuest = isListenTogetherGuest,
+                                    )
+                                }
+                            }
+                        }
 
-                    mediaMetadata?.let {
-                        controlsContent(it)
+                        mediaMetadata?.let {
+                            controlsContent(it)
+                        }
+
+                        Spacer(Modifier.height(30.dp))
                     }
-
-                    Spacer(Modifier.height(30.dp))
                 }
             }
         }
@@ -2093,6 +2147,113 @@ fun MoreActionsButton(
     ) {
         Image(
             painter = painterResource(R.drawable.more_horiz),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(iconButtonColor),
+        )
+    }
+}
+
+/** RING design: circular album art wrapped by a dynamic progress ring ("CD-player" look). */
+@Composable
+private fun RingArt(
+    thumbnailUrl: String?,
+    progress: Float,
+    cropAlbumArt: Boolean,
+    ringColor: Color,
+    trackColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        val side = minOf(maxWidth, maxHeight) * 0.82f
+        Box(modifier = Modifier.size(side), contentAlignment = Alignment.Center) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = null,
+                contentScale = if (cropAlbumArt) ContentScale.Crop else ContentScale.Crop,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .clip(CircleShape),
+            )
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val strokeWidth = 8.dp.toPx()
+                val d = size.minDimension - strokeWidth
+                val topLeft = Offset((size.width - d) / 2f, (size.height - d) / 2f)
+                drawArc(
+                    color = trackColor,
+                    startAngle = -90f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = Size(d, d),
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                )
+                drawArc(
+                    color = ringColor,
+                    startAngle = -90f,
+                    sweepAngle = 360f * progress.coerceIn(0f, 1f),
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = Size(d, d),
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                )
+            }
+        }
+    }
+}
+
+/** FULL_ART design: album art fills the stage behind a bottom scrim. */
+@Composable
+private fun FullArtBackground(
+    thumbnailUrl: String?,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        AsyncImage(
+            model = thumbnailUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Black.copy(alpha = 0.25f),
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.45f),
+                                Color.Black.copy(alpha = 0.85f),
+                            ),
+                        ),
+                    ),
+        )
+    }
+}
+
+@Composable
+private fun PlayerThemeButton(
+    textButtonColor: Color,
+    iconButtonColor: Color,
+) {
+    val navController = LocalNavController.current
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+            Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(textButtonColor)
+                .clickable { navController.navigate("settings/appearance/player_design") },
+    ) {
+        Image(
+            painter = painterResource(R.drawable.palette),
             contentDescription = null,
             colorFilter = ColorFilter.tint(iconButtonColor),
         )

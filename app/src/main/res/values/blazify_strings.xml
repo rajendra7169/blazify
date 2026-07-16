@@ -1066,4 +1066,12 @@
     <string name="hint_changelog">What\'s new in this version</string>
     <string name="hint_links">Handle Blazify links by default</string>
     <string name="hint_updater">Check for updates</string>
+    <!-- Player designs -->
+    <string name="player_theme">Player theme</string>
+    <string name="player_theme_desc">Choose a player layout</string>
+    <string name="apply">Apply</string>
+    <string name="using">Using</string>
+    <string name="player_design_classic">Classic</string>
+    <string name="player_design_ring">Ring</string>
+    <string name="player_design_full_art">Full Art</string>
 </resources>

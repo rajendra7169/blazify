@@ -59,6 +59,7 @@ import com.blazify.music.ui.screens.settings.RomanizationSettings
 import com.blazify.music.ui.screens.settings.SettingsScreen
 import com.blazify.music.ui.screens.settings.StorageSettings
 import com.blazify.music.ui.screens.settings.StreamSourcesSettings
+import com.blazify.music.ui.screens.settings.PlayerDesignScreen
 import com.blazify.music.ui.screens.settings.ThemeScreen
 import com.blazify.music.ui.screens.settings.UpdaterScreen
 import com.blazify.music.ui.screens.settings.integrations.DiscordSettings
@@ -384,6 +385,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/appearance/theme") {
         ThemeScreen(navController)
+    }
+
+    composable("settings/appearance/player_design") {
+        PlayerDesignScreen(navController)
     }
 
     composable("settings/content") {
