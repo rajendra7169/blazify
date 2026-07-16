@@ -2307,13 +2307,12 @@ private fun RingPlayerLayout(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .padding(horizontal = PlayerHorizontalPadding),
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // --- top bar: minimize · title/artist · theme ---
+        // --- top bar: minimize · "Now Playing" · theme (both icons plain, near the edges) ---
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RingIconButton(R.drawable.expand_more, textColor, size = 28, onClick = onCollapse)
@@ -2340,26 +2339,13 @@ private fun RingPlayerLayout(
                     )
                 }
             }
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(buttonBgColor)
-                    .clickable(onClick = onOpenTheme),
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.palette),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(buttonFgColor),
-                    modifier = Modifier.size(22.dp),
-                )
-            }
+            // Theme icon — plain, no background (matches the minimize icon).
+            RingIconButton(R.drawable.palette, textColor, size = 24, onClick = onOpenTheme)
         }
 
         // --- ring ---
         Box(
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
             contentAlignment = Alignment.Center,
         ) {
             BoxWithConstraints(contentAlignment = Alignment.Center) {
@@ -2382,7 +2368,7 @@ private fun RingPlayerLayout(
 
         // --- queue + favourite ---
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -2398,9 +2384,9 @@ private fun RingPlayerLayout(
         Spacer(Modifier.height(6.dp))
 
         // --- progress + times (uses the Settings slider style, same as classic) ---
-        sliderContent(Modifier.fillMaxWidth())
+        sliderContent(Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding))
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding + 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
@@ -2415,7 +2401,7 @@ private fun RingPlayerLayout(
 
         // --- transport ---
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -2655,11 +2641,12 @@ private fun FullArtBackground(
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            listOf(
-                                Color.Black.copy(alpha = 0.25f),
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.45f),
-                                Color.Black.copy(alpha = 0.85f),
+                            colorStops = arrayOf(
+                                0.0f to Color.Black.copy(alpha = 0.40f),
+                                0.35f to Color.Transparent,
+                                0.60f to Color.Black.copy(alpha = 0.55f),
+                                0.80f to Color.Black.copy(alpha = 0.80f),
+                                1.0f to Color.Black.copy(alpha = 0.95f),
                             ),
                         ),
                     ),

@@ -61,6 +61,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -74,6 +75,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -383,15 +386,25 @@ private fun PreviewArt(url: String?, shape: Shape, modifier: Modifier = Modifier
 }
 
 @Composable
-private fun PreviewTitle(meta: MediaMetadata?, color: Color) {
-    Text(meta?.title ?: "Song title", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, color = color)
+private fun PreviewTitle(meta: MediaMetadata?, color: Color, shadow: Boolean = false) {
+    val sh = if (shadow) Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f) else null
+    Text(
+        meta?.title ?: "Song title",
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        color = color,
+        style = LocalTextStyle.current.copy(shadow = sh),
+    )
     Spacer(Modifier.height(3.dp))
     Text(
         meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
         fontSize = 10.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        color = color.copy(alpha = 0.7f),
+        color = color.copy(alpha = 0.75f),
+        style = LocalTextStyle.current.copy(shadow = sh),
     )
 }
 
@@ -640,7 +653,7 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White) }
+                Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White, shadow = true) }
                 PreviewFavorite(pc, Color.White)
                 Spacer(Modifier.width(10.dp))
                 PreviewPillButton(R.drawable.palette, Color.White.copy(alpha = 0.18f), Color.White)
@@ -661,7 +674,12 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
 private fun FullArtScrim() {
     Box(
         Modifier.fillMaxSize().background(
-            Brush.verticalGradient(0.30f to Color.Transparent, 1.0f to Color.Black.copy(alpha = 0.78f)),
+            Brush.verticalGradient(
+                0.0f to Color.Black.copy(alpha = 0.30f),
+                0.35f to Color.Transparent,
+                0.65f to Color.Black.copy(alpha = 0.55f),
+                1.0f to Color.Black.copy(alpha = 0.92f),
+            ),
         ),
     )
 }
