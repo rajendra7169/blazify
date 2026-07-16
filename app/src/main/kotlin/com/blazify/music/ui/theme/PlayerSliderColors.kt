@@ -32,7 +32,10 @@ object PlayerSliderColors {
     fun getSliderColors(
         activeColor: Color,
         playerBackground: PlayerBackgroundStyle,
-        useDarkTheme: Boolean
+        useDarkTheme: Boolean,
+        // When set, this colour is used for the active track/thumb instead of the
+        // static Blaze amber — e.g. the RING design passes the dynamic album colour.
+        activeOverride: Color? = null,
     ): SliderColors {
         val inactiveTrackColor = when (playerBackground) {
             PlayerBackgroundStyle.DEFAULT -> {
@@ -48,8 +51,9 @@ object PlayerSliderColors {
             }
         }
 
-        // Blazify: amber accent progress over blur/gradient backgrounds
-        val effectiveActiveColor = when (playerBackground) {
+        // Blazify: amber accent progress over blur/gradient backgrounds,
+        // unless an override (e.g. the dynamic album colour) is provided.
+        val effectiveActiveColor = activeOverride ?: when (playerBackground) {
             PlayerBackgroundStyle.BLUR, PlayerBackgroundStyle.GRADIENT -> BlazeThemeColor
             else -> activeColor
         }

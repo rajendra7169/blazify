@@ -73,6 +73,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -878,7 +879,7 @@ fun BottomSheetPlayer(
     ) {
         // Shared music progress bar honouring the Settings slider style (Default / Wavy / Slim).
         // Used by both the classic controls and the RING design so they stay consistent.
-        val playerSeekBar: @Composable (Modifier) -> Unit = { seekModifier ->
+        val playerSeekBar: @Composable (Modifier, SliderColors) -> Unit = { seekModifier, seekColors ->
             when (sliderStyle) {
                 SliderStyle.DEFAULT -> {
                     Slider(
@@ -904,7 +905,7 @@ fun BottomSheetPlayer(
                             }
                         },
                         enabled = !isListenTogetherGuest,
-                        colors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                        colors = seekColors,
                         modifier = seekModifier,
                     )
                 }
@@ -930,7 +931,7 @@ fun BottomSheetPlayer(
                                 sliderPosition = null
                             },
                             modifier = seekModifier,
-                            colors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                            colors = seekColors,
                             isPlaying = effectiveIsPlaying,
                         )
                     } else {
@@ -952,7 +953,7 @@ fun BottomSheetPlayer(
                                 }
                                 sliderPosition = null
                             },
-                            colors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                            colors = seekColors,
                             modifier = seekModifier,
                             isPlaying = effectiveIsPlaying,
                         )
@@ -987,7 +988,7 @@ fun BottomSheetPlayer(
                         track = { sliderState ->
                             PlayerSliderTrack(
                                 sliderState = sliderState,
-                                colors = PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                                colors = seekColors,
                                 // Apple-Music-style slim bar
                                 trackHeight = 8.dp,
                             )
@@ -1431,7 +1432,10 @@ fun BottomSheetPlayer(
 
             Spacer(Modifier.height(24.dp))
 
-            playerSeekBar(Modifier.padding(horizontal = PlayerHorizontalPadding))
+            playerSeekBar(
+                Modifier.padding(horizontal = PlayerHorizontalPadding),
+                PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+            )
 
             Spacer(Modifier.height(4.dp))
 
@@ -1916,7 +1920,18 @@ fun BottomSheetPlayer(
                         buttonBgColor = textButtonColor,
                         buttonFgColor = iconButtonColor,
                         bottomReserve = ringBottomOverlayHeight,
-                        sliderContent = playerSeekBar,
+                        sliderContent = { seekModifier ->
+                            // RING keeps the progress bar dynamic (album colour), like the ring arc.
+                            playerSeekBar(
+                                seekModifier,
+                                PlayerSliderColors.getSliderColors(
+                                    activeColor = textButtonColor,
+                                    playerBackground = playerBackground,
+                                    useDarkTheme = useDarkTheme,
+                                    activeOverride = MaterialTheme.colorScheme.primary,
+                                ),
+                            )
+                        },
                         onSeek = { pos ->
                             playerConnection.player.seekTo(pos)
                             position = pos
