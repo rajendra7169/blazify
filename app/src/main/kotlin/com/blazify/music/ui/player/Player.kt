@@ -1434,7 +1434,13 @@ fun BottomSheetPlayer(
 
             playerSeekBar(
                 Modifier.padding(horizontal = PlayerHorizontalPadding),
-                PlayerSliderColors.getSliderColors(textButtonColor, playerBackground, useDarkTheme),
+                // Dynamic album-colour progress bar for every design; style stays from Settings.
+                PlayerSliderColors.getSliderColors(
+                    activeColor = textButtonColor,
+                    playerBackground = playerBackground,
+                    useDarkTheme = useDarkTheme,
+                    activeOverride = MaterialTheme.colorScheme.primary,
+                ),
             )
 
             Spacer(Modifier.height(4.dp))
