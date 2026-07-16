@@ -1997,6 +1997,12 @@ fun BottomSheetPlayer(
                                 fallbackBrush = Brush.linearGradient(
                                     listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary),
                                 ),
+                                progress =
+                                    if (duration > 0) {
+                                        ((sliderPosition ?: effectivePosition).toFloat() / duration).coerceIn(0f, 1f)
+                                    } else {
+                                        0f
+                                    },
                             )
                         }
 

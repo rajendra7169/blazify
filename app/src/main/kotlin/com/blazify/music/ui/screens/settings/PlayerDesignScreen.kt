@@ -645,6 +645,7 @@ private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: 
 private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
     val cs = MaterialTheme.colorScheme
     val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    val (pos, dur) = rememberLivePosition(pc)
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -656,6 +657,7 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
             isPlaying = isPlaying,
             modifier = Modifier.fillMaxWidth(0.94f).aspectRatio(1f),
             fallbackBrush = previewArtBrush(),
+            progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
         )
         Spacer(Modifier.weight(0.3f))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

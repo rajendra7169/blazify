@@ -56,7 +56,7 @@ private const val DISC_CY = 0.56f        // and a little lower
 private const val DISC_R = 0.38f
 private const val ARM_BX = 0.81f         // gimbal bearing centre
 private const val ARM_BY = 0.155f
-private const val ARM_REST_ANGLE = -16f  // CCW swing that lifts the stylus off the record
+private const val ARM_REST_ANGLE = -22f  // CCW swing that lifts the stylus fully off the record
 
 @Composable
 fun VinylTurntable(
@@ -64,6 +64,9 @@ fun VinylTurntable(
     isPlaying: Boolean,
     modifier: Modifier = Modifier,
     fallbackBrush: Brush? = null,
+    // Playback progress 0..1 — the arm starts near the centre and tracks
+    // outward as the song plays, leaving the record right at the end.
+    progress: Float = 0f,
 ) {
     // Continuous rotation while playing; freezes (keeps its angle) when paused.
     val rotation = remember { Animatable(0f) }
@@ -77,10 +80,12 @@ fun VinylTurntable(
         }
     }
 
-    // Tonearm: on the outer-mid grooves while playing (0°), lifts off when paused.
+    // Tonearm tracking: at progress 0 the stylus sits near the centre (inner
+    // grooves); as the song plays it sweeps outward, crossing the rim right at
+    // the end. Paused → fully out, like lifting the needle.
     val armAngle by animateFloatAsState(
-        targetValue = if (isPlaying) 0f else ARM_REST_ANGLE,
-        animationSpec = spring(dampingRatio = 0.72f, stiffness = 60f),
+        targetValue = if (isPlaying) ARM_REST_ANGLE * progress.coerceIn(0f, 1f) else ARM_REST_ANGLE,
+        animationSpec = spring(dampingRatio = 0.85f, stiffness = 45f),
         label = "tonearm",
     )
 
@@ -220,8 +225,8 @@ private fun VinylDisc(
 private fun DrawScope.drawTonearm() {
     val d = size.minDimension
     val b = Offset(d * ARM_BX, d * ARM_BY)     // bearing / pivot
-    val e = Offset(d * ARM_BX, d * 0.62f)      // elbow start — slightly toward the base
-    val h = Offset(d * 0.73f, d * 0.76f)       // stylus point: outer grooves, lower-right
+    val e = Offset(d * ARM_BX, d * 0.42f)      // elbow start — just base-side of the stick's middle
+    val h = Offset(d * 0.608f, d * 0.708f)     // stylus at ~0.55 × disc radius (inner grooves, progress 0)
 
     val chrome = Brush.linearGradient(
         listOf(Color(0xFF6E6F75), Color(0xFFEDEEF2), Color(0xFF93949A), Color(0xFF45464C)),
@@ -229,12 +234,12 @@ private fun DrawScope.drawTonearm() {
         end = Offset(d * 0.90f, 0f),
     )
 
-    // The J-arm path: straight down for most of its length, then one gentle,
-    // shallow elbow onto the record (half the previous sweep).
+    // The J-arm path: straight from the base to just past the middle, then one
+    // long gentle arc reaching the inner grooves.
     val tube = Path().apply {
         moveTo(b.x, b.y)
         lineTo(e.x, e.y)
-        cubicTo(d * ARM_BX, d * 0.70f, d * 0.775f, d * 0.72f, h.x, h.y)
+        cubicTo(d * ARM_BX, d * 0.55f, d * 0.675f, d * 0.648f, h.x, h.y)
     }
 
     /* --- shadows first (light from top-left → shadows fall down-right) --- */
