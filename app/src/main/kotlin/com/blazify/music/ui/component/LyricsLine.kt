@@ -581,23 +581,33 @@ private fun WordLevelLyrics(
 
                         for (i in 0 until clusterCount) {
                             if (wordIdxMap[i] == wIdx) {
-                                val charOffset = clusterCharOffsets[i]
-                                val bounds = layoutResult.getBoundingBox(charOffset)
-                                left = minOf(left, bounds.left)
-                                right = maxOf(right, bounds.right)
-                                top = minOf(top, bounds.top)
-                                bottom = maxOf(bottom, bounds.bottom)
+                                val startOff = clusterCharOffsets[i]
+                                val endOff = startOff + graphemeClusters[i].length
+                                val line = layoutResult.getLineForOffset(startOff)
+                                // Use the true horizontal boundary positions (advance
+                                // width incl. combining matras) instead of the start
+                                // char's bounding box, so the last conjunct+matra of a
+                                // word (e.g. the "DI" in GAL-BAN-DI) is fully covered.
+                                val xStart = layoutResult.getHorizontalPosition(startOff, usePrimaryDirection = true)
+                                val xEnd = layoutResult.getHorizontalPosition(endOff, usePrimaryDirection = true)
+                                left = minOf(left, xStart, xEnd)
+                                right = maxOf(right, xStart, xEnd)
+                                top = minOf(top, layoutResult.getLineTop(line))
+                                bottom = maxOf(bottom, layoutResult.getLineBottom(line))
                                 found = true
                             }
                         }
 
                         if (found) {
+                            // Half-pixel bleed so anti-aliased matra edges aren't clipped.
+                            val cl = left - 0.5f
+                            val cr = right + 0.5f
                             if (isWordSung) {
-                                clipRect(left = left, top = top, right = right, bottom = bottom) {
+                                clipRect(left = cl, top = top, right = cr, bottom = bottom) {
                                     drawText(layoutResult, color = expressiveAccent)
                                 }
                             } else if (isWordActive && sungFactor > 0f) {
-                                clipRect(left = left, top = top, right = right, bottom = bottom) {
+                                clipRect(left = cl, top = top, right = cr, bottom = bottom) {
                                     drawText(layoutResult, color = expressiveAccent.copy(alpha = focusedAlpha + (1f - focusedAlpha) * sungFactor))
                                 }
                             }
