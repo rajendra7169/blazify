@@ -5,6 +5,7 @@
 
 package com.blazify.music.ui.component
 
+import androidx.media3.common.C
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -364,10 +365,26 @@ fun ExperimentalLyrics(
             
             currentPositionState = position
             smoothPositionForSync = position
-            
+
+            // Plain (unsynced) lyrics have no timestamps, so no line ever becomes
+            // "active". Drive the scroll + current-line proportionally from playback
+            // progress so plain lyrics still scroll along with the song.
+            if (!isSynced && lines.isNotEmpty()) {
+                val durationMs = playerConnection.player.duration
+                if (durationMs != C.TIME_UNSET && durationMs > 0) {
+                    val frac = (position.toFloat() / durationMs).coerceIn(0f, 1f)
+                    val target = (frac * lines.size).toInt().coerceIn(0, lines.lastIndex)
+                    if (target != scrollTargetIndex && (isSeeking || target > scrollTargetIndex)) {
+                        scrollTargetIndex = target
+                    }
+                    activeLineIndices = setOf(target)
+                }
+                continue
+            }
+
             val lyricsOffset = currentSong?.song?.lyricsOffset ?: 0
             val effectivePosition = position + lyricsOffset
-            
+
             val initialActiveIndices = findActiveLineIndices(lines, effectivePosition)
             val scrollActiveIndicesRaw = findActiveLineIndices(lines, effectivePosition + (if (hasWordTimings) 0L else 250L))
             

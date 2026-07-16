@@ -93,6 +93,29 @@ private fun String.containsRtl(): Boolean {
 }
 
 /**
+ * True when the text uses a complex/Indic script (Devanagari, Bengali, Gurmukhi,
+ * Gujarati, Oriya, Tamil, Telugu, Kannada, Malayalam, Sinhala, Thai, Lao,
+ * Myanmar, Khmer). These shape base + matra/conjunct into single glyphs that the
+ * per-grapheme karaoke draw path mangles (cutting matras, overlapping words), so
+ * they render through the whole-line + per-word-clip path instead.
+ */
+private fun String.containsComplexScript(): Boolean {
+    for (c in this) {
+        val code = c.code
+        if (code in 0x0900..0x0DFF || // Devanagari … Sinhala
+            code in 0x0E00..0x0E7F || // Thai
+            code in 0x0E80..0x0EFF || // Lao
+            code in 0x0F00..0x0FFF || // Tibetan
+            code in 0x1000..0x109F || // Myanmar
+            code in 0x1780..0x17FF    // Khmer
+        ) {
+            return true
+        }
+    }
+    return false
+}
+
+/**
  * Splits a string into Unicode grapheme clusters using BreakIterator.
  * This correctly handles Devanagari, Bengali, Arabic, Hangul, emoji, etc.
  * where a single visible glyph is composed of multiple code points (e.g. base
@@ -219,6 +242,11 @@ internal fun LyricsLine(
                 val mainText = if (item.isBackground) mainTextRaw?.removePrefix("(")?.removeSuffix(")") else mainTextRaw
                 val subText = if (item.isBackground) subTextRaw?.removePrefix("(")?.removeSuffix(")") else subTextRaw
 
+                // Indic/complex scripts (Devanagari for Nepali/Hindi, etc.) need font
+                // padding and no line-height trimming, or their matras/conjuncts get
+                // clipped; they also render via the whole-line path (no per-glyph draw).
+                val isComplexText = remember(mainText) { mainText?.containsComplexScript() == true }
+
                 val lyricStyle = TextStyle(
                     fontSize = if (item.isBackground) (lyricsTextSize * 0.7f).sp else lyricsTextSize.sp,
                     fontWeight = FontWeight.Bold,
@@ -227,10 +255,10 @@ internal fun LyricsLine(
                     letterSpacing = (-0.5).sp,
                     textAlign = agentTextAlign,
                     fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                    platformStyle = PlatformTextStyle(includeFontPadding = isComplexText),
                     lineHeightStyle = LineHeightStyle(
                         alignment = LineHeightStyle.Alignment.Center,
-                        trim = LineHeightStyle.Trim.Both
+                        trim = if (isComplexText) LineHeightStyle.Trim.None else LineHeightStyle.Trim.Both
                     )
                 )
 
@@ -266,7 +294,8 @@ internal fun LyricsLine(
                         expressiveAccent = expressiveAccent,
                         isBackground = item.isBackground,
                         focusedAlpha = focusedAlpha,
-                        alignment = agentTextAlign
+                        alignment = agentTextAlign,
+                        useWholeLinePath = isComplexText,
                     )
                 } else {
                     Text(
@@ -330,7 +359,8 @@ private fun WordLevelLyrics(
     expressiveAccent: Color,
     isBackground: Boolean,
     focusedAlpha: Float,
-    alignment: TextAlign
+    alignment: TextAlign,
+    useWholeLinePath: Boolean = false,
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -522,7 +552,10 @@ private fun WordLevelLyrics(
             if (!isActiveLine) {
                 drawText(layoutResult, color = lineColor)
             } else {
-                if (isRtlText) {
+                // RTL and complex Indic scripts render as a whole shaped line with a
+                // per-word colour overlay — the per-glyph transform path below cuts
+                // matras and overlaps conjuncts on those scripts.
+                if (isRtlText || useWholeLinePath) {
                     val (wordIdxMap, _, _) = charToWordData
                     val wordFactors = effectiveWords.map { word ->
                         val wStartMs = (word.startTime * 1000).toLong()
