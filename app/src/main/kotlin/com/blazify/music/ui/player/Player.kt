@@ -153,6 +153,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
@@ -2118,6 +2119,7 @@ fun BottomSheetPlayer(
                                     },
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                                 accent = MaterialTheme.colorScheme.primary,
+                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             )
                         }
 
@@ -2198,6 +2200,7 @@ fun BottomSheetPlayer(
                                 onLyrics = { showInlineLyrics = true },
                                 onQueue = { queueSheetState.expandSoft() },
                                 onSleep = { showSleepTimerDialog = true },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                             )
                         }
 
@@ -3059,19 +3062,20 @@ private fun RetroTransportRow(
 }
 
 @Composable
-private fun RetroSegment(bg: Color, iconRes: Int, tint: Color, onClick: () -> Unit) {
+private fun RowScope.RetroSegment(bg: Color, iconRes: Int, tint: Color, onClick: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(width = 68.dp, height = 50.dp)
+            .weight(1f)
+            .height(50.dp)
             .background(bg)
             .clickable(onClick = onClick),
     ) {
-        Icon(painterResource(iconRes), contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+        Icon(painterResource(iconRes), contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
     }
 }
 
-/** Retro segmented bottom row: lyrics (accent) · queue · sleep timer · more. */
+/** Retro segmented bottom row: lyrics (accent) · queue · sleep timer · theme · more. */
 @Composable
 private fun RetroBottomRow(
     accent: Color,
@@ -3080,17 +3084,24 @@ private fun RetroBottomRow(
     onLyrics: () -> Unit,
     onQueue: () -> Unit,
     onSleep: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    val navController = LocalNavController.current
     val menuState = LocalMenuState.current
     val bottomSheetPageState = LocalBottomSheetPageState.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .shadow(8.dp, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp)),
     ) {
-        RetroSegment(bg = accent, iconRes = R.drawable.music_note, tint = Color.White, onClick = onLyrics)
+        RetroSegment(bg = accent, iconRes = R.drawable.lyrics, tint = Color.White, onClick = onLyrics)
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.queue_music, tint = RetroCream, onClick = onQueue)
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.bedtime, tint = RetroCream, onClick = onSleep)
+        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.palette, tint = RetroCream) {
+            // Theme gallery: collapse the player first so the page is visible.
+            state.collapseSoft()
+            navController.navigate("settings/appearance/player_design")
+        }
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.more_horiz, tint = RetroCream) {
             menuState.show {
                 PlayerMenu(

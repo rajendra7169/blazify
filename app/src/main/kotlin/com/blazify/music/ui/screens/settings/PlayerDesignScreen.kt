@@ -705,6 +705,7 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
             progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
             modifier = Modifier.fillMaxWidth(0.92f),
             accent = cs.primary,
+            thumbnailUrl = meta?.thumbnailUrl,
         )
         Spacer(Modifier.weight(0.3f))
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) { PreviewTitle(meta, textColor) }
@@ -755,14 +756,14 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
             }
         }
         Spacer(Modifier.height(10.dp))
-        // Retro segmented bottom row.
+        // Retro segmented bottom row (lyrics · queue · sleep · theme · more).
         Row(Modifier.clip(RoundedCornerShape(12.dp))) {
-            Box(Modifier.size(width = 46.dp, height = 34.dp).background(cs.primary), contentAlignment = Alignment.Center) {
-                MiniIcon(R.drawable.music_note, Color.White, 16)
+            Box(Modifier.size(width = 40.dp, height = 34.dp).background(cs.primary), contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.lyrics, Color.White, 15)
             }
-            for (icon in listOf(R.drawable.queue_music, R.drawable.bedtime, R.drawable.more_horiz)) {
-                Box(Modifier.size(width = 46.dp, height = 34.dp).background(Color(0xFF2A241E)), contentAlignment = Alignment.Center) {
-                    MiniIcon(icon, cream, 16)
+            for (icon in listOf(R.drawable.queue_music, R.drawable.bedtime, R.drawable.palette, R.drawable.more_horiz)) {
+                Box(Modifier.size(width = 40.dp, height = 34.dp).background(Color(0xFF2A241E)), contentAlignment = Alignment.Center) {
+                    MiniIcon(icon, cream, 15)
                 }
             }
         }

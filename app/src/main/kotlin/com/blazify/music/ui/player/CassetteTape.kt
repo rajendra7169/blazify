@@ -3,11 +3,12 @@
  * Licensed under GPL-3.0 | See git history for contributors
  *
  * CASSETTE design centrepiece: a 3D retro compact cassette (dark shell, cream
- * label, orange stripe, "A" side badge, "60" length mark) with a window showing
- * the two tape reels. The reels spin while a song plays and the tape visibly
- * transfers from the left spool to the right one as playback progresses; on
- * pause everything freezes. Pure Compose Canvas — no assets; shared by the
- * player and the design-preview so they always match.
+ * label, accent stripe, "A" side badge, "60" length mark) with a window showing
+ * the two tape reels. The album art is printed faintly across the label (under
+ * the printed texture) with a small full-opacity art preview beside the "A"
+ * badge. The reels spin while a song plays and the tape visibly transfers from
+ * the left spool to the right as playback progresses; on pause everything
+ * freezes. Compose Canvas + coil — shared by the player and the design-preview.
  */
 
 package com.blazify.music.ui.player
@@ -17,15 +18,21 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
@@ -38,9 +45,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.material3.Text
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -64,6 +73,8 @@ fun CassetteTape(
     modifier: Modifier = Modifier,
     // Dynamic accent (album colour) for the label stripe; retro neutrals stay fixed.
     accent: Color = RetroOrange,
+    // Album art: printed faintly across the label + a small preview beside "A".
+    thumbnailUrl: String? = null,
 ) {
     // Reels spin while playing; freeze in place on pause.
     val rotation = remember { Animatable(0f) }
@@ -86,17 +97,50 @@ fun CassetteTape(
     BoxWithConstraints(modifier = modifier.aspectRatio(1.55f)) {
         val bw = maxWidth
         val bh = maxHeight
-        Canvas(modifier = Modifier.fillMaxSize()) { drawCassette(tape, rotation.value, accent) }
 
-        // Side badge "A" (inside the drawn badge box).
+        // 1) Base: shadows, shell, cream label.
+        Canvas(modifier = Modifier.fillMaxSize()) { drawCassetteBase() }
+
+        // 2) Album art printed across the label — low opacity, under the texture.
+        if (thumbnailUrl != null) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .offset(x = bw * 0.075f, y = bh * 0.075f)
+                    .size(width = bw * 0.83f, height = bh * 0.545f)
+                    .clip(RoundedCornerShape(bw * 0.02f))
+                    .alpha(0.22f),
+            )
+        }
+
+        // 3) Printed texture + window + reels on top of the art.
+        Canvas(modifier = Modifier.fillMaxSize()) { drawCassetteDetails(tape, rotation.value, accent) }
+
+        // 4) Small full-opacity art preview, left of the "A" badge.
+        if (thumbnailUrl != null) {
+            AsyncImage(
+                model = thumbnailUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .offset(x = bw * 0.10f, y = bh * 0.10f)
+                    .size(width = bw * 0.055f, height = bh * 0.085f)
+                    .clip(RoundedCornerShape(bw * 0.008f))
+                    .border(1.dp, InkBrown.copy(alpha = 0.6f), RoundedCornerShape(bw * 0.008f)),
+            )
+        }
+
+        // Side badge "A" (inside the drawn badge box, right of the art preview).
         Text(
             text = "A",
             color = InkBrown,
             fontWeight = FontWeight.Black,
             fontSize = (bw.value * 0.045f).sp,
-            modifier = Modifier.offset(x = bw * 0.112f, y = bh * 0.095f),
+            modifier = Modifier.offset(x = bw * 0.182f, y = bh * 0.095f),
         )
-        // Length mark "60" on the orange stripe.
+        // Length mark "60" on the accent stripe.
         Text(
             text = "60",
             color = Color.White,
@@ -107,7 +151,8 @@ fun CassetteTape(
     }
 }
 
-private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: Color) {
+/** Pass 1 — shadows, shell body and the cream label backing. */
+private fun DrawScope.drawCassetteBase() {
     val s = size.width
     val t = size.height
 
@@ -179,13 +224,21 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: 
         drawLine(Color(0xFF54463A), c - Offset(s * 0.008f, 0f), c + Offset(s * 0.008f, 0f), strokeWidth = s * 0.004f)
     }
 
-    /* --- cream label --- */
+    /* --- cream label backing --- */
     drawRoundRect(
         brush = Brush.verticalGradient(listOf(LabelCream, LabelCreamDark)),
         topLeft = Offset(s * 0.075f, t * 0.075f),
         size = Size(s * 0.83f, t * 0.545f),
         cornerRadius = CornerRadius(s * 0.02f, s * 0.02f),
     )
+}
+
+/** Pass 2 — printed texture, window, reels and gloss, drawn over the label art. */
+private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, accent: Color) {
+    val s = size.width
+    val t = size.height
+
+    // Label frame (over the art edge).
     drawRoundRect(
         color = LabelBorder,
         topLeft = Offset(s * 0.075f, t * 0.075f),
@@ -194,10 +247,10 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: 
         style = Stroke(width = s * 0.004f),
     )
 
-    // "A" badge box (letter drawn as a Text overlay).
+    // "A" badge box (letter drawn as a Text overlay; sits right of the art preview).
     drawRoundRect(
         color = InkBrown,
-        topLeft = Offset(s * 0.10f, t * 0.10f),
+        topLeft = Offset(s * 0.17f, t * 0.10f),
         size = Size(s * 0.055f, t * 0.085f),
         cornerRadius = CornerRadius(s * 0.008f, s * 0.008f),
         style = Stroke(width = s * 0.0045f),
@@ -209,7 +262,6 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: 
         topLeft = Offset(s * 0.075f, t * 0.455f),
         size = Size(s * 0.83f, t * 0.105f),
     )
-    // Fine darker print lines inside the stripe.
     for (i in 1..3) {
         val ly = t * (0.455f + 0.105f * i / 4f)
         drawLine(
@@ -340,8 +392,8 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: 
             start = Offset(0f, 0f),
             end = Offset(s * 0.9f, t),
         ),
-        topLeft = shellTL,
-        size = shellSize,
+        topLeft = Offset(s * 0.005f, 0f),
+        size = Size(s * 0.97f, t * 0.955f),
         cornerRadius = CornerRadius(s * 0.045f, s * 0.045f),
     )
 }
