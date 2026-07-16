@@ -5,6 +5,7 @@
 
 package com.blazify.music.ui.player
 
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.activity.compose.BackHandler
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -63,7 +64,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
@@ -2375,6 +2375,18 @@ fun InlineLyricsView(
         if (mediaMetadata != null && currentLyrics == null) {
             // Tiny debounce only (rapid skips); the old 500ms delay made lyrics feel slow.
             delay(100)
+            // Resolve a usable duration first — fetching with an unknown duration lets
+            // the fuzzy providers cache WRONG lyrics. Fall back to the player's duration;
+            // if neither is known yet, skip (the service preload will fetch once known).
+            val resolvedDuration =
+                if (mediaMetadata.duration > 0) {
+                    mediaMetadata.duration
+                } else {
+                    val playerMs = playerConnection.player.duration
+                    if (playerMs != C.TIME_UNSET && playerMs > 0) (playerMs / 1000).toInt() else -1
+                }
+            if (resolvedDuration <= 0) return@LaunchedEffect
+            val resolvedMetadata = mediaMetadata.copy(duration = resolvedDuration)
             coroutineScope.launch(Dispatchers.IO) {
                 try {
                     val entryPoint =
@@ -2383,9 +2395,9 @@ fun InlineLyricsView(
                             com.blazify.music.di.LyricsHelperEntryPoint::class.java,
                         )
                     val lyricsHelper = entryPoint.lyricsHelper()
-                    val fetchedLyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
+                    val fetchedLyricsWithProvider = lyricsHelper.getLyrics(resolvedMetadata)
                     database.query {
-                        upsert(LyricsEntity(mediaMetadata.id, fetchedLyricsWithProvider.lyrics, fetchedLyricsWithProvider.provider))
+                        upsert(LyricsEntity(resolvedMetadata.id, fetchedLyricsWithProvider.lyrics, fetchedLyricsWithProvider.provider))
                     }
                 } catch (e: Exception) {
                     // Handle error
@@ -2417,6 +2429,9 @@ fun InlineLyricsView(
             try {
                 val existing = database.lyrics(nextId).first()
                 if (existing != null) return@withContext
+                // Never prefetch without a known duration — fuzzy providers would
+                // cache wrong lyrics permanently.
+                if (nextMetadata.duration <= 0) return@withContext
                 val entryPoint =
                     EntryPointAccessors.fromApplication(
                         context.applicationContext,
@@ -2441,7 +2456,7 @@ fun InlineLyricsView(
     ) {
         when {
             lyrics == null -> {
-                ContainedLoadingIndicator()
+                BlazeLoader()
             }
 
             lyrics == LyricsEntity.LYRICS_NOT_FOUND -> {

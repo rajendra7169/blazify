@@ -35,6 +35,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.core.app.ServiceCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
@@ -164,6 +165,7 @@ import com.blazify.music.constants.ShuffleModeKey
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
+import com.blazify.music.constants.LyricsCacheCleanupV1Key
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.db.MusicDatabase
@@ -233,6 +235,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -863,30 +866,65 @@ class MusicService :
             updateWidgetUI(player.isPlaying)
         }
 
+        // One-time cleanup: an earlier build preloaded lyrics before the song
+        // duration was known, letting fuzzy providers cache WRONG lyrics in the
+        // DB. Wipe the lyrics cache once so everything refetches correctly.
+        scope.launch {
+            val cleaned = dataStore.data.map { it[LyricsCacheCleanupV1Key] ?: false }.first()
+            if (!cleaned) {
+                database.query { clearAllLyrics() }
+                dataStore.edit { it[LyricsCacheCleanupV1Key] = true }
+            }
+        }
+
         // Lyrics preloading: fetch the CURRENT song's lyrics as soon as it starts
         // (regardless of whether the lyrics view is open) and then prefetch the
         // NEXT queue item's lyrics, so opening lyrics is instant.
+        // IMPORTANT: never fetch with an unknown duration — without it the
+        // search-based providers (KuGou/LrcLib/…) match fuzzily and return
+        // wrong lyrics that would be cached permanently.
         currentMediaMetadata
             .distinctUntilChangedBy { it?.id }
             .collectLatest(scope) { mediaMetadata ->
                 if (mediaMetadata != null && database.lyrics(mediaMetadata.id).first() == null) {
-                    val lyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
-                    database.query {
-                        upsert(
-                            LyricsEntity(
-                                id = mediaMetadata.id,
-                                lyrics = lyricsWithProvider.lyrics,
-                                provider = lyricsWithProvider.provider,
-                            ),
-                        )
+                    // Wait (up to 15s) for a usable duration: metadata first, then the player.
+                    val durationSec = withTimeoutOrNull(15_000) {
+                        while (true) {
+                            if (mediaMetadata.duration > 0) return@withTimeoutOrNull mediaMetadata.duration
+                            val playerDurationMs = withContext(Dispatchers.Main) {
+                                if (player.currentMetadata?.id == mediaMetadata.id) player.duration else C.TIME_UNSET
+                            }
+                            if (playerDurationMs != C.TIME_UNSET && playerDurationMs > 0) {
+                                return@withTimeoutOrNull (playerDurationMs / 1000).toInt()
+                            }
+                            delay(500)
+                        }
+                        @Suppress("UNREACHABLE_CODE")
+                        -1
+                    }
+                    if (durationSec != null && durationSec > 0) {
+                        val resolved = mediaMetadata.copy(duration = durationSec)
+                        val lyricsWithProvider = lyricsHelper.getLyrics(resolved)
+                        database.query {
+                            upsert(
+                                LyricsEntity(
+                                    id = mediaMetadata.id,
+                                    lyrics = lyricsWithProvider.lyrics,
+                                    provider = lyricsWithProvider.provider,
+                                ),
+                            )
+                        }
                     }
                 }
-                // Prefetch the next song's lyrics in the background.
+                // Prefetch the next song's lyrics in the background — only when its
+                // duration is already known (skip otherwise; never poison the cache).
                 val nextMetadata = withContext(Dispatchers.Main) {
                     val nextIndex = player.nextMediaItemIndex
                     if (nextIndex != C.INDEX_UNSET) player.getMediaItemAt(nextIndex).metadata else null
                 }
-                if (nextMetadata != null && database.lyrics(nextMetadata.id).first() == null) {
+                if (nextMetadata != null && nextMetadata.duration > 0 &&
+                    database.lyrics(nextMetadata.id).first() == null
+                ) {
                     val prefetched = lyricsHelper.getLyrics(nextMetadata)
                     database.query {
                         upsert(

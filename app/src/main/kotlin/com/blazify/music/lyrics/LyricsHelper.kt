@@ -28,8 +28,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val MAX_LYRICS_FETCH_MS = 12000L
-private const val PER_PROVIDER_TIMEOUT_MS = 6000L
+private const val MAX_LYRICS_FETCH_MS = 15000L
+private const val PER_PROVIDER_TIMEOUT_MS = 8000L
 private const val PROVIDER_NONE = ""
 
 class LyricsHelper
