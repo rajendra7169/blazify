@@ -1931,16 +1931,6 @@ fun BottomSheetPlayer(
                             playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
                         },
                         onOpenSleepTimer = { showSleepTimerDialog = true },
-                        moreButton = {
-                            mediaMetadata?.let {
-                                PlayerMoreMenuButton(
-                                    mediaMetadata = it,
-                                    state = state,
-                                    textButtonColor = textButtonColor,
-                                    iconButtonColor = iconButtonColor,
-                                )
-                            }
-                        },
                         modifier =
                             Modifier
                                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
@@ -2213,8 +2203,8 @@ fun MoreActionsButton(
  * RING design — a distinct full-player layout (see the "Remedy Vibe" reference):
  * top bar (minimize · "Now Playing" · theme), circular art wrapped by a seekable
  * progress ring, a queue+favourite row, an image-style progress bar with times,
- * transport, a sleep-timer + more row, and a partial synced-lyrics card that
- * expands to full lyrics on tap. Colours stay album-art dynamic.
+ * transport, a left-aligned sleep-timer icon, and a partial synced-lyrics card
+ * that expands to full lyrics on tap. Colours stay album-art dynamic.
  */
 @Composable
 private fun RingPlayerLayout(
@@ -2244,7 +2234,6 @@ private fun RingPlayerLayout(
     onOpenTheme: () -> Unit,
     onToggleShuffle: () -> Unit,
     onOpenSleepTimer: () -> Unit,
-    moreButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
@@ -2408,15 +2397,13 @@ private fun RingPlayerLayout(
 
         Spacer(Modifier.height(10.dp))
 
-        // --- sleep timer + more (above the lyrics card) ---
+        // --- sleep timer (left, above the lyrics card) ---
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RingIconButton(R.drawable.bedtime, textColor, size = 24, onClick = onOpenSleepTimer)
-            Spacer(Modifier.width(8.dp))
-            moreButton()
         }
 
         Spacer(Modifier.height(8.dp))
