@@ -455,6 +455,8 @@ val ShowLyricsKey = booleanPreferencesKey("showLyrics")
 val LyricsCacheCleanupV1Key = booleanPreferencesKey("lyricsCacheCleanupV1")
 // Second cleanup: entries cached before plausibility validation existed.
 val LyricsCacheCleanupV2Key = booleanPreferencesKey("lyricsCacheCleanupV2")
+// Third cleanup: entries cached before synced-lyrics preference existed.
+val LyricsCacheCleanupV3Key = booleanPreferencesKey("lyricsCacheCleanupV3")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

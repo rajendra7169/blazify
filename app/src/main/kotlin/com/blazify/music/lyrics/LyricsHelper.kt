@@ -101,7 +101,11 @@ constructor(
                     }
                 }
 
-                var found: LyricsWithProvider? = null
+                // Prefer SYNCED (scrolling) lyrics: take the first valid synced result
+                // in priority order; remember the best plain result only as a fallback
+                // for songs where no source has a synced match.
+                var synced: LyricsWithProvider? = null
+                var plainFallback: LyricsWithProvider? = null
                 for ((index, attempt) in attempts.withIndex()) {
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
@@ -112,17 +116,24 @@ constructor(
                             Timber.tag("LyricsHelper").w("${enabledProviders[index].name} returned implausible lyrics (timeline/duration mismatch) — skipping")
                             continue
                         }
-                        Timber.tag("LyricsHelper").i("Got lyrics from ${enabledProviders[index].name}")
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
-                        found = LyricsWithProvider(filtered, enabledProviders[index].name)
-                        break
+                        if (isSynced(filtered)) {
+                            Timber.tag("LyricsHelper").i("Got SYNCED lyrics from ${enabledProviders[index].name}")
+                            synced = LyricsWithProvider(filtered, enabledProviders[index].name)
+                            break
+                        }
+                        if (plainFallback == null) {
+                            Timber.tag("LyricsHelper").i("Got plain lyrics from ${enabledProviders[index].name} — holding as fallback, still looking for synced")
+                            plainFallback = LyricsWithProvider(filtered, enabledProviders[index].name)
+                        }
                     }
                 }
                 // Cancel any still-running lower-priority attempts.
                 attempts.forEach { it.cancel() }
 
-                if (found == null) Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
-                found ?: LyricsWithProvider(LYRICS_NOT_FOUND, PROVIDER_NONE)
+                val chosen = synced ?: plainFallback
+                if (chosen == null) Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
+                chosen ?: LyricsWithProvider(LYRICS_NOT_FOUND, PROVIDER_NONE)
             }
         }
 
@@ -212,6 +223,14 @@ constructor(
         currentLyricsJob?.join()
     }
 
+    /** True when the lyrics carry [mm:ss] timestamps (scrolling/karaoke capable). */
+    private fun isSynced(lyrics: String): Boolean =
+        try {
+            LyricsUtils.parseLyrics(lyrics).isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
+
     /**
      * Sanity-check fetched lyrics against the song: for SYNCED lyrics the last
      * timestamp must fall inside a sane window of the track length (40% .. +30s).
@@ -229,7 +248,7 @@ constructor(
         if (entries.isEmpty()) return true // plain lyrics — nothing to verify against
         val lastMs = entries.maxOf { it.time }
         val durationMs = durationSec * 1000L
-        return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 30_000L
+        return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 15_000L
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {
