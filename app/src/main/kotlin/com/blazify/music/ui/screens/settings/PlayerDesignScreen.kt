@@ -12,6 +12,7 @@
 package com.blazify.music.ui.screens.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -201,16 +203,55 @@ fun PlayerDesignScreen(navController: NavController) {
 
 @Composable
 private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val frameShape = RoundedCornerShape(40.dp)
     Box(
         modifier = modifier
-            .aspectRatio(9f / 19.2f)
-            .clip(RoundedCornerShape(34.dp))
-            .background(Color.Black)
-            .padding(5.dp)
-            .clip(RoundedCornerShape(29.dp))
+            .aspectRatio(9f / 19.3f)
+            // Drop shadow / glow so the frame pops off the dark background.
+            .shadow(
+                elevation = 26.dp,
+                shape = frameShape,
+                clip = false,
+                ambientColor = Color.White.copy(alpha = 0.35f),
+                spotColor = Color.White.copy(alpha = 0.55f),
+            )
+            .clip(frameShape)
+            // Metallic bezel (lighter than pure black so it's visible in the dark).
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF44454A),
+                        Color(0xFF26272B),
+                        Color(0xFF1A1B1E),
+                    ),
+                ),
+            )
+            // Bright edge highlight to define the frame outline.
+            .border(
+                width = 1.5.dp,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color.White.copy(alpha = 0.45f),
+                        Color.White.copy(alpha = 0.10f),
+                        Color.White.copy(alpha = 0.28f),
+                    ),
+                ),
+                shape = frameShape,
+            )
+            .padding(7.dp)
+            .clip(RoundedCornerShape(33.dp))
             .background(MaterialTheme.colorScheme.background),
     ) {
         content()
+        // Top speaker slit for a realistic look.
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 7.dp)
+                .size(width = 40.dp, height = 4.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.14f)),
+        )
     }
 }
 
