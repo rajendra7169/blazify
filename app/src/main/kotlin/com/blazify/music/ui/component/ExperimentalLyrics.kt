@@ -232,22 +232,44 @@ fun ExperimentalLyrics(
     val hasWordTimings = remember(lines) { lines.any { it.words?.isNotEmpty() == true } }
 
     // For PLAIN (un-timestamped) lyrics we drive the scroll from playback progress.
-    // Weight each line by how much text it carries so long lines linger and short
-    // ones pass quickly, instead of giving every line an equal time slice — an equal
-    // split makes the scroll race ahead on short lines and lag on long ones. Stored
-    // as cumulative END fractions in [0,1] (last entry == 1f).
-    val plainLineCumFractions = remember(lines) {
+    // Weight each line by how much text it carries (long lines linger, short ones
+    // pass quickly) PLUS a dwell bonus at stanza boundaries: blank lines in the
+    // source are stripped from `lines`, but an instrumental fill almost always
+    // sits at those gaps — so a line followed by blank line(s) holds the scroll
+    // longer instead of gliding straight into the next stanza. Stored as
+    // cumulative END fractions in [0,1] (last entry == 1f).
+    val plainLineCumFractions = remember(lyrics, lines) {
         if (lines.isEmpty()) {
             FloatArray(0)
         } else {
+            // Recover the per-line dwell bonus from the raw text's blank-line runs.
+            // `lines` is exactly the non-blank source lines in order, so we can walk
+            // the source and match them one-to-one; on any mismatch we fall back to
+            // length-only weighting.
+            val blankBonus: FloatArray? = lyrics?.lines()?.let { src ->
+                val bonuses = ArrayList<Float>(lines.size)
+                var i = 0
+                while (i < src.size) {
+                    if (src[i].isNotBlank()) {
+                        var blanks = 0
+                        var j = i + 1
+                        while (j < src.size && src[j].isBlank()) { blanks++; j++ }
+                        // Each blank line ≈ a couple lines' worth of extra dwell, capped
+                        // so a big gap can't freeze the scroll for the whole break.
+                        bonuses.add((blanks * 26).coerceAtMost(78).toFloat())
+                    }
+                    i++
+                }
+                if (bonuses.size == lines.size) bonuses.toFloatArray() else null
+            }
+
             val cum = FloatArray(lines.size)
             var total = 0f
             for (i in lines.indices) {
                 val len = lines[i].text.trim().length
-                // Blank/section lines still take a small beat; clamp so one very long
-                // line can't swallow a huge share of the timeline.
-                val weight = (if (len == 0) 4 else len).coerceIn(4, 80).toFloat()
-                total += weight
+                // Clamp so one very long line can't swallow a huge share of the timeline.
+                val base = (if (len == 0) 4 else len).coerceIn(4, 80).toFloat()
+                total += base + (blankBonus?.getOrNull(i) ?: 0f)
                 cum[i] = total
             }
             if (total <= 0f) cum else FloatArray(lines.size) { cum[it] / total }
