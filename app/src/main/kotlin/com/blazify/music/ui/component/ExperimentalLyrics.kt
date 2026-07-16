@@ -368,11 +368,18 @@ fun ExperimentalLyrics(
 
             // Plain (unsynced) lyrics have no timestamps, so no line ever becomes
             // "active". Drive the scroll + current-line proportionally from playback
-            // progress so plain lyrics still scroll along with the song.
+            // progress. Songs open with an instrumental intro and close with an
+            // outro, so map the lines onto the estimated VOCAL window (skip a
+            // lead-in, stop a little before the end) instead of the whole track —
+            // otherwise the lyrics scroll ahead of the singing.
             if (!isSynced && lines.isNotEmpty()) {
                 val durationMs = playerConnection.player.duration
                 if (durationMs != C.TIME_UNSET && durationMs > 0) {
-                    val frac = (position.toFloat() / durationMs).coerceIn(0f, 1f)
+                    // ~10% intro (capped at 12s) lead-in; ~7% outro tail.
+                    val introMs = (durationMs * 0.10f).toLong().coerceAtMost(12_000L)
+                    val outroMs = (durationMs * 0.07f).toLong()
+                    val vocalSpan = (durationMs - introMs - outroMs).coerceAtLeast(1L)
+                    val frac = ((position - introMs).toFloat() / vocalSpan).coerceIn(0f, 1f)
                     val target = (frac * lines.size).toInt().coerceIn(0, lines.lastIndex)
                     if (target != scrollTargetIndex && (isSeeking || target > scrollTargetIndex)) {
                         scrollTargetIndex = target
