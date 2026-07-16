@@ -16,6 +16,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -75,6 +76,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -99,6 +102,8 @@ import com.blazify.music.listentogether.SuggestionReceivedPayload
 import com.blazify.music.listentogether.UserInfo
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.IconButton
+import com.blazify.music.ui.theme.BlazeGradientEnd
+import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.launch
@@ -418,7 +423,17 @@ fun ListenTogetherScreen(
 
     if (shouldShowTopBar) {
         TopAppBar(
-            title = { Text(stringResource(R.string.together)) },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(R.drawable.blaze_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(26.dp),
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.blaze_together))
+                }
+            },
             navigationIcon = {
                 IconButton(
                     onClick = navController::navigateUp,
@@ -476,34 +491,51 @@ private fun HeaderSection(isInRoom: Boolean = false) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // Branded hero: a soft Blaze halo behind a gradient disc holding the
+        // group-with-plus icon (create / join a room).
         Box(
-            modifier =
-                Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier.size(112.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.group_outlined),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(48.dp),
+            Box(
+                modifier =
+                    Modifier
+                        .size(112.dp)
+                        .clip(CircleShape)
+                        .background(BlazeThemeColor.copy(alpha = 0.12f)),
             )
+            Box(
+                modifier =
+                    Modifier
+                        .size(88.dp)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.linearGradient(listOf(BlazeThemeColor, BlazeGradientEnd)),
+                        ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.group_add),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(46.dp),
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
         Text(
             text = stringResource(R.string.listen_together),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = stringResource(R.string.listen_together_description),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 8.dp),
         )
     }
 }

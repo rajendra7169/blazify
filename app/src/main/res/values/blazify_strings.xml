@@ -595,6 +595,7 @@
 
     <!-- Listen Together -->
     <string name="together">Together</string>
+    <string name="blaze_together">Blaze Together</string>
     <string name="listen_together">Listen Together</string>
     <string name="listen_together_server_url">Server URL</string>
     <string name="listen_together_choose_server">Choose server</string>
