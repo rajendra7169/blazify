@@ -54,7 +54,7 @@ import coil3.compose.AsyncImage
 private const val DISC_CX = 0.46f        // record slightly left — gives the arm its lane
 private const val DISC_CY = 0.56f        // and a little lower
 private const val DISC_R = 0.38f
-private const val ARM_BX = 0.84f         // gimbal bearing centre
+private const val ARM_BX = 0.81f         // gimbal bearing centre
 private const val ARM_BY = 0.155f
 private const val ARM_REST_ANGLE = -16f  // CCW swing that lifts the stylus off the record
 
@@ -220,8 +220,8 @@ private fun VinylDisc(
 private fun DrawScope.drawTonearm() {
     val d = size.minDimension
     val b = Offset(d * ARM_BX, d * ARM_BY)     // bearing / pivot
-    val e = Offset(d * ARM_BX, d * 0.66f)      // elbow starts LOW (tube stays straight past mid)
-    val h = Offset(d * 0.69f, d * 0.76f)       // stylus point: ~0.80 × disc radius, lower-right grooves
+    val e = Offset(d * ARM_BX, d * 0.62f)      // elbow start — slightly toward the base
+    val h = Offset(d * 0.73f, d * 0.76f)       // stylus point: outer grooves, lower-right
 
     val chrome = Brush.linearGradient(
         listOf(Color(0xFF6E6F75), Color(0xFFEDEEF2), Color(0xFF93949A), Color(0xFF45464C)),
@@ -229,12 +229,12 @@ private fun DrawScope.drawTonearm() {
         end = Offset(d * 0.90f, 0f),
     )
 
-    // The J-arm path: straight down for most of its length, then one short,
-    // tight elbow onto the record (less sweep, like the reference).
+    // The J-arm path: straight down for most of its length, then one gentle,
+    // shallow elbow onto the record (half the previous sweep).
     val tube = Path().apply {
         moveTo(b.x, b.y)
         lineTo(e.x, e.y)
-        cubicTo(d * ARM_BX, d * 0.72f, d * 0.759f, d * 0.72f, h.x, h.y)
+        cubicTo(d * ARM_BX, d * 0.70f, d * 0.775f, d * 0.72f, h.x, h.y)
     }
 
     /* --- shadows first (light from top-left → shadows fall down-right) --- */
@@ -361,9 +361,9 @@ private fun DrawScope.drawTonearm() {
     )
     drawCircle(Color(0xFF2A2B2F), radius = d * 0.0035f, center = b)
 
-    /* --- headshell: black cartridge along the elbow's tangent (~150°) --- */
+    /* --- headshell: black cartridge along the elbow's tangent (~138°) --- */
     drawCircle(brush = chrome, radius = d * 0.011f, center = h)
-    rotate(degrees = 150f, pivot = h) {
+    rotate(degrees = 138f, pivot = h) {
         // Cartridge body.
         drawRoundRect(
             color = Color(0xFF131316),
