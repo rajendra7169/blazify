@@ -1976,6 +1976,36 @@ fun BottomSheetPlayer(
                             Modifier
                                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                     )
+                } else if (playerDesign == PlayerDesign.RECORD && !showInlineLyrics) {
+                    // RECORD: spinning vinyl + tonearm as the artwork; classic controls below.
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier =
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding)
+                                .animateContentSize(),
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                        ) {
+                            VinylTurntable(
+                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                isPlaying = effectiveIsPlaying,
+                                modifier = Modifier.fillMaxSize().padding(horizontal = PlayerHorizontalPadding),
+                                fallbackBrush = Brush.linearGradient(
+                                    listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary),
+                                ),
+                            )
+                        }
+
+                        mediaMetadata?.let {
+                            controlsContent(it)
+                        }
+
+                        Spacer(Modifier.height(30.dp))
+                    }
                 } else {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

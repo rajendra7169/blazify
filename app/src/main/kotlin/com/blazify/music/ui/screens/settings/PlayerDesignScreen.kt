@@ -32,6 +32,7 @@ import coil3.toBitmap
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.ui.player.SeekableAlbumRing
+import com.blazify.music.ui.player.VinylTurntable
 import com.blazify.music.ui.theme.PlayerColorExtractor
 import com.blazify.music.utils.rememberEnumPreference
 import kotlinx.coroutines.Dispatchers
@@ -299,6 +300,7 @@ private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
             PlayerDesign.CLASSIC -> ClassicPreview(meta, pc, textColor)
             PlayerDesign.RING -> RingPreview(meta, pc, textColor)
             PlayerDesign.FULL_ART -> FullArtPreview(meta, pc)
+            PlayerDesign.RECORD -> RecordPreview(meta, pc, textColor)
         }
     }
 }
@@ -634,6 +636,42 @@ private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: 
             Spacer(Modifier.height(2.dp))
             Text("Whispers in my mind, they call", fontSize = 9.sp, color = textColor.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
+    }
+}
+
+/* ---------- RECORD ---------- */
+
+@Composable
+private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
+    val cs = MaterialTheme.colorScheme
+    val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+        Spacer(Modifier.weight(0.3f))
+        VinylTurntable(
+            thumbnailUrl = meta?.thumbnailUrl,
+            isPlaying = isPlaying,
+            modifier = Modifier.fillMaxWidth(0.94f).aspectRatio(1f),
+            fallbackBrush = previewArtBrush(),
+        )
+        Spacer(Modifier.weight(0.3f))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewFavorite(pc, textColor)
+            Spacer(Modifier.width(10.dp))
+            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
+            Spacer(Modifier.width(8.dp))
+            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
+        }
+        Spacer(Modifier.height(12.dp))
+        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewTransport(pc, textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewQueuePeek(textColor)
     }
 }
 

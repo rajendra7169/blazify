@@ -1074,5 +1074,6 @@
     <string name="player_design_classic">Classic</string>
     <string name="player_design_ring">Ring</string>
     <string name="player_design_full_art">Full Art</string>
+    <string name="player_design_record">Record</string>
     <string name="show_lyrics">Show Lyrics</string>
 </resources>
