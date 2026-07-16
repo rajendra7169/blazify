@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -539,7 +539,7 @@ fun SelectionSongMenu(
                                     Material3MenuItemData(
                                         title = { Text(text = stringResource(R.string.downloading)) },
                                         icon = {
-                                            CircularProgressIndicator(
+                                            BlazeLoader(
                                                 modifier = Modifier.size(24.dp),
                                                 strokeWidth = 2.dp,
                                             )
@@ -953,7 +953,7 @@ fun SelectionMediaMetadataMenu(
                                     Material3MenuItemData(
                                         title = { Text(text = stringResource(R.string.downloading)) },
                                         icon = {
-                                            CircularProgressIndicator(
+                                            BlazeLoader(
                                                 modifier = Modifier.size(24.dp),
                                                 strokeWidth = 2.dp,
                                             )

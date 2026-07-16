@@ -102,7 +102,7 @@ internal fun LyricsTranslationHeader(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ) {
-                    androidx.compose.material3.CircularProgressIndicator(
+                    BlazeLoader(
                         modifier = Modifier.size(16.dp),
                         strokeWidth = 2.dp,
                         color = MaterialTheme.colorScheme.onPrimaryContainer

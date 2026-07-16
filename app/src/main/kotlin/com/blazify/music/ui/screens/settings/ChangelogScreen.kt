@@ -5,6 +5,7 @@
 
 package com.blazify.music.ui.screens.settings
 
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -111,7 +112,7 @@ fun ChangelogScreen(
                 if (isLoading) {
                     item {
                         Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                            BlazeLoader()
                         }
                     }
                 } else if (releases.isEmpty()) {

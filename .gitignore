@@ -118,3 +118,6 @@ app/src/main/cpp/coverart/
 # Local-only files (never commit)
 CLAUDE.md
 .local/
+
+# Local technical docs (do not publish)
+docs/*.pdf

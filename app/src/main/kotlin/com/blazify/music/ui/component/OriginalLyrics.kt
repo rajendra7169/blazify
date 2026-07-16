@@ -712,7 +712,7 @@ fun OriginalLyrics(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            androidx.compose.material3.CircularProgressIndicator(
+                            BlazeLoader(
                                 modifier = Modifier.size(16.dp),
                                 strokeWidth = 2.dp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,

@@ -2373,7 +2373,8 @@ fun InlineLyricsView(
 
     LaunchedEffect(mediaMetadata?.id, currentLyrics) {
         if (mediaMetadata != null && currentLyrics == null) {
-            delay(500)
+            // Tiny debounce only (rapid skips); the old 500ms delay made lyrics feel slow.
+            delay(100)
             coroutineScope.launch(Dispatchers.IO) {
                 try {
                     val entryPoint =

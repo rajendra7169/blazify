@@ -160,7 +160,6 @@ import com.blazify.music.constants.ResumeOnBluetoothConnectKey
 import com.blazify.music.constants.ScrobbleDelayPercentKey
 import com.blazify.music.constants.ScrobbleDelaySecondsKey
 import com.blazify.music.constants.ScrobbleMinSongDurationKey
-import com.blazify.music.constants.ShowLyricsKey
 import com.blazify.music.constants.ShuffleModeKey
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
@@ -864,28 +863,42 @@ class MusicService :
             updateWidgetUI(player.isPlaying)
         }
 
-        combine(
-            currentMediaMetadata.distinctUntilChangedBy { it?.id },
-            dataStore.data.map { it[ShowLyricsKey] ?: false }.distinctUntilChanged(),
-        ) { mediaMetadata, showLyrics ->
-            mediaMetadata to showLyrics
-        }.collectLatest(scope) { (mediaMetadata, showLyrics) ->
-            if (showLyrics && mediaMetadata != null && database
-                    .lyrics(mediaMetadata.id)
-                    .first() == null
-            ) {
-                val lyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
-                database.query {
-                    upsert(
-                        LyricsEntity(
-                            id = mediaMetadata.id,
-                            lyrics = lyricsWithProvider.lyrics,
-                            provider = lyricsWithProvider.provider,
-                        ),
-                    )
+        // Lyrics preloading: fetch the CURRENT song's lyrics as soon as it starts
+        // (regardless of whether the lyrics view is open) and then prefetch the
+        // NEXT queue item's lyrics, so opening lyrics is instant.
+        currentMediaMetadata
+            .distinctUntilChangedBy { it?.id }
+            .collectLatest(scope) { mediaMetadata ->
+                if (mediaMetadata != null && database.lyrics(mediaMetadata.id).first() == null) {
+                    val lyricsWithProvider = lyricsHelper.getLyrics(mediaMetadata)
+                    database.query {
+                        upsert(
+                            LyricsEntity(
+                                id = mediaMetadata.id,
+                                lyrics = lyricsWithProvider.lyrics,
+                                provider = lyricsWithProvider.provider,
+                            ),
+                        )
+                    }
+                }
+                // Prefetch the next song's lyrics in the background.
+                val nextMetadata = withContext(Dispatchers.Main) {
+                    val nextIndex = player.nextMediaItemIndex
+                    if (nextIndex != C.INDEX_UNSET) player.getMediaItemAt(nextIndex).metadata else null
+                }
+                if (nextMetadata != null && database.lyrics(nextMetadata.id).first() == null) {
+                    val prefetched = lyricsHelper.getLyrics(nextMetadata)
+                    database.query {
+                        upsert(
+                            LyricsEntity(
+                                id = nextMetadata.id,
+                                lyrics = prefetched.lyrics,
+                                provider = prefetched.provider,
+                            ),
+                        )
+                    }
                 }
             }
-        }
 
         dataStore.data
             .map { (it[SkipSilenceKey] ?: false) to (it[SkipSilenceInstantKey] ?: false) }

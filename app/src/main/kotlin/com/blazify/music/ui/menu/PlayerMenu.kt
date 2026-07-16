@@ -37,7 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -574,7 +574,7 @@ fun PlayerMenu(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(R.string.downloading)) },
                                     icon = {
-                                        CircularProgressIndicator(
+                                        BlazeLoader(
                                             modifier = Modifier.size(24.dp),
                                             strokeWidth = 2.dp,
                                         )
@@ -1975,7 +1975,7 @@ fun ListenTogetherDialog(
                                 horizontalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                CircularProgressIndicator(
+                                BlazeLoader(
                                     modifier = Modifier.size(18.dp),
                                     strokeWidth = 2.dp,
                                     color = MaterialTheme.colorScheme.primary,

@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -620,7 +620,7 @@ fun YouTubePlaylistMenu(
                                         Material3MenuItemData(
                                             title = { Text(text = stringResource(R.string.downloading)) },
                                             icon = {
-                                                CircularProgressIndicator(
+                                                BlazeLoader(
                                                     modifier = Modifier.size(24.dp),
                                                     strokeWidth = 2.dp,
                                                 )

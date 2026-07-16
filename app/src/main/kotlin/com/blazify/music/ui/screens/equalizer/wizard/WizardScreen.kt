@@ -1,5 +1,6 @@
 package com.blazify.music.ui.screens.equalizer.wizard
 
+import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.animation.*
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
@@ -165,7 +166,7 @@ private fun ModelSelectionStep(
         ) {
             if (isLoading) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
+                    BlazeLoader()
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(R.string.eq_downloading),
@@ -218,7 +219,7 @@ private fun ModelSelectionStep(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                BlazeLoader()
             }
         } else if (models.isEmpty() && searchQuery.isNotBlank()) {
             Box(
@@ -346,7 +347,7 @@ private fun VariantSelectionStep(
                     .height(56.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
+                    BlazeLoader(
                         modifier = Modifier.size(24.dp),
                         color = MaterialTheme.colorScheme.onPrimary
                     )
