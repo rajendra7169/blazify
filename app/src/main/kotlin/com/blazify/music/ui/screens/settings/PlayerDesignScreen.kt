@@ -31,6 +31,7 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
+import com.blazify.music.ui.player.CassetteTape
 import com.blazify.music.ui.player.SeekableAlbumRing
 import com.blazify.music.ui.player.VinylTurntable
 import com.blazify.music.ui.theme.PlayerColorExtractor
@@ -301,6 +302,7 @@ private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
             PlayerDesign.RING -> RingPreview(meta, pc, textColor)
             PlayerDesign.FULL_ART -> FullArtPreview(meta, pc)
             PlayerDesign.RECORD -> RecordPreview(meta, pc, textColor)
+            PlayerDesign.CASSETTE -> CassettePreview(meta, pc, textColor)
         }
     }
 }
@@ -663,6 +665,45 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
             progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
         )
         Spacer(Modifier.weight(0.3f))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewFavorite(pc, textColor)
+            Spacer(Modifier.width(10.dp))
+            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
+            Spacer(Modifier.width(8.dp))
+            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
+        }
+        Spacer(Modifier.height(12.dp))
+        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewTransport(pc, textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewQueuePeek(textColor)
+    }
+}
+
+/* ---------- CASSETTE ---------- */
+
+@Composable
+private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
+    val cs = MaterialTheme.colorScheme
+    val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    val (pos, dur) = rememberLivePosition(pc)
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+        meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
+            Text(it, fontSize = 9.sp, color = textColor.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Spacer(Modifier.weight(0.4f))
+        CassetteTape(
+            isPlaying = isPlaying,
+            progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
+            modifier = Modifier.fillMaxWidth(0.92f),
+        )
+        Spacer(Modifier.weight(0.4f))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
             PreviewFavorite(pc, textColor)

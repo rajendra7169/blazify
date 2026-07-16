@@ -19,6 +19,7 @@ enum class PlayerDesign(
     RING("ring", R.string.player_design_ring),
     FULL_ART("full_art", R.string.player_design_full_art),
     RECORD("record", R.string.player_design_record),
+    CASSETTE("cassette", R.string.player_design_cassette),
     ;
 
     companion object {

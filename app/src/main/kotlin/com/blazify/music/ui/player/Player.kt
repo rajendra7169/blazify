@@ -2059,6 +2059,66 @@ fun BottomSheetPlayer(
 
                         Spacer(Modifier.height(30.dp))
                     }
+                } else if (playerDesign == PlayerDesign.CASSETTE && !showInlineLyrics) {
+                    // CASSETTE: retro 3D tape as the artwork; classic controls below.
+                    val cassetteQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier =
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding)
+                                .animateContentSize(),
+                    ) {
+                        // "Now Playing" + source header, like the classic ThumbnailHeader.
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                                    .padding(top = 8.dp, start = 48.dp, end = 48.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.now_playing),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextBackgroundColor,
+                            )
+                            val cassettePlayingFrom = cassetteQueueTitle ?: mediaMetadata?.album?.title
+                            if (!cassettePlayingFrom.isNullOrBlank()) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = cassettePlayingFrom,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextBackgroundColor.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    modifier = Modifier.basicMarquee(),
+                                )
+                            }
+                        }
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                        ) {
+                            CassetteTape(
+                                isPlaying = effectiveIsPlaying,
+                                progress =
+                                    if (duration > 0) {
+                                        ((sliderPosition ?: effectivePosition).toFloat() / duration).coerceIn(0f, 1f)
+                                    } else {
+                                        0f
+                                    },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                            )
+                        }
+
+                        mediaMetadata?.let {
+                            controlsContent(it)
+                        }
+
+                        Spacer(Modifier.height(30.dp))
+                    }
                 } else {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
