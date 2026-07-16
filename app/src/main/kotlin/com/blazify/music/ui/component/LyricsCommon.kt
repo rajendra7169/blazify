@@ -15,6 +15,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -56,8 +56,8 @@ sealed class LyricsListItem {
 
 /**
  * Instrumental-break indicator — Blazify's own composition: a large treble clef
- * that breathes and fills with a white→accent gradient (over a soft glow) as the
- * interlude progresses, with little music notes drifting up and fading around it.
+ * that breathes and fills with a white→accent gradient as the interlude
+ * progresses, with little music notes rising and fading upward around it.
  * Everything is in the dynamic theme colour.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -83,7 +83,7 @@ internal fun IntervalIndicator(
         }
     }
 
-    val targetHeightDp = 108.dp
+    val targetHeightDp = 132.dp
 
     val progress = if (gapEndMs > gapStartMs) {
         ((currentPositionMs - gapStartMs).toFloat() / (gapEndMs - gapStartMs).toFloat()).coerceIn(0f, 1f)
@@ -105,6 +105,7 @@ internal fun IntervalIndicator(
 
     Box(
         modifier = modifier
+            .fillMaxWidth()
             .height(targetHeightDp * rowHeightPx.value)
             .padding(top = 16.dp * rowHeightPx.value)
             .graphicsLayer {
@@ -138,19 +139,6 @@ private fun TrebleClefFill(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }
-            .drawBehind {
-                // Soft accent halo.
-                val r = size.minDimension * 0.62f
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(accent.copy(alpha = 0.20f), Color.Transparent),
-                        center = center,
-                        radius = r,
-                    ),
-                    radius = r,
-                    center = center,
-                )
             }
     ) {
         // Dim base glyph.
@@ -195,20 +183,23 @@ private data class FloatingNote(
 private fun BoxScope.FloatingNotes(color: Color, t: Float) {
     val notes = remember {
         listOf(
-            FloatingNote(xDp = -54f, sizeDp = 13f, phase = 0.00f, driftDp = -6f),
-            FloatingNote(xDp = -36f, sizeDp = 10f, phase = 0.42f, driftDp = 5f),
-            FloatingNote(xDp = 40f, sizeDp = 12f, phase = 0.68f, driftDp = 6f),
-            FloatingNote(xDp = 58f, sizeDp = 14f, phase = 0.20f, driftDp = -5f),
-            FloatingNote(xDp = -18f, sizeDp = 9f, phase = 0.85f, driftDp = 4f),
-            FloatingNote(xDp = 22f, sizeDp = 9f, phase = 0.55f, driftDp = -4f),
+            FloatingNote(xDp = -78f, sizeDp = 13f, phase = 0.00f, driftDp = -7f),
+            FloatingNote(xDp = -50f, sizeDp = 10f, phase = 0.42f, driftDp = 6f),
+            FloatingNote(xDp = 52f, sizeDp = 12f, phase = 0.68f, driftDp = 7f),
+            FloatingNote(xDp = 82f, sizeDp = 14f, phase = 0.20f, driftDp = -6f),
+            FloatingNote(xDp = -26f, sizeDp = 9f, phase = 0.85f, driftDp = 5f),
+            FloatingNote(xDp = 30f, sizeDp = 9f, phase = 0.55f, driftDp = -5f),
         )
     }
     notes.forEach { n ->
         val p = (t + n.phase) % 1f
-        // Rise from just below centre to above, fading in then out.
-        val y = (16f - 44f * p)
+        // Rise from below the clef up past the top, fading in then out — the
+        // whole travel stays inside the taller row so nothing gets clipped.
+        val y = (30f - 84f * p)
         val x = n.xDp + n.driftDp * sin(p * 2f * PI).toFloat()
-        val a = (sin(p * PI).toFloat()) * 0.5f
+        // Ease-in/out fade that reaches zero at both ends so notes appear and
+        // vanish softly instead of being cut.
+        val a = (sin(p * PI).toFloat()) * (sin(p * PI).toFloat()) * 0.55f
         Icon(
             painter = painterResource(R.drawable.music_note),
             contentDescription = null,
