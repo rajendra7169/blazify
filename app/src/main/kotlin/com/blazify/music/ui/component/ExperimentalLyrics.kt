@@ -231,6 +231,29 @@ fun ExperimentalLyrics(
     val isSynced = remember(lyrics) { lyricsTextLooksSynced(lyrics) }
     val hasWordTimings = remember(lines) { lines.any { it.words?.isNotEmpty() == true } }
 
+    // For PLAIN (un-timestamped) lyrics we drive the scroll from playback progress.
+    // Weight each line by how much text it carries so long lines linger and short
+    // ones pass quickly, instead of giving every line an equal time slice — an equal
+    // split makes the scroll race ahead on short lines and lag on long ones. Stored
+    // as cumulative END fractions in [0,1] (last entry == 1f).
+    val plainLineCumFractions = remember(lines) {
+        if (lines.isEmpty()) {
+            FloatArray(0)
+        } else {
+            val cum = FloatArray(lines.size)
+            var total = 0f
+            for (i in lines.indices) {
+                val len = lines[i].text.trim().length
+                // Blank/section lines still take a small beat; clamp so one very long
+                // line can't swallow a huge share of the timeline.
+                val weight = (if (len == 0) 4 else len).coerceIn(4, 80).toFloat()
+                total += weight
+                cum[i] = total
+            }
+            if (total <= 0f) cum else FloatArray(lines.size) { cum[it] / total }
+        }
+    }
+
     DisposableEffect(Unit) {
         LyricsTranslationHelper.setCompositionActive(true)
         onDispose {
@@ -380,7 +403,17 @@ fun ExperimentalLyrics(
                     val outroMs = (durationMs * 0.07f).toLong()
                     val vocalSpan = (durationMs - introMs - outroMs).coerceAtLeast(1L)
                     val frac = ((position - introMs).toFloat() / vocalSpan).coerceIn(0f, 1f)
-                    val target = (frac * lines.size).toInt().coerceIn(0, lines.lastIndex)
+                    // Map the progress fraction onto the length-weighted timeline: the
+                    // first line whose cumulative slice reaches `frac` is the current one.
+                    val target = if (plainLineCumFractions.isEmpty()) {
+                        (frac * lines.size).toInt().coerceIn(0, lines.lastIndex)
+                    } else {
+                        var idx = plainLineCumFractions.lastIndex
+                        for (i in plainLineCumFractions.indices) {
+                            if (frac <= plainLineCumFractions[i]) { idx = i; break }
+                        }
+                        idx.coerceIn(0, lines.lastIndex)
+                    }
                     if (target != scrollTargetIndex && (isSeeking || target > scrollTargetIndex)) {
                         scrollTargetIndex = target
                     }
