@@ -11,12 +11,33 @@
 
 package com.blazify.music.ui.screens.settings
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.input.pointer.pointerInput
+import com.blazify.music.utils.makeTimeString
+import kotlinx.coroutines.delay
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.palette.graphics.Palette
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
+import com.blazify.music.constants.PlayerBackgroundStyle
+import com.blazify.music.constants.PlayerBackgroundStyleKey
+import com.blazify.music.ui.player.SeekableAlbumRing
+import com.blazify.music.ui.theme.PlayerColorExtractor
+import com.blazify.music.utils.rememberEnumPreference
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -53,10 +74,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -257,17 +274,96 @@ private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () ->
 }
 
 
-/* ---------- static design previews (faithful, non-interactive) ---------- */
 
-private const val PREVIEW_PROGRESS = 0.35f
+/* ---------- interactive previews with the real dynamic player background ---------- */
+
+private const val PREVIEW_FALLBACK_PROGRESS = 0.35f
 
 @Composable
 private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
     val meta by remember(pc) { pc?.mediaMetadata ?: MutableStateFlow(null) }.collectAsState()
-    when (design) {
-        PlayerDesign.CLASSIC -> ClassicPreview(meta)
-        PlayerDesign.RING -> RingPreview(meta)
-        PlayerDesign.FULL_ART -> FullArtPreview(meta)
+    val bgStyle by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.GRADIENT)
+    val gradient = rememberPreviewGradient(meta, bgStyle)
+    val textColor = when (bgStyle) {
+        PlayerBackgroundStyle.DEFAULT -> MaterialTheme.colorScheme.onSurface
+        else -> Color.White
+    }
+    Box(Modifier.fillMaxSize()) {
+        if (design != PlayerDesign.FULL_ART) {
+            PreviewBackground(bgStyle, meta?.thumbnailUrl, gradient)
+        }
+        when (design) {
+            PlayerDesign.CLASSIC -> ClassicPreview(meta, pc, textColor)
+            PlayerDesign.RING -> RingPreview(meta, pc, textColor)
+            PlayerDesign.FULL_ART -> FullArtPreview(meta, pc)
+        }
+    }
+}
+
+/** Extract the same album-art gradient colours the real player uses (GRADIENT style). */
+@Composable
+private fun rememberPreviewGradient(meta: MediaMetadata?, bgStyle: PlayerBackgroundStyle): List<Color> {
+    val context = LocalContext.current
+    val fallback = MaterialTheme.colorScheme.surface.toArgb()
+    var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
+    LaunchedEffect(meta?.id, bgStyle) {
+        if (bgStyle != PlayerBackgroundStyle.GRADIENT || meta?.thumbnailUrl == null) {
+            colors = emptyList()
+            return@LaunchedEffect
+        }
+        withContext(Dispatchers.IO) {
+            val request = ImageRequest.Builder(context)
+                .data(meta.thumbnailUrl)
+                .size(100, 100)
+                .allowHardware(false)
+                .build()
+            val result = runCatching { context.imageLoader.execute(request) }.getOrNull()
+            val bitmap = result?.image?.toBitmap()
+            if (bitmap != null) {
+                val palette = withContext(Dispatchers.Default) {
+                    Palette.from(bitmap).maximumColorCount(8).resizeBitmapArea(100 * 100).generate()
+                }
+                val extracted = PlayerColorExtractor.extractGradientColors(palette = palette, fallbackColor = fallback)
+                withContext(Dispatchers.Main) { colors = extracted }
+            }
+        }
+    }
+    return colors
+}
+
+@Composable
+private fun PreviewBackground(bgStyle: PlayerBackgroundStyle, thumbnailUrl: String?, gradient: List<Color>) {
+    val context = LocalContext.current
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer)) {
+        when (bgStyle) {
+            PlayerBackgroundStyle.BLUR -> {
+                if (thumbnailUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context).data(thumbnailUrl).size(100, 100).allowHardware(false).build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().blur(45.dp),
+                    )
+                    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.30f)))
+                }
+            }
+            PlayerBackgroundStyle.GRADIENT -> {
+                if (gradient.size >= 3) {
+                    Box(
+                        Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(colorStops = arrayOf(0.0f to gradient[0], 0.5f to gradient[1], 1.0f to gradient[2])),
+                        ),
+                    )
+                } else if (gradient.isNotEmpty()) {
+                    Box(
+                        Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(0.0f to gradient[0], 0.6f to gradient[0].copy(alpha = 0.7f), 1.0f to Color.Black),
+                        ),
+                    )
+                }
+            }
+            PlayerBackgroundStyle.DEFAULT -> { /* theme surface already painted */ }
+        }
     }
 }
 
@@ -280,80 +376,128 @@ private fun previewArtBrush(): Brush {
 @Composable
 private fun PreviewArt(url: String?, shape: Shape, modifier: Modifier = Modifier) {
     if (url != null) {
-        AsyncImage(
-            model = url,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = modifier.clip(shape),
-        )
+        AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = modifier.clip(shape))
     } else {
         Box(modifier.clip(shape).background(previewArtBrush()))
     }
 }
 
 @Composable
-private fun PreviewTitle(meta: MediaMetadata?, color: Color = MaterialTheme.colorScheme.onSurface) {
-    Text(
-        text = meta?.title ?: "Song title",
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        color = color,
-    )
+private fun PreviewTitle(meta: MediaMetadata?, color: Color) {
+    Text(meta?.title ?: "Song title", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, color = color)
     Spacer(Modifier.height(3.dp))
     Text(
-        text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
+        meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
         fontSize = 10.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        color = color.copy(alpha = 0.6f),
+        color = color.copy(alpha = 0.7f),
     )
 }
 
-/** Apple-Music-style slim bar matching the app's default slider look. */
 @Composable
-private fun PreviewSlider(activeColor: Color, inactiveColor: Color) {
-    Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(inactiveColor)) {
-        Box(Modifier.fillMaxWidth(PREVIEW_PROGRESS).height(6.dp).clip(CircleShape).background(activeColor))
+private fun MiniIcon(res: Int, tint: Color, size: Int = 18, onClick: (() -> Unit)? = null) {
+    val base = Modifier.size(size.dp)
+    Icon(
+        painter = painterResource(res),
+        contentDescription = null,
+        tint = tint,
+        modifier = if (onClick != null) base.clip(CircleShape).clickable(onClick = onClick) else base,
+    )
+}
+
+@Composable
+private fun PreviewPillButton(res: Int, bg: Color, tint: Color, onClick: (() -> Unit)? = null) {
+    Box(
+        modifier = Modifier.size(26.dp).clip(CircleShape).background(bg).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(painter = painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(15.dp))
+    }
+}
+
+/** Live playback position (ms) + duration (ms), polled. */
+@Composable
+private fun rememberLivePosition(pc: PlayerConnection?): Pair<Long, Long> {
+    var pos by remember { mutableStateOf(0L) }
+    var dur by remember { mutableStateOf(0L) }
+    LaunchedEffect(pc) {
+        while (pc != null) {
+            pos = pc.player.currentPosition
+            dur = pc.player.duration.coerceAtLeast(0L)
+            delay(500)
+        }
+    }
+    return pos to dur
+}
+
+/** Slim, seekable progress bar (tap/drag) matching the app's default slider look. */
+@Composable
+private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveColor: Color, textColor: Color) {
+    val (pos, dur) = rememberLivePosition(pc)
+    var dragFrac by remember { mutableStateOf<Float?>(null) }
+    val frac = dragFrac ?: if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .pointerInput(dur) {
+                detectTapGestures { off -> if (dur > 0) pc?.player?.seekTo((off.x / size.width * dur).toLong()) }
+            }
+            .pointerInput(dur) {
+                detectHorizontalDragGestures(
+                    onDragStart = { off -> dragFrac = (off.x / size.width).coerceIn(0f, 1f) },
+                    onHorizontalDrag = { change, _ -> dragFrac = (change.position.x / size.width).coerceIn(0f, 1f) },
+                    onDragEnd = { dragFrac?.let { if (dur > 0) pc?.player?.seekTo((it * dur).toLong()) }; dragFrac = null },
+                    onDragCancel = { dragFrac = null },
+                )
+            },
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(inactiveColor)) {
+            Box(Modifier.fillMaxWidth(frac).height(6.dp).clip(CircleShape).background(activeColor))
+        }
+    }
+    Row(Modifier.fillMaxWidth().padding(top = 3.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(makeTimeString((frac * dur).toLong()), fontSize = 9.sp, color = textColor.copy(alpha = 0.8f))
+        Text(if (dur > 0) makeTimeString(dur) else "0:00", fontSize = 9.sp, color = textColor.copy(alpha = 0.8f))
     }
 }
 
 @Composable
-private fun PreviewTimes(color: Color) {
-    Row(Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text("1:02", fontSize = 9.sp, color = color)
-        Text("2:59", fontSize = 9.sp, color = color)
-    }
-}
-
-@Composable
-private fun MiniIcon(res: Int, tint: Color, size: Int = 18) {
-    Icon(painter = painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(size.dp))
-}
-
-@Composable
-private fun PreviewTransport(onColor: Color, big: Boolean = false) {
+private fun PreviewTransport(pc: PlayerConnection?, onColor: Color) {
     val cs = MaterialTheme.colorScheme
+    val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MiniIcon(R.drawable.shuffle, onColor, 18)
-        MiniIcon(R.drawable.skip_previous, onColor, 22)
+        MiniIcon(R.drawable.skip_previous, onColor, 22) { pc?.seekToPrevious() }
         Box(
-            Modifier.size(if (big) 52.dp else 46.dp).clip(CircleShape).background(cs.primary),
+            Modifier.size(46.dp).clip(CircleShape).background(cs.primary).clickable { pc?.togglePlayPause() },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(R.drawable.pause), null, tint = cs.onPrimary, modifier = Modifier.size(if (big) 24.dp else 22.dp))
+            Icon(painterResource(if (isPlaying) R.drawable.pause else R.drawable.play), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
         }
-        MiniIcon(R.drawable.skip_next, onColor, 22)
+        MiniIcon(R.drawable.skip_next, onColor, 22) { pc?.seekToNext() }
         MiniIcon(R.drawable.repeat, onColor, 18)
     }
 }
 
-/** Collapsed queue peek bar (Queue · Sleep timer · Lyrics) shown at the bottom of the real player. */
+@Composable
+private fun PreviewFavorite(pc: PlayerConnection?, color: Color) {
+    val song by remember(pc) { pc?.currentSong ?: MutableStateFlow(null) }.collectAsState()
+    val liked = song?.song?.liked == true
+    MiniIcon(
+        if (liked) R.drawable.favorite else R.drawable.favorite_border,
+        if (liked) MaterialTheme.colorScheme.error else color,
+        18,
+    ) { pc?.toggleLike() }
+}
+
+/** Collapsed queue peek bar (Queue - Sleep timer - Lyrics) shown at the bottom of the real player. */
 @Composable
 private fun PreviewQueuePeek(color: Color) {
     Row(
@@ -379,144 +523,103 @@ private fun PeekItem(res: Int, label: String, color: Color) {
 /* ---------- CLASSIC ---------- */
 
 @Composable
-private fun ClassicPreview(meta: MediaMetadata?) {
+private fun ClassicPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
     val cs = MaterialTheme.colorScheme
-    val onColor = cs.onSurface
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // "Now Playing" header (centred), like the real classic ThumbnailHeader.
-        Text(
-            text = stringResource(R.string.now_playing),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = onColor,
-        )
+        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
         Spacer(Modifier.weight(0.4f))
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
         Spacer(Modifier.height(16.dp))
-        // title/artist + favourite + theme + more (matches the real classic title row).
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { PreviewTitle(meta) }
-            MiniIcon(R.drawable.favorite_border, onColor, 18)
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewFavorite(pc, textColor)
             Spacer(Modifier.width(10.dp))
-            PreviewPillButton(R.drawable.palette, onColor.copy(alpha = 0.12f), onColor)
+            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
             Spacer(Modifier.width(8.dp))
-            PreviewPillButton(R.drawable.more_horiz, onColor.copy(alpha = 0.12f), onColor)
+            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
         }
-        Spacer(Modifier.height(14.dp))
-        PreviewSlider(cs.primary, onColor.copy(alpha = 0.22f))
-        PreviewTimes(onColor.copy(alpha = 0.7f))
+        Spacer(Modifier.height(12.dp))
+        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
         Spacer(Modifier.weight(0.5f))
-        PreviewTransport(onColor)
+        PreviewTransport(pc, textColor)
         Spacer(Modifier.weight(0.4f))
-        PreviewQueuePeek(onColor)
-    }
-}
-
-/** Small filled pill button matching the real player's theme / more buttons. */
-@Composable
-private fun PreviewPillButton(res: Int, bg: Color, tint: Color) {
-    Box(
-        modifier = Modifier.size(26.dp).clip(CircleShape).background(bg),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(painter = painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(15.dp))
+        PreviewQueuePeek(textColor)
     }
 }
 
 /* ---------- RING ---------- */
 
 @Composable
-private fun RingPreview(meta: MediaMetadata?) {
+private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
     val cs = MaterialTheme.colorScheme
+    val (pos, dur) = rememberLivePosition(pc)
+    val progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
     Column(
         modifier = Modifier.fillMaxSize().padding(start = 14.dp, end = 14.dp, top = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            MiniIcon(R.drawable.expand_more, cs.onSurface, 22)
+            MiniIcon(R.drawable.expand_more, textColor, 22)
             Text(
                 text = stringResource(R.string.now_playing),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = cs.onSurface,
+                color = textColor,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
             )
-            MiniIcon(R.drawable.palette, cs.onSurface, 20)
+            MiniIcon(R.drawable.palette, textColor, 20)
         }
         Spacer(Modifier.weight(0.4f))
-        StaticRing(meta?.thumbnailUrl, Modifier.fillMaxWidth(0.66f).aspectRatio(1f))
+        SeekableAlbumRing(
+            thumbnailUrl = meta?.thumbnailUrl,
+            progress = progress,
+            ringColor = cs.primary,
+            trackColor = textColor.copy(alpha = 0.20f),
+            onSeek = { f -> if (dur > 0) pc?.player?.seekTo((f * dur).toLong()) },
+            modifier = Modifier.fillMaxWidth(0.66f).aspectRatio(1f),
+            ringStrokeDp = 5f,
+            artPaddingDp = 9f,
+            fallbackBrush = previewArtBrush(),
+            thumbColor = cs.primary,
+        )
         Spacer(Modifier.weight(0.4f))
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniIcon(R.drawable.queue_music, cs.onSurface, 20)
-            MiniIcon(R.drawable.favorite, cs.error, 20)
+            MiniIcon(R.drawable.queue_music, textColor, 20)
+            PreviewFavorite(pc, textColor)
         }
         Spacer(Modifier.height(6.dp))
-        PreviewSlider(cs.primary, cs.onSurface.copy(alpha = 0.22f))
-        PreviewTimes(cs.onSurface.copy(alpha = 0.7f))
+        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
         Spacer(Modifier.height(8.dp))
-        PreviewTransport(cs.onSurface)
+        PreviewTransport(pc, textColor)
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            MiniIcon(R.drawable.bedtime, cs.onSurface, 18)
-            MiniIcon(R.drawable.more_horiz, cs.onSurface, 18)
+            MiniIcon(R.drawable.bedtime, textColor, 18)
+            MiniIcon(R.drawable.more_horiz, textColor, 18)
         }
         Spacer(Modifier.height(8.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(Color.Black.copy(alpha = 0.55f))
+                .background(Color.Black.copy(alpha = 0.45f))
                 .padding(horizontal = 12.dp, vertical = 12.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.show_lyrics),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = cs.onSurface,
-                    modifier = Modifier.weight(1f),
-                )
-                MiniIcon(R.drawable.expand_less, cs.onSurface, 16)
+                Text(stringResource(R.string.show_lyrics), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textColor, modifier = Modifier.weight(1f))
+                MiniIcon(R.drawable.expand_less, textColor, 16)
             }
             Spacer(Modifier.height(6.dp))
-            Text("In the stillness of the night", fontSize = 9.sp, color = cs.onSurface.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            Text("In the stillness of the night", fontSize = 9.sp, color = textColor.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(2.dp))
             Text("I feel the weight, the empty sight", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(2.dp))
-            Text("Whispers in my mind, they call", fontSize = 9.sp, color = cs.onSurface.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        }
-    }
-}
-
-/** Static (non-interactive) circular art + progress ring + thumb for the RING preview. */
-@Composable
-private fun StaticRing(thumbnailUrl: String?, modifier: Modifier = Modifier) {
-    val cs = MaterialTheme.colorScheme
-    val trackColor = cs.onSurface.copy(alpha = 0.18f)
-    val ringColor = cs.primary
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        if (thumbnailUrl != null) {
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().padding(9.dp).clip(CircleShape),
-            )
-        } else {
-            Box(Modifier.fillMaxSize().padding(9.dp).clip(CircleShape).background(previewArtBrush()))
-        }
-        Canvas(Modifier.fillMaxSize()) {
-            val stroke = 5.dp.toPx()
-            val d = size.minDimension - stroke
-            val topLeft = Offset((size.width - d) / 2f, (size.height - d) / 2f)
-            drawArc(color = trackColor, startAngle = -90f, sweepAngle = 360f, useCenter = false, topLeft = topLeft, size = Size(d, d), style = Stroke(width = stroke, cap = StrokeCap.Round))
-            drawArc(color = ringColor, startAngle = -90f, sweepAngle = 360f * PREVIEW_PROGRESS, useCenter = false, topLeft = topLeft, size = Size(d, d), style = Stroke(width = stroke, cap = StrokeCap.Round))
+            Text("Whispers in my mind, they call", fontSize = 9.sp, color = textColor.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -524,7 +627,7 @@ private fun StaticRing(thumbnailUrl: String?, modifier: Modifier = Modifier) {
 /* ---------- FULL ART ---------- */
 
 @Composable
-private fun FullArtPreview(meta: MediaMetadata?) {
+private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     Box(Modifier.fillMaxSize()) {
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
@@ -538,18 +641,17 @@ private fun FullArtPreview(meta: MediaMetadata?) {
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White) }
-                MiniIcon(R.drawable.favorite_border, Color.White, 18)
+                PreviewFavorite(pc, Color.White)
                 Spacer(Modifier.width(10.dp))
                 PreviewPillButton(R.drawable.palette, Color.White.copy(alpha = 0.18f), Color.White)
                 Spacer(Modifier.width(8.dp))
                 PreviewPillButton(R.drawable.more_horiz, Color.White.copy(alpha = 0.18f), Color.White)
             }
+            Spacer(Modifier.height(10.dp))
+            PreviewSlider(pc, MaterialTheme.colorScheme.primary, Color.White.copy(alpha = 0.25f), Color.White)
+            Spacer(Modifier.height(10.dp))
+            PreviewTransport(pc, Color.White)
             Spacer(Modifier.height(12.dp))
-            PreviewSlider(MaterialTheme.colorScheme.primary, Color.White.copy(alpha = 0.25f))
-            PreviewTimes(Color.White.copy(alpha = 0.8f))
-            Spacer(Modifier.height(12.dp))
-            PreviewTransport(Color.White)
-            Spacer(Modifier.height(14.dp))
             PreviewQueuePeek(Color.White)
         }
     }
@@ -559,10 +661,7 @@ private fun FullArtPreview(meta: MediaMetadata?) {
 private fun FullArtScrim() {
     Box(
         Modifier.fillMaxSize().background(
-            Brush.verticalGradient(
-                0.30f to Color.Transparent,
-                1.0f to Color.Black.copy(alpha = 0.78f),
-            ),
+            Brush.verticalGradient(0.30f to Color.Transparent, 1.0f to Color.Black.copy(alpha = 0.78f)),
         ),
     )
 }
