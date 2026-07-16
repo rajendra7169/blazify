@@ -62,6 +62,8 @@ fun CassetteTape(
     isPlaying: Boolean,
     progress: Float,
     modifier: Modifier = Modifier,
+    // Dynamic accent (album colour) for the label stripe; retro neutrals stay fixed.
+    accent: Color = RetroOrange,
 ) {
     // Reels spin while playing; freeze in place on pause.
     val rotation = remember { Animatable(0f) }
@@ -84,7 +86,7 @@ fun CassetteTape(
     BoxWithConstraints(modifier = modifier.aspectRatio(1.55f)) {
         val bw = maxWidth
         val bh = maxHeight
-        Canvas(modifier = Modifier.fillMaxSize()) { drawCassette(tape, rotation.value) }
+        Canvas(modifier = Modifier.fillMaxSize()) { drawCassette(tape, rotation.value, accent) }
 
         // Side badge "A" (inside the drawn badge box).
         Text(
@@ -105,20 +107,26 @@ fun CassetteTape(
     }
 }
 
-private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float) {
+private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float, accent: Color) {
     val s = size.width
     val t = size.height
 
-    /* --- drop shadow (3D lift off the background) --- */
+    /* --- layered drop shadow (soft, wide → tight, dark = 3D lift) --- */
     drawRoundRect(
-        color = Color.Black.copy(alpha = 0.12f),
+        color = Color.Black.copy(alpha = 0.08f),
+        topLeft = Offset(s * 0.05f, t * 0.10f),
+        size = Size(s * 0.97f, t * 0.93f),
+        cornerRadius = CornerRadius(s * 0.06f, s * 0.06f),
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.14f),
         topLeft = Offset(s * 0.035f, t * 0.075f),
         size = Size(s * 0.965f, t * 0.925f),
         cornerRadius = CornerRadius(s * 0.055f, s * 0.055f),
     )
     drawRoundRect(
-        color = Color.Black.copy(alpha = 0.22f),
-        topLeft = Offset(s * 0.025f, t * 0.05f),
+        color = Color.Black.copy(alpha = 0.24f),
+        topLeft = Offset(s * 0.022f, t * 0.048f),
         size = Size(s * 0.96f, t * 0.93f),
         cornerRadius = CornerRadius(s * 0.05f, s * 0.05f),
     )
@@ -131,6 +139,21 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float) {
         topLeft = shellTL,
         size = shellSize,
         cornerRadius = CornerRadius(s * 0.045f, s * 0.045f),
+    )
+    // Double-wall bevel: inner dark line + outer hairline light.
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.35f),
+        topLeft = Offset(shellTL.x + s * 0.012f, shellTL.y + t * 0.02f),
+        size = Size(shellSize.width - s * 0.024f, shellSize.height - t * 0.04f),
+        cornerRadius = CornerRadius(s * 0.035f, s * 0.035f),
+        style = Stroke(width = s * 0.003f),
+    )
+    drawRoundRect(
+        color = Color.White.copy(alpha = 0.10f),
+        topLeft = shellTL,
+        size = shellSize,
+        cornerRadius = CornerRadius(s * 0.045f, s * 0.045f),
+        style = Stroke(width = s * 0.0025f),
     )
     // Top catch-light + bottom inner shade.
     drawLine(
@@ -180,14 +203,24 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float) {
         style = Stroke(width = s * 0.0045f),
     )
 
-    // Orange stripe with a thinner echo line (retro label print).
+    // Accent stripe (dynamic colour) with print texture + a thinner echo line.
     drawRect(
-        color = RetroOrange,
+        color = accent,
         topLeft = Offset(s * 0.075f, t * 0.455f),
         size = Size(s * 0.83f, t * 0.105f),
     )
+    // Fine darker print lines inside the stripe.
+    for (i in 1..3) {
+        val ly = t * (0.455f + 0.105f * i / 4f)
+        drawLine(
+            Color.Black.copy(alpha = 0.10f),
+            Offset(s * 0.075f, ly),
+            Offset(s * 0.905f, ly),
+            strokeWidth = t * 0.006f,
+        )
+    }
     drawRect(
-        color = RetroOrange.copy(alpha = 0.55f),
+        color = accent.copy(alpha = 0.55f),
         topLeft = Offset(s * 0.075f, t * 0.575f),
         size = Size(s * 0.83f, t * 0.022f),
     )
@@ -238,6 +271,13 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float) {
             Offset(rightC.x, winTL.y + winSize.height - t * 0.02f),
             strokeWidth = t * 0.028f,
         )
+        // Tape sheen (thin light line along the moving tape).
+        drawLine(
+            Color.White.copy(alpha = 0.10f),
+            Offset(leftC.x, winTL.y + winSize.height - t * 0.026f),
+            Offset(rightC.x, winTL.y + winSize.height - t * 0.026f),
+            strokeWidth = t * 0.006f,
+        )
 
         for ((center, spool) in listOf(leftC to leftSpool, rightC to rightSpool)) {
             // Wound tape spool (radius follows playback progress).
@@ -262,6 +302,18 @@ private fun DrawScope.drawCassette(progress: Float, rotationDeg: Float) {
             }
             drawCircle(WindowDark, radius = s * 0.012f, center = center)
         }
+
+        // Glass gloss across the window (diagonal light band).
+        drawRoundRect(
+            brush = Brush.linearGradient(
+                listOf(Color.White.copy(alpha = 0.09f), Color.Transparent, Color.Transparent),
+                start = Offset(winTL.x, winTL.y),
+                end = Offset(winTL.x + winSize.width * 0.8f, winTL.y + winSize.height),
+            ),
+            topLeft = winTL,
+            size = winSize,
+            cornerRadius = CornerRadius(winRadius, winRadius),
+        )
     }
 
     /* --- bottom trapezoid with capstan holes --- */

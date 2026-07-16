@@ -148,8 +148,15 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -2110,14 +2117,91 @@ fun BottomSheetPlayer(
                                         0f
                                     },
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                                accent = MaterialTheme.colorScheme.primary,
                             )
                         }
 
-                        mediaMetadata?.let {
-                            controlsContent(it)
+                        // Title / artist (over the dynamic background).
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                        ) {
+                            Text(
+                                text = mediaMetadata?.title.orEmpty(),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = TextBackgroundColor,
+                                modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
+                            )
+                            Text(
+                                text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = TextBackgroundColor.copy(alpha = 0.7f),
+                            )
                         }
 
-                        Spacer(Modifier.height(30.dp))
+                        Spacer(Modifier.height(12.dp))
+
+                        // Retro waveform progress card (times + seekable bars + heart).
+                        val cassetteIsEpisode = currentSong?.song?.isEpisode == true
+                        val cassetteIsFavorite =
+                            if (cassetteIsEpisode) {
+                                currentSong?.song?.inLibrary != null
+                            } else {
+                                currentSong?.song?.liked == true
+                            }
+                        RetroWaveformCard(
+                            position = sliderPosition ?: effectivePosition,
+                            duration = duration,
+                            accent = MaterialTheme.colorScheme.primary,
+                            isFavorite = cassetteIsFavorite,
+                            onToggleLike = { playerConnection.toggleLike() },
+                            onSeek = { pos ->
+                                playerConnection.player.seekTo(pos)
+                                position = pos
+                            },
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                        )
+
+                        Spacer(Modifier.height(14.dp))
+
+                        // Chunky 3D retro transport.
+                        val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+                        RetroTransportRow(
+                            isPlaying = effectiveIsPlaying,
+                            shuffleOn = cassetteShuffle,
+                            repeatMode = repeatMode,
+                            accent = MaterialTheme.colorScheme.primary,
+                            flatColor = TextBackgroundColor,
+                            onToggleShuffle = {
+                                playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
+                            },
+                            onPrevious = { playerConnection.seekToPrevious() },
+                            onTogglePlay = { playerConnection.togglePlayPause() },
+                            onNext = { playerConnection.seekToNext() },
+                            onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                        )
+
+                        Spacer(Modifier.height(14.dp))
+
+                        // Retro segmented bottom row: lyrics · queue · sleep · more.
+                        mediaMetadata?.let { meta ->
+                            RetroBottomRow(
+                                accent = MaterialTheme.colorScheme.primary,
+                                mediaMetadata = meta,
+                                state = state,
+                                onLyrics = { showInlineLyrics = true },
+                                onQueue = { queueSheetState.expandSoft() },
+                                onSleep = { showSleepTimerDialog = true },
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
                     }
                 } else {
                     Column(
@@ -2192,9 +2276,13 @@ fun BottomSheetPlayer(
                 onToggleLyrics = {
                     showInlineLyrics = !showInlineLyrics
                 },
-                // Hide the collapsed queue peek only on the RING front player (its lyrics
-                // card owns the bottom). The full lyrics page keeps the peek as usual.
-                showCollapsedContent = !(playerDesign == PlayerDesign.RING && !showInlineLyrics),
+                // Hide the collapsed queue peek on the RING front player (its lyrics card
+                // owns the bottom) and on CASSETTE (its retro bottom row replaces it).
+                // The full lyrics page keeps the peek as usual.
+                showCollapsedContent = !(
+                    (playerDesign == PlayerDesign.RING || playerDesign == PlayerDesign.CASSETTE) &&
+                        !showInlineLyrics
+                ),
             )
         }
 
@@ -2809,6 +2897,216 @@ private fun FullArtBackground(
                         ),
                     ),
         )
+    }
+}
+
+/* ---------- CASSETTE retro controls (chunky 3D keys, cream + ink, dynamic accent) ---------- */
+
+private val RetroCream = Color(0xFFF2E7D0)
+private val RetroInk = Color(0xFF3A2F24)
+private val RetroDarkKey = Color(0xFF2A241E)
+
+/** Retro waveform progress card: times on top, seekable bars, favourite heart. */
+@Composable
+private fun RetroWaveformCard(
+    position: Long,
+    duration: Long,
+    accent: Color,
+    isFavorite: Boolean,
+    onToggleLike: () -> Unit,
+    onSeek: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .shadow(8.dp, RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(RetroCream)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+    ) {
+        Column(Modifier.weight(1f)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(makeTimeString(position), style = MaterialTheme.typography.labelSmall, color = RetroInk)
+                Text(
+                    text = if (duration != C.TIME_UNSET && duration > 0) makeTimeString(duration) else "",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = RetroInk,
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            val frac = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .pointerInput(duration) {
+                        detectTapGestures { off ->
+                            if (duration > 0) {
+                                onSeek((off.x / size.width * duration).toLong().coerceIn(0L, duration))
+                            }
+                        }
+                    }
+                    .pointerInput(duration) {
+                        detectHorizontalDragGestures { change, _ ->
+                            if (duration > 0) {
+                                onSeek((change.position.x / size.width * duration).toLong().coerceIn(0L, duration))
+                            }
+                        }
+                    },
+            ) {
+                val n = 36
+                val gap = size.width / n
+                val barW = gap * 0.55f
+                for (i in 0 until n) {
+                    // Deterministic pseudo-random bar heights (retro EQ look).
+                    val wave = kotlin.math.abs(kotlin.math.sin(i * 1.7) * 0.5 + kotlin.math.sin(i * 0.53 + 1.3) * 0.5)
+                    val barH = size.height * (0.30f + 0.65f * wave.toFloat()).coerceIn(0.15f, 1f)
+                    val x = gap * i + (gap - barW) / 2f
+                    drawRoundRect(
+                        color = if ((i + 0.5f) / n <= frac) accent else RetroInk.copy(alpha = 0.25f),
+                        topLeft = Offset(x, (size.height - barH) / 2f),
+                        size = Size(barW, barH),
+                        cornerRadius = CornerRadius(barW / 2f, barW / 2f),
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+        Icon(
+            painter = painterResource(if (isFavorite) R.drawable.favorite else R.drawable.favorite_border),
+            contentDescription = null,
+            tint = if (isFavorite) MaterialTheme.colorScheme.error else RetroInk,
+            modifier = Modifier
+                .size(26.dp)
+                .clip(CircleShape)
+                .clickable(onClick = onToggleLike),
+        )
+    }
+}
+
+/** Raised 3D retro key (cream or accent pill with drop shadow). */
+@Composable
+private fun RetroKey(
+    width: Dp,
+    height: Dp,
+    bg: Color,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(width = width, height = height)
+            .shadow(8.dp, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .background(bg)
+            .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick),
+    ) { content() }
+}
+
+@Composable
+private fun RetroTransportRow(
+    isPlaying: Boolean,
+    shuffleOn: Boolean,
+    repeatMode: Int,
+    accent: Color,
+    flatColor: Color,
+    onToggleShuffle: () -> Unit,
+    onPrevious: () -> Unit,
+    onTogglePlay: () -> Unit,
+    onNext: () -> Unit,
+    onToggleRepeat: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        RingIconButton(
+            res = R.drawable.shuffle,
+            tint = if (shuffleOn) accent else flatColor,
+            size = 22,
+            onClick = onToggleShuffle,
+        )
+        Spacer(Modifier.width(8.dp))
+        RetroKey(width = 62.dp, height = 50.dp, bg = RetroCream, onClick = onPrevious) {
+            Icon(painterResource(R.drawable.skip_previous), null, tint = RetroInk, modifier = Modifier.size(26.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        RetroKey(width = 76.dp, height = 56.dp, bg = accent, onClick = onTogglePlay) {
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(30.dp),
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        RetroKey(width = 62.dp, height = 50.dp, bg = RetroCream, onClick = onNext) {
+            Icon(painterResource(R.drawable.skip_next), null, tint = RetroInk, modifier = Modifier.size(26.dp))
+        }
+        Spacer(Modifier.width(8.dp))
+        RingIconButton(
+            res = if (repeatMode == Player.REPEAT_MODE_ONE) R.drawable.repeat_one else R.drawable.repeat,
+            tint = if (repeatMode != Player.REPEAT_MODE_OFF) accent else flatColor,
+            size = 22,
+            onClick = onToggleRepeat,
+        )
+    }
+}
+
+@Composable
+private fun RetroSegment(bg: Color, iconRes: Int, tint: Color, onClick: () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(width = 68.dp, height = 50.dp)
+            .background(bg)
+            .clickable(onClick = onClick),
+    ) {
+        Icon(painterResource(iconRes), contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+    }
+}
+
+/** Retro segmented bottom row: lyrics (accent) · queue · sleep timer · more. */
+@Composable
+private fun RetroBottomRow(
+    accent: Color,
+    mediaMetadata: MediaMetadata,
+    state: BottomSheetState,
+    onLyrics: () -> Unit,
+    onQueue: () -> Unit,
+    onSleep: () -> Unit,
+) {
+    val menuState = LocalMenuState.current
+    val bottomSheetPageState = LocalBottomSheetPageState.current
+    Row(
+        modifier = Modifier
+            .shadow(8.dp, RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(18.dp)),
+    ) {
+        RetroSegment(bg = accent, iconRes = R.drawable.music_note, tint = Color.White, onClick = onLyrics)
+        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.queue_music, tint = RetroCream, onClick = onQueue)
+        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.bedtime, tint = RetroCream, onClick = onSleep)
+        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.more_horiz, tint = RetroCream) {
+            menuState.show {
+                PlayerMenu(
+                    mediaMetadata = mediaMetadata,
+                    playerBottomSheetState = state,
+                    onShowDetailsDialog = {
+                        mediaMetadata.id.let {
+                            bottomSheetPageState.show {
+                                ShowMediaInfo(it)
+                            }
+                        }
+                    },
+                    onDismiss = menuState::dismiss,
+                )
+            }
+        }
     }
 }
 

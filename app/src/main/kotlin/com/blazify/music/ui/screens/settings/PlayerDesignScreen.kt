@@ -11,6 +11,7 @@
 
 package com.blazify.music.ui.screens.settings
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -78,6 +79,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -702,22 +704,68 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
             isPlaying = isPlaying,
             progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
             modifier = Modifier.fillMaxWidth(0.92f),
+            accent = cs.primary,
         )
-        Spacer(Modifier.weight(0.4f))
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
-            PreviewFavorite(pc, textColor)
-            Spacer(Modifier.width(10.dp))
-            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
+        Spacer(Modifier.weight(0.3f))
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) { PreviewTitle(meta, textColor) }
+        Spacer(Modifier.height(8.dp))
+        // Retro waveform card (cream, accent bars).
+        val cream = Color(0xFFF2E7D0)
+        val ink = Color(0xFF3A2F24)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(cream)
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+        ) {
+            Canvas(Modifier.weight(1f).height(22.dp)) {
+                val n = 24
+                val gap = size.width / n
+                val barW = gap * 0.55f
+                val frac = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f
+                for (i in 0 until n) {
+                    val wave = kotlin.math.abs(kotlin.math.sin(i * 1.7) * 0.5 + kotlin.math.sin(i * 0.53 + 1.3) * 0.5)
+                    val barH = size.height * (0.30f + 0.65f * wave.toFloat()).coerceIn(0.15f, 1f)
+                    drawRoundRect(
+                        color = if ((i + 0.5f) / n <= frac) cs.primary else ink.copy(alpha = 0.25f),
+                        topLeft = Offset(gap * i + (gap - barW) / 2f, (size.height - barH) / 2f),
+                        size = Size(barW, barH),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(barW / 2f, barW / 2f),
+                    )
+                }
+            }
             Spacer(Modifier.width(8.dp))
-            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
+            MiniIcon(R.drawable.favorite_border, ink, 16)
         }
-        Spacer(Modifier.height(12.dp))
-        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
         Spacer(Modifier.height(10.dp))
-        PreviewTransport(pc, textColor)
+        // Retro key transport.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+            Box(Modifier.size(width = 44.dp, height = 34.dp).clip(RoundedCornerShape(10.dp)).background(cream), contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.skip_previous, ink, 18)
+            }
+            Spacer(Modifier.width(8.dp))
+            Box(Modifier.size(width = 52.dp, height = 38.dp).clip(RoundedCornerShape(10.dp)).background(cs.primary), contentAlignment = Alignment.Center) {
+                MiniIcon(if (isPlaying) R.drawable.pause else R.drawable.play, Color.White, 20)
+            }
+            Spacer(Modifier.width(8.dp))
+            Box(Modifier.size(width = 44.dp, height = 34.dp).clip(RoundedCornerShape(10.dp)).background(cream), contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.skip_next, ink, 18)
+            }
+        }
         Spacer(Modifier.height(10.dp))
-        PreviewQueuePeek(textColor)
+        // Retro segmented bottom row.
+        Row(Modifier.clip(RoundedCornerShape(12.dp))) {
+            Box(Modifier.size(width = 46.dp, height = 34.dp).background(cs.primary), contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.music_note, Color.White, 16)
+            }
+            for (icon in listOf(R.drawable.queue_music, R.drawable.bedtime, R.drawable.more_horiz)) {
+                Box(Modifier.size(width = 46.dp, height = 34.dp).background(Color(0xFF2A241E)), contentAlignment = Alignment.Center) {
+                    MiniIcon(icon, cream, 16)
+                }
+            }
+        }
     }
 }
 
