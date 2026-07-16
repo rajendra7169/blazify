@@ -105,8 +105,15 @@ constructor(
                 for ((index, attempt) in attempts.withIndex()) {
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
+                        val raw = providerResult.getOrNull()!!
+                        // Reject results whose synced timeline doesn't fit this song —
+                        // that's the signature of a wrong-song fuzzy match.
+                        if (!isPlausible(raw, mediaMetadata.duration)) {
+                            Timber.tag("LyricsHelper").w("${enabledProviders[index].name} returned implausible lyrics (timeline/duration mismatch) — skipping")
+                            continue
+                        }
                         Timber.tag("LyricsHelper").i("Got lyrics from ${enabledProviders[index].name}")
-                        val filtered = LyricsUtils.filterLyricsCreditLines(providerResult.getOrNull()!!)
+                        val filtered = LyricsUtils.filterLyricsCreditLines(raw)
                         found = LyricsWithProvider(filtered, enabledProviders[index].name)
                         break
                     }
@@ -203,6 +210,26 @@ constructor(
         }
 
         currentLyricsJob?.join()
+    }
+
+    /**
+     * Sanity-check fetched lyrics against the song: for SYNCED lyrics the last
+     * timestamp must fall inside a sane window of the track length (40% .. +30s).
+     * Wrong-song fuzzy matches almost always fail this. Plain (unsynced) lyrics
+     * can't be time-verified and are accepted as-is.
+     */
+    private fun isPlausible(lyrics: String, durationSec: Int): Boolean {
+        if (durationSec <= 0) return true
+        if (lyrics == LYRICS_NOT_FOUND || lyrics.isBlank()) return true
+        val entries = try {
+            LyricsUtils.parseLyrics(lyrics)
+        } catch (e: Exception) {
+            return true
+        }
+        if (entries.isEmpty()) return true // plain lyrics — nothing to verify against
+        val lastMs = entries.maxOf { it.time }
+        val durationMs = durationSec * 1000L
+        return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 30_000L
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {

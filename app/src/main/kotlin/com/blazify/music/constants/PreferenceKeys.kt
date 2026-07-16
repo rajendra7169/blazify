@@ -453,6 +453,8 @@ val PlayerBackgroundStyleKey = stringPreferencesKey("playerBackgroundStyle")
 val ShowLyricsKey = booleanPreferencesKey("showLyrics")
 // One-time cleanup of lyrics wrongly cached by the duration-less preload bug.
 val LyricsCacheCleanupV1Key = booleanPreferencesKey("lyricsCacheCleanupV1")
+// Second cleanup: entries cached before plausibility validation existed.
+val LyricsCacheCleanupV2Key = booleanPreferencesKey("lyricsCacheCleanupV2")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

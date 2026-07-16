@@ -165,7 +165,7 @@ import com.blazify.music.constants.ShuffleModeKey
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
-import com.blazify.music.constants.LyricsCacheCleanupV1Key
+import com.blazify.music.constants.LyricsCacheCleanupV2Key
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.db.MusicDatabase
@@ -870,10 +870,10 @@ class MusicService :
         // duration was known, letting fuzzy providers cache WRONG lyrics in the
         // DB. Wipe the lyrics cache once so everything refetches correctly.
         scope.launch {
-            val cleaned = dataStore.data.map { it[LyricsCacheCleanupV1Key] ?: false }.first()
+            val cleaned = dataStore.data.map { it[LyricsCacheCleanupV2Key] ?: false }.first()
             if (!cleaned) {
                 database.query { clearAllLyrics() }
-                dataStore.edit { it[LyricsCacheCleanupV1Key] = true }
+                dataStore.edit { it[LyricsCacheCleanupV2Key] = true }
             }
         }
 

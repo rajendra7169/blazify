@@ -34,14 +34,18 @@ object LyricsProviderRegistry {
         return providers.filter { it in providerNames }.joinToString(",")
     }
 
+    // Ordered by match precision: LrcLib (strict duration match) and BetterLyrics
+    // first, then the exact-video YouTube sources (always the right song), and the
+    // fuzzy keyword-search providers (KuGou/Paxsenix/LyricsPlus) last — they are
+    // the ones that can return wrong-song lyrics.
     fun getDefaultProviderOrder(): List<String> = listOf(
-        "BetterLyrics",
         "LrcLib",
+        "BetterLyrics",
+        "YouTube",
+        "YouTubeSubtitle",
         "KuGou",
         "Paxsenix",
         "LyricsPlus",
-        "YouTubeSubtitle",
-        "YouTube",
     )
 
     fun getOrderedProviders(orderString: String): List<LyricsProvider> {
