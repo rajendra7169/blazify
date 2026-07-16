@@ -353,6 +353,29 @@ private fun PreviewTransport(onColor: Color, big: Boolean = false) {
     }
 }
 
+/** Collapsed queue peek bar (Queue · Sleep timer · Lyrics) shown at the bottom of the real player. */
+@Composable
+private fun PreviewQueuePeek(color: Color) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        PeekItem(R.drawable.queue_music, stringResource(R.string.queue), color)
+        PeekItem(R.drawable.bedtime, stringResource(R.string.sleep_timer), color)
+        PeekItem(R.drawable.lyrics, stringResource(R.string.lyrics), color)
+    }
+}
+
+@Composable
+private fun PeekItem(res: Int, label: String, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(painter = painterResource(res), contentDescription = null, tint = color, modifier = Modifier.size(14.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(label, fontSize = 9.sp, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
 /* ---------- CLASSIC ---------- */
 
 @Composable
@@ -378,6 +401,8 @@ private fun ClassicPreview(meta: MediaMetadata?) {
         PreviewTimes(onColor.copy(alpha = 0.7f))
         Spacer(Modifier.weight(0.5f))
         PreviewTransport(onColor)
+        Spacer(Modifier.weight(0.4f))
+        PreviewQueuePeek(onColor)
     }
 }
 
@@ -500,6 +525,8 @@ private fun FullArtPreview(meta: MediaMetadata?) {
             PreviewTimes(Color.White.copy(alpha = 0.8f))
             Spacer(Modifier.height(12.dp))
             PreviewTransport(Color.White)
+            Spacer(Modifier.height(14.dp))
+            PreviewQueuePeek(Color.White)
         }
     }
 }
