@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,6 +73,9 @@ fun BlazeSleepTimerDialog(
 ) {
     var sleepTimerValue by remember { mutableFloatStateOf(initialMinutes) }
     var songCount by remember { mutableIntStateOf(1) }
+    // Which mode START applies: false = minutes timer, true = after N songs.
+    // Touching the stepper selects songs; touching the slider/chips selects minutes.
+    var useSongs by remember { mutableStateOf(false) }
     val accent = MaterialTheme.colorScheme.primary
 
     AlertDialog(
@@ -99,7 +103,12 @@ fun BlazeSleepTimerDialog(
                 if (!sleepTimerEnabled) {
                     val selectedMinutes = sleepTimerValue.roundToInt()
                     Text(
-                        text = String.format("%02d:%02d:00", selectedMinutes / 60, selectedMinutes % 60),
+                        text =
+                            if (useSongs) {
+                                pluralStringResource(R.plurals.n_song, songCount, songCount)
+                            } else {
+                                String.format("%02d:%02d:00", selectedMinutes / 60, selectedMinutes % 60)
+                            },
                         fontSize = 34.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp,
@@ -107,7 +116,10 @@ fun BlazeSleepTimerDialog(
 
                     Slider(
                         value = sleepTimerValue,
-                        onValueChange = { sleepTimerValue = it },
+                        onValueChange = {
+                            sleepTimerValue = it
+                            useSongs = false
+                        },
                         valueRange = 5f..120f,
                         steps = (120 - 5) / 5 - 1,
                         colors = SliderDefaults.colors(
@@ -125,7 +137,7 @@ fun BlazeSleepTimerDialog(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         listOf(15, 30, 45, 60).forEach { minutes ->
-                            val selected = selectedMinutes == minutes
+                            val selected = !useSongs && selectedMinutes == minutes
                             Box(
                                 modifier =
                                     Modifier
@@ -134,7 +146,10 @@ fun BlazeSleepTimerDialog(
                                             if (selected) accent
                                             else MaterialTheme.colorScheme.surfaceContainerHighest,
                                         )
-                                        .clickable { sleepTimerValue = minutes.toFloat() }
+                                        .clickable {
+                                            sleepTimerValue = minutes.toFloat()
+                                            useSongs = false
+                                        }
                                         .padding(horizontal = 18.dp, vertical = 10.dp),
                             ) {
                                 Text(
@@ -178,11 +193,13 @@ fun BlazeSleepTimerDialog(
                                 .weight(1f)
                                 .height(46.dp)
                                 .clip(RoundedCornerShape(24.dp))
+                                .background(if (useSongs) accent.copy(alpha = 0.15f) else Color.Transparent)
                                 .border(2.dp, accent, RoundedCornerShape(24.dp))
                                 .padding(horizontal = 2.dp),
                         ) {
                             StepButton(R.drawable.remove, accent) {
                                 songCount = (songCount - 1).coerceAtLeast(1)
+                                useSongs = true
                             }
                             Text(
                                 text = pluralStringResource(R.plurals.n_song, songCount, songCount),
@@ -193,10 +210,13 @@ fun BlazeSleepTimerDialog(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(20.dp))
-                                    .clickable { onStartAfterSongs(songCount) }
+                                    .clickable { useSongs = true }
                                     .padding(vertical = 8.dp),
                             )
-                            StepButton(R.drawable.add, accent) { songCount++ }
+                            StepButton(R.drawable.add, accent) {
+                                songCount++
+                                useSongs = true
+                            }
                         }
                     }
 
@@ -221,7 +241,13 @@ fun BlazeSleepTimerDialog(
                         Spacer(Modifier.width(12.dp))
 
                         Button(
-                            onClick = { onStart(sleepTimerValue.roundToInt()) },
+                            onClick = {
+                                if (useSongs) {
+                                    onStartAfterSongs(songCount)
+                                } else {
+                                    onStart(sleepTimerValue.roundToInt())
+                                }
+                            },
                             shape = RoundedCornerShape(28.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = accent,
