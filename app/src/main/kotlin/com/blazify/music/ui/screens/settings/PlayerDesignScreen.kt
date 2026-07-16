@@ -380,29 +380,49 @@ private fun PeekItem(res: Int, label: String, color: Color) {
 
 @Composable
 private fun ClassicPreview(meta: MediaMetadata?) {
-    val onColor = MaterialTheme.colorScheme.onSurface
+    val cs = MaterialTheme.colorScheme
+    val onColor = cs.onSurface
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniIcon(R.drawable.expand_more, onColor)
-            MiniIcon(R.drawable.more_horiz, onColor)
-        }
+        // "Now Playing" header (centred), like the real classic ThumbnailHeader.
+        Text(
+            text = stringResource(R.string.now_playing),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = onColor,
+        )
         Spacer(Modifier.weight(0.4f))
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
         Spacer(Modifier.height(16.dp))
+        // title/artist + favourite + theme + more (matches the real classic title row).
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { PreviewTitle(meta) }
-            MiniIcon(R.drawable.favorite_border, onColor, 20)
+            MiniIcon(R.drawable.favorite_border, onColor, 18)
+            Spacer(Modifier.width(10.dp))
+            PreviewPillButton(R.drawable.palette, onColor.copy(alpha = 0.12f), onColor)
+            Spacer(Modifier.width(8.dp))
+            PreviewPillButton(R.drawable.more_horiz, onColor.copy(alpha = 0.12f), onColor)
         }
         Spacer(Modifier.height(14.dp))
-        PreviewSlider(MaterialTheme.colorScheme.primary, onColor.copy(alpha = 0.22f))
+        PreviewSlider(cs.primary, onColor.copy(alpha = 0.22f))
         PreviewTimes(onColor.copy(alpha = 0.7f))
         Spacer(Modifier.weight(0.5f))
         PreviewTransport(onColor)
         Spacer(Modifier.weight(0.4f))
         PreviewQueuePeek(onColor)
+    }
+}
+
+/** Small filled pill button matching the real player's theme / more buttons. */
+@Composable
+private fun PreviewPillButton(res: Int, bg: Color, tint: Color) {
+    Box(
+        modifier = Modifier.size(26.dp).clip(CircleShape).background(bg),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(painter = painterResource(res), contentDescription = null, tint = tint, modifier = Modifier.size(15.dp))
     }
 }
 
@@ -518,7 +538,11 @@ private fun FullArtPreview(meta: MediaMetadata?) {
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White) }
-                MiniIcon(R.drawable.favorite_border, Color.White, 20)
+                MiniIcon(R.drawable.favorite_border, Color.White, 18)
+                Spacer(Modifier.width(10.dp))
+                PreviewPillButton(R.drawable.palette, Color.White.copy(alpha = 0.18f), Color.White)
+                Spacer(Modifier.width(8.dp))
+                PreviewPillButton(R.drawable.more_horiz, Color.White.copy(alpha = 0.18f), Color.White)
             }
             Spacer(Modifier.height(12.dp))
             PreviewSlider(MaterialTheme.colorScheme.primary, Color.White.copy(alpha = 0.25f))
