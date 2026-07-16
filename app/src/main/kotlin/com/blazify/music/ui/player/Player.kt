@@ -2676,13 +2676,40 @@ private fun RingPlayerLayout(
 
         Spacer(Modifier.height(8.dp))
 
-        // --- queue + favourite ---
+        // --- queue · title/artist · favourite ---
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RingIconButton(R.drawable.queue_music, textColor, size = 26, onClick = onOpenQueue)
+            Column(
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = mediaMetadata?.title.orEmpty(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = textColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().basicMarquee(),
+                )
+                val artistText = mediaMetadata?.artists?.joinToString { it.name }.orEmpty()
+                if (artistText.isNotBlank()) {
+                    Text(
+                        text = artistText,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = textColor.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().basicMarquee(),
+                    )
+                }
+            }
             RingIconButton(
                 res = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
                 tint = if (isFavorite) MaterialTheme.colorScheme.error else textColor,
