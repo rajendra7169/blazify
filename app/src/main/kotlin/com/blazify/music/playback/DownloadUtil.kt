@@ -22,9 +22,12 @@ import com.blazify.music.constants.AudioQuality
 import com.blazify.music.constants.AudioQualityKey
 import com.blazify.music.db.MusicDatabase
 import com.blazify.music.db.entities.FormatEntity
+import com.blazify.music.db.entities.LyricsEntity
 import com.blazify.music.db.entities.SongEntity
 import com.blazify.music.di.DownloadCache
 import com.blazify.music.di.PlayerCache
+import com.blazify.music.lyrics.LyricsHelper
+import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.enumPreference
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,6 +39,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -56,6 +60,7 @@ constructor(
     val databaseProvider: DatabaseProvider,
     @DownloadCache val downloadCache: Cache,
     @PlayerCache val playerCache: Cache,
+    private val lyricsHelper: LyricsHelper,
 ) {
     private val TAG = "DownloadUtil"
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
@@ -200,6 +205,10 @@ constructor(
                             when (download.state) {
                                 Download.STATE_COMPLETED -> {
                                     database.updateDownloadedInfo(download.request.id, true, LocalDateTime.now())
+                                    // A downloaded song should work fully offline —
+                                    // fetch and store its lyrics now, while we still
+                                    // have network.
+                                    ensureLyricsAvailableOffline(download.request.id)
                                 }
                                 Download.STATE_FAILED,
                                 Download.STATE_STOPPED,
@@ -245,6 +254,30 @@ constructor(
     }
 
     fun getDownload(songId: String): Flow<Download?> = downloads.map { it[songId] }
+
+    /**
+     * Fetch + cache lyrics for a song that was just downloaded, so they are
+     * available offline. Skips when lyrics are already cached or the duration is
+     * unknown (fuzzy providers would cache wrong lyrics permanently). NOT_FOUND
+     * is never cached — a later online play can still retry.
+     */
+    private suspend fun ensureLyricsAvailableOffline(songId: String) {
+        try {
+            if (database.lyrics(songId).first() != null) return
+            val song = database.song(songId).first() ?: return
+            val mediaMetadata = song.toMediaMetadata()
+            if (mediaMetadata.duration <= 0) return
+            val fetched = lyricsHelper.getLyrics(mediaMetadata)
+            if (fetched.lyrics != LyricsEntity.LYRICS_NOT_FOUND) {
+                database.query {
+                    upsert(LyricsEntity(songId, fetched.lyrics, fetched.provider))
+                }
+                Timber.tag(TAG).d("Cached lyrics offline for downloaded song $songId (${fetched.provider})")
+            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).w(e, "Failed to cache offline lyrics for $songId")
+        }
+    }
 
     fun release() {
         scope.cancel()
