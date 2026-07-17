@@ -235,6 +235,21 @@ internal fun LyricsActionOverlay(
     }
 }
 
+/** Display order for the source picker: best sources first, unknown ones last. */
+private fun lyricsSourceRank(providerName: String): Int {
+    val n = providerName.lowercase()
+    return when {
+        n.contains("paxsenix") -> 0
+        n.contains("betterlyrics") || n.contains("better lyrics") -> 1
+        n.contains("lrclib") -> 2
+        n.contains("subtitle") -> 3
+        n.contains("youtube") -> 4
+        n.contains("kugou") -> 5
+        n.contains("lyricsplus") || n.contains("lyrics plus") -> 6
+        else -> 7
+    }
+}
+
 /** Small pill on the lyrics screen that opens the source/language picker. */
 @Composable
 internal fun LyricsLanguageButton(
@@ -269,6 +284,9 @@ internal fun LyricsSourceLanguageDialog(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     var expandedIndex by remember { mutableIntStateOf(-1) }
 
+    // Show the better sources first (Paxsenix, BetterLyrics, LrcLib), then the rest.
+    val orderedResults = remember(results) { results.sortedBy { lyricsSourceRank(it.providerName) } }
+
     LaunchedEffect(mediaMetadata.id) {
         viewModel.results.value = emptyList()
         viewModel.search(
@@ -300,7 +318,7 @@ internal fun LyricsSourceLanguageDialog(
                 )
                 Spacer(Modifier.height(8.dp))
                 LazyColumn(modifier = Modifier.heightIn(max = 420.dp)) {
-                    itemsIndexed(results) { index, result ->
+                    itemsIndexed(orderedResults) { index, result ->
                         val isCurrent = result.providerName == currentProvider
                         Row(
                             modifier = Modifier
