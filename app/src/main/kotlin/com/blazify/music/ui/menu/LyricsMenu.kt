@@ -215,7 +215,7 @@ fun LyricsMenu(
                         }
                     },
                 ) {
-                    Text(stringResource(R.string.search_online))
+                    Text(stringResource(R.string.lyrics_search_google))
                 }
 
                 Spacer(Modifier.width(8.dp))
@@ -232,14 +232,14 @@ fun LyricsMenu(
                             searchMediaMetadata.album?.title
                         )
                         showSearchResultDialog = true
-                        
+
                         // Show warning only if network is definitely unavailable
                         if (!isNetworkAvailable) {
                             Toast.makeText(context, context.getString(R.string.error_no_internet), Toast.LENGTH_SHORT).show()
                         }
                     },
                 ) {
-                    Text(stringResource(android.R.string.ok))
+                    Text(stringResource(R.string.lyrics_find_all_sources))
                 }
             },
         ) {
