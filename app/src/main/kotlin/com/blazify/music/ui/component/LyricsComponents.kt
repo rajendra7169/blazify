@@ -22,7 +22,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -218,65 +217,6 @@ internal fun LyricsActionOverlay(
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.share))
                 }
-            }
-        }
-    }
-}
-
-/**
- * "Fix sync" control for out-of-sync songs. Shown as a small pill button top-right
- * of the lyrics; tapping it enters calibrate mode and shows a hint telling the user
- * to tap the line they're hearing. The tap-handling lives in the lyrics list.
- */
-@Composable
-internal fun LyricsSyncFixControl(
-    visible: Boolean,
-    calibrateMode: Boolean,
-    onEnter: () -> Unit,
-    onCancel: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier.padding(top = 8.dp, end = 12.dp)) {
-        AnimatedVisibility(
-            visible = visible && !calibrateMode,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            FilledTonalButton(
-                onClick = onEnter,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-            ) {
-                Icon(painterResource(R.drawable.timer), null, Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text(stringResource(R.string.lyrics_sync_to_voice))
-            }
-        }
-        AnimatedVisibility(
-            visible = visible && calibrateMode,
-            enter = fadeIn() + slideInVertically { -it },
-            exit = fadeOut() + slideOutVertically { -it },
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
-                    .padding(start = 14.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.lyrics_sync_tap_hint),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                Spacer(Modifier.width(6.dp))
-                Icon(
-                    painterResource(R.drawable.close),
-                    contentDescription = stringResource(R.string.cancel),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clickable(onClick = onCancel)
-                        .padding(4.dp),
-                )
             }
         }
     }
