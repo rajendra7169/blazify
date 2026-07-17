@@ -132,11 +132,15 @@ constructor(
                 // duration+title matching) always beat results from FUZZY keyword
                 // sources (KuGou/LyricsPlus), even when the trusted result is plain
                 // and the fuzzy one is synced — a correct plain lyric beats a wrong
-                // scrolling one. Within each tier, synced > plain. A trusted synced
-                // timeline that's a little off (video vs album cut) is STILL kept
-                // synced: a real timeline that roughly follows the song beats a blind
-                // time-estimate, so we never strip a trusted timeline here.
+                // scrolling one. Within each tier, synced > plain.
+                //
+                // Among TRUSTED SYNCED results we don't just take the first: different
+                // sources are timed to different editions (Apple's full version vs a
+                // shorter YouTube cut), so we keep the one whose timeline best fits the
+                // edition actually playing. We stop early only once a near-perfect fit
+                // (≤15% off) is in hand — good enough, no need to wait for the rest.
                 var trustedSynced: LyricsWithProvider? = null
+                var trustedSyncedMisfit = Float.MAX_VALUE
                 var trustedPlain: LyricsWithProvider? = null
                 var fuzzySynced: LyricsWithProvider? = null
                 var fuzzyPlain: LyricsWithProvider? = null
@@ -156,15 +160,19 @@ constructor(
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
                         val synced = isSynced(filtered)
                         val trusted = providerName in TRUSTED_PROVIDERS
-                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"})")
+                        val misfit = if (synced) timelineMisfit(filtered, mediaMetadata.duration) else Float.MAX_VALUE
+                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"}${if (synced && misfit < Float.MAX_VALUE) ", fit ${(100 - (misfit * 100).toInt())}%" else ""})")
                         when {
-                            trusted && synced && trustedSynced == null -> trustedSynced = LyricsWithProvider(filtered, providerName)
+                            trusted && synced -> if (misfit < trustedSyncedMisfit) {
+                                trustedSynced = LyricsWithProvider(filtered, providerName)
+                                trustedSyncedMisfit = misfit
+                            }
                             trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
                             !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
                             !trusted && !synced && fuzzyPlain == null -> fuzzyPlain = LyricsWithProvider(filtered, providerName)
                         }
-                        // Best possible outcome reached — stop early.
-                        if (trustedSynced != null) break
+                        // A near-perfect trusted synced fit is the best possible outcome — stop.
+                        if (trustedSynced != null && trustedSyncedMisfit <= 0.15f) break
                     }
                 }
                 // Cancel any still-running lower-priority attempts.
@@ -300,6 +308,25 @@ constructor(
         val lastMs = entries.maxOf { it.time }
         val durationMs = durationSec * 1000L
         return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 15_000L
+    }
+
+    /**
+     * How badly a SYNCED timeline fits the playing edit: |lastTimestamp − duration|
+     * as a fraction of duration. 0 = the last line lands exactly at the song's end
+     * (perfect); 0.76 = the timeline runs to 176% of the song (a different, longer
+     * edition). Used to pick the best-fitting synced source, not to reject any.
+     * Returns 0 when the duration is unknown (can't judge — treat as acceptable).
+     */
+    private fun timelineMisfit(lyrics: String, durationSec: Int): Float {
+        if (durationSec <= 0) return 0f
+        val entries = try {
+            LyricsUtils.parseLyrics(lyrics)
+        } catch (e: Exception) {
+            return Float.MAX_VALUE
+        }
+        if (entries.isEmpty()) return Float.MAX_VALUE
+        val lastSec = entries.maxOf { it.time } / 1000f
+        return kotlin.math.abs(lastSec - durationSec) / durationSec
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {
