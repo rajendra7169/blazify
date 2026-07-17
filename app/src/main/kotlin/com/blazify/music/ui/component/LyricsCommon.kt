@@ -149,6 +149,11 @@ private fun BlazeLogoFill(
             modifier = Modifier.fillMaxSize()
         )
         // Filled portion: white icon, recoloured with a vertical gradient, clipped to progress.
+        // The flame glyph's opaque pixels only span ~16%..77% of the PNG canvas
+        // (transparent padding below), so map the fill onto those bounds — otherwise
+        // nothing appears until ~25% progress and the fill looks like it starts late.
+        val glyphTopFrac = 0.16f
+        val glyphBottomFrac = 0.77f
         Icon(
             painter = painterResource(R.drawable.blaze_logo_white),
             contentDescription = null,
@@ -157,7 +162,8 @@ private fun BlazeLogoFill(
                 .fillMaxSize()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithContent {
-                    clipRect(top = size.height * (1f - fill.coerceIn(0f, 1f))) {
+                    val f = fill.coerceIn(0f, 1f)
+                    clipRect(top = size.height * (glyphBottomFrac - (glyphBottomFrac - glyphTopFrac) * f)) {
                         this@drawWithContent.drawContent()
                         drawRect(
                             brush = Brush.verticalGradient(
