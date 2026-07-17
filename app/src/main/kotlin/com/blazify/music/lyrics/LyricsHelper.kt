@@ -30,11 +30,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val MAX_LYRICS_FETCH_MS = 16000L
 private const val PER_PROVIDER_TIMEOUT_MS = 12000L
 private const val PROVIDER_NONE = ""
 
+// MUST be a singleton: the service preload, the player view and the download
+// hook all fetch lyrics — without a shared instance each gets its own in-flight
+// map and the same song is raced against every provider several times over
+// (seen in logcat as duplicate "Racing N providers" lines seconds apart).
+@Singleton
 class LyricsHelper
 @Inject
 constructor(
@@ -123,33 +129,34 @@ constructor(
                 }
 
                 // Trust tiers: results from TRUSTED sources (exact-id or strict
-                // duration+title matching) always beat results from FUZZY keyword
-                // sources (KuGou/Paxsenix/LyricsPlus), even when the trusted result
-                // is plain text and the fuzzy one is synced — a correct plain lyric
-                // beats a wrong scrolling one. Within each tier, synced > plain.
+                // duration+title matching) beat results from FUZZY keyword sources
+                // (KuGou/LyricsPlus). Within each tier, synced > plain — but a synced
+                // timeline must PLAUSIBLY fit this song to win: a trusted result whose
+                // timestamps don't fit is a different EDIT (video vs album cut) and
+                // scrolls visibly out of sync, so correct plain lyrics beat it. It is
+                // kept only as a last resort when nothing else exists.
                 var trustedSynced: LyricsWithProvider? = null
                 var trustedPlain: LyricsWithProvider? = null
                 var fuzzySynced: LyricsWithProvider? = null
                 var fuzzyPlain: LyricsWithProvider? = null
+                var driftedSynced: LyricsWithProvider? = null
                 for ((index, attempt) in attempts.withIndex()) {
                     val providerName = enabledProviders[index].name
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
                         val raw = providerResult.getOrNull()!!
-                        // Reject results whose synced timeline doesn't fit this song —
-                        // that's the signature of a wrong-song FUZZY match. Trusted
-                        // sources match by exact id / strict search, so a timeline
-                        // mismatch there just means a different EDIT of the right song
-                        // (video vs album cut) — keep those, drift beats nothing.
-                        if (providerName !in TRUSTED_PROVIDERS && !isPlausible(raw, mediaMetadata.duration)) {
+                        val plausible = isPlausible(raw, mediaMetadata.duration)
+                        if (providerName !in TRUSTED_PROVIDERS && !plausible) {
+                            // Implausible FUZZY results are wrong-song matches — drop.
                             Timber.tag("LyricsHelper").w("$providerName returned implausible lyrics (timeline/duration mismatch) — skipping")
                             continue
                         }
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
                         val synced = isSynced(filtered)
                         val trusted = providerName in TRUSTED_PROVIDERS
-                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"})")
+                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"}${if (synced && !plausible) ", DRIFTED timeline" else ""})")
                         when {
+                            trusted && synced && !plausible -> if (driftedSynced == null) driftedSynced = LyricsWithProvider(filtered, providerName)
                             trusted && synced && trustedSynced == null -> trustedSynced = LyricsWithProvider(filtered, providerName)
                             trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
                             !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
@@ -162,7 +169,7 @@ constructor(
                 // Cancel any still-running lower-priority attempts.
                 attempts.forEach { it.cancel() }
 
-                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain
+                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain ?: driftedSynced
                 if (chosen == null) {
                     Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
                 } else {
@@ -197,6 +204,10 @@ constructor(
                 .map { preferences -> resolveLyricsProviders(preferences) }
                 .first()
                 .filter { it.isEnabled(context) && it.name in TRUSTED_PROVIDERS }
+                // LrcLib matches by title+artist+DURATION, so its timeline fits the
+                // edit that is actually playing — prefer it for upgrades. (Stable
+                // sort keeps the user's order for the rest.)
+                .sortedByDescending { it.name == "LrcLib" }
 
             if (syncedCapableProviders.isEmpty()) return@withTimeoutOrNull null
 
@@ -232,7 +243,7 @@ constructor(
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
                         val filtered = LyricsUtils.filterLyricsCreditLines(providerResult.getOrNull()!!)
-                        if (isSynced(filtered) && isPlausible(filtered, mediaMetadata.duration)) {
+                        if (isSynced(filtered) && fitsTimelineTightly(filtered, mediaMetadata.duration)) {
                             Timber.tag("LyricsHelper").i("Synced-upgrade: found synced lyrics from $providerName")
                             best = LyricsWithProvider(filtered, providerName)
                             break
@@ -354,6 +365,25 @@ constructor(
         val lastMs = entries.maxOf { it.time }
         val durationMs = durationSec * 1000L
         return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 15_000L
+    }
+
+    /**
+     * Stricter timeline check used ONLY for the synced-upgrade path: an upgrade
+     * REPLACES already-correct plain lyrics, so the candidate's last timestamp
+     * must land close to the end of what is actually playing (60% .. +10s).
+     * A drifting upgrade would be a downgrade.
+     */
+    private fun fitsTimelineTightly(lyrics: String, durationSec: Int): Boolean {
+        if (durationSec <= 0) return false
+        val entries = try {
+            LyricsUtils.parseLyrics(lyrics)
+        } catch (e: Exception) {
+            return false
+        }
+        if (entries.isEmpty()) return false
+        val lastMs = entries.maxOf { it.time }
+        val durationMs = durationSec * 1000L
+        return lastMs >= (durationMs * 0.6).toLong() && lastMs <= durationMs + 10_000L
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {
