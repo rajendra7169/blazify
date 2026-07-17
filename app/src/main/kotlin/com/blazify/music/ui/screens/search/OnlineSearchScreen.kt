@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -136,7 +138,13 @@ fun OnlineSearchScreen(
 
     LazyColumn(
         state = lazyListState,
-        contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Bottom).asPaddingValues(),
+        // Include the keyboard (IME) inset, not just the nav bar — otherwise, while
+        // typing, the lower suggestions sit BEHIND the keyboard and the list can't be
+        // scrolled to reach them (it's laid out at full height, so nothing overflows).
+        contentPadding = WindowInsets.systemBars
+            .union(WindowInsets.ime)
+            .only(WindowInsetsSides.Bottom)
+            .asPaddingValues(),
         modifier =
             Modifier
                 .fillMaxSize()
