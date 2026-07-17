@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
@@ -884,7 +885,10 @@ fun ExperimentalLyrics(
         if (!isSelectionModeActive && !isGuest && lyrics != null && lyrics != LYRICS_NOT_FOUND && mediaMetadata != null) {
             LyricsLanguageButton(
                 onClick = { showSourcePicker = true },
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = 8.dp),
             )
         }
     }
