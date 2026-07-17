@@ -38,7 +38,8 @@ class LyricsViewModel @Inject constructor() : ViewModel() {
         lyrics: String?,
         enabledLanguages: List<String>,
         romanizeCyrillicByLine: Boolean,
-        showIntervalIndicator: Boolean
+        showIntervalIndicator: Boolean,
+        songDurationSec: Int = 0
     ) {
         processJob?.cancel()
         processJob = viewModelScope.launch {
@@ -64,7 +65,13 @@ class LyricsViewModel @Inject constructor() : ViewModel() {
             }
             
             _lines.value = processedLines
-            updateMergedList(processedLines, showIntervalIndicator)
+            // Only show interlude indicators when the synced timeline actually fits
+            // the edition that's playing. A timeline timed to a longer/shorter edit
+            // (Apple's full version vs a YouTube remix/cut) puts the instrumental
+            // gaps in the wrong places, so the interlude logo "fills" over the vocals
+            // and reads as loading. In that case, suppress the indicators.
+            val showInterval = showIntervalIndicator && timelineFitsForInterludes(processedLines, songDurationSec)
+            updateMergedList(processedLines, showInterval)
 
             // Romanize in the background after the UI has been updated
             if (lyrics != null && lyrics != LYRICS_NOT_FOUND && enabledLanguages.isNotEmpty()) {
@@ -81,6 +88,19 @@ class LyricsViewModel @Inject constructor() : ViewModel() {
                 }
             }
         }
+    }
+
+    /**
+     * Whether the synced timeline lands close enough to the playing edit for its
+     * instrumental gaps (interludes) to be trustworthy. If the last line's
+     * timestamp is far past / short of the song length, the lyrics are timed to a
+     * different edition and the gaps would be misplaced. Unknown duration → allow.
+     */
+    private fun timelineFitsForInterludes(lines: List<LyricsEntry>, durationSec: Int): Boolean {
+        if (durationSec <= 0) return true
+        val lastMs = lines.filter { it.text.isNotBlank() }.maxOfOrNull { it.time } ?: return true
+        val durationMs = durationSec * 1000L
+        return lastMs <= durationMs * 1.2 && lastMs >= durationMs * 0.5
     }
 
     private fun updateMergedList(lines: List<LyricsEntry>, showIntervalIndicator: Boolean) {

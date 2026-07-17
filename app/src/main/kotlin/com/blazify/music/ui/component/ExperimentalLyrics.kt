@@ -227,8 +227,9 @@ fun ExperimentalLyrics(
     val lines by lyricsViewModel.lines.collectAsStateWithLifecycle()
     val mergedLyricsList by lyricsViewModel.mergedLyricsList.collectAsStateWithLifecycle()
 
-    LaunchedEffect(lyrics, enabledLanguages, romanizeCyrillicByLine, showIntervalIndicator) {
-        lyricsViewModel.processLyrics(lyrics, enabledLanguages, romanizeCyrillicByLine, showIntervalIndicator)
+    val songDurationSec = mediaMetadata?.duration ?: 0
+    LaunchedEffect(lyrics, enabledLanguages, romanizeCyrillicByLine, showIntervalIndicator, songDurationSec) {
+        lyricsViewModel.processLyrics(lyrics, enabledLanguages, romanizeCyrillicByLine, showIntervalIndicator, songDurationSec)
     }
 
     val isSynced = remember(lyrics) { lyricsTextLooksSynced(lyrics) }
