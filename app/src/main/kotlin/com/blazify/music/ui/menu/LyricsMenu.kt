@@ -13,7 +13,10 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -310,6 +313,21 @@ fun LyricsMenu(
                                 color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1,
                             )
+                            // Language/script label so the user can choose the version
+                            // in the language they want (e.g. Devanagari vs Roman).
+                            detectLyricsScript(result.lyrics)?.let { script ->
+                                Text(
+                                    text = script,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    maxLines = 1,
+                                    modifier = Modifier
+                                        .padding(start = 6.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                                        .padding(horizontal = 6.dp, vertical = 1.dp),
+                                )
+                            }
                             if (result.lyrics.startsWith("[")) {
                                 Icon(
                                     painter = painterResource(R.drawable.sync),
@@ -688,4 +706,37 @@ fun LyricsMenu(
             )
         }
     }
+}
+
+/**
+ * Best-guess script of a lyrics block, so the search-results picker can label each
+ * source's version (Devanagari / Roman / Gurmukhi / …) and the user can choose the
+ * language they want. LRC timestamps are stripped first. Note: languages that share
+ * a script (e.g. Hindi and Marathi both use Devanagari) can't be told apart here —
+ * the preview text distinguishes those.
+ */
+internal fun detectLyricsScript(lyrics: String): String? {
+    val text = lyrics.replace(Regex("\\[[^\\]]*]"), "")
+    val counts = HashMap<String, Int>()
+    for (ch in text) {
+        val label = when (ch.code) {
+            in 0x0900..0x097F -> "Devanagari"
+            in 0x0A00..0x0A7F -> "Gurmukhi"
+            in 0x0980..0x09FF -> "Bengali"
+            in 0x0A80..0x0AFF -> "Gujarati"
+            in 0x0B00..0x0B7F -> "Odia"
+            in 0x0B80..0x0BFF -> "Tamil"
+            in 0x0C00..0x0C7F -> "Telugu"
+            in 0x0C80..0x0CFF -> "Kannada"
+            in 0x0D00..0x0D7F -> "Malayalam"
+            in 0x0600..0x06FF, in 0x0750..0x077F -> "Urdu"
+            in 0x4E00..0x9FFF -> "Chinese"
+            in 0x3040..0x30FF -> "Japanese"
+            in 0xAC00..0xD7AF -> "Korean"
+            in 0x0041..0x005A, in 0x0061..0x007A -> "Roman"
+            else -> null
+        }
+        if (label != null) counts[label] = (counts[label] ?: 0) + 1
+    }
+    return counts.maxByOrNull { it.value }?.key
 }
