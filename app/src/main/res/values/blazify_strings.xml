@@ -375,6 +375,9 @@
 
     <!-- Lyrics Offset Settings -->
     <string name="lyrics_offset">Lyrics offset</string>
+    <string name="lyrics_sync_to_voice">Fix sync</string>
+    <string name="lyrics_sync_tap_hint">Tap the line you hear now</string>
+    <string name="lyrics_synced">Lyrics synced to this line</string>
 
     <!-- Material 3 Settings Sections -->
     <string name="settings_section_ui">Interface</string>

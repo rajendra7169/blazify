@@ -191,7 +191,7 @@ fun ShowOffsetDialog(songProvider: () -> SongEntity?) {
         ) {
             IconButton(
                 onClick = {
-                    lyricsOffset = (lyricsOffset - 50).coerceIn(-3000, 3000)
+                    lyricsOffset = (lyricsOffset - 50).coerceIn(-20000, 20000)
                     textFieldValue = lyricsOffset.toString()
                 }
             ) {
@@ -208,14 +208,14 @@ fun ShowOffsetDialog(songProvider: () -> SongEntity?) {
                     lyricsOffset = rounded
                     textFieldValue = rounded.toString()
                 },
-                valueRange = -3000f..3000f,
-                steps = 59,
+                valueRange = -20000f..20000f,
+                steps = 79,
                 modifier = Modifier.weight(1f)
             )
 
             IconButton(
                 onClick = {
-                    lyricsOffset = (lyricsOffset + 50).coerceIn(-3000, 3000)
+                    lyricsOffset = (lyricsOffset + 50).coerceIn(-20000, 20000)
                     textFieldValue = lyricsOffset.toString()
                 }
             ) {
@@ -235,12 +235,12 @@ fun ShowOffsetDialog(songProvider: () -> SongEntity?) {
                 .padding(horizontal = 48.dp)
         ) {
             Text(
-                text = "-3000ms",
+                text = "-20000ms",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "+3000ms",
+                text = "+20000ms",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

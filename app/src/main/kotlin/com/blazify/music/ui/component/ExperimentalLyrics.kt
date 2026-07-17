@@ -331,6 +331,20 @@ fun ExperimentalLyrics(
     val isLyricsProviderShown = lyricsEntity != null && lyricsEntity.provider != "Unknown" && lyricsEntity.provider != "Manual" && !isSelectionModeActive
     var isAutoScrollEnabled by rememberSaveable { mutableStateOf(true) }
 
+    // One-tap calibration: when the lyrics are out of sync (a YouTube edit that's
+    // shifted from the album timing), the user taps the line they hear RIGHT NOW
+    // and we set this song's offset so that line is active at the current position.
+    var calibrateMode by remember(mediaMetadata?.id) { mutableStateOf(false) }
+    val lyricsSyncedToast = stringResource(R.string.lyrics_synced)
+    fun calibrateToLine(lineTimeMs: Long) {
+        val song = currentSong?.song ?: return
+        val newOffset = (lineTimeMs - currentPositionState).toInt().coerceIn(-30_000, 30_000)
+        database.query { upsert(song.copy(lyricsOffset = newOffset)) }
+        calibrateMode = false
+        isAutoScrollEnabled = true
+        Toast.makeText(context, lyricsSyncedToast, Toast.LENGTH_SHORT).show()
+    }
+
     BackHandler(enabled = isSelectionModeActive) {
         isSelectionModeActive = false
         selectedIndices.clear()
@@ -826,7 +840,10 @@ fun ExperimentalLyrics(
                                         enabledLanguages = enabledLanguages, romanizeLyrics = currentSong?.romanizeLyrics == true,
                                         onSizeChanged = { itemHeights[listIndex] = it },
                                         onClick = {
-                                            if (isSelectionModeActive) {
+                                            if (calibrateMode && isSynced) {
+                                                // Calibrate: make THIS line active at the current position.
+                                                calibrateToLine(item.time)
+                                            } else if (isSelectionModeActive) {
                                                 if (selectedIndices.contains(index)) {
                                                     selectedIndices.remove(index)
                                                     if (selectedIndices.isEmpty()) isSelectionModeActive = false
@@ -872,6 +889,17 @@ fun ExperimentalLyrics(
                 }
                 isSelectionModeActive = false; selectedIndices.clear()
             }
+        )
+
+        // "Fix sync" affordance for out-of-sync (YouTube-edit) songs. Tapping it
+        // enters calibrate mode; the user then taps the line they hear now and the
+        // whole song's offset is set so that line is active at the current position.
+        LyricsSyncFixControl(
+            visible = isSynced && !isSelectionModeActive && !isGuest && lyrics != null && lyrics != LYRICS_NOT_FOUND,
+            calibrateMode = calibrateMode,
+            onEnter = { calibrateMode = true; isAutoScrollEnabled = true },
+            onCancel = { calibrateMode = false },
+            modifier = Modifier.align(Alignment.TopEnd),
         )
     }
 
