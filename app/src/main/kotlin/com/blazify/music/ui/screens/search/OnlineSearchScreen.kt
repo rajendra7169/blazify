@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import com.blazify.music.db.entities.SearchHistory
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.blazify.music.LocalNavController
+import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.innertube.models.AlbumItem
 import com.blazify.innertube.models.ArtistItem
 import com.blazify.innertube.models.EpisodeItem
@@ -138,10 +139,12 @@ fun OnlineSearchScreen(
 
     LazyColumn(
         state = lazyListState,
-        // Include the keyboard (IME) inset, not just the nav bar — otherwise, while
-        // typing, the lower suggestions sit BEHIND the keyboard and the list can't be
-        // scrolled to reach them (it's laid out at full height, so nothing overflows).
-        contentPadding = WindowInsets.systemBars
+        // Reserve space for BOTH the now-playing mini-player (via the player-aware
+        // insets) and the keyboard (IME) — not just the nav bar. Otherwise, when a
+        // song is playing, the lower items sit BEHIND the mini-player and the list
+        // can't be scrolled to reach them (it's laid out at full height, so nothing
+        // overflows the viewport).
+        contentPadding = LocalPlayerAwareWindowInsets.current
             .union(WindowInsets.ime)
             .only(WindowInsetsSides.Bottom)
             .asPaddingValues(),

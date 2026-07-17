@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -45,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalNavController
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
@@ -137,8 +140,11 @@ fun LocalSearchScreen(
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.weight(1f),
+            // Reserve space for the now-playing mini-player + keyboard, not just the
+            // nav bar, so the last results aren't stuck behind the mini-player.
             contentPadding =
-                WindowInsets.systemBars
+                LocalPlayerAwareWindowInsets.current
+                    .union(WindowInsets.ime)
                     .only(WindowInsetsSides.Bottom)
                     .asPaddingValues(),
         ) {
