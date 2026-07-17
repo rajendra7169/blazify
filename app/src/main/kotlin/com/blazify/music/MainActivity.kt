@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.WindowInsets
@@ -1047,13 +1048,13 @@ class MainActivity : ComponentActivity() {
                                             TextButton(
                                                 onClick = { navController.navigate("listen_together_from_topbar") },
                                             ) {
-                                                Text(stringResource(R.string.together))
-                                                Spacer(Modifier.width(6.dp))
-                                                Icon(
-                                                    painter = painterResource(R.drawable.group_add),
+                                                Image(
+                                                    painter = painterResource(R.drawable.blaze_logo),
                                                     contentDescription = null,
                                                     modifier = Modifier.size(20.dp),
                                                 )
+                                                Spacer(Modifier.width(6.dp))
+                                                Text(stringResource(R.string.blaze_together))
                                             }
                                             IconButton(onClick = { showAccountDialog = true }) {
                                                 BadgedBox(badge = {
