@@ -471,6 +471,7 @@ val LyricsCacheCleanupV7Key = booleanPreferencesKey("lyricsCacheCleanupV7")
 val LyricsCacheCleanupV8Key = booleanPreferencesKey("lyricsCacheCleanupV8")
 // Ninth cleanup: refetch with Paxsenix (Apple Music) as the primary source.
 val LyricsCacheCleanupV9Key = booleanPreferencesKey("lyricsCacheCleanupV9")
+val LyricsDriftFixupV1Key = booleanPreferencesKey("lyricsDriftFixupV1")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
 val LyricsScrollKey = booleanPreferencesKey("lyricsScrollKey")

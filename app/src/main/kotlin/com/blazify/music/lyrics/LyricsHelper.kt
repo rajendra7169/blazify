@@ -131,15 +131,15 @@ constructor(
                 // Trust tiers: results from TRUSTED sources (exact-id or strict
                 // duration+title matching) beat results from FUZZY keyword sources
                 // (KuGou/LyricsPlus). Within each tier, synced > plain — but a synced
-                // timeline must PLAUSIBLY fit this song to win: a trusted result whose
-                // timestamps don't fit is a different EDIT (video vs album cut) and
-                // scrolls visibly out of sync, so correct plain lyrics beat it. It is
-                // kept only as a last resort when nothing else exists.
+                // timeline must PLAUSIBLY fit this song to stay synced: a trusted
+                // result whose timestamps don't fit is a different EDIT of the right
+                // song (video vs album cut) and scrolls visibly out of sync — the
+                // singer sings while the interlude logo fills. Its TEXT is still
+                // trustworthy, so keep it with the timestamps STRIPPED (plain).
                 var trustedSynced: LyricsWithProvider? = null
                 var trustedPlain: LyricsWithProvider? = null
                 var fuzzySynced: LyricsWithProvider? = null
                 var fuzzyPlain: LyricsWithProvider? = null
-                var driftedSynced: LyricsWithProvider? = null
                 for ((index, attempt) in attempts.withIndex()) {
                     val providerName = enabledProviders[index].name
                     val providerResult = attempt.await()
@@ -156,7 +156,16 @@ constructor(
                         val trusted = providerName in TRUSTED_PROVIDERS
                         Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"}${if (synced && !plausible) ", DRIFTED timeline" else ""})")
                         when {
-                            trusted && synced && !plausible -> if (driftedSynced == null) driftedSynced = LyricsWithProvider(filtered, providerName)
+                            trusted && synced && !plausible -> {
+                                // Right song, wrong edit: demote to plain text.
+                                Timber.tag("LyricsHelper").w(
+                                    "$providerName timeline doesn't fit (last ts ${lastTimestampSec(filtered)}s vs song ${mediaMetadata.duration}s) — keeping text as PLAIN"
+                                )
+                                val plainText = stripTimestamps(filtered)
+                                if (plainText.isNotBlank() && trustedPlain == null) {
+                                    trustedPlain = LyricsWithProvider(plainText, providerName)
+                                }
+                            }
                             trusted && synced && trustedSynced == null -> trustedSynced = LyricsWithProvider(filtered, providerName)
                             trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
                             !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
@@ -169,7 +178,7 @@ constructor(
                 // Cancel any still-running lower-priority attempts.
                 attempts.forEach { it.cancel() }
 
-                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain ?: driftedSynced
+                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain
                 if (chosen == null) {
                     Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
                 } else {
@@ -338,6 +347,26 @@ constructor(
 
         currentLyricsJob?.join()
     }
+
+    /**
+     * Drop LRC timestamps but keep the line text — used when a synced timeline
+     * doesn't fit the edit that is actually playing. The text then scrolls with
+     * the plain-lyrics estimate instead of a wrong karaoke timeline.
+     */
+    private fun stripTimestamps(lyrics: String): String =
+        try {
+            LyricsUtils.parseLyrics(lyrics).joinToString("\n") { it.text }.trim()
+        } catch (e: Exception) {
+            ""
+        }
+
+    /** Last LRC timestamp in seconds, for diagnostics. */
+    private fun lastTimestampSec(lyrics: String): Long =
+        try {
+            LyricsUtils.parseLyrics(lyrics).maxOf { it.time } / 1000
+        } catch (e: Exception) {
+            -1
+        }
 
     /** True when the lyrics carry [mm:ss] timestamps (scrolling/karaoke capable). */
     private fun isSynced(lyrics: String): Boolean =

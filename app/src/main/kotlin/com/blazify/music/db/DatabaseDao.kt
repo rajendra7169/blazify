@@ -713,6 +713,9 @@ interface DatabaseDao {
     @Query("SELECT * FROM lyrics WHERE id = :id")
     fun lyrics(id: String?): Flow<LyricsEntity?>
 
+    @Query("SELECT * FROM lyrics")
+    fun allLyrics(): Flow<List<LyricsEntity>>
+
     @Query("DELETE FROM lyrics")
     fun clearAllLyrics()
 

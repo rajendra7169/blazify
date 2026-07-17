@@ -166,6 +166,8 @@ import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
 import com.blazify.music.constants.LyricsCacheCleanupV9Key
+import com.blazify.music.constants.LyricsDriftFixupV1Key
+import com.blazify.music.lyrics.LyricsUtils
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.db.MusicDatabase
@@ -875,6 +877,39 @@ class MusicService :
             if (!cleaned) {
                 database.query { clearAllLyrics() }
                 dataStore.edit { it[LyricsCacheCleanupV9Key] = true }
+            }
+        }
+
+        // One-time fixup: earlier builds stored SYNCED lyrics whose timeline
+        // doesn't fit the edit actually playing (video vs album cut) — the
+        // scroll runs visibly out of sync. Strip the timestamps in place so
+        // the (correct) text stays and scrolls by estimate instead. Surgical:
+        // only entries whose last timestamp falls outside the song's duration
+        // window are touched.
+        scope.launch(Dispatchers.IO) {
+            val fixed = dataStore.data.map { it[LyricsDriftFixupV1Key] ?: false }.first()
+            if (!fixed) {
+                runCatching {
+                    val entries = database.allLyrics().first()
+                    for (entity in entries) {
+                        if (entity.lyrics == LyricsEntity.LYRICS_NOT_FOUND) continue
+                        val parsed = runCatching { LyricsUtils.parseLyrics(entity.lyrics) }.getOrNull()
+                        if (parsed.isNullOrEmpty()) continue // plain — nothing to fix
+                        val durationSec = database.song(entity.id).first()?.song?.duration ?: continue
+                        if (durationSec <= 0) continue
+                        val lastMs = parsed.maxOf { it.time }
+                        val durationMs = durationSec * 1000L
+                        val fits = lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 15_000L
+                        if (!fits) {
+                            val plainText = parsed.joinToString("\n") { it.text }.trim()
+                            if (plainText.isNotBlank()) {
+                                database.query { upsert(entity.copy(lyrics = plainText)) }
+                                Timber.tag("MusicService").i("Drift fixup: stripped timestamps for ${entity.id} (last ts ${lastMs / 1000}s vs song ${durationSec}s)")
+                            }
+                        }
+                    }
+                }
+                dataStore.edit { it[LyricsDriftFixupV1Key] = true }
             }
         }
 
