@@ -128,19 +128,20 @@ constructor(
                     }
                 }
 
-                // Trust tiers: results from TRUSTED sources (exact-id or strict
-                // duration+title matching) always beat results from FUZZY keyword
-                // sources (KuGou/LyricsPlus), even when the trusted result is plain
-                // and the fuzzy one is synced — a correct plain lyric beats a wrong
-                // scrolling one. Within each tier, synced > plain.
-                //
-                // Among TRUSTED SYNCED results we don't just take the first: different
-                // sources are timed to different editions (Apple's full version vs a
-                // shorter YouTube cut), so we keep the one whose timeline best fits the
-                // edition actually playing. We stop early only once a near-perfect fit
-                // (≤15% off) is in hand — good enough, no need to wait for the rest.
-                var trustedSynced: LyricsWithProvider? = null
-                var trustedSyncedMisfit = Float.MAX_VALUE
+                // Selection, in order of importance:
+                //  1. RIGHT SONG. EXACT-ID sources (BetterLyrics/YouTube look up by the
+                //     video id that's actually playing) can't return a different song.
+                //     SEARCH sources (Paxsenix/LrcLib match by title+artist) can grab a
+                //     wrong same-named track — that's how "Tu Meri" got the wrong lyrics.
+                //     So an exact-id synced result beats a search synced one.
+                //  2. SYNCED over plain; TRUSTED over FUZZY (KuGou/LyricsPlus keyword).
+                //  3. Best TIMELINE FIT within a bucket (Apple's full edit vs a shorter
+                //     YouTube cut) — keep the closest match to the edition playing.
+                val lastExactIdIndex = enabledProviders.indexOfLast { it.name in EXACT_ID_PROVIDERS }
+                var exactIdSynced: LyricsWithProvider? = null
+                var exactIdSyncedMisfit = Float.MAX_VALUE
+                var searchSynced: LyricsWithProvider? = null
+                var searchSyncedMisfit = Float.MAX_VALUE
                 var trustedPlain: LyricsWithProvider? = null
                 var fuzzySynced: LyricsWithProvider? = null
                 var fuzzyPlain: LyricsWithProvider? = null
@@ -160,25 +161,34 @@ constructor(
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
                         val synced = isSynced(filtered)
                         val trusted = providerName in TRUSTED_PROVIDERS
+                        val exactId = providerName in EXACT_ID_PROVIDERS
                         val misfit = if (synced) timelineMisfit(filtered, mediaMetadata.duration) else Float.MAX_VALUE
-                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"}${if (synced && misfit < Float.MAX_VALUE) ", fit ${(100 - (misfit * 100).toInt())}%" else ""})")
+                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (exactId) "exact-id" else if (trusted) "trusted" else "fuzzy"}${if (synced && misfit < Float.MAX_VALUE) ", fit ${(100 - (misfit * 100).toInt())}%" else ""})")
                         when {
-                            trusted && synced -> if (misfit < trustedSyncedMisfit) {
-                                trustedSynced = LyricsWithProvider(filtered, providerName)
-                                trustedSyncedMisfit = misfit
+                            exactId && synced -> if (misfit < exactIdSyncedMisfit) {
+                                exactIdSynced = LyricsWithProvider(filtered, providerName)
+                                exactIdSyncedMisfit = misfit
+                            }
+                            trusted && synced -> if (misfit < searchSyncedMisfit) {
+                                searchSynced = LyricsWithProvider(filtered, providerName)
+                                searchSyncedMisfit = misfit
                             }
                             trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
                             !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
                             !trusted && !synced && fuzzyPlain == null -> fuzzyPlain = LyricsWithProvider(filtered, providerName)
                         }
-                        // A near-perfect trusted synced fit is the best possible outcome — stop.
-                        if (trustedSynced != null && trustedSyncedMisfit <= 0.15f) break
+                        // Best possible: an exact-id (guaranteed-right-song) synced with a
+                        // good fit — stop. Otherwise, once every exact-id source has been
+                        // awaited and we already have a trusted synced, stop (don't wait on
+                        // the fuzzy sources).
+                        if (exactIdSynced != null && exactIdSyncedMisfit <= 0.15f) break
+                        if ((exactIdSynced ?: searchSynced) != null && index >= lastExactIdIndex) break
                     }
                 }
                 // Cancel any still-running lower-priority attempts.
                 attempts.forEach { it.cancel() }
 
-                val chosen = trustedSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain
+                val chosen = exactIdSynced ?: searchSynced ?: trustedPlain ?: fuzzySynced ?: fuzzyPlain
                 if (chosen == null) {
                     Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
                 } else {
@@ -347,6 +357,11 @@ constructor(
         // results; LrcLib matches duration strictly). Everything else is fuzzy
         // keyword search and can return wrong-song lyrics (KuGou, LyricsPlus).
         private val TRUSTED_PROVIDERS = setOf("Paxsenix", "LrcLib", "BetterLyrics", "YouTube", "YouTubeSubtitle")
+
+        // Trusted sources that look the song up by the exact YouTube video id that's
+        // playing, so they CANNOT return a different same-named song. Preferred over
+        // the search-based trusted sources (Paxsenix/LrcLib) for song identity.
+        private val EXACT_ID_PROVIDERS = setOf("BetterLyrics", "YouTube", "YouTubeSubtitle")
     }
 }
 
