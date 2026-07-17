@@ -11,8 +11,12 @@ import android.os.Build
 import com.blazify.music.BuildConfig
 import com.blazify.music.ui.screens.CrashActivity
 import timber.log.Timber
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.system.exitProcess
 
 class CrashHandler private constructor(
@@ -26,7 +30,13 @@ class CrashHandler private constructor(
         try {
             val crashLog = buildCrashLog(throwable)
             Timber.e(throwable, "App crashed")
-            
+
+            // ALWAYS persist to disk FIRST: when the app crashes in the
+            // background (music playing, screen off) Android 10+ silently
+            // blocks the activity launch below and the process just dies —
+            // without this file those "random crashes" leave no trace at all.
+            persistCrashLog(crashLog)
+
             // Launch crash activity
             val intent = Intent(applicationContext, CrashActivity::class.java).apply {
                 putExtra(EXTRA_CRASH_LOG, crashLog)
@@ -41,6 +51,28 @@ class CrashHandler private constructor(
             // If we fail to handle the crash, fall back to default handler
             Timber.e(e, "Error handling crash")
             defaultHandler?.uncaughtException(thread, throwable)
+        }
+    }
+
+    /**
+     * Write the crash log to files the developer can actually retrieve later:
+     * the app's external files dir (visible over adb/USB at
+     * Android/data/com.blazify.music/files/crashlogs) with the internal files
+     * dir as fallback. Keeps the 5 most recent logs.
+     */
+    private fun persistCrashLog(crashLog: String) {
+        try {
+            val base = applicationContext.getExternalFilesDir(null) ?: applicationContext.filesDir
+            val dir = File(base, "crashlogs")
+            if (!dir.isDirectory) dir.mkdirs()
+            val stamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(Date())
+            File(dir, "crash_$stamp.txt").writeText(crashLog)
+            dir.listFiles()
+                ?.sortedByDescending { it.name }
+                ?.drop(5)
+                ?.forEach { it.delete() }
+        } catch (_: Exception) {
+            // Persisting must never make crash handling itself crash.
         }
     }
 
