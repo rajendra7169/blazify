@@ -55,10 +55,10 @@ sealed class LyricsListItem {
 }
 
 /**
- * Instrumental-break indicator — Blazify's own composition: the Blaze logo that
- * breathes and fills bottom-up with a white→accent gradient as the interlude
- * progresses (like the flame lighting up), with little music notes rising and
- * fading upward around it. Everything is in the dynamic theme colour.
+ * Instrumental-break indicator — Blazify's own composition: a large treble clef
+ * that breathes and fills with a white→accent gradient as the interlude
+ * progresses, with little music notes rising and fading upward around it.
+ * Everything is in the dynamic theme colour.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -116,9 +116,9 @@ internal fun IntervalIndicator(
     ) {
         FloatingNotes(color = color, t = t)
 
-        // Breathing logo, driven by a slow sine on the loop phase.
+        // Breathing clef, driven by a slow sine on the loop phase.
         val breathe = 1f + 0.06f * abs(sin(t * PI)).toFloat()
-        BlazeLogoFill(
+        TrebleClefFill(
             fill = animatedProgress,
             accent = color,
             scale = breathe,
@@ -126,16 +126,16 @@ internal fun IntervalIndicator(
     }
 }
 
-/** Blaze logo: dim base glyph, filled bottom-up with a white→accent gradient. */
+/** Treble clef: soft glow behind, dim base, filled bottom-up with a white→accent gradient. */
 @Composable
-private fun BlazeLogoFill(
+private fun TrebleClefFill(
     fill: Float,
     accent: Color,
     scale: Float,
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(60.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -143,27 +143,21 @@ private fun BlazeLogoFill(
     ) {
         // Dim base glyph.
         Icon(
-            painter = painterResource(R.drawable.blaze_logo_white),
+            painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
             tint = accent.copy(alpha = 0.26f),
             modifier = Modifier.fillMaxSize()
         )
         // Filled portion: white icon, recoloured with a vertical gradient, clipped to progress.
-        // The flame glyph's opaque pixels only span ~16%..77% of the PNG canvas
-        // (transparent padding below), so map the fill onto those bounds — otherwise
-        // nothing appears until ~25% progress and the fill looks like it starts late.
-        val glyphTopFrac = 0.16f
-        val glyphBottomFrac = 0.77f
         Icon(
-            painter = painterResource(R.drawable.blaze_logo_white),
+            painter = painterResource(R.drawable.treble_clef),
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithContent {
-                    val f = fill.coerceIn(0f, 1f)
-                    clipRect(top = size.height * (glyphBottomFrac - (glyphBottomFrac - glyphTopFrac) * f)) {
+                    clipRect(top = size.height * (1f - fill.coerceIn(0f, 1f))) {
                         this@drawWithContent.drawContent()
                         drawRect(
                             brush = Brush.verticalGradient(
