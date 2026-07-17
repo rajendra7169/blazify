@@ -174,87 +174,21 @@ constructor(
                 if (chosen == null) {
                     Timber.tag("LyricsHelper").w("No lyrics found after racing all providers")
                 } else {
-                    Timber.tag("LyricsHelper").i("Chose lyrics from ${chosen.provider}")
+                    // Diagnostic only: how well does the chosen synced timeline fit the
+                    // playing edit? A last timestamp far from the song length means the
+                    // lyrics are timed to a different recording and can't scroll in sync.
+                    val fitNote = if (isSynced(chosen.lyrics) && mediaMetadata.duration > 0) {
+                        val lastSec = runCatching { LyricsUtils.parseLyrics(chosen.lyrics).maxOf { it.time } / 1000 }.getOrDefault(-1)
+                        val pct = if (lastSec > 0) (lastSec * 100 / mediaMetadata.duration) else -1
+                        " [sync fit: last ${lastSec}s / song ${mediaMetadata.duration}s = ${pct}%]"
+                    } else ""
+                    Timber.tag("LyricsHelper").i("Chose lyrics from ${chosen.provider}$fitNote")
                 }
                 chosen ?: LyricsWithProvider(LYRICS_NOT_FOUND, PROVIDER_NONE)
             }
         }
 
         return result ?: LyricsWithProvider(LYRICS_NOT_FOUND, PROVIDER_NONE)
-    }
-
-    /**
-     * Best-effort SYNCED-only fetch, used to upgrade a song that is currently
-     * showing plain lyrics. Races only the TRUSTED providers like [getLyrics],
-     * but returns a result only when it actually carries timestamps AND its
-     * timeline plausibly fits the song — so a correct plain lyric is never
-     * replaced by a wrong scrolling one. Returns null when no trustworthy synced
-     * version exists (the plain lyrics then stay in place).
-     */
-    suspend fun getSyncedLyricsOrNull(mediaMetadata: MediaMetadata): LyricsWithProvider? {
-        val isNetworkAvailable = try {
-            networkConnectivity.isCurrentlyConnected()
-        } catch (e: Exception) {
-            true
-        }
-        if (!isNetworkAvailable) return null
-
-        return withTimeoutOrNull(MAX_LYRICS_FETCH_MS) {
-            val cleanedTitle = LyricsUtils.cleanTitleForSearch(mediaMetadata.title)
-            val syncedCapableProviders = context.dataStore.data
-                .map { preferences -> resolveLyricsProviders(preferences) }
-                .first()
-                .filter { it.isEnabled(context) && it.name in TRUSTED_PROVIDERS }
-                // LrcLib matches by title+artist+DURATION, so its timeline fits the
-                // edit that is actually playing — prefer it for upgrades. (Stable
-                // sort keeps the user's order for the rest.)
-                .sortedByDescending { it.name == "LrcLib" }
-
-            if (syncedCapableProviders.isEmpty()) return@withTimeoutOrNull null
-
-            Timber.tag("LyricsHelper").d("Synced-upgrade: racing ${syncedCapableProviders.size} trusted providers for: $cleanedTitle")
-
-            coroutineScope {
-                val attempts = syncedCapableProviders.map { provider ->
-                    async {
-                        try {
-                            withTimeoutOrNull(PER_PROVIDER_TIMEOUT_MS) {
-                                provider.getLyrics(
-                                    context,
-                                    mediaMetadata.id,
-                                    cleanedTitle,
-                                    mediaMetadata.artists.joinToString { it.name },
-                                    mediaMetadata.duration,
-                                    mediaMetadata.album?.title,
-                                )
-                            }
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                }
-
-                // Take the highest-priority provider that returns a real, plausible
-                // synced result.
-                var best: LyricsWithProvider? = null
-                for ((index, attempt) in attempts.withIndex()) {
-                    val providerName = syncedCapableProviders[index].name
-                    val providerResult = attempt.await()
-                    if (providerResult != null && providerResult.isSuccess) {
-                        val filtered = LyricsUtils.filterLyricsCreditLines(providerResult.getOrNull()!!)
-                        if (isSynced(filtered) && isPlausible(filtered, mediaMetadata.duration)) {
-                            Timber.tag("LyricsHelper").i("Synced-upgrade: found synced lyrics from $providerName")
-                            best = LyricsWithProvider(filtered, providerName)
-                            break
-                        }
-                    }
-                }
-                attempts.forEach { it.cancel() }
-                best
-            }
-        }
     }
 
     suspend fun getAllLyrics(

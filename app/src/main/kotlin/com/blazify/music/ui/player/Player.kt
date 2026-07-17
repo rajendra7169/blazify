@@ -2448,50 +2448,6 @@ fun InlineLyricsView(
         }
     }
 
-    // Auto-upgrade to synced: when the current song ends up with PLAIN lyrics, quietly
-    // hunt the trusted providers for a real timestamped (LRC) version and swap it in when
-    // found. Plain lyrics can only be scrolled by estimate; synced ones track the vocals
-    // exactly. One attempt per song, only while the lyrics pane is open and in foreground.
-    var syncedUpgradeAttemptedFor by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(mediaMetadata?.id, currentLyrics, showLyrics, appInForeground) {
-        if (!showLyrics || !appInForeground) return@LaunchedEffect
-        val meta = mediaMetadata ?: return@LaunchedEffect
-        val entity = currentLyrics ?: return@LaunchedEffect
-        if (entity.id != meta.id) return@LaunchedEffect
-        if (entity.lyrics == LyricsEntity.LYRICS_NOT_FOUND) return@LaunchedEffect
-        if (lyricsTextLooksSynced(entity.lyrics)) return@LaunchedEffect // already synced
-        if (syncedUpgradeAttemptedFor == meta.id) return@LaunchedEffect  // one attempt per song
-
-        // Need a real duration for the plausibility check; fall back to the player.
-        val resolvedDuration =
-            if (meta.duration > 0) {
-                meta.duration
-            } else {
-                val playerMs = playerConnection.player.duration
-                if (playerMs != C.TIME_UNSET && playerMs > 0) (playerMs / 1000).toInt() else -1
-            }
-        if (resolvedDuration <= 0) return@LaunchedEffect
-        syncedUpgradeAttemptedFor = meta.id
-        val resolvedMeta = meta.copy(duration = resolvedDuration)
-        delay(600) // let the first render settle; don't compete with the initial fetch
-        if (!isActive) return@LaunchedEffect
-        withContext(Dispatchers.IO) {
-            try {
-                val entryPoint =
-                    EntryPointAccessors.fromApplication(
-                        context.applicationContext,
-                        com.blazify.music.di.LyricsHelperEntryPoint::class.java,
-                    )
-                val synced = entryPoint.lyricsHelper().getSyncedLyricsOrNull(resolvedMeta)
-                    ?: return@withContext
-                database.query {
-                    upsert(LyricsEntity(resolvedMeta.id, synced.lyrics, synced.provider))
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
-
     Box(
         modifier =
             Modifier
