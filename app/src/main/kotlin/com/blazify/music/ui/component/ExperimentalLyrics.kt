@@ -122,6 +122,7 @@ import com.blazify.music.ui.utils.fadingEdge
 import com.blazify.music.utils.ComposeToImage
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.viewmodels.LyricsMenuViewModel
 import com.blazify.music.viewmodels.LyricsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -330,6 +331,11 @@ fun ExperimentalLyrics(
     var showMaxSelectionToast by remember { mutableStateOf(false) }
     val isLyricsProviderShown = lyricsEntity != null && lyricsEntity.provider != "Unknown" && lyricsEntity.provider != "Manual" && !isSelectionModeActive
     var isAutoScrollEnabled by rememberSaveable { mutableStateOf(true) }
+
+    // Source/language switcher: pick another source's version (often a different
+    // language/script) for the current song, right from the lyrics screen.
+    val lyricsMenuViewModel: LyricsMenuViewModel = hiltViewModel()
+    var showSourcePicker by remember(mediaMetadata?.id) { mutableStateOf(false) }
 
     BackHandler(enabled = isSelectionModeActive) {
         isSelectionModeActive = false
@@ -872,6 +878,34 @@ fun ExperimentalLyrics(
                 }
                 isSelectionModeActive = false; selectedIndices.clear()
             }
+        )
+
+        // Language / source switcher pill — top-centre of the lyrics pane.
+        if (!isSelectionModeActive && !isGuest && lyrics != null && lyrics != LYRICS_NOT_FOUND && mediaMetadata != null) {
+            LyricsLanguageButton(
+                onClick = { showSourcePicker = true },
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp),
+            )
+        }
+    }
+
+    val pickerMetadata = mediaMetadata
+    if (showSourcePicker && pickerMetadata != null) {
+        LyricsSourceLanguageDialog(
+            mediaMetadata = pickerMetadata,
+            currentProvider = lyricsEntity?.provider,
+            viewModel = lyricsMenuViewModel,
+            onPick = { result ->
+                database.query {
+                    upsert(
+                        com.blazify.music.db.entities.LyricsEntity(
+                            pickerMetadata.id, result.lyrics, result.providerName,
+                        ),
+                    )
+                }
+                showSourcePicker = false
+            },
+            onDismiss = { showSourcePicker = false },
         )
     }
 

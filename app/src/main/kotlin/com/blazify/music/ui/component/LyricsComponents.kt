@@ -23,15 +23,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,11 +47,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,8 +74,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.blazify.music.lyrics.LyricsResult
+import com.blazify.music.ui.menu.detectLyricsScript
+import com.blazify.music.viewmodels.LyricsMenuViewModel
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import coil3.ImageLoader
@@ -216,6 +229,162 @@ internal fun LyricsActionOverlay(
                     Icon(painterResource(R.drawable.share), stringResource(R.string.share_selected), Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.share))
+                }
+            }
+        }
+    }
+}
+
+/** Small pill on the lyrics screen that opens the source/language picker. */
+@Composable
+internal fun LyricsLanguageButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+    ) {
+        Icon(painterResource(R.drawable.translate), null, Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(stringResource(R.string.lyrics_language))
+    }
+}
+
+/**
+ * Picker that lists the current song's lyrics from every source at once, each row
+ * tagged with its language/script and whether it's synced, so the user can switch
+ * to the version (and language) they want in one tap — no digging in menus.
+ */
+@Composable
+internal fun LyricsSourceLanguageDialog(
+    mediaMetadata: MediaMetadata,
+    currentProvider: String?,
+    viewModel: LyricsMenuViewModel,
+    onPick: (LyricsResult) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val results by viewModel.results.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    var expandedIndex by remember { mutableIntStateOf(-1) }
+
+    LaunchedEffect(mediaMetadata.id) {
+        viewModel.results.value = emptyList()
+        viewModel.search(
+            mediaMetadata.id,
+            mediaMetadata.title,
+            mediaMetadata.artists.joinToString { it.name },
+            mediaMetadata.duration,
+            mediaMetadata.album?.title,
+        )
+    }
+
+    Dialog(onDismissRequest = { viewModel.cancelSearch(); onDismiss() }) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        ) {
+            Column(Modifier.padding(vertical = 16.dp)) {
+                Text(
+                    text = stringResource(R.string.lyrics_choose_source),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+                Text(
+                    text = stringResource(R.string.lyrics_choose_source_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 2.dp),
+                )
+                Spacer(Modifier.height(8.dp))
+                LazyColumn(modifier = Modifier.heightIn(max = 420.dp)) {
+                    itemsIndexed(results) { index, result ->
+                        val isCurrent = result.providerName == currentProvider
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { viewModel.cancelSearch(); onPick(result) }
+                                .padding(horizontal = 20.dp, vertical = 10.dp),
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = result.lyrics.replace(Regex("\\[[^\\]]*]"), "").trim(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = if (index == expandedIndex) Int.MAX_VALUE else 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(bottom = 4.dp),
+                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = result.providerName,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        maxLines = 1,
+                                    )
+                                    detectLyricsScript(result.lyrics)?.let { script ->
+                                        Text(
+                                            text = script,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            maxLines = 1,
+                                            modifier = Modifier
+                                                .padding(start = 6.dp)
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                                .padding(horizontal = 6.dp, vertical = 1.dp),
+                                        )
+                                    }
+                                    if (result.lyrics.startsWith("[")) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.sync),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.padding(start = 4.dp).size(16.dp),
+                                        )
+                                    }
+                                    if (isCurrent) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.check),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.padding(start = 4.dp).size(16.dp),
+                                        )
+                                    }
+                                }
+                            }
+                            IconButton(onClick = { expandedIndex = if (expandedIndex == index) -1 else index }) {
+                                Icon(
+                                    painter = painterResource(if (index == expandedIndex) R.drawable.expand_less else R.drawable.expand_more),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                    if (isLoading) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                BlazeLoader()
+                            }
+                        }
+                    }
+                    if (!isLoading && results.isEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(R.string.lyrics_not_found),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                            )
+                        }
+                    }
+                }
+                TextButton(
+                    onClick = { viewModel.cancelSearch(); onDismiss() },
+                    modifier = Modifier.align(Alignment.End).padding(end = 12.dp),
+                ) {
+                    Text(stringResource(android.R.string.cancel))
                 }
             }
         }
