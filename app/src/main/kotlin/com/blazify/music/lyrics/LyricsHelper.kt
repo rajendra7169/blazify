@@ -129,13 +129,13 @@ constructor(
                 }
 
                 // Trust tiers: results from TRUSTED sources (exact-id or strict
-                // duration+title matching) beat results from FUZZY keyword sources
-                // (KuGou/LyricsPlus). Within each tier, synced > plain — but a synced
-                // timeline must PLAUSIBLY fit this song to stay synced: a trusted
-                // result whose timestamps don't fit is a different EDIT of the right
-                // song (video vs album cut) and scrolls visibly out of sync — the
-                // singer sings while the interlude logo fills. Its TEXT is still
-                // trustworthy, so keep it with the timestamps STRIPPED (plain).
+                // duration+title matching) always beat results from FUZZY keyword
+                // sources (KuGou/LyricsPlus), even when the trusted result is plain
+                // and the fuzzy one is synced — a correct plain lyric beats a wrong
+                // scrolling one. Within each tier, synced > plain. A trusted synced
+                // timeline that's a little off (video vs album cut) is STILL kept
+                // synced: a real timeline that roughly follows the song beats a blind
+                // time-estimate, so we never strip a trusted timeline here.
                 var trustedSynced: LyricsWithProvider? = null
                 var trustedPlain: LyricsWithProvider? = null
                 var fuzzySynced: LyricsWithProvider? = null
@@ -145,27 +145,19 @@ constructor(
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
                         val raw = providerResult.getOrNull()!!
-                        val plausible = isPlausible(raw, mediaMetadata.duration)
-                        if (providerName !in TRUSTED_PROVIDERS && !plausible) {
-                            // Implausible FUZZY results are wrong-song matches — drop.
+                        // Reject only FUZZY results whose timeline doesn't fit — that's
+                        // the signature of a wrong-song keyword match. Trusted sources
+                        // matched by id / strict search, so a timeline mismatch there is
+                        // just a different edit of the right song — keep it.
+                        if (providerName !in TRUSTED_PROVIDERS && !isPlausible(raw, mediaMetadata.duration)) {
                             Timber.tag("LyricsHelper").w("$providerName returned implausible lyrics (timeline/duration mismatch) — skipping")
                             continue
                         }
                         val filtered = LyricsUtils.filterLyricsCreditLines(raw)
                         val synced = isSynced(filtered)
                         val trusted = providerName in TRUSTED_PROVIDERS
-                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"}${if (synced && !plausible) ", DRIFTED timeline" else ""})")
+                        Timber.tag("LyricsHelper").i("Got ${if (synced) "SYNCED" else "plain"} lyrics from $providerName (${if (trusted) "trusted" else "fuzzy"})")
                         when {
-                            trusted && synced && !plausible -> {
-                                // Right song, wrong edit: demote to plain text.
-                                Timber.tag("LyricsHelper").w(
-                                    "$providerName timeline doesn't fit (last ts ${lastTimestampSec(filtered)}s vs song ${mediaMetadata.duration}s) — keeping text as PLAIN"
-                                )
-                                val plainText = stripTimestamps(filtered)
-                                if (plainText.isNotBlank() && trustedPlain == null) {
-                                    trustedPlain = LyricsWithProvider(plainText, providerName)
-                                }
-                            }
                             trusted && synced && trustedSynced == null -> trustedSynced = LyricsWithProvider(filtered, providerName)
                             trusted && !synced && trustedPlain == null -> trustedPlain = LyricsWithProvider(filtered, providerName)
                             !trusted && synced && fuzzySynced == null -> fuzzySynced = LyricsWithProvider(filtered, providerName)
@@ -252,7 +244,7 @@ constructor(
                     val providerResult = attempt.await()
                     if (providerResult != null && providerResult.isSuccess) {
                         val filtered = LyricsUtils.filterLyricsCreditLines(providerResult.getOrNull()!!)
-                        if (isSynced(filtered) && fitsTimelineTightly(filtered, mediaMetadata.duration)) {
+                        if (isSynced(filtered) && isPlausible(filtered, mediaMetadata.duration)) {
                             Timber.tag("LyricsHelper").i("Synced-upgrade: found synced lyrics from $providerName")
                             best = LyricsWithProvider(filtered, providerName)
                             break
@@ -348,26 +340,6 @@ constructor(
         currentLyricsJob?.join()
     }
 
-    /**
-     * Drop LRC timestamps but keep the line text — used when a synced timeline
-     * doesn't fit the edit that is actually playing. The text then scrolls with
-     * the plain-lyrics estimate instead of a wrong karaoke timeline.
-     */
-    private fun stripTimestamps(lyrics: String): String =
-        try {
-            LyricsUtils.parseLyrics(lyrics).joinToString("\n") { it.text }.trim()
-        } catch (e: Exception) {
-            ""
-        }
-
-    /** Last LRC timestamp in seconds, for diagnostics. */
-    private fun lastTimestampSec(lyrics: String): Long =
-        try {
-            LyricsUtils.parseLyrics(lyrics).maxOf { it.time } / 1000
-        } catch (e: Exception) {
-            -1
-        }
-
     /** True when the lyrics carry [mm:ss] timestamps (scrolling/karaoke capable). */
     private fun isSynced(lyrics: String): Boolean =
         try {
@@ -394,25 +366,6 @@ constructor(
         val lastMs = entries.maxOf { it.time }
         val durationMs = durationSec * 1000L
         return lastMs >= (durationMs * 0.4).toLong() && lastMs <= durationMs + 15_000L
-    }
-
-    /**
-     * Stricter timeline check used ONLY for the synced-upgrade path: an upgrade
-     * REPLACES already-correct plain lyrics, so the candidate's last timestamp
-     * must land close to the end of what is actually playing (60% .. +10s).
-     * A drifting upgrade would be a downgrade.
-     */
-    private fun fitsTimelineTightly(lyrics: String, durationSec: Int): Boolean {
-        if (durationSec <= 0) return false
-        val entries = try {
-            LyricsUtils.parseLyrics(lyrics)
-        } catch (e: Exception) {
-            return false
-        }
-        if (entries.isEmpty()) return false
-        val lastMs = entries.maxOf { it.time }
-        val durationMs = durationSec * 1000L
-        return lastMs >= (durationMs * 0.6).toLong() && lastMs <= durationMs + 10_000L
     }
 
     private fun resolveLyricsProviders(preferences: androidx.datastore.preferences.core.Preferences): List<LyricsProvider> {
