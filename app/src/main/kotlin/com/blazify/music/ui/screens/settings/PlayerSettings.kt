@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -419,6 +420,7 @@ fun PlayerSettings(
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.volume_up),
                     title = { Text(stringResource(R.string.audio_normalization)) },
+                    description = { Text(stringResource(R.string.audio_normalization_desc)) },
                     trailingContent = {
                         Switch(
                             checked = audioNormalization,
@@ -657,6 +659,7 @@ fun PlayerSettings(
                     )
                 )
 
+                    // A link row (not a switch): tapping opens the schedule dialog.
                     add(
                         Material3SettingsItem(
                             icon = painterResource(R.drawable.baseline_event_repeat_24),
@@ -667,18 +670,10 @@ fun PlayerSettings(
                                 )
                             },
                             trailingContent = {
-                                Switch(
-                                    checked = sleepTimerEnabled,
-                                    onCheckedChange = {showSleepTimerDialog = true},
-                                    thumbContent = {
-                                        Icon(
-                                            painter = painterResource(
-                                                id = if (sleepTimerEnabled) R.drawable.check else R.drawable.close
-                                            ),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SwitchDefaults.IconSize)
-                                        )
-                                    }
+                                Icon(
+                                    painter = painterResource(R.drawable.navigate_next),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
                             onClick = { showSleepTimerDialog = true }
@@ -1009,6 +1004,7 @@ fun PlayerSettings(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.clear_all),
                     title = { Text(stringResource(R.string.stop_music_on_task_clear)) },
+                    description = { Text(stringResource(R.string.stop_music_on_task_clear_desc)) },
                     trailingContent = {
                         Switch(
                             checked = stopMusicOnTaskClear,
@@ -1029,6 +1025,7 @@ fun PlayerSettings(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.volume_off_pause),
                     title = { Text(stringResource(R.string.pause_music_when_media_is_muted)) },
+                    description = { Text(stringResource(R.string.pause_on_mute_desc)) },
                     trailingContent = {
                         Switch(
                             checked = pauseOnMute,
@@ -1049,6 +1046,7 @@ fun PlayerSettings(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.bluetooth),
                     title = { Text(stringResource(R.string.resume_on_bluetooth_connect)) },
+                    description = { Text(stringResource(R.string.resume_on_bluetooth_desc)) },
                     trailingContent = {
                         Switch(
                             checked = resumeOnBluetoothConnect,
@@ -1069,6 +1067,7 @@ fun PlayerSettings(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.screenshot),
                     title = { Text(stringResource(R.string.keep_screen_on_when_player_is_expanded)) },
+                    description = { Text(stringResource(R.string.keep_screen_on_desc)) },
                     trailingContent = {
                         Switch(
                             checked = keepScreenOn,

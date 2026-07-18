@@ -150,7 +150,7 @@ fun RomanizationSettings(
         Spacer(modifier = Modifier.height(8.dp))
 
         checkboxesList += Material3SettingsItem(
-            title = { Text("Play all") },
+            title = { Text(stringResource(R.string.romanize_select_all)) },
             trailingContent = {
                 TriStateCheckbox(
                     state = parentState,
@@ -183,7 +183,7 @@ fun RomanizationSettings(
         }
 
         Material3SettingsGroup(
-            title = stringResource(R.string.content_language),
+            title = stringResource(R.string.romanize_languages_title),
             items = checkboxesList
         )
     }

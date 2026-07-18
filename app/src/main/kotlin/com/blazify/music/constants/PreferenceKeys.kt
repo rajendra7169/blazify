@@ -241,7 +241,8 @@ val AddToPlaylistSortDescendingKey = booleanPreferencesKey("addToPlaylistSortDes
 val ArtistSongSortTypeKey = stringPreferencesKey("artistSongSortType")
 val ArtistSongSortDescendingKey = booleanPreferencesKey("artistSongSortDescending")
 val MixSortTypeKey = stringPreferencesKey("mixSortType")
-val MixSortDescendingKey = booleanPreferencesKey("albumSortDescending")
+// Was accidentally "albumSortDescending", clobbering the album sort state.
+val MixSortDescendingKey = booleanPreferencesKey("mixSortDescending")
 
 val SongFilterKey = stringPreferencesKey("songFilter")
 val ArtistFilterKey = stringPreferencesKey("artistFilter")

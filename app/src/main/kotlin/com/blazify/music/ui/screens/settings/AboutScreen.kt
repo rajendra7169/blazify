@@ -189,9 +189,9 @@ fun AboutScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    SocialButton(Modifier.weight(1f), R.drawable.language) { uriHandler.openUri(WEBSITE_URL) }
-                    SocialButton(Modifier.weight(1f), R.drawable.github) { uriHandler.openUri(GITHUB_URL) }
-                    SocialButton(Modifier.weight(1f), R.drawable.instagram) { uriHandler.openUri(INSTAGRAM_URL) }
+                    SocialButton(Modifier.weight(1f), R.drawable.language, stringResource(R.string.social_website)) { uriHandler.openUri(WEBSITE_URL) }
+                    SocialButton(Modifier.weight(1f), R.drawable.github, stringResource(R.string.social_github)) { uriHandler.openUri(GITHUB_URL) }
+                    SocialButton(Modifier.weight(1f), R.drawable.instagram, stringResource(R.string.social_instagram)) { uriHandler.openUri(INSTAGRAM_URL) }
                 }
 
                 Spacer(Modifier.height(20.dp))
@@ -283,12 +283,12 @@ private fun HeroChip(text: String, ink: Color = Color.White) {
 }
 
 @Composable
-private fun SocialButton(modifier: Modifier = Modifier, iconRes: Int, onClick: () -> Unit) {
+private fun SocialButton(modifier: Modifier = Modifier, iconRes: Int, contentDescription: String? = null, onClick: () -> Unit) {
     FilledTonalButton(
         onClick = onClick,
         modifier = modifier.height(48.dp),
     ) {
-        Icon(painterResource(iconRes), contentDescription = null)
+        Icon(painterResource(iconRes), contentDescription = contentDescription)
     }
 }
 
