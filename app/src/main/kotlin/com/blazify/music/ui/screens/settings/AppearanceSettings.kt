@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.blazify.music.ui.player.MiniPlayerDesign
 import com.blazify.music.constants.MiniPlayerDesignKey
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.fillMaxSize
 import com.blazify.music.LocalPlayerConnection
@@ -1989,21 +1990,14 @@ private fun MiniPlayerDesignPicker(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(12.dp))
-        MiniPlayerDesign.entries.chunked(2).forEach { rowDesigns ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+        // One design per full-width row.
+        MiniPlayerDesign.entries.forEach { d ->
+            MiniPlayerDesignCard(
+                design = d,
+                selected = d == selected,
+                onClick = { onSelect(d) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-            ) {
-                rowDesigns.forEach { d ->
-                    MiniPlayerDesignCard(
-                        design = d,
-                        selected = d == selected,
-                        onClick = { onSelect(d) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                if (rowDesigns.size == 1) Spacer(Modifier.weight(1f))
-            }
+            )
         }
     }
 }
@@ -2068,8 +2062,12 @@ private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
     val pc = LocalPlayerConnection.current
     val meta by (pc?.mediaMetadata ?: remember { MutableStateFlow<MediaMetadata?>(null) }).collectAsState()
     val gradient = rememberMiniPreviewGradient(meta?.thumbnailUrl)
-    val onColor = Color.White
-    val fallbackArt = MaterialTheme.colorScheme.primary
+    val cs = MaterialTheme.colorScheme
+    // Reflect the chosen mini-player background style in the preview.
+    val bgStyle by rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
+    val lightText = bgStyle == MiniPlayerBackgroundStyle.GRADIENT || bgStyle == MiniPlayerBackgroundStyle.BLUR
+    val onColor = if (lightText) Color.White else cs.onSurface
+    val fallbackArt = cs.primary
 
     val barShape = when (design) {
         MiniPlayerDesign.FLAT -> RoundedCornerShape(6.dp)
@@ -2079,24 +2077,38 @@ private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
     val artShape =
         if (design == MiniPlayerDesign.FLAT || design == MiniPlayerDesign.FLOATING) RoundedCornerShape(6.dp) else CircleShape
 
+    val baseBg =
+        if (bgStyle == MiniPlayerBackgroundStyle.GRADIENT && gradient.size >= 2) {
+            Modifier.background(Brush.horizontalGradient(gradient))
+        } else {
+            Modifier.background(cs.surfaceContainerHighest)
+        }
+
     Box(
         modifier = Modifier
             .fillMaxWidth(if (design == MiniPlayerDesign.FLOATING) 0.9f else 1f)
             .then(if (design == MiniPlayerDesign.FLOATING) Modifier.shadow(6.dp, barShape, clip = false) else Modifier)
             .height(46.dp)
             .clip(barShape)
-            .then(
-                if (gradient.size >= 2) {
-                    Modifier.background(Brush.horizontalGradient(gradient))
-                } else {
-                    Modifier.background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                },
-            ),
+            .then(baseBg),
         contentAlignment = Alignment.CenterStart,
     ) {
-        // Subtle dark scrim for text contrast, matching the real mini-player.
-        if (gradient.size >= 2) {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)))
+        when (bgStyle) {
+            MiniPlayerBackgroundStyle.BLUR -> {
+                meta?.thumbnailUrl?.let { url ->
+                    AsyncImage(
+                        model = url,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().blur(16.dp),
+                    )
+                    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
+                }
+            }
+            MiniPlayerBackgroundStyle.GRADIENT -> {
+                if (gradient.size >= 2) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)))
+            }
+            else -> {}
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,

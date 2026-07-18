@@ -216,7 +216,7 @@ fun PortraitThemeLayout(
                 .padding(vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.96f)) {
+            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.82f)) {
                 ThemePhonePreview(
                     darkMode = darkMode,
                     pureBlack = pureBlack,
