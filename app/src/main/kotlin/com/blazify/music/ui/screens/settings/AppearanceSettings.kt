@@ -20,6 +20,24 @@ import androidx.compose.ui.text.font.FontWeight
 import com.blazify.music.ui.player.MiniPlayerDesign
 import com.blazify.music.constants.MiniPlayerDesignKey
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.fillMaxSize
+import com.blazify.music.LocalPlayerConnection
+import com.blazify.music.models.MediaMetadata
+import com.blazify.music.ui.theme.PlayerColorExtractor
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
+import androidx.palette.graphics.Palette
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
@@ -2000,10 +2018,11 @@ private fun MiniPlayerDesignCard(
                 .fillMaxWidth()
                 .height(58.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
-            MiniPlayerMock(design)
+            MiniPlayerDesignPreview(design)
         }
         Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -2026,63 +2045,143 @@ private fun MiniPlayerDesignCard(
     }
 }
 
-/** Tiny static mock of each mini-player design for the picker card (non-interactive). */
+/**
+ * Compact but REAL preview of a mini-player design for the picker card: the
+ * currently-playing song's art, title and artist over the album-art gradient,
+ * with each design's real control icons. Non-interactive (the card selects).
+ */
 @Composable
-private fun MiniPlayerMock(design: MiniPlayerDesign) {
-    val art = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
-    val line = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
-    val faint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.28f)
-    val barBg = MaterialTheme.colorScheme.surfaceContainerHighest
-    val artShape =
-        if (design == MiniPlayerDesign.FLAT || design == MiniPlayerDesign.FLOATING) RoundedCornerShape(5.dp) else CircleShape
+private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
+    val pc = LocalPlayerConnection.current
+    val meta by (pc?.mediaMetadata ?: remember { MutableStateFlow<MediaMetadata?>(null) }).collectAsState()
+    val gradient = rememberMiniPreviewGradient(meta?.thumbnailUrl)
+    val onColor = Color.White
+    val fallbackArt = MaterialTheme.colorScheme.primary
+
     val barShape = when (design) {
-        MiniPlayerDesign.FLAT -> RoundedCornerShape(4.dp)
-        MiniPlayerDesign.FLOATING -> RoundedCornerShape(8.dp)
+        MiniPlayerDesign.FLAT -> RoundedCornerShape(6.dp)
+        MiniPlayerDesign.FLOATING -> RoundedCornerShape(12.dp)
         else -> RoundedCornerShape(50)
     }
+    val artShape =
+        if (design == MiniPlayerDesign.FLAT || design == MiniPlayerDesign.FLOATING) RoundedCornerShape(6.dp) else CircleShape
+
     Box(
         modifier = Modifier
-            .fillMaxWidth(if (design == MiniPlayerDesign.FLOATING) 0.84f else 0.94f)
-            .then(if (design == MiniPlayerDesign.FLOATING) Modifier.shadow(4.dp, barShape, clip = false) else Modifier)
-            .height(30.dp)
+            .fillMaxWidth(if (design == MiniPlayerDesign.FLOATING) 0.9f else 1f)
+            .then(if (design == MiniPlayerDesign.FLOATING) Modifier.shadow(6.dp, barShape, clip = false) else Modifier)
+            .height(46.dp)
             .clip(barShape)
-            .background(barBg),
+            .then(
+                if (gradient.size >= 2) {
+                    Modifier.background(Brush.horizontalGradient(gradient))
+                } else {
+                    Modifier.background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                },
+            ),
         contentAlignment = Alignment.CenterStart,
     ) {
+        // Subtle dark scrim for text contrast, matching the real mini-player.
+        if (gradient.size >= 2) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)))
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 7.dp),
         ) {
-            Box(Modifier.size(20.dp).clip(artShape).background(art))
-            Spacer(Modifier.width(6.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Box(Modifier.fillMaxWidth(0.8f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(line))
-                Box(Modifier.fillMaxWidth(0.5f).height(3.dp).clip(RoundedCornerShape(2.dp)).background(faint))
+            Box(Modifier.size(32.dp).clip(artShape)) {
+                val url = meta?.thumbnailUrl
+                if (url != null) {
+                    AsyncImage(
+                        model = url,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize().background(fallbackArt))
+                }
             }
-            Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.width(8.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = meta?.title ?: "Song title",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = onColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() }
+                        ?: stringResource(R.string.unknown),
+                    fontSize = 8.sp,
+                    color = onColor.copy(alpha = 0.75f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Spacer(Modifier.width(6.dp))
             when (design) {
                 MiniPlayerDesign.ROUNDED -> {
-                    MockGlyph(R.drawable.skip_previous, line)
+                    MockGlyph(R.drawable.skip_previous, onColor, 12)
                     Spacer(Modifier.width(2.dp))
                     Box(
-                        Modifier.size(16.dp).clip(CircleShape).background(art),
+                        Modifier.size(18.dp).clip(CircleShape).background(onColor.copy(alpha = 0.92f)),
                         contentAlignment = Alignment.Center,
-                    ) { MockGlyph(R.drawable.play, MaterialTheme.colorScheme.onPrimary, 10) }
+                    ) { MockGlyph(R.drawable.play, Color.Black, 11) }
                     Spacer(Modifier.width(2.dp))
-                    MockGlyph(R.drawable.skip_next, line)
+                    MockGlyph(R.drawable.skip_next, onColor, 12)
                 }
-                MiniPlayerDesign.FLAT -> {}
+                MiniPlayerDesign.FLAT -> {
+                    MockGlyph(R.drawable.favorite_border, onColor, 13)
+                }
                 else -> {
-                    Box(Modifier.size(5.dp).clip(CircleShape).background(faint))
-                    Spacer(Modifier.width(4.dp))
-                    Box(Modifier.size(5.dp).clip(CircleShape).background(faint))
+                    MockGlyph(R.drawable.playlist_add, onColor.copy(alpha = 0.9f), 13)
+                    Spacer(Modifier.width(6.dp))
+                    MockGlyph(R.drawable.favorite_border, onColor.copy(alpha = 0.9f), 13)
                 }
             }
         }
         if (design == MiniPlayerDesign.FLAT) {
-            Box(Modifier.align(Alignment.TopStart).fillMaxWidth(0.4f).height(2.dp).background(art))
+            // Flat design shows a thin progress bar along the top edge.
+            Box(
+                Modifier
+                    .align(Alignment.TopStart)
+                    .fillMaxWidth(0.42f)
+                    .height(2.dp)
+                    .background(onColor),
+            )
         }
     }
+}
+
+/** Album-art horizontal gradient for the mini-player preview (same extractor as the real one). */
+@Composable
+private fun rememberMiniPreviewGradient(url: String?): List<Color> {
+    val context = LocalContext.current
+    val fallback = MaterialTheme.colorScheme.surfaceContainer.toArgb()
+    var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
+    LaunchedEffect(url) {
+        if (url == null) {
+            colors = emptyList()
+            return@LaunchedEffect
+        }
+        withContext(Dispatchers.IO) {
+            val request = ImageRequest.Builder(context)
+                .data(url)
+                .size(100, 100)
+                .allowHardware(false)
+                .build()
+            val bitmap = runCatching { context.imageLoader.execute(request) }.getOrNull()?.image?.toBitmap()
+            if (bitmap != null) {
+                val palette = Palette.from(bitmap).maximumColorCount(8).resizeBitmapArea(100 * 100).generate()
+                val extracted = PlayerColorExtractor.extractGradientColors(palette = palette, fallbackColor = fallback)
+                withContext(Dispatchers.Main) { colors = extracted }
+            }
+        }
+    }
+    return colors
 }
 
 @Composable
