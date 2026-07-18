@@ -83,9 +83,13 @@ import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
+import com.blazify.music.constants.DefaultOpenTabKey
+import com.blazify.music.constants.GridItemSize
+import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.ui.player.MiniPlayerDesign
 import com.blazify.music.constants.DynamicThemeKey
@@ -752,6 +756,10 @@ internal fun ThemePhonePreview(
         }
     }
     val (miniBgStyle) = rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
+    // Reflect the home-layout settings too, so the preview updates when they change.
+    val (defaultTab) = rememberEnumPreference(DefaultOpenTabKey, NavigationTab.HOME)
+    val (gridSize) = rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
+    val (slimNav) = rememberPreference(SlimNavBarKey, defaultValue = false)
     BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
         val cs = MaterialTheme.colorScheme
         Column(
@@ -807,11 +815,13 @@ internal fun ThemePhonePreview(
             // Section title.
             Box(Modifier.fillMaxWidth(0.42f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(cs.onSurface.copy(alpha = 0.8f)))
             Spacer(Modifier.height(7.dp))
-            // Card rail using the theme container colours.
+            // Card rail — density reflects the grid cell size (Big = 2, Small = 3).
+            val containers = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
+            val railCount = if (gridSize == GridItemSize.BIG) 2 else 3
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
-                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.secondaryContainer))
-                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.tertiaryContainer))
-                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.primaryContainer))
+                repeat(railCount) { i ->
+                    Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(containers[i % containers.size]))
+                }
             }
             Spacer(Modifier.weight(1f))
             // Mini-player — shape + background reflect the selected design/style.
@@ -865,11 +875,30 @@ internal fun ThemePhonePreview(
                     }
                 }
             }
-            Spacer(Modifier.height(9.dp))
-            // Bottom nav (first tab uses the theme colour).
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                repeat(4) { i ->
-                    Box(Modifier.size(10.dp).clip(CircleShape).background(if (i == 0) cs.primary else cs.onSurfaceVariant.copy(alpha = 0.5f)))
+            Spacer(Modifier.height(if (slimNav) 7.dp else 9.dp))
+            // Bottom nav — real tab icons; the default-open tab is highlighted; slim
+            // hides the labels and tightens the row.
+            val navItems = listOf(
+                NavigationTab.HOME to R.drawable.home_filled,
+                NavigationTab.SEARCH to R.drawable.search,
+                null to R.drawable.grid_view,
+                NavigationTab.LIBRARY to R.drawable.library_music_outlined,
+            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Top) {
+                navItems.forEach { (tab, iconRes) ->
+                    val active = tab != null && tab == defaultTab
+                    val tint = if (active) cs.primary else cs.onSurfaceVariant.copy(alpha = 0.55f)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Icon(
+                            painter = painterResource(iconRes),
+                            contentDescription = null,
+                            tint = tint,
+                            modifier = Modifier.size(if (slimNav) 11.dp else 13.dp),
+                        )
+                        if (!slimNav) {
+                            Box(Modifier.width(12.dp).height(2.5.dp).clip(RoundedCornerShape(2.dp)).background(tint.copy(alpha = if (active) 1f else 0.5f)))
+                        }
+                    }
                 }
             }
         }
