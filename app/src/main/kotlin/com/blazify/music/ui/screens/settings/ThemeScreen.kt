@@ -16,6 +16,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -870,9 +871,13 @@ internal fun ThemePhonePreview(
                 Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
             Spacer(Modifier.height(8.dp))
-            // Mood chips with labels, like the real home — small, proportional to the mini screen.
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
-                listOf("Energize", "Relax", "Feel good").forEach { label ->
+            // Mood chips with labels, like the real home — the rail runs past the screen
+            // edge and the last chip gets cut off, exactly like the real chips row.
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState(), enabled = false),
+            ) {
+                listOf("Energize", "Relax", "Feel good", "Workout", "Party").forEach { label ->
                     // Fixed thin height + explicit lineHeight — the inherited text
                     // line-box was inflating these pills no matter the padding.
                     Box(
@@ -905,9 +910,9 @@ internal fun ThemePhonePreview(
             Spacer(Modifier.height(7.dp))
             // Quick-picks song rows (art · title · artist · ⋮). Art size reflects grid cell size.
             val rowArt = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
-            val artSize = if (gridSize == GridItemSize.BIG) 30.dp else 25.dp
-            Column(verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
-                repeat(3) { i ->
+            val artSize = if (gridSize == GridItemSize.BIG) 28.dp else 23.dp
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                repeat(4) { i ->
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Box(Modifier.size(artSize).clip(RoundedCornerShape(6.dp)).background(rowArt[i % rowArt.size]))
                         Spacer(Modifier.width(8.dp))
@@ -967,10 +972,12 @@ internal fun ThemePhonePreview(
                         }
                         Spacer(Modifier.width(7.dp))
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                            Text(meta?.title ?: "Song title", color = onMini, fontSize = 7.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            // Explicit lineHeights: the inherited tall line-boxes pushed the
+                            // artist line out of the 34dp bar's clip, so it never showed.
+                            Text(meta?.title ?: "Song title", color = onMini, fontSize = 7.sp, fontWeight = FontWeight.Bold, lineHeight = 7.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(
                                 meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
-                                color = onMini.copy(alpha = 0.7f), fontSize = 5.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                color = onMini.copy(alpha = 0.7f), fontSize = 5.5.sp, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
                         }
                         Spacer(Modifier.width(5.dp))
