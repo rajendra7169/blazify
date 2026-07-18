@@ -808,40 +808,39 @@ internal fun ThemePhonePreview(
                 }
                 Icon(painterResource(R.drawable.settings), null, tint = cs.onSurface.copy(alpha = 0.75f), modifier = Modifier.size(13.dp))
             }
-            Spacer(Modifier.height(13.dp))
-            // Greeting card: amber gradient + text (left) + hero image (right, bottom
-            // flush with the card, spilling a little above — like the real home).
+            Spacer(Modifier.height(6.dp))
+            // Greeting card: a CLIPPED gradient background with the hero image as an
+            // UN-clipped sibling of an un-clipped outer box, so the hero spills out of
+            // the card and a little over the wordmark — exactly like the real home.
             val onCard = cs.onPrimary
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(68.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
-                ) {
-                    Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Spacer(Modifier.height(2.dp))
-                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Spacer(Modifier.height(2.dp))
-                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                // BottomEnd alignment sits the (taller) image flush with the card bottom;
-                // the extra height (82 - 68 = 14dp) spills above for the "pops out" look,
-                // staying right of the centered wordmark.
+            Box(modifier = Modifier.fillMaxWidth().height(68.dp)) {
+                // Card background (rounded, clipped).
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
+                )
+                // Hero: bottom flush, extra height spills up out of the card (over the
+                // wordmark). No clip so the transparent PNG blends like on the real home.
                 Image(
                     painter = painterResource(if (useDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .requiredWidth(68.dp)
-                        .requiredHeight(82.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .requiredWidth(80.dp)
+                        .requiredHeight(98.dp),
                 )
+                // Greeting text — centered-left and tight, over the card.
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
+                ) {
+                    Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
+                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
             }
             Spacer(Modifier.height(9.dp))
             // Search pill (icon · placeholder · mic).
@@ -868,7 +867,7 @@ internal fun ThemePhonePreview(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(cs.surfaceContainerHigh)
-                            .padding(horizontal = 6.dp, vertical = 2.5.dp),
+                            .padding(horizontal = 7.dp, vertical = 1.5.dp),
                     ) {
                         Text(label, fontSize = 5.sp, color = cs.onSurfaceVariant, maxLines = 1)
                     }
@@ -882,7 +881,7 @@ internal fun ThemePhonePreview(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
                         .border(0.6.dp, cs.primary.copy(alpha = 0.7f), RoundedCornerShape(50))
-                        .padding(horizontal = 6.dp, vertical = 1.5.dp),
+                        .padding(horizontal = 8.dp, vertical = 0.5.dp),
                 ) {
                     Text("Play all", fontSize = 4.5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
                 }
