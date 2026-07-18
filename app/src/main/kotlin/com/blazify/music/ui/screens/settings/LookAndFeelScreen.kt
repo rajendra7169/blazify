@@ -162,7 +162,7 @@ fun LookAndFeelScreen(
 
     // Preview frame scales with the screen (responsive) and leaves room for the tabs + controls.
     val screenHeightDp = LocalConfiguration.current.screenHeightDp.toFloat()
-    val frameHeight = (screenHeightDp * 0.42f).coerceIn(240f, 440f).dp
+    val frameHeight = (screenHeightDp * 0.48f).coerceIn(260f, 480f).dp
 
     Column(
         modifier = Modifier

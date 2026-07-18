@@ -808,7 +808,7 @@ internal fun ThemePhonePreview(
                 }
                 Icon(painterResource(R.drawable.settings), null, tint = cs.onSurface.copy(alpha = 0.75f), modifier = Modifier.size(13.dp))
             }
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(13.dp))
             // Greeting card: amber gradient + text (left) + hero image (right, bottom
             // flush with the card, spilling a little above — like the real home).
             val onCard = cs.onPrimary
@@ -861,21 +861,50 @@ internal fun ThemePhonePreview(
                 Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
             Spacer(Modifier.height(9.dp))
-            // Mood chips.
+            // Mood chips with labels, like the real home.
             Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
-                repeat(4) {
-                    Box(Modifier.weight(1f).height(15.dp).clip(RoundedCornerShape(50)).background(cs.surfaceContainerHigh))
+                listOf("Energize", "Relax", "Feel good").forEach { label ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(cs.surfaceContainerHigh)
+                            .padding(horizontal = 7.dp, vertical = 4.dp),
+                    ) {
+                        Text(label, fontSize = 6.sp, color = cs.onSurfaceVariant, maxLines = 1)
+                    }
                 }
             }
             Spacer(Modifier.height(10.dp))
-            // "Speed dial" section + grid (density reflects grid cell size).
-            Text("Speed dial", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
-            Spacer(Modifier.height(6.dp))
-            val containers = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
-            val railCount = if (gridSize == GridItemSize.BIG) 2 else 3
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                repeat(railCount) { i ->
-                    Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(9.dp)).background(containers[i % containers.size]))
+            // "Quick picks" header + Play all pill.
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Quick picks", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .border(0.8.dp, cs.primary.copy(alpha = 0.7f), RoundedCornerShape(50))
+                        .padding(horizontal = 7.dp, vertical = 2.dp),
+                ) {
+                    Text("Play all", fontSize = 5.5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
+                }
+            }
+            Spacer(Modifier.height(7.dp))
+            // Quick-picks song rows (art · title · artist · ⋮). Art size reflects grid cell size.
+            val rowArt = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
+            val artSize = if (gridSize == GridItemSize.BIG) 30.dp else 25.dp
+            Column(verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
+                repeat(2) { i ->
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Box(Modifier.size(artSize).clip(RoundedCornerShape(6.dp)).background(rowArt[i % rowArt.size]))
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Box(Modifier.fillMaxWidth(0.68f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onSurface.copy(alpha = 0.85f)))
+                            Box(Modifier.fillMaxWidth(0.44f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(cs.onSurfaceVariant.copy(alpha = 0.6f)))
+                        }
+                        Spacer(Modifier.width(6.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(1.5.dp)) {
+                            repeat(3) { Box(Modifier.size(2.5.dp).clip(CircleShape).background(cs.onSurfaceVariant.copy(alpha = 0.6f))) }
+                        }
+                    }
                 }
             }
             Spacer(Modifier.weight(1f))
