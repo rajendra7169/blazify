@@ -50,12 +50,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
+import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
@@ -64,6 +66,7 @@ import com.blazify.music.ui.component.EnumDialog
 import com.blazify.music.ui.component.Material3SettingsGroup
 import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.player.MiniPlayerDesign
+import com.blazify.music.ui.player.PlayerDesign
 import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.ui.theme.DefaultThemeColor
 import com.blazify.music.utils.rememberEnumPreference
@@ -72,6 +75,7 @@ import com.blazify.music.utils.rememberPreference
 /** Tabs of the Look & Feel hub. More (Player / Lyrics / Home) land in later increments. */
 private enum class LookFeelTab(val labelRes: Int) {
     THEME(R.string.theme),
+    PLAYER(R.string.player),
     MINI(R.string.mini_player),
 }
 
@@ -120,6 +124,13 @@ fun LookAndFeelScreen(
         rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
     var showMiniPlayerBackgroundDialog by rememberSaveable { mutableStateOf(false) }
 
+    // ── Player state ──
+    val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
+    val playerDesign = remember(playerDesignId) {
+        PlayerDesign.entries.firstOrNull { it.id == playerDesignId } ?: PlayerDesign.CLASSIC
+    }
+    val playerConnection = LocalPlayerConnection.current
+
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
 
     // Preview frame scales with the screen (responsive) and leaves room for the tabs + controls.
@@ -136,13 +147,16 @@ fun LookAndFeelScreen(
     ) {
         Spacer(Modifier.height(12.dp))
 
-        // ── Pinned live preview ──
+        // ── Pinned live preview (interior switches with the active tab) ──
         ThemePhoneFrame(modifier = Modifier.height(frameHeight)) {
-            ThemePhonePreview(
-                darkMode = darkMode,
-                pureBlack = pureBlack,
-                themeColor = selectedThemeColor,
-            )
+            when (tab) {
+                LookFeelTab.PLAYER -> LivePreview(playerDesign, playerConnection)
+                else -> ThemePhonePreview(
+                    darkMode = darkMode,
+                    pureBlack = pureBlack,
+                    themeColor = selectedThemeColor,
+                )
+            }
         }
         Spacer(Modifier.height(18.dp))
 
@@ -162,6 +176,20 @@ fun LookAndFeelScreen(
                         selectedThemeColor = selectedThemeColor,
                         onSelectedThemeColorChange = handleColorSelection,
                     )
+
+                LookFeelTab.PLAYER ->
+                    Box(Modifier.padding(horizontal = 16.dp)) {
+                        Material3SettingsGroup(
+                            items = listOf(
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.palette),
+                                    title = { Text(stringResource(R.string.player_theme)) },
+                                    description = { Text(stringResource(playerDesign.nameRes)) },
+                                    onClick = { navController.navigate("settings/appearance/player_design") },
+                                ),
+                            ),
+                        )
+                    }
 
                 LookFeelTab.MINI ->
                     Column(Modifier.fillMaxWidth()) {

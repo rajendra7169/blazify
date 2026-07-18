@@ -287,7 +287,7 @@ private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () ->
 private const val PREVIEW_FALLBACK_PROGRESS = 0.35f
 
 @Composable
-private fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
+internal fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
     val meta by remember(pc) { pc?.mediaMetadata ?: MutableStateFlow(null) }.collectAsState()
     val bgStyle by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.GRADIENT)
     val gradient = rememberPreviewGradient(meta, bgStyle)
