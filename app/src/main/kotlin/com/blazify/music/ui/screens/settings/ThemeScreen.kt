@@ -14,6 +14,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,7 +41,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -62,6 +66,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +74,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
@@ -77,11 +84,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
+import coil3.compose.AsyncImage
+import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.models.MediaMetadata
+import kotlinx.coroutines.flow.MutableStateFlow
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.GridItemSize
@@ -732,6 +746,16 @@ internal fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable
     }
 }
 
+private fun greetingLine(): String {
+    val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+    return when {
+        hour in 5..11 -> "Good Morning 🌅"
+        hour in 12..16 -> "Good Afternoon ☀️"
+        hour in 17..20 -> "Good Evening 🌆"
+        else -> "Good Night 🌙"
+    }
+}
+
 /** A realistic mini Blazify home rendered with the chosen theme, so changes preview live. */
 @Composable
 internal fun ThemePhonePreview(
@@ -768,63 +792,94 @@ internal fun ThemePhonePreview(
                 .background(cs.background)
                 .padding(horizontal = 10.dp, vertical = 14.dp),
         ) {
-            // Header: person · wordmark · gear
+            // Header: account · logo + wordmark · settings (real icons).
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(Modifier.size(12.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.55f)))
-                Box(Modifier.width(56.dp).height(8.dp).clip(RoundedCornerShape(4.dp)).background(cs.onSurface.copy(alpha = 0.85f)))
-                Box(Modifier.size(12.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.55f)))
+                Icon(painterResource(R.drawable.person), null, tint = cs.onSurface.copy(alpha = 0.75f), modifier = Modifier.size(13.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Image(
+                        painter = painterResource(if (useDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Text("Blazify", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                }
+                Icon(painterResource(R.drawable.settings), null, tint = cs.onSurface.copy(alpha = 0.75f), modifier = Modifier.size(13.dp))
+            }
+            Spacer(Modifier.height(9.dp))
+            // Greeting card: amber gradient + text + hero image (the signature element).
+            val onCard = cs.onPrimary
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(74.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.56f).padding(start = 11.dp),
+                ) {
+                    Text(greetingLine(), color = onCard, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 11.5.sp)
+                    Spacer(Modifier.height(3.dp))
+                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 8.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(3.dp))
+                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 6.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Image(
+                    painter = painterResource(if (useDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .requiredWidth(80.dp)
+                        .requiredHeight(96.dp)
+                        .offset(y = (-16).dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                )
+            }
+            Spacer(Modifier.height(9.dp))
+            // Search pill (icon · placeholder · mic).
+            val searchTint = if (useDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(if (useDark) Color.White.copy(alpha = 0.10f) else Color(0xFFEEEEEE))
+                    .padding(horizontal = 9.dp),
+            ) {
+                Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
+                Spacer(Modifier.width(5.dp))
+                Text("Search songs, artists…", fontSize = 7.sp, color = searchTint, maxLines = 1, modifier = Modifier.weight(1f))
+                Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
+            }
+            Spacer(Modifier.height(9.dp))
+            // Mood chips.
+            Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
+                repeat(4) {
+                    Box(Modifier.weight(1f).height(15.dp).clip(RoundedCornerShape(50)).background(cs.surfaceContainerHigh))
+                }
             }
             Spacer(Modifier.height(10.dp))
-            // Hero greeting card (primary).
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(58.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.72f)))),
-            ) {
-                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Box(Modifier.fillMaxWidth(0.55f).height(7.dp).clip(RoundedCornerShape(4.dp)).background(cs.onPrimary.copy(alpha = 0.95f)))
-                    Box(Modifier.fillMaxWidth(0.35f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onPrimary.copy(alpha = 0.7f)))
-                }
-            }
-            Spacer(Modifier.height(9.dp))
-            // Search pill.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(26.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(cs.surfaceContainerHigh),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                Box(Modifier.padding(start = 10.dp).fillMaxWidth(0.45f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onSurfaceVariant.copy(alpha = 0.6f)))
-            }
-            Spacer(Modifier.height(9.dp))
-            // Chips.
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                repeat(3) {
-                    Box(Modifier.width(38.dp).height(18.dp).clip(RoundedCornerShape(50)).background(cs.surfaceContainer))
-                }
-            }
-            Spacer(Modifier.height(11.dp))
-            // Section title.
-            Box(Modifier.fillMaxWidth(0.42f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(cs.onSurface.copy(alpha = 0.8f)))
-            Spacer(Modifier.height(7.dp))
-            // Card rail — density reflects the grid cell size (Big = 2, Small = 3).
+            // "Speed dial" section + grid (density reflects grid cell size).
+            Text("Speed dial", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+            Spacer(Modifier.height(6.dp))
             val containers = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
             val railCount = if (gridSize == GridItemSize.BIG) 2 else 3
-            Row(horizontalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                 repeat(railCount) { i ->
-                    Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(containers[i % containers.size]))
+                    Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(9.dp)).background(containers[i % containers.size]))
                 }
             }
             Spacer(Modifier.weight(1f))
-            // Mini-player — shape + background reflect the selected design/style.
+            // Mini-player — REAL song art + title; shape/background reflect the design.
+            val pc = LocalPlayerConnection.current
+            val meta by (pc?.mediaMetadata ?: remember { MutableStateFlow<MediaMetadata?>(null) }).collectAsState()
             val isFloating = miniDesign == MiniPlayerDesign.FLOATING
             val isFlat = miniDesign == MiniPlayerDesign.FLAT
             val miniShape = when {
@@ -848,7 +903,7 @@ internal fun ThemePhonePreview(
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(if (isFloating) 0.92f else 1f)
+                        .fillMaxWidth(if (isFloating) 0.94f else 1f)
                         .then(if (isFloating) Modifier.shadow(4.dp, miniShape, clip = false) else Modifier)
                         .height(34.dp)
                         .clip(miniShape)
@@ -856,21 +911,44 @@ internal fun ThemePhonePreview(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
-                        Box(Modifier.size(22.dp).clip(miniArtShape).background(onMini.copy(alpha = 0.9f)))
-                        Spacer(Modifier.width(7.dp))
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                            Box(Modifier.fillMaxWidth(0.6f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(onMini))
-                            Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(onMini.copy(alpha = 0.7f)))
+                        Box(Modifier.size(23.dp).clip(miniArtShape)) {
+                            val url = meta?.thumbnailUrl
+                            if (url != null) {
+                                AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                            } else {
+                                Box(Modifier.fillMaxSize().background(onMini.copy(alpha = 0.85f)))
+                            }
                         }
-                        if (miniDesign == MiniPlayerDesign.ROUNDED) {
-                            // prev · play · next
-                            Box(Modifier.size(10.dp).clip(CircleShape).background(onMini.copy(alpha = 0.6f)))
-                            Spacer(Modifier.width(3.dp))
-                            Box(Modifier.size(16.dp).clip(CircleShape).background(onMini))
-                            Spacer(Modifier.width(3.dp))
-                            Box(Modifier.size(10.dp).clip(CircleShape).background(onMini.copy(alpha = 0.6f)))
-                        } else {
-                            Box(Modifier.size(16.dp).clip(CircleShape).background(onMini.copy(alpha = 0.9f)))
+                        Spacer(Modifier.width(7.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                            Text(meta?.title ?: "Song title", color = onMini, fontSize = 7.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(
+                                meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
+                                color = onMini.copy(alpha = 0.7f), fontSize = 5.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Spacer(Modifier.width(5.dp))
+                        when (miniDesign) {
+                            MiniPlayerDesign.ROUNDED -> {
+                                Icon(painterResource(R.drawable.skip_previous), null, tint = onMini, modifier = Modifier.size(10.dp))
+                                Spacer(Modifier.width(2.dp))
+                                Box(Modifier.size(15.dp).clip(CircleShape).background(onMini), contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        painterResource(R.drawable.play), null,
+                                        tint = if (miniBgStyle == MiniPlayerBackgroundStyle.GRADIENT) cs.primary else cs.surface,
+                                        modifier = Modifier.size(9.dp),
+                                    )
+                                }
+                                Spacer(Modifier.width(2.dp))
+                                Icon(painterResource(R.drawable.skip_next), null, tint = onMini, modifier = Modifier.size(10.dp))
+                            }
+                            MiniPlayerDesign.FLAT ->
+                                Icon(painterResource(R.drawable.favorite_border), null, tint = onMini, modifier = Modifier.size(11.dp))
+                            else -> {
+                                Icon(painterResource(R.drawable.playlist_add), null, tint = onMini.copy(alpha = 0.9f), modifier = Modifier.size(11.dp))
+                                Spacer(Modifier.width(5.dp))
+                                Icon(painterResource(R.drawable.favorite_border), null, tint = onMini.copy(alpha = 0.9f), modifier = Modifier.size(11.dp))
+                            }
                         }
                     }
                 }
