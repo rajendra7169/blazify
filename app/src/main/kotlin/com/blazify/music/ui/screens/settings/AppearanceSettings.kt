@@ -1059,6 +1059,7 @@ fun AppearanceSettings(
                             Material3SettingsItem(
                                 icon = painterResource(R.drawable.palette),
                                 title = { Text(stringResource(R.string.enable_dynamic_theme)) },
+                                description = { Text(stringResource(R.string.enable_dynamic_theme_desc)) },
                                 trailingContent = {
                                     Switch(
                                         checked = dynamicTheme,
@@ -1186,6 +1187,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.palette),
                         title = { Text(stringResource(R.string.new_player_design)) },
+                        description = { Text(stringResource(R.string.new_player_design_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = useNewPlayerDesign,
@@ -1307,6 +1309,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
                         title = { Text(stringResource(R.string.enable_swipe_thumbnail)) },
+                        description = { Text(stringResource(R.string.enable_swipe_thumbnail_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = swipeThumbnail,
@@ -1564,6 +1567,7 @@ fun AppearanceSettings(
                         Material3SettingsItem(
                             icon = painterResource(R.drawable.lyrics),
                             title = { Text(stringResource(R.string.lyrics_click_change)) },
+                            description = { Text(stringResource(R.string.lyrics_click_change_desc)) },
                             trailingContent = {
                                 Switch(
                                     checked = lyricsClick,
@@ -1587,6 +1591,7 @@ fun AppearanceSettings(
                         Material3SettingsItem(
                             icon = painterResource(R.drawable.lyrics),
                             title = { Text(stringResource(R.string.lyrics_auto_scroll)) },
+                            description = { Text(stringResource(R.string.lyrics_auto_scroll_desc)) },
                             trailingContent = {
                                 Switch(
                                     checked = lyricsScroll,
@@ -1673,6 +1678,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
                         title = { Text(stringResource(R.string.swipe_song_to_add)) },
+                        description = { Text(stringResource(R.string.swipe_song_to_add_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = swipeToSong,
@@ -1694,6 +1700,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
                         title = { Text(stringResource(R.string.swipe_song_to_remove)) },
+                        description = { Text(stringResource(R.string.swipe_song_to_remove_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = swipeToRemoveSong,
@@ -1715,6 +1722,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.nav_bar),
                         title = { Text(stringResource(R.string.slim_navbar)) },
+                        description = { Text(stringResource(R.string.slim_navbar_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = slimNav,
@@ -1788,6 +1796,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.favorite),
                         title = { Text(stringResource(R.string.show_liked_playlist)) },
+                        description = { Text(stringResource(R.string.show_liked_playlist_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = showLikedPlaylist,
@@ -1809,6 +1818,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.offline),
                         title = { Text(stringResource(R.string.show_downloaded_playlist)) },
+                        description = { Text(stringResource(R.string.show_downloaded_playlist_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = showDownloadedPlaylist,
@@ -1830,6 +1840,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.trending_up),
                         title = { Text(stringResource(R.string.show_top_playlist)) },
+                        description = { Text(stringResource(R.string.show_top_playlist_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = showTopPlaylist,
@@ -1851,6 +1862,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.cached),
                         title = { Text(stringResource(R.string.show_cached_playlist)) },
+                        description = { Text(stringResource(R.string.show_cached_playlist_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = showCachedPlaylist,
@@ -1872,6 +1884,7 @@ fun AppearanceSettings(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.backup),
                         title = { Text(stringResource(R.string.show_uploaded_playlist)) },
+                        description = { Text(stringResource(R.string.show_uploaded_playlist_desc)) },
                         trailingContent = {
                             Switch(
                                 checked = showUploadedPlaylist,

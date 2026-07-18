@@ -22,6 +22,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -196,25 +203,27 @@ fun PortraitThemeLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
+            .padding(innerPadding)
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+            .padding(top = 56.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(1f))
-
+        // Live theme preview inside a phone frame with a drop shadow.
         Box(
             modifier = Modifier
-                .width(120.dp)
-                .height(240.dp),
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-            ThemeMockupPortrait(
-                darkMode = darkMode,
-                pureBlack = pureBlack,
-                themeColor = selectedThemeColor
-            )
+            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.96f)) {
+                ThemePhonePreview(
+                    darkMode = darkMode,
+                    pureBlack = pureBlack,
+                    themeColor = selectedThemeColor
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         ThemeControls(
             darkMode = darkMode,
@@ -225,7 +234,7 @@ fun PortraitThemeLayout(
             onSelectedThemeColorChange = onSelectedThemeColorChange
         )
 
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(modifier = Modifier.height(96.dp))
     }
 }
 
@@ -254,15 +263,16 @@ fun LandscapeThemeLayout(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .heightIn(max = 300.dp),
+                    .fillMaxHeight(0.9f),
                 contentAlignment = Alignment.Center
             ) {
-                ThemeMockup(
-                    darkMode = darkMode,
-                    pureBlack = pureBlack,
-                    themeColor = selectedThemeColor
-                )
+                ThemePhoneFrame(modifier = Modifier.fillMaxHeight()) {
+                    ThemePhonePreview(
+                        darkMode = darkMode,
+                        pureBlack = pureBlack,
+                        themeColor = selectedThemeColor
+                    )
+                }
             }
         }
 
@@ -658,6 +668,157 @@ fun PaletteItem(
                     topLeft = Offset(width / 2, height / 2),
                     size = Size(width / 2, height / 2)
                 )
+            }
+        }
+    }
+}
+
+/** Metallic phone bezel with a soft drop shadow — same look as the player-theme screen. */
+@Composable
+private fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val frameShape = RoundedCornerShape(38.dp)
+    Box(
+        modifier = modifier
+            .aspectRatio(9f / 19.3f)
+            .shadow(
+                elevation = 24.dp,
+                shape = frameShape,
+                clip = false,
+                ambientColor = Color.White.copy(alpha = 0.30f),
+                spotColor = Color.White.copy(alpha = 0.50f),
+            )
+            .clip(frameShape)
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF44454A), Color(0xFF26272B), Color(0xFF1A1B1E)),
+                ),
+            )
+            .border(
+                width = 1.5.dp,
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Color.White.copy(alpha = 0.45f),
+                        Color.White.copy(alpha = 0.10f),
+                        Color.White.copy(alpha = 0.28f),
+                    ),
+                ),
+                shape = frameShape,
+            )
+            .padding(6.dp)
+            .clip(RoundedCornerShape(32.dp)),
+    ) {
+        content()
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 6.dp)
+                .size(width = 36.dp, height = 4.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.14f)),
+        )
+    }
+}
+
+/** A realistic mini Blazify home rendered with the chosen theme, so changes preview live. */
+@Composable
+private fun ThemePhonePreview(
+    darkMode: DarkMode,
+    pureBlack: Boolean,
+    themeColor: Color,
+) {
+    val isSystemDark = isSystemInDarkTheme()
+    val useDark = when (darkMode) {
+        DarkMode.AUTO -> isSystemDark
+        DarkMode.ON -> true
+        DarkMode.OFF -> false
+    }
+    BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
+        val cs = MaterialTheme.colorScheme
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(cs.background)
+                .padding(horizontal = 10.dp, vertical = 14.dp),
+        ) {
+            // Header: person · wordmark · gear
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(Modifier.size(12.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.55f)))
+                Box(Modifier.width(56.dp).height(8.dp).clip(RoundedCornerShape(4.dp)).background(cs.onSurface.copy(alpha = 0.85f)))
+                Box(Modifier.size(12.dp).clip(CircleShape).background(cs.onSurface.copy(alpha = 0.55f)))
+            }
+            Spacer(Modifier.height(10.dp))
+            // Hero greeting card (primary).
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.72f)))),
+            ) {
+                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Box(Modifier.fillMaxWidth(0.55f).height(7.dp).clip(RoundedCornerShape(4.dp)).background(cs.onPrimary.copy(alpha = 0.95f)))
+                    Box(Modifier.fillMaxWidth(0.35f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onPrimary.copy(alpha = 0.7f)))
+                }
+            }
+            Spacer(Modifier.height(9.dp))
+            // Search pill.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(26.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(cs.surfaceContainerHigh),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Box(Modifier.padding(start = 10.dp).fillMaxWidth(0.45f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onSurfaceVariant.copy(alpha = 0.6f)))
+            }
+            Spacer(Modifier.height(9.dp))
+            // Chips.
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                repeat(3) {
+                    Box(Modifier.width(38.dp).height(18.dp).clip(RoundedCornerShape(50)).background(cs.surfaceContainer))
+                }
+            }
+            Spacer(Modifier.height(11.dp))
+            // Section title.
+            Box(Modifier.fillMaxWidth(0.42f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(cs.onSurface.copy(alpha = 0.8f)))
+            Spacer(Modifier.height(7.dp))
+            // Card rail using the theme container colours.
+            Row(horizontalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
+                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.secondaryContainer))
+                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.tertiaryContainer))
+                Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.primaryContainer))
+            }
+            Spacer(Modifier.weight(1f))
+            // Mini-player (primary gradient).
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(34.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.72f)))),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
+                    Box(Modifier.size(22.dp).clip(CircleShape).background(cs.onPrimary.copy(alpha = 0.9f)))
+                    Spacer(Modifier.width(7.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Box(Modifier.fillMaxWidth(0.6f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onPrimary))
+                        Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(cs.onPrimary.copy(alpha = 0.7f)))
+                    }
+                    Box(Modifier.size(16.dp).clip(CircleShape).background(cs.onPrimary.copy(alpha = 0.9f)))
+                }
+            }
+            Spacer(Modifier.height(9.dp))
+            // Bottom nav (first tab uses the theme colour).
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                repeat(4) { i ->
+                    Box(Modifier.size(10.dp).clip(CircleShape).background(if (i == 0) cs.primary else cs.onSurfaceVariant.copy(alpha = 0.5f)))
+                }
             }
         }
     }

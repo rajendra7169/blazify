@@ -1093,4 +1093,19 @@
     <string name="mini_player_design_modern">Modern</string>
     <string name="mini_player_design_rounded">Rounded</string>
     <string name="mini_player_design_floating">Floating</string>
+
+    <!-- Toggle descriptions (what each does) -->
+    <string name="enable_dynamic_theme_desc">Match the app colours to your wallpaper (Android 12+)</string>
+    <string name="new_player_design_desc">Use the redesigned full-screen player</string>
+    <string name="enable_swipe_thumbnail_desc">Swipe the mini-player artwork to change songs</string>
+    <string name="slim_navbar_desc">Use a thinner bottom navigation bar</string>
+    <string name="lyrics_click_change_desc">Tap a lyric line to jump to that moment</string>
+    <string name="lyrics_auto_scroll_desc">Scroll lyrics automatically as the song plays</string>
+    <string name="swipe_song_to_add_desc">Swipe a song to add it to the queue</string>
+    <string name="swipe_song_to_remove_desc">Swipe a song to remove it from the queue</string>
+    <string name="show_liked_playlist_desc">Show the Liked Songs auto-playlist in your library</string>
+    <string name="show_downloaded_playlist_desc">Show the Downloaded auto-playlist in your library</string>
+    <string name="show_top_playlist_desc">Show the Most-played auto-playlist in your library</string>
+    <string name="show_cached_playlist_desc">Show the Cached auto-playlist in your library</string>
+    <string name="show_uploaded_playlist_desc">Show your uploaded songs in your library</string>
 </resources>
