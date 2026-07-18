@@ -17,15 +17,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +40,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,16 +49,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
@@ -72,6 +82,7 @@ import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
 import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
+import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.component.EnumDialog
 import com.blazify.music.ui.component.Material3SettingsGroup
 import com.blazify.music.ui.component.Material3SettingsItem
@@ -82,6 +93,7 @@ import com.blazify.music.ui.theme.BlazifyTheme
 import com.blazify.music.ui.theme.DefaultThemeColor
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Tabs of the Look & Feel hub. More (Player / Lyrics / Home) land in later increments. */
 private enum class LookFeelTab(val labelRes: Int) {
@@ -398,7 +410,12 @@ private fun GridItemSize.label(): String = when (this) {
     GridItemSize.SMALL -> stringResource(R.string.small)
 }
 
-/** A small synced-lyrics sample so the position choice previews live. */
+/**
+ * A faithful mini of the real lyrics page: Language pill up top, dimmed previous
+ * stanza → bright active stanza → dimmed next, then the song bar (real art ·
+ * title/artist · fullscreen/theme/more buttons) and the progress bar with times,
+ * all over the tinted gradient. Lyric alignment follows the position setting.
+ */
 @Composable
 private fun LyricsSampleInterior(
     darkMode: DarkMode,
@@ -413,6 +430,8 @@ private fun LyricsSampleInterior(
     }
     BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
         val cs = MaterialTheme.colorScheme
+        val pc = LocalPlayerConnection.current
+        val meta by (pc?.mediaMetadata ?: remember { MutableStateFlow<MediaMetadata?>(null) }).collectAsState()
         val horizontal = when (position) {
             LyricsPosition.LEFT -> Alignment.Start
             LyricsPosition.RIGHT -> Alignment.End
@@ -423,32 +442,86 @@ private fun LyricsSampleInterior(
             LyricsPosition.RIGHT -> TextAlign.End
             LyricsPosition.CENTER -> TextAlign.Center
         }
-        val lines = listOf(
-            "Pehla nasha, pehla khumaar",
-            "Naya pyaar hai, naya intezaar",
-            "Kar loon main kya apna haal",
-            "Aye dil-e-bekaraar",
-            "Tu hi bata",
-        )
-        val activeIndex = 2
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(cs.background)
-                .padding(horizontal = 16.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = horizontal,
+                .background(Brush.verticalGradient(listOf(lerp(cs.primary, Color.Black, 0.62f), cs.background)))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
-            lines.forEachIndexed { i, line ->
-                val active = i == activeIndex
+            // Language pill — a little below the notch, like the real page.
+            Box(Modifier.fillMaxWidth().padding(top = 10.dp), contentAlignment = Alignment.Center) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.White.copy(alpha = 0.16f))
+                        .padding(horizontal = 7.dp, vertical = 2.5.dp),
+                ) {
+                    Icon(painterResource(R.drawable.translate), null, tint = Color.White, modifier = Modifier.size(7.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text("Language", fontSize = 5.5.sp, lineHeight = 6.sp, color = Color.White)
+                }
+            }
+            // Stanzas fill the whole page height — dimmed · bright active · dimmed —
+            // spread out like the real lyrics screen, not clustered in the middle.
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = horizontal,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            ) {
                 Text(
-                    text = line,
-                    color = if (active) cs.primary else cs.onSurface.copy(alpha = 0.4f),
-                    fontSize = if (active) 15.sp else 12.sp,
-                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                    textAlign = textAlign,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                    "Baatein teri,\nraatein-saugaate\nin teri",
+                    color = Color.White.copy(alpha = 0.30f), fontSize = 10.sp, lineHeight = 12.sp,
+                    fontWeight = FontWeight.Bold, textAlign = textAlign, modifier = Modifier.fillMaxWidth(),
                 )
+                Text(
+                    "Kyun tera sab\nyeh ho gaya?\nHua kya?",
+                    color = Color.White, fontSize = 13.sp, lineHeight = 15.5.sp,
+                    fontWeight = FontWeight.Bold, textAlign = textAlign, modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    "Main kahin bhi\njaata hoon, tum\nse hi mil jaata hoon",
+                    color = Color.White.copy(alpha = 0.30f), fontSize = 10.sp, lineHeight = 12.sp,
+                    fontWeight = FontWeight.Bold, textAlign = textAlign, modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            // Song bar: real art · title/artist · fullscreen / theme / more.
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Box(Modifier.size(20.dp).clip(RoundedCornerShape(4.dp))) {
+                    val url = meta?.thumbnailUrl
+                    if (url != null) {
+                        AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    } else {
+                        Box(Modifier.fillMaxSize().background(cs.primary))
+                    }
+                }
+                Spacer(Modifier.width(6.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(meta?.title ?: "Song title", color = Color.White, fontSize = 7.sp, lineHeight = 7.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() } ?: "Artist",
+                        color = Color.White.copy(alpha = 0.7f), fontSize = 5.5.sp, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                listOf(R.drawable.fullscreen, R.drawable.palette, R.drawable.more_horiz).forEach { icon ->
+                    Box(
+                        Modifier.padding(start = 3.dp).size(13.dp).clip(CircleShape).background(Color.White),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(painterResource(icon), null, tint = Color.Black, modifier = Modifier.size(7.dp))
+                    }
+                }
+            }
+            Spacer(Modifier.height(7.dp))
+            // Progress bar + times.
+            Box(Modifier.fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(Color.White.copy(alpha = 0.25f))) {
+                Box(Modifier.fillMaxWidth(0.48f).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(cs.primary))
+            }
+            Spacer(Modifier.height(3.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("2:33", color = Color.White.copy(alpha = 0.8f), fontSize = 5.sp, lineHeight = 5.5.sp)
+                Text("5:21", color = Color.White.copy(alpha = 0.8f), fontSize = 5.sp, lineHeight = 5.5.sp)
             }
         }
     }
