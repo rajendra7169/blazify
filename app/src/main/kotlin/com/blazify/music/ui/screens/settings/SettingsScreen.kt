@@ -133,8 +133,8 @@ fun SettingsScreen(
             add(SettingRow(R.drawable.language, stringResource(R.string.content), stringResource(R.string.hint_content)) {
                 navController.navigate("settings/content")
             })
-            add(SettingRow(R.drawable.translate, stringResource(R.string.ai_lyrics_translation), stringResource(R.string.hint_lyrics)) {
-                navController.navigate("settings/ai")
+            add(SettingRow(R.drawable.lyrics, stringResource(R.string.lyrics), stringResource(R.string.hint_lyrics_home)) {
+                navController.navigate("settings/lyrics")
             })
             if (hasAndroidAuto) {
                 add(SettingRow(R.drawable.ic_android_auto, stringResource(R.string.android_auto), stringResource(R.string.hint_android_auto)) {

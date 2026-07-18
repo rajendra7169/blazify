@@ -48,6 +48,7 @@ import com.blazify.music.ui.screens.search.OnlineSearchResult
 import com.blazify.music.ui.screens.search.SearchScreen
 import com.blazify.music.ui.screens.settings.AboutScreen
 import com.blazify.music.ui.screens.settings.AiSettings
+import com.blazify.music.ui.screens.settings.LyricsSettings
 import com.blazify.music.ui.screens.settings.AndroidAutoSettings
 import com.blazify.music.ui.screens.settings.AppearanceSettings
 import com.blazify.music.ui.screens.settings.LookAndFeelScreen
@@ -406,6 +407,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/ai") {
         AiSettings(navController)
+    }
+
+    composable("settings/lyrics") {
+        LyricsSettings(navController)
     }
 
     composable("settings/player") {
