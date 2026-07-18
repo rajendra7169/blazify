@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -821,20 +822,23 @@ internal fun ThemePhonePreview(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
                 )
-                // Hero: bottom flush, extra height spills up out of the card (over the
-                // wordmark). No clip so the transparent PNG blends like on the real home.
+                // Hero: spills up out of the card (over the wordmark) but the offset
+                // keeps its bottom a few dp INSIDE the card, so it never overflows below.
+                // No clip so the transparent PNG blends like on the real home.
                 Image(
                     painter = painterResource(if (useDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .requiredWidth(80.dp)
-                        .requiredHeight(98.dp),
+                        .requiredWidth(78.dp)
+                        .requiredHeight(92.dp)
+                        .offset(y = (-6).dp),
                 )
-                // Greeting text — centered-left and tight, over the card.
+                // Greeting text — centered-left, tight (so the greeting sits a touch
+                // lower and 'Enjoy the music' a touch higher, with padding around it).
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalArrangement = Arrangement.spacedBy(1.dp),
                     modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
                 ) {
                     Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
@@ -867,7 +871,7 @@ internal fun ThemePhonePreview(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(cs.surfaceContainerHigh)
-                            .padding(horizontal = 7.dp, vertical = 1.5.dp),
+                            .padding(horizontal = 7.dp, vertical = 0.5.dp),
                     ) {
                         Text(label, fontSize = 5.sp, color = cs.onSurfaceVariant, maxLines = 1)
                     }
@@ -891,7 +895,7 @@ internal fun ThemePhonePreview(
             val rowArt = listOf(cs.secondaryContainer, cs.tertiaryContainer, cs.primaryContainer)
             val artSize = if (gridSize == GridItemSize.BIG) 30.dp else 25.dp
             Column(verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
-                repeat(2) { i ->
+                repeat(3) { i ->
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Box(Modifier.size(artSize).clip(RoundedCornerShape(6.dp)).background(rowArt[i % rowArt.size]))
                         Spacer(Modifier.width(8.dp))
