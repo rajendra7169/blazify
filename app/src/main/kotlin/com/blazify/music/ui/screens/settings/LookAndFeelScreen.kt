@@ -8,6 +8,8 @@ package com.blazify.music.ui.screens.settings
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,13 +49,16 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DynamicThemeKey
+import com.blazify.music.constants.LyricsTextPositionKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
@@ -68,6 +73,7 @@ import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.player.MiniPlayerDesign
 import com.blazify.music.ui.player.PlayerDesign
 import com.blazify.music.ui.theme.BlazeThemeColor
+import com.blazify.music.ui.theme.BlazifyTheme
 import com.blazify.music.ui.theme.DefaultThemeColor
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
@@ -77,6 +83,7 @@ private enum class LookFeelTab(val labelRes: Int) {
     THEME(R.string.theme),
     PLAYER(R.string.player),
     MINI(R.string.mini_player),
+    LYRICS(R.string.lyrics),
 }
 
 /**
@@ -131,6 +138,11 @@ fun LookAndFeelScreen(
     }
     val playerConnection = LocalPlayerConnection.current
 
+    // ── Lyrics state ──
+    val (lyricsPosition, onLyricsPositionChange) =
+        rememberEnumPreference(LyricsTextPositionKey, LyricsPosition.CENTER)
+    var showLyricsPositionDialog by rememberSaveable { mutableStateOf(false) }
+
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
 
     // Preview frame scales with the screen (responsive) and leaves room for the tabs + controls.
@@ -151,6 +163,12 @@ fun LookAndFeelScreen(
         ThemePhoneFrame(modifier = Modifier.height(frameHeight)) {
             when (tab) {
                 LookFeelTab.PLAYER -> LivePreview(playerDesign, playerConnection)
+                LookFeelTab.LYRICS -> LyricsSampleInterior(
+                    darkMode = darkMode,
+                    pureBlack = pureBlack,
+                    themeColor = selectedThemeColor,
+                    position = lyricsPosition,
+                )
                 else -> ThemePhonePreview(
                     darkMode = darkMode,
                     pureBlack = pureBlack,
@@ -186,6 +204,20 @@ fun LookAndFeelScreen(
                                     title = { Text(stringResource(R.string.player_theme)) },
                                     description = { Text(stringResource(playerDesign.nameRes)) },
                                     onClick = { navController.navigate("settings/appearance/player_design") },
+                                ),
+                            ),
+                        )
+                    }
+
+                LookFeelTab.LYRICS ->
+                    Box(Modifier.padding(horizontal = 16.dp)) {
+                        Material3SettingsGroup(
+                            items = listOf(
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.lyrics),
+                                    title = { Text(stringResource(R.string.lyrics_text_position)) },
+                                    description = { Text(lyricsPosition.label()) },
+                                    onClick = { showLyricsPositionDialog = true },
                                 ),
                             ),
                         )
@@ -259,6 +291,83 @@ fun LookAndFeelScreen(
             valueText = { it.label() },
         )
     }
+
+    if (showLyricsPositionDialog) {
+        EnumDialog(
+            onDismiss = { showLyricsPositionDialog = false },
+            onSelect = {
+                onLyricsPositionChange(it)
+                showLyricsPositionDialog = false
+            },
+            title = stringResource(R.string.lyrics_text_position),
+            current = lyricsPosition,
+            values = LyricsPosition.entries.toList(),
+            valueText = { it.label() },
+        )
+    }
+}
+
+@Composable
+private fun LyricsPosition.label(): String = when (this) {
+    LyricsPosition.LEFT -> stringResource(R.string.left)
+    LyricsPosition.CENTER -> stringResource(R.string.center)
+    LyricsPosition.RIGHT -> stringResource(R.string.right)
+}
+
+/** A small synced-lyrics sample so the position choice previews live. */
+@Composable
+private fun LyricsSampleInterior(
+    darkMode: DarkMode,
+    pureBlack: Boolean,
+    themeColor: Color,
+    position: LyricsPosition,
+) {
+    val useDark = when (darkMode) {
+        DarkMode.AUTO -> isSystemInDarkTheme()
+        DarkMode.ON -> true
+        DarkMode.OFF -> false
+    }
+    BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
+        val cs = MaterialTheme.colorScheme
+        val horizontal = when (position) {
+            LyricsPosition.LEFT -> Alignment.Start
+            LyricsPosition.RIGHT -> Alignment.End
+            LyricsPosition.CENTER -> Alignment.CenterHorizontally
+        }
+        val textAlign = when (position) {
+            LyricsPosition.LEFT -> TextAlign.Start
+            LyricsPosition.RIGHT -> TextAlign.End
+            LyricsPosition.CENTER -> TextAlign.Center
+        }
+        val lines = listOf(
+            "Pehla nasha, pehla khumaar",
+            "Naya pyaar hai, naya intezaar",
+            "Kar loon main kya apna haal",
+            "Aye dil-e-bekaraar",
+            "Tu hi bata",
+        )
+        val activeIndex = 2
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(cs.background)
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = horizontal,
+        ) {
+            lines.forEachIndexed { i, line ->
+                val active = i == activeIndex
+                Text(
+                    text = line,
+                    color = if (active) cs.primary else cs.onSurface.copy(alpha = 0.4f),
+                    fontSize = if (active) 15.sp else 12.sp,
+                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                    textAlign = textAlign,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -270,7 +379,7 @@ private fun MiniPlayerBackgroundStyle.label(): String = when (this) {
     MiniPlayerBackgroundStyle.PURE_BLACK -> stringResource(R.string.pure_black)
 }
 
-/** Amber segmented tab strip; scales cleanly as more tabs are added. */
+/** Amber pill tab strip; horizontally scrollable so it scales to any number of tabs. */
 @Composable
 private fun LookFeelTabRow(
     selected: LookFeelTab,
@@ -278,22 +387,19 @@ private fun LookFeelTabRow(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(999.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         LookFeelTab.entries.forEach { t ->
             val active = t == selected
             Box(
                 modifier = Modifier
-                    .weight(1f)
                     .clip(RoundedCornerShape(999.dp))
-                    .background(if (active) MaterialTheme.colorScheme.primary else Color.Transparent)
+                    .background(if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest)
                     .clickable { onSelect(t) }
-                    .padding(vertical = 10.dp),
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
