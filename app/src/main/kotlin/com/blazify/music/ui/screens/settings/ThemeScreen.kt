@@ -83,6 +83,11 @@ import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
+import com.blazify.music.constants.MiniPlayerBackgroundStyle
+import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
+import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.UseNewMiniPlayerDesignKey
+import com.blazify.music.ui.player.MiniPlayerDesign
 import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
@@ -736,6 +741,17 @@ internal fun ThemePhonePreview(
         DarkMode.ON -> true
         DarkMode.OFF -> false
     }
+    // Reflect the chosen mini-player design + background in the preview.
+    val (miniDesignId) = rememberPreference(MiniPlayerDesignKey, defaultValue = "")
+    val (useNewMini) = rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
+    val miniDesign = remember(miniDesignId, useNewMini) {
+        if (miniDesignId.isBlank()) {
+            if (useNewMini) MiniPlayerDesign.MODERN else MiniPlayerDesign.FLAT
+        } else {
+            MiniPlayerDesign.fromId(miniDesignId)
+        }
+    }
+    val (miniBgStyle) = rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
     BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
         val cs = MaterialTheme.colorScheme
         Column(
@@ -798,23 +814,55 @@ internal fun ThemePhonePreview(
                 Box(Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(10.dp)).background(cs.primaryContainer))
             }
             Spacer(Modifier.weight(1f))
-            // Mini-player (primary gradient).
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(34.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.72f)))),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
-                    Box(Modifier.size(22.dp).clip(CircleShape).background(cs.onPrimary.copy(alpha = 0.9f)))
-                    Spacer(Modifier.width(7.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        Box(Modifier.fillMaxWidth(0.6f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(cs.onPrimary))
-                        Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(cs.onPrimary.copy(alpha = 0.7f)))
+            // Mini-player — shape + background reflect the selected design/style.
+            val isFloating = miniDesign == MiniPlayerDesign.FLOATING
+            val isFlat = miniDesign == MiniPlayerDesign.FLAT
+            val miniShape = when {
+                isFlat -> RoundedCornerShape(6.dp)
+                isFloating -> RoundedCornerShape(12.dp)
+                else -> RoundedCornerShape(50)
+            }
+            val miniArtShape = if (isFlat || isFloating) RoundedCornerShape(5.dp) else CircleShape
+            val onMini = when (miniBgStyle) {
+                MiniPlayerBackgroundStyle.GRADIENT -> cs.onPrimary
+                MiniPlayerBackgroundStyle.PURE_BLACK -> Color.White
+                else -> cs.onSurface
+            }
+            val miniBackground: Modifier = when (miniBgStyle) {
+                MiniPlayerBackgroundStyle.GRADIENT ->
+                    Modifier.background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.72f))))
+                MiniPlayerBackgroundStyle.PURE_BLACK -> Modifier.background(Color.Black)
+                MiniPlayerBackgroundStyle.BLUR -> Modifier.background(cs.surfaceVariant)
+                else -> Modifier.background(cs.surfaceContainerHighest)
+            }
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isFloating) 0.92f else 1f)
+                        .then(if (isFloating) Modifier.shadow(4.dp, miniShape, clip = false) else Modifier)
+                        .height(34.dp)
+                        .clip(miniShape)
+                        .then(miniBackground),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
+                        Box(Modifier.size(22.dp).clip(miniArtShape).background(onMini.copy(alpha = 0.9f)))
+                        Spacer(Modifier.width(7.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Box(Modifier.fillMaxWidth(0.6f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(onMini))
+                            Box(Modifier.fillMaxWidth(0.4f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(onMini.copy(alpha = 0.7f)))
+                        }
+                        if (miniDesign == MiniPlayerDesign.ROUNDED) {
+                            // prev · play · next
+                            Box(Modifier.size(10.dp).clip(CircleShape).background(onMini.copy(alpha = 0.6f)))
+                            Spacer(Modifier.width(3.dp))
+                            Box(Modifier.size(16.dp).clip(CircleShape).background(onMini))
+                            Spacer(Modifier.width(3.dp))
+                            Box(Modifier.size(10.dp).clip(CircleShape).background(onMini.copy(alpha = 0.6f)))
+                        } else {
+                            Box(Modifier.size(16.dp).clip(CircleShape).background(onMini.copy(alpha = 0.9f)))
+                        }
                     }
-                    Box(Modifier.size(16.dp).clip(CircleShape).background(cs.onPrimary.copy(alpha = 0.9f)))
                 }
             }
             Spacer(Modifier.height(9.dp))
