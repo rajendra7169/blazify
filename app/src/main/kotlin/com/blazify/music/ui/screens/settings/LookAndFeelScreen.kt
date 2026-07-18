@@ -32,6 +32,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -57,7 +58,10 @@ import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
+import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.DynamicThemeKey
+import com.blazify.music.constants.GridItemSize
+import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.LyricsTextPositionKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
@@ -66,6 +70,7 @@ import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
+import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.ui.component.EnumDialog
 import com.blazify.music.ui.component.Material3SettingsGroup
@@ -84,6 +89,7 @@ private enum class LookFeelTab(val labelRes: Int) {
     PLAYER(R.string.player),
     MINI(R.string.mini_player),
     LYRICS(R.string.lyrics),
+    HOME(R.string.home),
 }
 
 /**
@@ -142,6 +148,15 @@ fun LookAndFeelScreen(
     val (lyricsPosition, onLyricsPositionChange) =
         rememberEnumPreference(LyricsTextPositionKey, LyricsPosition.CENTER)
     var showLyricsPositionDialog by rememberSaveable { mutableStateOf(false) }
+
+    // ── Home / layout state ──
+    val (defaultOpenTab, onDefaultOpenTabChange) =
+        rememberEnumPreference(DefaultOpenTabKey, NavigationTab.HOME)
+    var showDefaultOpenTabDialog by rememberSaveable { mutableStateOf(false) }
+    val (gridItemSize, onGridItemSizeChange) =
+        rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
+    var showGridSizeDialog by rememberSaveable { mutableStateOf(false) }
+    val (slimNavBar, onSlimNavBarChange) = rememberPreference(SlimNavBarKey, defaultValue = false)
 
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
 
@@ -218,6 +233,34 @@ fun LookAndFeelScreen(
                                     title = { Text(stringResource(R.string.lyrics_text_position)) },
                                     description = { Text(lyricsPosition.label()) },
                                     onClick = { showLyricsPositionDialog = true },
+                                ),
+                            ),
+                        )
+                    }
+
+                LookFeelTab.HOME ->
+                    Box(Modifier.padding(horizontal = 16.dp)) {
+                        Material3SettingsGroup(
+                            items = listOf(
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.home_outlined),
+                                    title = { Text(stringResource(R.string.default_open_tab)) },
+                                    description = { Text(defaultOpenTab.label()) },
+                                    onClick = { showDefaultOpenTabDialog = true },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.grid_view),
+                                    title = { Text(stringResource(R.string.grid_cell_size)) },
+                                    description = { Text(gridItemSize.label()) },
+                                    onClick = { showGridSizeDialog = true },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.nav_bar),
+                                    title = { Text(stringResource(R.string.slim_navbar)) },
+                                    trailingContent = {
+                                        Switch(checked = slimNavBar, onCheckedChange = onSlimNavBarChange)
+                                    },
+                                    onClick = { onSlimNavBarChange(!slimNavBar) },
                                 ),
                             ),
                         )
@@ -305,6 +348,34 @@ fun LookAndFeelScreen(
             valueText = { it.label() },
         )
     }
+
+    if (showDefaultOpenTabDialog) {
+        EnumDialog(
+            onDismiss = { showDefaultOpenTabDialog = false },
+            onSelect = {
+                onDefaultOpenTabChange(it)
+                showDefaultOpenTabDialog = false
+            },
+            title = stringResource(R.string.default_open_tab),
+            current = defaultOpenTab,
+            values = NavigationTab.entries.toList(),
+            valueText = { it.label() },
+        )
+    }
+
+    if (showGridSizeDialog) {
+        EnumDialog(
+            onDismiss = { showGridSizeDialog = false },
+            onSelect = {
+                onGridItemSizeChange(it)
+                showGridSizeDialog = false
+            },
+            title = stringResource(R.string.grid_cell_size),
+            current = gridItemSize,
+            values = GridItemSize.entries.toList(),
+            valueText = { it.label() },
+        )
+    }
 }
 
 @Composable
@@ -312,6 +383,19 @@ private fun LyricsPosition.label(): String = when (this) {
     LyricsPosition.LEFT -> stringResource(R.string.left)
     LyricsPosition.CENTER -> stringResource(R.string.center)
     LyricsPosition.RIGHT -> stringResource(R.string.right)
+}
+
+@Composable
+private fun NavigationTab.label(): String = when (this) {
+    NavigationTab.HOME -> stringResource(R.string.home)
+    NavigationTab.SEARCH -> stringResource(R.string.search)
+    NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+}
+
+@Composable
+private fun GridItemSize.label(): String = when (this) {
+    GridItemSize.BIG -> stringResource(R.string.big)
+    GridItemSize.SMALL -> stringResource(R.string.small)
 }
 
 /** A small synced-lyrics sample so the position choice previews live. */
