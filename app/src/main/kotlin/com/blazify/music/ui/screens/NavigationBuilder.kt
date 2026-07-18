@@ -50,6 +50,7 @@ import com.blazify.music.ui.screens.settings.AboutScreen
 import com.blazify.music.ui.screens.settings.AiSettings
 import com.blazify.music.ui.screens.settings.AndroidAutoSettings
 import com.blazify.music.ui.screens.settings.AppearanceSettings
+import com.blazify.music.ui.screens.settings.LookAndFeelScreen
 import com.blazify.music.ui.screens.settings.BackupAndRestore
 import com.blazify.music.ui.screens.settings.ContentSettings
 import com.blazify.music.ui.screens.settings.DarkMode
@@ -385,6 +386,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/appearance/theme") {
         ThemeScreen(navController)
+    }
+
+    composable("settings/appearance/look_and_feel") {
+        LookAndFeelScreen(navController)
     }
 
     composable("settings/appearance/player_design") {

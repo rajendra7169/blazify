@@ -1973,7 +1973,7 @@ enum class PlayerTextAlignment {
 /* ------------------------------------------------------------------------- */
 
 @Composable
-private fun MiniPlayerDesignPicker(
+internal fun MiniPlayerDesignPicker(
     selected: MiniPlayerDesign,
     onSelect: (MiniPlayerDesign) -> Unit,
 ) {

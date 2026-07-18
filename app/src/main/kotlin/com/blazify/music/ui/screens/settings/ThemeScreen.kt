@@ -679,7 +679,7 @@ fun PaletteItem(
 
 /** Metallic phone bezel with a soft drop shadow — same look as the player-theme screen. */
 @Composable
-private fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+internal fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val frameShape = RoundedCornerShape(38.dp)
     Box(
         modifier = modifier
@@ -725,7 +725,7 @@ private fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable 
 
 /** A realistic mini Blazify home rendered with the chosen theme, so changes preview live. */
 @Composable
-private fun ThemePhonePreview(
+internal fun ThemePhonePreview(
     darkMode: DarkMode,
     pureBlack: Boolean,
     themeColor: Color,

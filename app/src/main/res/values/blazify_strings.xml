@@ -1062,6 +1062,8 @@
     <string name="settings_group_about">About</string>
     <string name="search_settings">Search settings</string>
     <string name="hint_appearance">Theme, colors, dark mode, layout</string>
+    <string name="look_and_feel">Look &amp; Feel</string>
+    <string name="look_and_feel_desc">Preview and style theme and mini-player in one place</string>
     <string name="hint_player">Quality, gapless, normalization, EQ</string>
     <string name="hint_stream">Where audio is fetched from</string>
     <string name="hint_content">Region, explicit, video songs</string>

@@ -98,6 +98,9 @@ fun SettingsScreen(
 
     val groups: List<Pair<String, List<SettingRow>>> = listOf(
         stringResource(R.string.settings_group_personalize) to listOf(
+            SettingRow(R.drawable.gradient, stringResource(R.string.look_and_feel), stringResource(R.string.look_and_feel_desc)) {
+                navController.navigate("settings/appearance/look_and_feel")
+            },
             SettingRow(R.drawable.palette, stringResource(R.string.appearance), stringResource(R.string.hint_appearance)) {
                 navController.navigate("settings/appearance")
             },
