@@ -748,10 +748,10 @@ internal fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable
 private fun greetingLine(): String {
     val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
     return when {
-        hour in 5..11 -> "Good Morning 🌅"
-        hour in 12..16 -> "Good Afternoon ☀️"
-        hour in 17..20 -> "Good Evening 🌆"
-        else -> "Good Night 🌙"
+        hour in 5..11 -> "Good\nMorning 🌅"
+        hour in 12..16 -> "Good\nAfternoon ☀️"
+        hour in 17..20 -> "Good\nEvening 🌆"
+        else -> "Good\nNight 🌙"
     }
 }
 
@@ -815,31 +815,31 @@ internal fun ThemePhonePreview(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(76.dp)
+                    .height(68.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.55f).padding(start = 11.dp),
+                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
                 ) {
-                    Text(greetingLine(), color = onCard, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 11.5.sp)
-                    Spacer(Modifier.height(3.dp))
-                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 8.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Spacer(Modifier.height(3.dp))
-                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 6.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(2.dp))
+                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(2.dp))
+                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                // BottomEnd alignment already sits the (taller) image flush with the card
-                // bottom; the extra height (90 - 76 = 14dp) spills above for the
-                // "pops out of the card" look, staying right of the centered wordmark.
+                // BottomEnd alignment sits the (taller) image flush with the card bottom;
+                // the extra height (82 - 68 = 14dp) spills above for the "pops out" look,
+                // staying right of the centered wordmark.
                 Image(
                     painter = painterResource(if (useDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .requiredWidth(74.dp)
-                        .requiredHeight(90.dp)
+                        .requiredWidth(68.dp)
+                        .requiredHeight(82.dp)
                         .clip(RoundedCornerShape(8.dp)),
                 )
             }
@@ -860,31 +860,31 @@ internal fun ThemePhonePreview(
                 Text("Search songs, artists…", fontSize = 7.sp, color = searchTint, maxLines = 1, modifier = Modifier.weight(1f))
                 Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
-            Spacer(Modifier.height(9.dp))
-            // Mood chips with labels, like the real home.
-            Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(8.dp))
+            // Mood chips with labels, like the real home — small, proportional to the mini screen.
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                 listOf("Energize", "Relax", "Feel good").forEach { label ->
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(cs.surfaceContainerHigh)
-                            .padding(horizontal = 7.dp, vertical = 4.dp),
+                            .padding(horizontal = 6.dp, vertical = 2.5.dp),
                     ) {
-                        Text(label, fontSize = 6.sp, color = cs.onSurfaceVariant, maxLines = 1)
+                        Text(label, fontSize = 5.sp, color = cs.onSurfaceVariant, maxLines = 1)
                     }
                 }
             }
-            Spacer(Modifier.height(10.dp))
-            // "Quick picks" header + Play all pill.
+            Spacer(Modifier.height(9.dp))
+            // "Quick picks" header + a small Play all pill.
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Quick picks", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+                Text("Quick picks", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .border(0.8.dp, cs.primary.copy(alpha = 0.7f), RoundedCornerShape(50))
-                        .padding(horizontal = 7.dp, vertical = 2.dp),
+                        .border(0.6.dp, cs.primary.copy(alpha = 0.7f), RoundedCornerShape(50))
+                        .padding(horizontal = 6.dp, vertical = 1.5.dp),
                 ) {
-                    Text("Play all", fontSize = 5.5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
+                    Text("Play all", fontSize = 4.5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
                 }
             }
             Spacer(Modifier.height(7.dp))
