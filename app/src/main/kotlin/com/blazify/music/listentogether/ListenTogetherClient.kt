@@ -838,6 +838,8 @@ class ListenTogetherClient
 
         internal fun serverTimeNow(): Long? = serverClock.now()
 
+        internal fun oneWayLatencyMs(): Long = serverClock.oneWayLatencyMs()
+
         internal fun positionAtServerTime(
             position: Long,
             effectiveAtServerTime: Long?,

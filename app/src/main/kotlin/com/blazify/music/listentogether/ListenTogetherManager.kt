@@ -887,8 +887,12 @@ class ListenTogetherManager
                         val target = client.positionAtServerTime(position, effectiveAtServerTime, isPlaying = true)
                         val drift = target - player.currentPosition
                         val absoluteDrift = kotlin.math.abs(drift)
-                        if (absoluteDrift <= SOFT_SYNC_THRESHOLD_MS) break
+                        if (absoluteDrift <= SOFT_SYNC_THRESHOLD_MS) {
+                            Timber.tag(TAG).d("SYNC ok: drift=${drift}ms (target=$target pos=${player.currentPosition} oneWayLat=${client.oneWayLatencyMs()}ms)")
+                            break
+                        }
                         if (absoluteDrift >= HARD_SYNC_THRESHOLD_MS) {
+                            Timber.tag(TAG).d("SYNC hard-seek: drift=${drift}ms -> $target (oneWayLat=${client.oneWayLatencyMs()}ms)")
                             connection.seekTo(target)
                             break
                         }

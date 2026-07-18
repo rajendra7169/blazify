@@ -1,6 +1,7 @@
 package com.blazify.music.listentogether
 
 import kotlin.math.max
+import kotlin.math.min
 
 internal class ServerClock(
     private val elapsedRealtime: () -> Long,
@@ -39,6 +40,16 @@ internal class ServerClock(
     @Synchronized
     fun now(): Long? = serverOffsetMs?.let { (elapsedRealtime() + it).toLong() }
 
+    /**
+     * Our best estimate of one-way latency to the server (half the best observed
+     * network round-trip), capped. Used to approximate the host→server travel leg
+     * that the server's receive timestamp doesn't include. 0 until a sample exists.
+     */
+    @Synchronized
+    fun oneWayLatencyMs(): Long =
+        if (bestRoundTripMs == Long.MAX_VALUE) 0L
+        else min(bestRoundTripMs / 2, MAX_HOST_LEG_COMPENSATION_MS)
+
     fun positionAt(
         position: Long,
         effectiveAtServerTime: Long?,
@@ -46,11 +57,17 @@ internal class ServerClock(
     ): Long {
         if (!isPlaying || effectiveAtServerTime == null || effectiveAtServerTime <= 0L) return position
         val serverNow = now() ?: return position
-        return position + max(0L, serverNow - effectiveAtServerTime)
+        // effectiveAtServerTime is when the SERVER received the host's update, so the
+        // host→server travel leg is missing from it — that's why guests trail the host.
+        // Approximate that leg with our own one-way latency (host and server are
+        // usually comparably close), capped so an asymmetric link can't overshoot.
+        val hostLegCompensation = oneWayLatencyMs()
+        return position + max(0L, serverNow - effectiveAtServerTime) + hostLegCompensation
     }
 
     private companion object {
         const val MAX_SAMPLE_AGE_MS = 60_000L
         const val GOOD_SAMPLE_MARGIN_MS = 50L
+        const val MAX_HOST_LEG_COMPENSATION_MS = 500L
     }
 }
