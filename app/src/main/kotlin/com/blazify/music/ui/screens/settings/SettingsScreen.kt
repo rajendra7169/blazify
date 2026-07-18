@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -63,9 +64,16 @@ import com.blazify.music.BuildConfig
 import com.blazify.music.LocalChangelogState
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
+import com.blazify.music.constants.AccountNameKey
+import com.blazify.music.constants.DarkModeKey
+import com.blazify.music.constants.DynamicThemeKey
+import com.blazify.music.constants.InnerTubeCookieKey
+import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.ReleaseNotesCard
 import com.blazify.music.ui.utils.backToMain
+import com.blazify.music.utils.rememberEnumPreference
+import com.blazify.music.utils.rememberPreference
 
 private class SettingRow(
     val icon: Int,
@@ -95,6 +103,14 @@ fun SettingsScreen(
     val showChangelog = LocalChangelogState.current
     val hasUpdate = BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME
     var query by rememberSaveable { mutableStateOf("") }
+
+    // Profile + quick-toggle state for the landing header.
+    val (innerTubeCookie) = rememberPreference(InnerTubeCookieKey, "")
+    val (accountName) = rememberPreference(AccountNameKey, "")
+    val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in innerTubeCookie }
+    val (darkMode, onDarkModeChange) = rememberEnumPreference(DarkModeKey, DarkMode.AUTO)
+    val (dynamicTheme, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, true)
+    val (pureBlack, onPureBlackChange) = rememberPreference(PureBlackKey, true)
 
     val groups: List<Pair<String, List<SettingRow>>> = listOf(
         stringResource(R.string.settings_group_personalize) to listOf(
@@ -174,7 +190,27 @@ fun SettingsScreen(
         Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top)))
         Spacer(Modifier.height(8.dp))
 
+        ProfileHeader(
+            name = accountName.takeIf { it.isNotBlank() && isLoggedIn } ?: stringResource(R.string.guest),
+            isLoggedIn = isLoggedIn,
+            onClick = { navController.navigate(if (isLoggedIn) "account" else "login") },
+        )
+        Spacer(Modifier.height(12.dp))
+
         SettingsSearchField(query = query, onQueryChange = { query = it })
+
+        // Only show quick toggles when not actively searching.
+        if (query.isBlank()) {
+            Spacer(Modifier.height(12.dp))
+            QuickToggles(
+                darkMode = darkMode,
+                onDarkModeChange = onDarkModeChange,
+                dynamicTheme = dynamicTheme,
+                onDynamicThemeChange = onDynamicThemeChange,
+                pureBlack = pureBlack,
+                onPureBlackChange = onPureBlackChange,
+            )
+        }
 
         val q = query.trim()
         var chipIndex = 0
@@ -300,6 +336,147 @@ private fun BlazeSettingRow(row: SettingRow, colorIndex: Int) {
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+@Composable
+private fun ProfileHeader(name: String, isLoggedIn: Boolean, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .background(
+                Brush.horizontalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.06f),
+                    ),
+                ),
+            )
+            .padding(14.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.person),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(if (isLoggedIn) R.string.manage_account else R.string.tap_to_sign_in),
+                fontSize = 12.5.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Icon(
+            painter = painterResource(R.drawable.navigate_next),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+@Composable
+private fun QuickToggles(
+    darkMode: DarkMode,
+    onDarkModeChange: (DarkMode) -> Unit,
+    dynamicTheme: Boolean,
+    onDynamicThemeChange: (Boolean) -> Unit,
+    pureBlack: Boolean,
+    onPureBlackChange: (Boolean) -> Unit,
+) {
+    val (modeIcon, modeLabel) = when (darkMode) {
+        DarkMode.AUTO -> R.drawable.contrast to stringResource(R.string.quick_theme_auto)
+        DarkMode.ON -> R.drawable.bedtime to stringResource(R.string.quick_theme_dark)
+        DarkMode.OFF -> R.drawable.contrast to stringResource(R.string.quick_theme_light)
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        // Theme mode cycles Auto -> On -> Off.
+        QuickChip(
+            icon = modeIcon,
+            label = modeLabel,
+            active = darkMode != DarkMode.AUTO,
+            modifier = Modifier.weight(1f),
+        ) {
+            onDarkModeChange(
+                when (darkMode) {
+                    DarkMode.AUTO -> DarkMode.ON
+                    DarkMode.ON -> DarkMode.OFF
+                    DarkMode.OFF -> DarkMode.AUTO
+                },
+            )
+        }
+        QuickChip(
+            icon = R.drawable.palette,
+            label = stringResource(R.string.quick_dynamic_color),
+            active = dynamicTheme,
+            modifier = Modifier.weight(1f),
+        ) { onDynamicThemeChange(!dynamicTheme) }
+        QuickChip(
+            icon = R.drawable.bedtime,
+            label = stringResource(R.string.pure_black),
+            active = pureBlack,
+            modifier = Modifier.weight(1f),
+        ) { onPureBlackChange(!pureBlack) }
+    }
+}
+
+@Composable
+private fun QuickChip(
+    icon: Int,
+    label: String,
+    active: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .background(
+                if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+                else MaterialTheme.colorScheme.surfaceContainer,
+            )
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(22.dp),
+        )
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
+            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

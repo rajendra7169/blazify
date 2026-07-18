@@ -1088,6 +1088,13 @@
     <string name="settings_group_connections">Connections</string>
     <string name="hint_integrations">Discord Rich Presence, Last.fm scrobbling</string>
     <string name="hint_together_settings">Listen Together sync and room settings</string>
+    <string name="guest">Guest</string>
+    <string name="manage_account">Manage your account</string>
+    <string name="tap_to_sign_in">Tap to sign in</string>
+    <string name="quick_theme_auto">Auto</string>
+    <string name="quick_theme_dark">Dark</string>
+    <string name="quick_theme_light">Light</string>
+    <string name="quick_dynamic_color">Dynamic</string>
     <string name="hint_player">Quality, crossfade, sleep timer, queue</string>
     <string name="hint_stream">Where audio is fetched from</string>
     <string name="hint_content">Region, explicit, video songs</string>
