@@ -1085,6 +1085,9 @@
     <string name="social_website">Website</string>
     <string name="social_github">GitHub</string>
     <string name="social_instagram">Instagram</string>
+    <string name="settings_group_connections">Connections</string>
+    <string name="hint_integrations">Discord Rich Presence, Last.fm scrobbling</string>
+    <string name="hint_together_settings">Listen Together sync and room settings</string>
     <string name="hint_player">Quality, crossfade, sleep timer, queue</string>
     <string name="hint_stream">Where audio is fetched from</string>
     <string name="hint_content">Region, explicit, video songs</string>

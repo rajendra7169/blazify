@@ -126,6 +126,14 @@ fun SettingsScreen(
                 })
             }
         },
+        stringResource(R.string.settings_group_connections) to listOf(
+            SettingRow(R.drawable.link, stringResource(R.string.integrations), stringResource(R.string.hint_integrations)) {
+                navController.navigate("settings/integrations")
+            },
+            SettingRow(R.drawable.group_outlined, stringResource(R.string.together), stringResource(R.string.hint_together_settings)) {
+                navController.navigate("settings/integrations/listen_together")
+            },
+        ),
         stringResource(R.string.settings_group_privacy_data) to listOf(
             SettingRow(R.drawable.security, stringResource(R.string.privacy), stringResource(R.string.hint_privacy)) {
                 navController.navigate("settings/privacy")
