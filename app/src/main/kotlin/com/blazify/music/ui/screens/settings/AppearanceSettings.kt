@@ -1990,14 +1990,22 @@ private fun MiniPlayerDesignPicker(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(12.dp))
-        // One design per full-width row.
-        MiniPlayerDesign.entries.forEach { d ->
-            MiniPlayerDesignCard(
-                design = d,
-                selected = d == selected,
-                onClick = { onSelect(d) },
+        // Two designs per row for tidy, consistent space use.
+        MiniPlayerDesign.entries.chunked(2).forEach { rowDesigns ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-            )
+            ) {
+                rowDesigns.forEach { d ->
+                    MiniPlayerDesignCard(
+                        design = d,
+                        selected = d == selected,
+                        onClick = { onSelect(d) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (rowDesigns.size == 1) Spacer(Modifier.weight(1f))
+            }
         }
     }
 }
@@ -2053,21 +2061,21 @@ private fun MiniPlayerDesignCard(
 }
 
 /**
- * Compact but REAL preview of a mini-player design for the picker card: the
- * currently-playing song's art, title and artist over the album-art gradient,
- * with each design's real control icons. Non-interactive (the card selects).
+ * Lightweight SKELETON preview of a mini-player design for the picker card:
+ * placeholder art + title/subtitle bars laid out exactly like the real
+ * mini-player, with each design's real control icons and shape. No image
+ * loading or palette work (keeps the picker light); the chosen background
+ * style is reflected representatively. Non-interactive (the card selects).
  */
 @Composable
 private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
-    val pc = LocalPlayerConnection.current
-    val meta by (pc?.mediaMetadata ?: remember { MutableStateFlow<MediaMetadata?>(null) }).collectAsState()
-    val gradient = rememberMiniPreviewGradient(meta?.thumbnailUrl)
     val cs = MaterialTheme.colorScheme
     // Reflect the chosen mini-player background style in the preview.
     val bgStyle by rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
     val lightText = bgStyle == MiniPlayerBackgroundStyle.GRADIENT || bgStyle == MiniPlayerBackgroundStyle.BLUR
     val onColor = if (lightText) Color.White else cs.onSurface
-    val fallbackArt = cs.primary
+    val barFill = onColor.copy(alpha = 0.32f)   // skeleton title/subtitle lines
+    val artFill = onColor.copy(alpha = 0.22f)   // skeleton album-art placeholder
 
     val barShape = when (design) {
         MiniPlayerDesign.FLAT -> RoundedCornerShape(6.dp)
@@ -2077,74 +2085,36 @@ private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
     val artShape =
         if (design == MiniPlayerDesign.FLAT || design == MiniPlayerDesign.FLOATING) RoundedCornerShape(6.dp) else CircleShape
 
-    val baseBg =
-        if (bgStyle == MiniPlayerBackgroundStyle.GRADIENT && gradient.size >= 2) {
-            Modifier.background(Brush.horizontalGradient(gradient))
-        } else {
-            Modifier.background(cs.surfaceContainerHighest)
-        }
+    // Representative background per style (theme-based, no album art needed).
+    val bgMod = when (bgStyle) {
+        MiniPlayerBackgroundStyle.GRADIENT ->
+            Modifier.background(Brush.horizontalGradient(listOf(cs.primary, cs.primary.copy(alpha = 0.62f))))
+        MiniPlayerBackgroundStyle.BLUR -> Modifier.background(cs.surfaceVariant)
+        else -> Modifier.background(cs.surfaceContainerHighest)
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth(if (design == MiniPlayerDesign.FLOATING) 0.9f else 1f)
             .then(if (design == MiniPlayerDesign.FLOATING) Modifier.shadow(6.dp, barShape, clip = false) else Modifier)
-            .height(46.dp)
+            .height(44.dp)
             .clip(barShape)
-            .then(baseBg),
+            .then(bgMod),
         contentAlignment = Alignment.CenterStart,
     ) {
-        when (bgStyle) {
-            MiniPlayerBackgroundStyle.BLUR -> {
-                meta?.thumbnailUrl?.let { url ->
-                    AsyncImage(
-                        model = url,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().blur(16.dp),
-                    )
-                    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
-                }
-            }
-            MiniPlayerBackgroundStyle.GRADIENT -> {
-                if (gradient.size >= 2) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)))
-            }
-            else -> {}
+        // Subtle overlay hints at a blurred art background.
+        if (bgStyle == MiniPlayerBackgroundStyle.BLUR) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.12f)))
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 7.dp),
         ) {
-            Box(Modifier.size(32.dp).clip(artShape)) {
-                val url = meta?.thumbnailUrl
-                if (url != null) {
-                    AsyncImage(
-                        model = url,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                } else {
-                    Box(Modifier.fillMaxSize().background(fallbackArt))
-                }
-            }
+            Box(Modifier.size(28.dp).clip(artShape).background(artFill))
             Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(
-                    text = meta?.title ?: "Song title",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = onColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = meta?.artists?.joinToString { it.name }?.takeIf { it.isNotBlank() }
-                        ?: stringResource(R.string.unknown),
-                    fontSize = 8.sp,
-                    color = onColor.copy(alpha = 0.75f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Box(Modifier.fillMaxWidth(0.72f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(barFill))
+                Box(Modifier.fillMaxWidth(0.46f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(barFill.copy(alpha = 0.7f)))
             }
             Spacer(Modifier.width(6.dp))
             when (design) {
@@ -2179,34 +2149,6 @@ private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
             )
         }
     }
-}
-
-/** Album-art horizontal gradient for the mini-player preview (same extractor as the real one). */
-@Composable
-private fun rememberMiniPreviewGradient(url: String?): List<Color> {
-    val context = LocalContext.current
-    val fallback = MaterialTheme.colorScheme.surfaceContainer.toArgb()
-    var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
-    LaunchedEffect(url) {
-        if (url == null) {
-            colors = emptyList()
-            return@LaunchedEffect
-        }
-        withContext(Dispatchers.IO) {
-            val request = ImageRequest.Builder(context)
-                .data(url)
-                .size(100, 100)
-                .allowHardware(false)
-                .build()
-            val bitmap = runCatching { context.imageLoader.execute(request) }.getOrNull()?.image?.toBitmap()
-            if (bitmap != null) {
-                val palette = Palette.from(bitmap).maximumColorCount(8).resizeBitmapArea(100 * 100).generate()
-                val extracted = PlayerColorExtractor.extractGradientColors(palette = palette, fallbackColor = fallback)
-                withContext(Dispatchers.Main) { colors = extracted }
-            }
-        }
-    }
-    return colors
 }
 
 @Composable

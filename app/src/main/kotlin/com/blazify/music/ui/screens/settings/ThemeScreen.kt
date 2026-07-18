@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
+import com.blazify.music.LocalPlayerAwareWindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -200,30 +202,29 @@ fun PortraitThemeLayout(
     selectedThemeColor: Color,
     onSelectedThemeColorChange: (Color) -> Unit
 ) {
+    // Frame height scales with the screen (responsive on small phones), ~5%
+    // bigger than before. Scrollable so nothing is ever trapped off-screen.
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp.toFloat()
+    val frameHeight = (screenHeightDp * 0.5f).coerceIn(260f, 520f).dp
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .padding(top = 56.dp),
+            .padding(top = 56.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(12.dp))
         // Live theme preview inside a phone frame with a drop shadow.
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.82f)) {
-                ThemePhonePreview(
-                    darkMode = darkMode,
-                    pureBlack = pureBlack,
-                    themeColor = selectedThemeColor
-                )
-            }
+        ThemePhoneFrame(modifier = Modifier.height(frameHeight)) {
+            ThemePhonePreview(
+                darkMode = darkMode,
+                pureBlack = pureBlack,
+                themeColor = selectedThemeColor
+            )
         }
+        Spacer(modifier = Modifier.height(20.dp))
 
         ThemeControls(
             darkMode = darkMode,
@@ -234,7 +235,10 @@ fun PortraitThemeLayout(
             onSelectedThemeColorChange = onSelectedThemeColorChange
         )
 
-        Spacer(modifier = Modifier.height(96.dp))
+        // Clear the now-playing mini-player + navigation bar so the controls
+        // card is never hidden behind them.
+        Spacer(modifier = Modifier.windowInsetsBottomHeight(LocalPlayerAwareWindowInsets.current))
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
