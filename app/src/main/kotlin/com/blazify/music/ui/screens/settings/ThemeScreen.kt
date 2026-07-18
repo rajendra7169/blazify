@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -809,19 +808,20 @@ internal fun ThemePhonePreview(
                 }
                 Icon(painterResource(R.drawable.settings), null, tint = cs.onSurface.copy(alpha = 0.75f), modifier = Modifier.size(13.dp))
             }
-            Spacer(Modifier.height(9.dp))
-            // Greeting card: amber gradient + text + hero image (the signature element).
+            Spacer(Modifier.height(16.dp))
+            // Greeting card: amber gradient + text (left) + hero image (right, bottom
+            // flush with the card, spilling a little above — like the real home).
             val onCard = cs.onPrimary
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(74.dp)
+                    .height(76.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f)))),
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.56f).padding(start = 11.dp),
+                    modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.55f).padding(start = 11.dp),
                 ) {
                     Text(greetingLine(), color = onCard, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 11.5.sp)
                     Spacer(Modifier.height(3.dp))
@@ -829,15 +829,17 @@ internal fun ThemePhonePreview(
                     Spacer(Modifier.height(3.dp))
                     Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 6.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
+                // BottomEnd alignment already sits the (taller) image flush with the card
+                // bottom; the extra height (90 - 76 = 14dp) spills above for the
+                // "pops out of the card" look, staying right of the centered wordmark.
                 Image(
                     painter = painterResource(if (useDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .requiredWidth(80.dp)
-                        .requiredHeight(96.dp)
-                        .offset(y = (-16).dp)
+                        .requiredWidth(74.dp)
+                        .requiredHeight(90.dp)
                         .clip(RoundedCornerShape(8.dp)),
                 )
             }
