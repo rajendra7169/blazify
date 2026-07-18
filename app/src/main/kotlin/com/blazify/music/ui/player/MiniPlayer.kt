@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -94,6 +95,7 @@ import com.blazify.music.constants.SwipeSensitivityKey
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.ThumbnailCornerRadius
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
+import com.blazify.music.constants.MiniPlayerDesignKey
 import com.blazify.music.db.entities.ArtistEntity
 import com.blazify.music.listentogether.ListenTogetherManager
 import com.blazify.music.models.MediaMetadata
@@ -148,25 +150,39 @@ fun MiniPlayer(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    val useNewMiniPlayerDesign by rememberPreference(UseNewMiniPlayerDesignKey, true)
+    // Migration: honour the legacy on/off toggle until the user picks a design.
+    // Old ON -> Modern, old OFF -> Flat. New installs default to Modern.
+    val designId by rememberPreference(MiniPlayerDesignKey, "")
+    val legacyNewDesign by rememberPreference(UseNewMiniPlayerDesignKey, true)
+    val design =
+        remember(designId, legacyNewDesign) {
+            if (designId.isBlank()) {
+                if (legacyNewDesign) MiniPlayerDesign.MODERN else MiniPlayerDesign.FLAT
+            } else {
+                MiniPlayerDesign.fromId(designId)
+            }
+        }
 
     // Create stable progress state - doesn't cause recomposition on position changes
     val progressState = remember { ProgressState(positionState, durationState) }
 
-    if (useNewMiniPlayerDesign) {
-        NewMiniPlayer(
-            progressState = progressState,
-            modifier = modifier,
-            onClick = onClick,
-        )
-    } else {
-        Box(modifier = modifier.fillMaxWidth()) {
-            LegacyMiniPlayer(
-                progressState = progressState,
-                modifier = Modifier.align(Alignment.Center),
-                onClick = onClick,
-            )
+    when (design) {
+        MiniPlayerDesign.FLAT -> {
+            Box(modifier = modifier.fillMaxWidth()) {
+                LegacyMiniPlayer(
+                    progressState = progressState,
+                    modifier = Modifier.align(Alignment.Center),
+                    onClick = onClick,
+                )
+            }
         }
+        else ->
+            NewMiniPlayer(
+                progressState = progressState,
+                modifier = modifier,
+                onClick = onClick,
+                variant = design,
+            )
     }
 }
 
@@ -179,9 +195,15 @@ private fun NewMiniPlayer(
     progressState: ProgressState,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    variant: MiniPlayerDesign = MiniPlayerDesign.MODERN,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val menuState = LocalMenuState.current
+    // Floating = boxier corners + a drop shadow so the card lifts off the page.
+    // Rounded = same pill but with an explicit prev / play / next cluster.
+    val isFloating = variant == MiniPlayerDesign.FLOATING
+    val isRoundedControls = variant == MiniPlayerDesign.ROUNDED
+    val cardShape = RoundedCornerShape(if (isFloating) 18.dp else 32.dp)
 
     // Theme settings - these rarely change
     val miniPlayerBackground by rememberEnumPreference(
@@ -382,9 +404,10 @@ private fun NewMiniPlayer(
                     .then(if (isTabletLandscape) Modifier.width(500.dp).align(Alignment.Center) else Modifier.fillMaxWidth())
                     .height(64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
-                    .clip(RoundedCornerShape(32.dp))
+                    .then(if (isFloating) Modifier.shadow(10.dp, cardShape, clip = false) else Modifier)
+                    .clip(cardShape)
                     .background(color = backgroundColor)
-                    .border(1.dp, outlineColor.copy(alpha = 0.3f), RoundedCornerShape(32.dp))
+                    .border(1.dp, outlineColor.copy(alpha = 0.3f), cardShape)
                     .clickable(
                         interactionSource = interactionSource,
                         indication = LocalIndication.current,
@@ -468,37 +491,49 @@ private fun NewMiniPlayer(
                     Spacer(modifier = Modifier.width(12.dp))
                 }
 
-// Subscribe button - isolated composable
-                mediaMetadata?.artists?.firstOrNull()?.id?.let { artistId ->
-                    SubscribeButton(
-                        artistId = artistId,
-                        metadata = mediaMetadata!!,
-                        primaryColor = primaryColor,
-                        outlineColor = outlineColor,
+                if (isRoundedControls) {
+                    // Explicit transport controls for the Rounded design.
+                    MiniPlayerTransportCluster(
+                        playerConnection = playerConnection,
+                        canSkipPrevious = canSkipPrevious,
+                        canSkipNext = canSkipNext,
                         onSurfaceColor = onSurfaceColor,
+                        primaryColor = primaryColor,
                     )
-                }
+                    Spacer(modifier = Modifier.width(6.dp))
+                } else {
+// Subscribe button - isolated composable
+                    mediaMetadata?.artists?.firstOrNull()?.id?.let { artistId ->
+                        SubscribeButton(
+                            artistId = artistId,
+                            metadata = mediaMetadata!!,
+                            primaryColor = primaryColor,
+                            outlineColor = outlineColor,
+                            onSurfaceColor = onSurfaceColor,
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
 // Add to playlist button - isolated composable
-                mediaMetadata?.let { metadata ->
-                    AddToPlaylistButton(
-                        onClick = {
-                            menuState.show {
-                                AddToPlaylistDialog(
-                                    isVisible = true,
-                                    onGetSong = { listOf(metadata.id) },
-                                    onDismiss = menuState::dismiss,
-                                )
-                            }
-                        },
-                        outlineColor = outlineColor,
-                        onSurfaceColor = onSurfaceColor,
-                    )
-                }
+                    mediaMetadata?.let { metadata ->
+                        AddToPlaylistButton(
+                            onClick = {
+                                menuState.show {
+                                    AddToPlaylistDialog(
+                                        isVisible = true,
+                                        onGetSong = { listOf(metadata.id) },
+                                        onDismiss = menuState::dismiss,
+                                    )
+                                }
+                            },
+                            outlineColor = outlineColor,
+                            onSurfaceColor = onSurfaceColor,
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
 
 // Favorite button - isolated composable
                 mediaMetadata?.let { FavoriteButton(
@@ -509,6 +544,59 @@ private fun NewMiniPlayer(
                 )
                 }
             }
+        }
+    }
+}
+
+/** Prev · Play/Pause · Next cluster used by the Rounded mini-player design. */
+@Composable
+private fun MiniPlayerTransportCluster(
+    playerConnection: PlayerConnection,
+    canSkipPrevious: Boolean,
+    canSkipNext: Boolean,
+    onSurfaceColor: Color,
+    primaryColor: Color,
+) {
+    val isPlaying by playerConnection.isPlaying.collectAsState()
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(
+            onClick = { playerConnection.player.seekToPreviousMediaItem() },
+            enabled = canSkipPrevious,
+            modifier = Modifier.size(32.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.skip_previous),
+                contentDescription = null,
+                tint = onSurfaceColor.copy(alpha = if (canSkipPrevious) 1f else 0.4f),
+                modifier = Modifier.size(22.dp),
+            )
+        }
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(primaryColor)
+                .clickable { playerConnection.togglePlayPause() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+        IconButton(
+            onClick = { playerConnection.player.seekToNext() },
+            enabled = canSkipNext,
+            modifier = Modifier.size(32.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.skip_next),
+                contentDescription = null,
+                tint = onSurfaceColor.copy(alpha = if (canSkipNext) 1f else 0.4f),
+                modifier = Modifier.size(22.dp),
+            )
         }
     }
 }

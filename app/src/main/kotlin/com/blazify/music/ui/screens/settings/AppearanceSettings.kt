@@ -13,7 +13,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import com.blazify.music.ui.player.MiniPlayerDesign
+import com.blazify.music.constants.MiniPlayerDesignKey
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -185,6 +194,18 @@ fun AppearanceSettings(
             UseNewMiniPlayerDesignKey,
             defaultValue = true,
         )
+    val (miniPlayerDesignId, onMiniPlayerDesignChange) =
+        rememberPreference(MiniPlayerDesignKey, defaultValue = "")
+    val selectedMiniPlayerDesign =
+        remember(miniPlayerDesignId, useNewMiniPlayerDesign) {
+            if (miniPlayerDesignId.isBlank()) {
+                if (useNewMiniPlayerDesign) MiniPlayerDesign.MODERN else MiniPlayerDesign.FLAT
+            } else {
+                MiniPlayerDesign.fromId(miniPlayerDesignId)
+            }
+        }
+    // The album-art background style only applies to the non-flat designs.
+    val miniPlayerUsesArtBackground = selectedMiniPlayerDesign != MiniPlayerDesign.FLAT
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
         rememberPreference(
             HidePlayerThumbnailKey,
@@ -1083,33 +1104,17 @@ fun AppearanceSettings(
                 defaultValue = false,
             )
 
+        MiniPlayerDesignPicker(
+            selected = selectedMiniPlayerDesign,
+            onSelect = { onMiniPlayerDesignChange(it.id) },
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         Material3SettingsGroup(
             title = stringResource(id = R.string.mini_player),
             items =
                 buildList {
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.nav_bar),
-                            title = { Text(stringResource(R.string.new_mini_player_design)) },
-                            trailingContent = {
-                                Switch(
-                                    checked = useNewMiniPlayerDesign,
-                                    onCheckedChange = onUseNewMiniPlayerDesignChange,
-                                    thumbContent = {
-                                        Icon(
-                                            painter =
-                                                painterResource(
-                                                    id = if (useNewMiniPlayerDesign) R.drawable.check else R.drawable.close,
-                                                ),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SwitchDefaults.IconSize),
-                                        )
-                                    },
-                                )
-                            },
-                            onClick = { onUseNewMiniPlayerDesignChange(!useNewMiniPlayerDesign) },
-                        ),
-                    )
                     add(
                         Material3SettingsItem(
                             icon = painterResource(R.drawable.gradient),
@@ -1117,7 +1122,7 @@ fun AppearanceSettings(
                                 Text(
                                     text = stringResource(R.string.mini_player_background_style),
                                     color =
-                                        if (!useNewMiniPlayerDesign) {
+                                        if (!miniPlayerUsesArtBackground) {
                                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                                         } else {
                                             MaterialTheme.colorScheme.onSurface
@@ -1127,7 +1132,7 @@ fun AppearanceSettings(
                             description = {
                                 Text(
                                     text =
-                                        if (!useNewMiniPlayerDesign) {
+                                        if (!miniPlayerUsesArtBackground) {
                                             stringResource(R.string.mini_player_background_not_available)
                                         } else {
                                             when (miniPlayerBackground) {
@@ -1139,14 +1144,14 @@ fun AppearanceSettings(
                                             }
                                         },
                                     color =
-                                        if (!useNewMiniPlayerDesign) {
+                                        if (!miniPlayerUsesArtBackground) {
                                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                                         } else {
                                             MaterialTheme.colorScheme.onSurfaceVariant
                                         },
                                 )
                             },
-                            onClick = { if (useNewMiniPlayerDesign) showMiniPlayerBackgroundDialog = true },
+                            onClick = { if (miniPlayerUsesArtBackground) showMiniPlayerBackgroundDialog = true },
                         ),
                     )
                 },
@@ -1929,4 +1934,163 @@ enum class LyricsPosition {
 enum class PlayerTextAlignment {
     SIDED,
     CENTER,
+}
+
+/* ------------------------------------------------------------------------- */
+/* Mini-player design picker: non-interactive preview cards, 2 per row.       */
+/* ------------------------------------------------------------------------- */
+
+@Composable
+private fun MiniPlayerDesignPicker(
+    selected: MiniPlayerDesign,
+    onSelect: (MiniPlayerDesign) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Text(
+            text = stringResource(R.string.mini_player_design),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(R.string.mini_player_design_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(12.dp))
+        MiniPlayerDesign.entries.chunked(2).forEach { rowDesigns ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            ) {
+                rowDesigns.forEach { d ->
+                    MiniPlayerDesignCard(
+                        design = d,
+                        selected = d == selected,
+                        onClick = { onSelect(d) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (rowDesigns.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiniPlayerDesignCard(
+    design: MiniPlayerDesign,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val borderColor =
+        if (selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .border(if (selected) 2.dp else 1.dp, borderColor, RoundedCornerShape(18.dp))
+            .padding(12.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+            contentAlignment = Alignment.Center,
+        ) {
+            MiniPlayerMock(design)
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(design.nameRes),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            if (selected) {
+                Icon(
+                    painter = painterResource(R.drawable.check),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+    }
+}
+
+/** Tiny static mock of each mini-player design for the picker card (non-interactive). */
+@Composable
+private fun MiniPlayerMock(design: MiniPlayerDesign) {
+    val art = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
+    val line = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
+    val faint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.28f)
+    val barBg = MaterialTheme.colorScheme.surfaceContainerHighest
+    val artShape =
+        if (design == MiniPlayerDesign.FLAT || design == MiniPlayerDesign.FLOATING) RoundedCornerShape(5.dp) else CircleShape
+    val barShape = when (design) {
+        MiniPlayerDesign.FLAT -> RoundedCornerShape(4.dp)
+        MiniPlayerDesign.FLOATING -> RoundedCornerShape(8.dp)
+        else -> RoundedCornerShape(50)
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(if (design == MiniPlayerDesign.FLOATING) 0.84f else 0.94f)
+            .then(if (design == MiniPlayerDesign.FLOATING) Modifier.shadow(4.dp, barShape, clip = false) else Modifier)
+            .height(30.dp)
+            .clip(barShape)
+            .background(barBg),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp),
+        ) {
+            Box(Modifier.size(20.dp).clip(artShape).background(art))
+            Spacer(Modifier.width(6.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Box(Modifier.fillMaxWidth(0.8f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(line))
+                Box(Modifier.fillMaxWidth(0.5f).height(3.dp).clip(RoundedCornerShape(2.dp)).background(faint))
+            }
+            Spacer(Modifier.width(4.dp))
+            when (design) {
+                MiniPlayerDesign.ROUNDED -> {
+                    MockGlyph(R.drawable.skip_previous, line)
+                    Spacer(Modifier.width(2.dp))
+                    Box(
+                        Modifier.size(16.dp).clip(CircleShape).background(art),
+                        contentAlignment = Alignment.Center,
+                    ) { MockGlyph(R.drawable.play, MaterialTheme.colorScheme.onPrimary, 10) }
+                    Spacer(Modifier.width(2.dp))
+                    MockGlyph(R.drawable.skip_next, line)
+                }
+                MiniPlayerDesign.FLAT -> {}
+                else -> {
+                    Box(Modifier.size(5.dp).clip(CircleShape).background(faint))
+                    Spacer(Modifier.width(4.dp))
+                    Box(Modifier.size(5.dp).clip(CircleShape).background(faint))
+                }
+            }
+        }
+        if (design == MiniPlayerDesign.FLAT) {
+            Box(Modifier.align(Alignment.TopStart).fillMaxWidth(0.4f).height(2.dp).background(art))
+        }
+    }
+}
+
+@Composable
+private fun MockGlyph(res: Int, tint: Color, size: Int = 12) {
+    Icon(
+        painter = painterResource(res),
+        contentDescription = null,
+        tint = tint,
+        modifier = Modifier.size(size.dp),
+    )
 }

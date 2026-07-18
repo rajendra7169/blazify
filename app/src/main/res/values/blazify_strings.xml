@@ -1085,4 +1085,12 @@
     <string name="player_design_record">Record</string>
     <string name="player_design_cassette">Cassette</string>
     <string name="show_lyrics">Show Lyrics</string>
+
+    <!-- Mini-player design picker -->
+    <string name="mini_player_design">Mini-player design</string>
+    <string name="mini_player_design_desc">Pick how the mini-player looks</string>
+    <string name="mini_player_design_flat">Flat</string>
+    <string name="mini_player_design_modern">Modern</string>
+    <string name="mini_player_design_rounded">Rounded</string>
+    <string name="mini_player_design_floating">Floating</string>
 </resources>
