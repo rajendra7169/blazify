@@ -833,17 +833,23 @@ internal fun ThemePhonePreview(
                         .align(Alignment.BottomEnd)
                         .requiredWidth(78.dp)
                         .requiredHeight(92.dp)
-                        .offset(y = (-6).dp),
+                        // requiredHeight overflow is centred (12dp above AND below the
+                        // 68dp card) — shift up by exactly that half so the bottom edge
+                        // is flush inside the card and only the top spills out.
+                        .offset(y = (-12).dp),
                 )
                 // Greeting text — centered-left, tight (so the greeting sits a touch
                 // lower and 'Enjoy the music' a touch higher, with padding around it).
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(1.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                     modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
                 ) {
+                    // Explicit lineHeights kill the inherited tall line-boxes, compressing
+                    // the block: the greeting sits lower, 'Enjoy the music' higher, with
+                    // even padding above and below.
                     Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
-                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Spacer(Modifier.height(9.dp))
@@ -867,13 +873,17 @@ internal fun ThemePhonePreview(
             // Mood chips with labels, like the real home — small, proportional to the mini screen.
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                 listOf("Energize", "Relax", "Feel good").forEach { label ->
+                    // Fixed thin height + explicit lineHeight — the inherited text
+                    // line-box was inflating these pills no matter the padding.
                     Box(
                         modifier = Modifier
+                            .height(10.dp)
                             .clip(RoundedCornerShape(50))
                             .background(cs.surfaceContainerHigh)
-                            .padding(horizontal = 7.dp, vertical = 0.5.dp),
+                            .padding(horizontal = 7.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(label, fontSize = 5.sp, color = cs.onSurfaceVariant, maxLines = 1)
+                        Text(label, fontSize = 5.sp, lineHeight = 5.5.sp, color = cs.onSurfaceVariant, maxLines = 1)
                     }
                 }
             }
@@ -883,11 +893,13 @@ internal fun ThemePhonePreview(
                 Text("Quick picks", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
                 Box(
                     modifier = Modifier
+                        .height(10.dp)
                         .clip(RoundedCornerShape(50))
                         .border(0.6.dp, cs.primary.copy(alpha = 0.7f), RoundedCornerShape(50))
-                        .padding(horizontal = 8.dp, vertical = 0.5.dp),
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Text("Play all", fontSize = 4.5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
+                    Text("Play all", fontSize = 4.5.sp, lineHeight = 5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
                 }
             }
             Spacer(Modifier.height(7.dp))
