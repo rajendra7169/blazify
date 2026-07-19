@@ -489,6 +489,9 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
             ),
             contentColor = textColor,
             enabled = pc != null,
+            // The phone frame is a fraction of real screen width, so the full-size
+            // bar swallows the track here just as it did in the picker tiles.
+            compact = true,
         )
         return
     }
