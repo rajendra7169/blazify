@@ -172,7 +172,9 @@ import com.blazify.music.playback.MusicService
 import com.blazify.music.playback.MusicService.MusicBinder
 import com.blazify.music.playback.PlayerConnection
 import com.blazify.music.playback.queues.YouTubeQueue
+import com.blazify.music.constants.OnboardingCompletedKey
 import com.blazify.music.ui.component.BlazeSplash
+import com.blazify.music.ui.screens.OnboardingScreen
 import com.blazify.music.ui.component.AccountSettingsDialog
 import com.blazify.music.ui.component.AppNavigationBar
 import com.blazify.music.ui.component.AppNavigationRail
@@ -476,6 +478,13 @@ class MainActivity : ComponentActivity() {
                 splashVisible = false
             }
             BlazeSplash(visible = splashVisible)
+
+            // First run: introduce what the app does before dropping into it.
+            val (onboardingCompleted, setOnboardingCompleted) =
+                rememberPreference(OnboardingCompletedKey, defaultValue = false)
+            if (!onboardingCompleted && !splashVisible) {
+                OnboardingScreen(onFinish = { setOnboardingCompleted(true) })
+            }
         }
     }
 

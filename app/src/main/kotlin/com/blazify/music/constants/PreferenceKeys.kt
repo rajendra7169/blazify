@@ -773,3 +773,6 @@ enum class NavBarStyle {
     /** Tinted, outlined rounded box around icon + label. */
     OUTLINED,
 }
+
+// First-run onboarding (shown once until completed/skipped).
+val OnboardingCompletedKey = booleanPreferencesKey("onboardingCompleted")
