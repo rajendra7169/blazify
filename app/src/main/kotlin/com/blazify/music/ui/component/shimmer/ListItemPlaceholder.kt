@@ -42,7 +42,7 @@ fun ListItemPlaceHolder(
                 .padding(6.dp)
                 .size(ListThumbnailSize)
                 .clip(thumbnailShape)
-                .background(MaterialTheme.colorScheme.onSurface),
+                .background(skeletonBlockColor),
         )
 
         Column(
