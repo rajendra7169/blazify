@@ -1,0 +1,15 @@
+Blazify
+Copyright (C) 2026 Rajendra Pandey
+
+The user interface, theming, branding, and feature work in this application are
+original.
+
+Blazify's streaming core derives from the Metrolist project
+(https://github.com/MetrolistGroup/Metrolist), which itself derives from
+InnerTune. Both are licensed under the GNU General Public License v3.0, and
+their copyright notices are preserved here as that license requires.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See the LICENSE file for the full license text.
