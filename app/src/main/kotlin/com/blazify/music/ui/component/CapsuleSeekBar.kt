@@ -73,12 +73,13 @@ fun CapsuleSeekBar(
     /** Shrinks every dimension so the bar still reads inside a settings preview tile. */
     compact: Boolean = false,
 ) {
-    val buttonSize = if (compact) 20.dp else SEEK_BUTTON_SIZE
-    val capsuleHeight = if (compact) 18.dp else CAPSULE_HEIGHT
-    val trackHeight = if (compact) 3.dp else TRACK_HEIGHT
-    val gap = if (compact) 6.dp else 12.dp
-    val labelSize = if (compact) 9.sp else 12.sp
-    val labelPadding = if (compact) 12.dp else 24.dp
+    val buttonSize = if (compact) 16.dp else SEEK_BUTTON_SIZE
+    val capsuleHeight = if (compact) 14.dp else CAPSULE_HEIGHT
+    val trackHeight = if (compact) 2.5.dp else TRACK_HEIGHT
+    val gap = if (compact) 5.dp else 10.dp
+    val labelSize = if (compact) 7.sp else 10.sp
+    // Keep the capsule tight around its label so the track stays visible either side.
+    val labelPadding = if (compact) 8.dp else 14.dp
     // While dragging, show where the finger is rather than where playback still is.
     var dragFraction by remember { mutableStateOf<Float?>(null) }
     val fraction = dragFraction
@@ -210,9 +211,9 @@ fun CapsuleSeekBar(
     }
 }
 
-private val TRACK_HEIGHT = 4.dp
-private val CAPSULE_HEIGHT = 26.dp
-private val SEEK_BUTTON_SIZE = 26.dp
+private val TRACK_HEIGHT = 3.dp
+private val CAPSULE_HEIGHT = 20.dp
+private val SEEK_BUTTON_SIZE = 22.dp
 
 /**
  * Ten-second skip control: an almost-closed ring with an arrowhead on its top
