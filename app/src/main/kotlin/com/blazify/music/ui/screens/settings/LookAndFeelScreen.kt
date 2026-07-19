@@ -82,6 +82,8 @@ import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
+import com.blazify.music.constants.SliderStyle
+import com.blazify.music.constants.SliderStyleKey
 import com.blazify.music.constants.ShowHomeGreetingKey
 import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
@@ -158,6 +160,8 @@ fun LookAndFeelScreen(
     val playerDesign = remember(playerDesignId) {
         PlayerDesign.entries.firstOrNull { it.id == playerDesignId } ?: PlayerDesign.CLASSIC
     }
+    val (sliderStyle, onSliderStyleChange) = rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+    var showSliderStyleDialog by rememberSaveable { mutableStateOf(false) }
     val playerConnection = LocalPlayerConnection.current
 
     // ── Lyrics state ──
@@ -239,6 +243,12 @@ fun LookAndFeelScreen(
                                     title = { Text(stringResource(R.string.player_theme)) },
                                     description = { Text(stringResource(playerDesign.nameRes)) },
                                     onClick = { navController.navigate("settings/appearance/player_design") },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.sliders),
+                                    title = { Text(stringResource(R.string.player_slider_style)) },
+                                    description = { Text(sliderStyle.label()) },
+                                    onClick = { showSliderStyleDialog = true },
                                 ),
                             ),
                         )
@@ -379,6 +389,20 @@ fun LookAndFeelScreen(
         )
     }
 
+    if (showSliderStyleDialog) {
+        EnumDialog(
+            onDismiss = { showSliderStyleDialog = false },
+            onSelect = {
+                onSliderStyleChange(it)
+                showSliderStyleDialog = false
+            },
+            title = stringResource(R.string.player_slider_style),
+            current = sliderStyle,
+            values = SliderStyle.entries.toList(),
+            valueText = { it.label() },
+        )
+    }
+
     if (showLyricsPositionDialog) {
         EnumDialog(
             onDismiss = { showLyricsPositionDialog = false },
@@ -445,6 +469,13 @@ private fun NavigationTab.label(): String = when (this) {
     NavigationTab.HOME -> stringResource(R.string.home)
     NavigationTab.SEARCH -> stringResource(R.string.search)
     NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+}
+
+@Composable
+private fun SliderStyle.label(): String = when (this) {
+    SliderStyle.DEFAULT -> stringResource(R.string.slider_style_capsule)
+    SliderStyle.WAVY -> stringResource(R.string.wavy)
+    SliderStyle.SLIM -> stringResource(R.string.slim)
 }
 
 @Composable

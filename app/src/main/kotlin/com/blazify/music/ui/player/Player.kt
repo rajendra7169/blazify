@@ -191,6 +191,7 @@ import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.component.BottomSheet
 import com.blazify.music.ui.component.BlazeSleepTimerDialog
 import com.blazify.music.ui.component.BottomSheetState
+import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.component.Lyrics
@@ -892,30 +893,24 @@ fun BottomSheetPlayer(
         val playerSeekBar: @Composable (Modifier, SliderColors) -> Unit = { seekModifier, seekColors ->
             when (sliderStyle) {
                 SliderStyle.DEFAULT -> {
-                    Slider(
-                        value = (sliderPosition ?: effectivePosition).toFloat(),
-                        valueRange = 0f..(if (duration == C.TIME_UNSET) 0f else duration.toFloat()),
-                        onValueChange = {
+                    CapsuleSeekBar(
+                        position = sliderPosition ?: effectivePosition,
+                        duration = if (duration == C.TIME_UNSET) 0L else duration,
+                        onSeek = {
                             if (!isListenTogetherGuest) {
-                                sliderPosition = it.toLong()
-                            }
-                        },
-                        onValueChangeFinished = {
-                            if (!isListenTogetherGuest) {
-                                sliderPosition?.let {
-                                    if (isCasting) {
-                                        castHandler?.seekTo(it)
-                                        lastManualSeekTime = System.currentTimeMillis()
-                                    } else {
-                                        playerConnection.player.seekTo(it)
-                                    }
-                                    position = it
+                                if (isCasting) {
+                                    castHandler?.seekTo(it)
+                                    lastManualSeekTime = System.currentTimeMillis()
+                                } else {
+                                    playerConnection.player.seekTo(it)
                                 }
+                                position = it
                                 sliderPosition = null
                             }
                         },
-                        enabled = !isListenTogetherGuest,
                         colors = seekColors,
+                        contentColor = onBackgroundColor,
+                        enabled = !isListenTogetherGuest,
                         modifier = seekModifier,
                     )
                 }

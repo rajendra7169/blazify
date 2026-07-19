@@ -36,6 +36,8 @@ import com.blazify.music.ui.player.CassetteTape
 import com.blazify.music.ui.player.SeekableAlbumRing
 import com.blazify.music.ui.player.VinylTurntable
 import com.blazify.music.ui.theme.PlayerColorExtractor
+import com.blazify.music.constants.SliderStyle
+import com.blazify.music.constants.SliderStyleKey
 import com.blazify.music.utils.rememberEnumPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -67,6 +69,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -102,6 +105,7 @@ import com.blazify.music.R
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.playback.PlayerConnection
+import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.player.PlayerDesign
 import com.blazify.music.ui.utils.backToMain
@@ -299,6 +303,9 @@ private fun PhoneFrame(modifier: Modifier = Modifier, content: @Composable () ->
 
 private const val PREVIEW_FALLBACK_PROGRESS = 0.35f
 
+/** Stand-in length so the capsule shows a plausible readout with no song loaded. */
+private const val PREVIEW_FALLBACK_DURATION = 179_000L
+
 @Composable
 internal fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
     val meta by remember(pc) { pc?.mediaMetadata ?: MutableStateFlow(null) }.collectAsState()
@@ -467,6 +474,25 @@ private fun rememberLivePosition(pc: PlayerConnection?): Pair<Long, Long> {
 @Composable
 private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveColor: Color, textColor: Color) {
     val (pos, dur) = rememberLivePosition(pc)
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+
+    // The capsule style is distinctive enough that the preview has to show it,
+    // otherwise picking it in Look & Feel appears to do nothing.
+    if (sliderStyle == SliderStyle.DEFAULT) {
+        CapsuleSeekBar(
+            position = if (dur > 0) pos else (PREVIEW_FALLBACK_PROGRESS * PREVIEW_FALLBACK_DURATION).toLong(),
+            duration = if (dur > 0) dur else PREVIEW_FALLBACK_DURATION,
+            onSeek = { pc?.player?.seekTo(it) },
+            colors = SliderDefaults.colors(
+                activeTrackColor = activeColor,
+                inactiveTrackColor = inactiveColor,
+            ),
+            contentColor = textColor,
+            enabled = pc != null,
+        )
+        return
+    }
+
     var dragFrac by remember { mutableStateOf<Float?>(null) }
     val frac = dragFrac ?: if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
     Box(
