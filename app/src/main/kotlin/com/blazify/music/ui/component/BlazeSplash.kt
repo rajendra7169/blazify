@@ -10,6 +10,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -74,7 +76,14 @@ fun BlazeSplash(
             logoAlpha.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
         }
         LaunchedEffect(Unit) {
-            logoScale.animateTo(1f, tween(620, easing = FastOutSlowInEasing))
+            // Slight overshoot so the glyph lands with some weight.
+            logoScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow,
+                ),
+            )
         }
         LaunchedEffect(Unit) {
             delay(220)
@@ -116,6 +125,28 @@ fun BlazeSplash(
                 .background(Color.Black),
             contentAlignment = Alignment.Center,
         ) {
+            // Slowly turning conic sheen, so the backdrop has motion of its own.
+            Box(
+                modifier = Modifier
+                    .size(300.dp)
+                    .graphicsLayer {
+                        rotationZ = shimmer * 360f
+                        alpha = 0.55f * logoAlpha.value
+                    }
+                    .background(
+                        Brush.sweepGradient(
+                            listOf(
+                                Color.Transparent,
+                                BlazeThemeColor.copy(alpha = 0.22f),
+                                Color.Transparent,
+                                BlazeGradientEnd.copy(alpha = 0.16f),
+                                Color.Transparent,
+                            ),
+                        ),
+                        shape = CircleShape,
+                    ),
+            )
+
             // Warm glow so the black isn't flat.
             Box(
                 modifier = Modifier

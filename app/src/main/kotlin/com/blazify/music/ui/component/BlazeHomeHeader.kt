@@ -95,21 +95,13 @@ fun BlazeHomeHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
             ) {
-                // Logo sits on a white disc with padding so the glyph doesn't run
-                // edge-to-edge; the coloured logo is used since white-on-white vanishes.
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.blaze_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(27.dp),
-                    )
-                }
+                Image(
+                    painter = painterResource(
+                        if (isDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo,
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(42.dp),
+                )
                 Spacer(Modifier.width(10.dp))
                 Text(
                     text = "Blazify",

@@ -888,6 +888,7 @@ private fun LegacyMiniPlayer(
                 ).let { baseModifier ->
                     if (swipeThumbnail) {
                         baseModifier.pointerInput(Unit) {
+                            val containerWidth = size.width.toFloat()
                             detectHorizontalDragGestures(
                                 onDragStart = {
                                     dragStartTime = System.currentTimeMillis()
@@ -896,7 +897,8 @@ private fun LegacyMiniPlayer(
                                 onDragCancel = {
                                     coroutineScope.launch { offsetXAnimatable.animateTo(0f, animationSpec) }
                                 },
-                                onHorizontalDrag = { _, dragAmount ->
+                                onHorizontalDrag = { change, dragAmount ->
+                                    change.consume()
                                     val adjustedDragAmount =
                                         if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
                                     val canSkipPrevious = playerConnection.player.previousMediaItemIndex != -1
@@ -928,14 +930,26 @@ private fun LegacyMiniPlayer(
                                         (kotlin.math.abs(currentOffset) > minDistanceThreshold && velocity > velocityThreshold) ||
                                             (kotlin.math.abs(currentOffset) > autoSwipeThreshold)
 
-                                    if (shouldChangeSong) {
-                                        if (currentOffset > 0 && canSkipPrevious) {
-                                            playerConnection.player.seekToPreviousMediaItem()
-                                        } else if (currentOffset <= 0 && canSkipNext) {
-                                            playerConnection.player.seekToNext()
+                                    val goingToPrevious = currentOffset > 0
+                                    val canChange =
+                                        shouldChangeSong &&
+                                            ((goingToPrevious && canSkipPrevious) || (!goingToPrevious && canSkipNext))
+
+                                    coroutineScope.launch {
+                                        if (canChange) {
+                                            val exitTarget = if (goingToPrevious) containerWidth else -containerWidth
+                                            offsetXAnimatable.animateTo(exitTarget, tween(durationMillis = 160))
+                                            if (goingToPrevious) {
+                                                playerConnection.player.seekToPreviousMediaItem()
+                                            } else {
+                                                playerConnection.player.seekToNext()
+                                            }
+                                            offsetXAnimatable.snapTo(-exitTarget)
+                                            offsetXAnimatable.animateTo(0f, tween(durationMillis = 240))
+                                        } else {
+                                            offsetXAnimatable.animateTo(0f, animationSpec)
                                         }
                                     }
-                                    coroutineScope.launch { offsetXAnimatable.animateTo(0f, animationSpec) }
                                 },
                             )
                         }
@@ -992,28 +1006,7 @@ private fun LegacyMiniPlayer(
             }
         }
 
-        // Swipe indicator
-        if (offsetXAnimatable.value.absoluteValue > 50f) {
-            Box(
-                modifier =
-                    Modifier
-                        .align(if (offsetXAnimatable.value > 0) Alignment.CenterStart else Alignment.CenterEnd)
-                        .padding(horizontal = 16.dp),
-            ) {
-                Icon(
-                    painter =
-                        painterResource(
-                            if (offsetXAnimatable.value > 0) R.drawable.skip_previous else R.drawable.skip_next,
-                        ),
-                    contentDescription = null,
-                    tint =
-                        primaryColor.copy(
-                            alpha = (offsetXAnimatable.value.absoluteValue / autoSwipeThreshold).coerceIn(0f, 1f),
-                        ),
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        }
+
     }
 }
 

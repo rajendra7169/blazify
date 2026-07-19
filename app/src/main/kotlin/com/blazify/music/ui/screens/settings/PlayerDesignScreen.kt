@@ -122,15 +122,14 @@ fun PlayerDesignScreen(navController: NavController) {
     )
 
     // The stored design arrives from DataStore after the first composition, so
-    // initialPage can still be the default. Jump to the design actually in use.
-    var jumpedToActive by rememberSaveable { mutableStateOf(false) }
+    // initialPage can still be the default. Whenever the stored design changes
+    // (including that first load), land on it. Deliberately NOT rememberSaveable:
+    // a saved "already jumped" flag survived re-entry and left the pager on the
+    // default page. Guarded on isScrollInProgress so it never fights a swipe.
     LaunchedEffect(activeId) {
-        if (!jumpedToActive) {
-            val index = designs.indexOfFirst { it.id == activeId }
-            if (index >= 0) {
-                pagerState.scrollToPage(index)
-                jumpedToActive = true
-            }
+        val index = designs.indexOfFirst { it.id == activeId }
+        if (index >= 0 && index != pagerState.currentPage && !pagerState.isScrollInProgress) {
+            pagerState.scrollToPage(index)
         }
     }
 

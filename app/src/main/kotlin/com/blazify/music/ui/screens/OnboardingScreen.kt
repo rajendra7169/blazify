@@ -59,6 +59,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blazify.music.R
+import androidx.compose.ui.graphics.lerp
+import com.blazify.music.ui.screens.settings.DarkMode
+import com.blazify.music.ui.screens.settings.ThemePhoneFrame
+import com.blazify.music.ui.screens.settings.ThemePhonePreview
 import com.blazify.music.ui.theme.BlazeGradientEnd
 import com.blazify.music.ui.theme.BlazeThemeColor
 import kotlinx.coroutines.launch
@@ -67,6 +71,7 @@ private data class OnboardPage(
     val titleRes: Int,
     val bodyRes: Int,
     val iconRes: Int,
+    val accent: Color,
 )
 
 /**
@@ -76,10 +81,10 @@ private data class OnboardPage(
 fun OnboardingScreen(onFinish: () -> Unit) {
     val pages = remember {
         listOf(
-            OnboardPage(R.string.onboard_1_title, R.string.onboard_1_body, R.drawable.play),
-            OnboardPage(R.string.onboard_2_title, R.string.onboard_2_body, R.drawable.lyrics),
-            OnboardPage(R.string.onboard_3_title, R.string.onboard_3_body, R.drawable.group_add),
-            OnboardPage(R.string.onboard_4_title, R.string.onboard_4_body, R.drawable.gradient),
+            OnboardPage(R.string.onboard_1_title, R.string.onboard_1_body, R.drawable.play, BlazeThemeColor),
+            OnboardPage(R.string.onboard_2_title, R.string.onboard_2_body, R.drawable.lyrics, Color(0xFF00ACC1)),
+            OnboardPage(R.string.onboard_3_title, R.string.onboard_3_body, R.drawable.group_add, Color(0xFF8E24AA)),
+            OnboardPage(R.string.onboard_4_title, R.string.onboard_4_body, R.drawable.gradient, Color(0xFF43A047)),
         )
     }
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -89,11 +94,12 @@ fun OnboardingScreen(onFinish: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            // Fully opaque: an alpha stop here let the app behind show through.
             .background(
                 Brush.verticalGradient(
                     listOf(
                         Color.Black,
-                        BlazeThemeColor.copy(alpha = 0.10f),
+                        lerp(Color.Black, BlazeThemeColor, 0.14f),
                         Color.Black,
                     ),
                 ),
@@ -179,25 +185,30 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentAlignment = Alignment.Center,
         ) {
-            OnboardPhone(
+            // Back frame: the real app preview in a different accent, tilted away.
+            ThemePhoneFrame(
                 modifier = Modifier
                     .fillMaxHeight(0.66f)
                     .graphicsLayer {
                         rotationZ = -9f
                         translationX = -70f
-                        scaleX = 0.86f
-                        scaleY = 0.86f
                         alpha = 0.55f
                     },
-                accent = BlazeGradientEnd,
-                variant = index + 1,
-            )
-            OnboardPhone(
-                modifier = Modifier.fillMaxHeight(0.78f),
-                accent = BlazeThemeColor,
-                variant = index,
-                iconRes = page.iconRes,
-            )
+            ) {
+                ThemePhonePreview(
+                    darkMode = DarkMode.ON,
+                    pureBlack = true,
+                    themeColor = page.accent,
+                )
+            }
+            // Front frame: the real app preview in this page's accent.
+            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.78f)) {
+                ThemePhonePreview(
+                    darkMode = DarkMode.ON,
+                    pureBlack = false,
+                    themeColor = page.accent,
+                )
+            }
         }
 
         Spacer(Modifier.height(28.dp))
@@ -219,111 +230,5 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 12.dp),
         )
-    }
-}
-
-/** A small stylised phone frame holding a simple mock of the feature. */
-@Composable
-private fun OnboardPhone(
-    modifier: Modifier = Modifier,
-    accent: Color,
-    variant: Int,
-    iconRes: Int? = null,
-) {
-    val frameShape = RoundedCornerShape(26.dp)
-    val transition = rememberInfiniteTransition(label = "onboardPhone")
-    val pulse by transition.animateFloat(
-        initialValue = 0.96f,
-        targetValue = 1.04f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "pulse",
-    )
-
-    Box(
-        modifier = modifier
-            .aspectRatio(9f / 19f)
-            .clip(frameShape)
-            .background(Brush.verticalGradient(listOf(Color(0xFF3A3B40), Color(0xFF1A1B1E))))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), frameShape)
-            .padding(6.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(21.dp))
-                .background(Color(0xFF0B0B0D))
-                .padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
-        ) {
-            // Hero block, tinted by the page accent.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Brush.horizontalGradient(listOf(accent, accent.copy(alpha = 0.55f)))),
-                contentAlignment = Alignment.Center,
-            ) {
-                if (iconRes != null) {
-                    Icon(
-                        painter = painterResource(iconRes),
-                        contentDescription = null,
-                        tint = Color.Black.copy(alpha = 0.75f),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .graphicsLayer {
-                                scaleX = pulse
-                                scaleY = pulse
-                            },
-                    )
-                }
-            }
-            // A few content rows so it reads as a real screen.
-            repeat(4) { row ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(Color.White.copy(alpha = if (row == 0) 0.22f else 0.12f)),
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(3.dp),
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(if (row % 2 == 0) 0.72f else 0.58f)
-                                .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp))
-                                .background(Color.White.copy(alpha = 0.20f)),
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.4f)
-                                .height(3.dp)
-                                .clip(RoundedCornerShape(2.dp))
-                                .background(Color.White.copy(alpha = 0.11f)),
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.weight(1f))
-            // Mini-player strip at the bottom.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(22.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(accent.copy(alpha = 0.30f)),
-            )
-        }
     }
 }

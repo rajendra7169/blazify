@@ -177,9 +177,10 @@ private fun NavItemContent(
 
         NavBarStyle.GRADIENT -> {
             val shape = RoundedCornerShape(14.dp)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            // Label sits under the icon, and the highlight wraps both.
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
                     .clip(shape)
                     .then(
@@ -195,7 +196,7 @@ private fun NavItemContent(
                             Modifier
                         },
                     )
-                    .padding(horizontal = if (selected) 12.dp else 8.dp, vertical = 6.dp),
+                    .padding(horizontal = 12.dp, vertical = 5.dp),
             ) {
                 Icon(
                     painter = painterResource(id = iconRes),
@@ -203,11 +204,11 @@ private fun NavItemContent(
                     tint = if (selected) onAccent else idle,
                     modifier = Modifier.size(20.dp),
                 )
-                if (selected && !slimNav) {
+                if (!slimNav) {
                     Text(
                         text = label,
-                        color = onAccent,
-                        fontSize = 12.sp,
+                        color = if (selected) onAccent else idle,
+                        fontSize = 11.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -217,9 +218,10 @@ private fun NavItemContent(
 
         NavBarStyle.OUTLINED -> {
             val shape = RoundedCornerShape(12.dp)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            // Label sits under the icon, and the outlined box wraps both.
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
                     .clip(shape)
                     .then(
@@ -231,7 +233,7 @@ private fun NavItemContent(
                             Modifier
                         },
                     )
-                    .padding(horizontal = if (selected) 12.dp else 8.dp, vertical = 6.dp),
+                    .padding(horizontal = 12.dp, vertical = 5.dp),
             ) {
                 Icon(
                     painter = painterResource(id = iconRes),
@@ -239,11 +241,11 @@ private fun NavItemContent(
                     tint = if (selected) accent else idle,
                     modifier = Modifier.size(20.dp),
                 )
-                if (selected && !slimNav) {
+                if (!slimNav) {
                     Text(
                         text = label,
-                        color = accent,
-                        fontSize = 12.sp,
+                        color = if (selected) accent else idle,
+                        fontSize = 11.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
