@@ -468,7 +468,7 @@ private fun GridItemSize.label(): String = when (this) {
  * all over the tinted gradient. Lyric alignment follows the position setting.
  */
 @Composable
-private fun LyricsSampleInterior(
+internal fun LyricsSampleInterior(
     darkMode: DarkMode,
     pureBlack: Boolean,
     themeColor: Color,
