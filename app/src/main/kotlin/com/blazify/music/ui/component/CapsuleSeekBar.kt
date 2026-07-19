@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +70,15 @@ fun CapsuleSeekBar(
     modifier: Modifier = Modifier,
     contentColor: Color = Color.White,
     enabled: Boolean = true,
+    /** Shrinks every dimension so the bar still reads inside a settings preview tile. */
+    compact: Boolean = false,
 ) {
+    val buttonSize = if (compact) 20.dp else SEEK_BUTTON_SIZE
+    val capsuleHeight = if (compact) 18.dp else CAPSULE_HEIGHT
+    val trackHeight = if (compact) 3.dp else TRACK_HEIGHT
+    val gap = if (compact) 6.dp else 12.dp
+    val labelSize = if (compact) 9.sp else 12.sp
+    val labelPadding = if (compact) 12.dp else 24.dp
     // While dragging, show where the finger is rather than where playback still is.
     var dragFraction by remember { mutableStateOf<Float?>(null) }
     val fraction = dragFraction
@@ -94,25 +103,26 @@ fun CapsuleSeekBar(
             forward = false,
             color = contentColor,
             enabled = enabled,
+            diameter = buttonSize,
             onClick = { onSeek((position - SEEK_STEP_MS).coerceAtLeast(0L)) },
         )
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(gap))
 
         val textMeasurer = rememberTextMeasurer()
-        val labelStyle = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        val labelStyle = TextStyle(fontSize = labelSize, fontWeight = FontWeight.SemiBold)
         val density = LocalDensity.current
         // Measure the capsule up front so it can be positioned in the same frame —
         // reacting to onSizeChanged instead would make it jump on first layout.
-        val capsuleWidth = remember(label, density) {
+        val naturalCapsuleWidth = remember(label, density, labelStyle) {
             with(density) {
-                textMeasurer.measure(label, labelStyle).size.width.toDp() + 24.dp
+                textMeasurer.measure(label, labelStyle).size.width.toDp() + labelPadding
             }
         }
 
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .height(CAPSULE_HEIGHT)
+                .height(capsuleHeight)
                 .then(
                     if (!enabled) Modifier else Modifier
                         .pointerInput(duration) {
@@ -144,6 +154,9 @@ fun CapsuleSeekBar(
             contentAlignment = Alignment.CenterStart,
         ) {
             val trackWidth = maxWidth
+            // In a narrow container (a settings preview tile) the label can be wider
+            // than the track; clamp so it ellipsizes instead of being cut off.
+            val capsuleWidth = naturalCapsuleWidth.coerceAtMost(trackWidth)
             // The capsule rides between the track ends rather than overhanging them.
             val travel = (trackWidth - capsuleWidth).coerceAtLeast(0.dp)
             val capsuleStart = travel * fraction
@@ -151,7 +164,7 @@ fun CapsuleSeekBar(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(TRACK_HEIGHT)
+                    .height(trackHeight)
                     .clip(CircleShape)
                     .background(inactiveColor),
             )
@@ -159,7 +172,7 @@ fun CapsuleSeekBar(
             Box(
                 modifier = Modifier
                     .width(capsuleStart + capsuleWidth / 2)
-                    .height(TRACK_HEIGHT)
+                    .height(trackHeight)
                     .clip(CircleShape)
                     .background(activeColor),
             )
@@ -167,7 +180,7 @@ fun CapsuleSeekBar(
                 modifier = Modifier
                     .offset(x = capsuleStart)
                     .width(capsuleWidth)
-                    .height(CAPSULE_HEIGHT)
+                    .height(capsuleHeight)
                     .clip(CircleShape)
                     .background(activeColor),
                 contentAlignment = Alignment.Center,
@@ -178,15 +191,17 @@ fun CapsuleSeekBar(
                     fontSize = labelStyle.fontSize,
                     fontWeight = labelStyle.fontWeight,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(gap))
         SeekTenButton(
             forward = true,
             color = contentColor,
             enabled = enabled,
+            diameter = buttonSize,
             onClick = {
                 val target = position + SEEK_STEP_MS
                 onSeek(if (duration > 0) target.coerceAtMost(duration) else target)
@@ -209,11 +224,13 @@ private fun SeekTenButton(
     forward: Boolean,
     color: Color,
     enabled: Boolean,
+    // Not named `size`: that would shadow DrawScope.size inside the Canvas below.
+    diameter: Dp,
     onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
-            .size(SEEK_BUTTON_SIZE)
+            .size(diameter)
             .clip(CircleShape)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
@@ -221,7 +238,7 @@ private fun SeekTenButton(
         Canvas(
             // Mirror only the ring; the label must stay the right way round.
             modifier = Modifier
-                .size(SEEK_BUTTON_SIZE)
+                .size(diameter)
                 .graphicsLayer { if (!forward) scaleX = -1f },
         ) {
             val stroke = 1.4.dp.toPx()
@@ -260,8 +277,8 @@ private fun SeekTenButton(
         Text(
             text = "10",
             color = color,
-            fontSize = 9.sp,
-            lineHeight = 9.5.sp,
+            fontSize = (diameter.value * 0.35f).sp,
+            lineHeight = (diameter.value * 0.38f).sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 1.dp),
         )

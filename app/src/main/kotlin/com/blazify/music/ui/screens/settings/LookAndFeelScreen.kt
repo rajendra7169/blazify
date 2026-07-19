@@ -84,6 +84,7 @@ import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
 import com.blazify.music.constants.SliderStyle
 import com.blazify.music.constants.SliderStyleKey
+import com.blazify.music.constants.SquigglySliderKey
 import com.blazify.music.constants.ShowHomeGreetingKey
 import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
@@ -161,6 +162,8 @@ fun LookAndFeelScreen(
         PlayerDesign.entries.firstOrNull { it.id == playerDesignId } ?: PlayerDesign.CLASSIC
     }
     val (sliderStyle, onSliderStyleChange) = rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+    // Squiggly is a variant of WAVY rather than its own style, so it rides along.
+    val (squigglySlider, onSquigglySliderChange) = rememberPreference(SquigglySliderKey, defaultValue = false)
     var showSliderStyleDialog by rememberSaveable { mutableStateOf(false) }
     val playerConnection = LocalPlayerConnection.current
 
@@ -247,7 +250,7 @@ fun LookAndFeelScreen(
                                 Material3SettingsItem(
                                     icon = painterResource(R.drawable.sliders),
                                     title = { Text(stringResource(R.string.player_slider_style)) },
-                                    description = { Text(sliderStyle.label()) },
+                                    description = { Text(sliderStyle.label(squigglySlider)) },
                                     onClick = { showSliderStyleDialog = true },
                                 ),
                             ),
@@ -390,16 +393,15 @@ fun LookAndFeelScreen(
     }
 
     if (showSliderStyleDialog) {
-        EnumDialog(
-            onDismiss = { showSliderStyleDialog = false },
-            onSelect = {
-                onSliderStyleChange(it)
+        SliderStyleDialog(
+            current = sliderStyle,
+            squiggly = squigglySlider,
+            onSelect = { style, squig ->
+                onSliderStyleChange(style)
+                onSquigglySliderChange(squig)
                 showSliderStyleDialog = false
             },
-            title = stringResource(R.string.player_slider_style),
-            current = sliderStyle,
-            values = SliderStyle.entries.toList(),
-            valueText = { it.label() },
+            onDismiss = { showSliderStyleDialog = false },
         )
     }
 
@@ -472,9 +474,10 @@ private fun NavigationTab.label(): String = when (this) {
 }
 
 @Composable
-private fun SliderStyle.label(): String = when (this) {
+private fun SliderStyle.label(squiggly: Boolean): String = when (this) {
     SliderStyle.DEFAULT -> stringResource(R.string.slider_style_capsule)
-    SliderStyle.WAVY -> stringResource(R.string.wavy)
+    SliderStyle.WAVY ->
+        if (squiggly) stringResource(R.string.squiggly) else stringResource(R.string.wavy)
     SliderStyle.SLIM -> stringResource(R.string.slim)
 }
 
