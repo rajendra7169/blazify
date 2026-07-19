@@ -1626,7 +1626,10 @@ class MainActivity : ComponentActivity() {
 
 val LocalDatabase = staticCompositionLocalOf<MusicDatabase> { error("No database provided") }
 val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController provided") }
-val LocalPlayerConnection = staticCompositionLocalOf<PlayerConnection?> { error("No PlayerConnection provided") }
+// Defaults to null rather than throwing: the type is nullable and every reader
+// already null-checks. Previews shown before the player exists (onboarding, the
+// Look & Feel phone frame) live outside the provider and must not crash.
+val LocalPlayerConnection = staticCompositionLocalOf<PlayerConnection?> { null }
 val LocalPlayerBottomSheetState = staticCompositionLocalOf<BottomSheetState?> { null }
 val LocalPlayerAwareWindowInsets = compositionLocalOf<WindowInsets> { error("No WindowInsets provided") }
 val LocalDownloadUtil = staticCompositionLocalOf<DownloadUtil> { error("No DownloadUtil provided") }
