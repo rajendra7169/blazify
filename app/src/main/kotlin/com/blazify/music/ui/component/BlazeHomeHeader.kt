@@ -7,6 +7,7 @@ package com.blazify.music.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -88,13 +89,21 @@ fun BlazeHomeHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
             ) {
-                Image(
-                    painter = painterResource(
-                        if (isDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo,
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.size(42.dp),
-                )
+                // Logo sits on a white disc with padding so the glyph doesn't run
+                // edge-to-edge; the coloured logo is used since white-on-white vanishes.
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.blaze_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(27.dp),
+                    )
+                }
                 Spacer(Modifier.width(10.dp))
                 Text(
                     text = "Blazify",
@@ -217,10 +226,14 @@ fun BlazeHomeHeader(
                 modifier = Modifier.size(24.dp),
             )
             Spacer(Modifier.width(12.dp))
+            // Keep the placeholder on one line: on narrow screens it used to wrap and
+            // grow the search bar's height, so ellipsize instead.
             Text(
                 text = "Search songs, albums, artists...",
                 color = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
                 fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
             // Song recognition

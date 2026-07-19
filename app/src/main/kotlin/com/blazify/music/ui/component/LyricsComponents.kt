@@ -48,6 +48,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -256,10 +257,15 @@ internal fun LyricsLanguageButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Follows the dynamic (album-art seeded) theme rather than a fixed tonal colour.
     FilledTonalButton(
         onClick = onClick,
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f),
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
     ) {
         Icon(painterResource(R.drawable.translate), null, Modifier.size(18.dp))
         Spacer(Modifier.width(6.dp))

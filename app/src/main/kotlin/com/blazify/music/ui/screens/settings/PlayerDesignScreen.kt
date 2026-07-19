@@ -73,6 +73,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,6 +120,19 @@ fun PlayerDesignScreen(navController: NavController) {
         initialPage = designs.indexOfFirst { it.id == activeId }.coerceAtLeast(0),
         pageCount = { designs.size },
     )
+
+    // The stored design arrives from DataStore after the first composition, so
+    // initialPage can still be the default. Jump to the design actually in use.
+    var jumpedToActive by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(activeId) {
+        if (!jumpedToActive) {
+            val index = designs.indexOfFirst { it.id == activeId }
+            if (index >= 0) {
+                pagerState.scrollToPage(index)
+                jumpedToActive = true
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

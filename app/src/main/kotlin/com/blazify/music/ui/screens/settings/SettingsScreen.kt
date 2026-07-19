@@ -12,6 +12,7 @@ import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -452,15 +453,22 @@ private fun QuickChip(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val shape = RoundedCornerShape(16.dp)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(shape)
             .clickable(onClick = onClick)
             .background(
                 if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
                 else MaterialTheme.colorScheme.surfaceContainer,
+            )
+            // A visible outline makes the active state unmistakable.
+            .border(
+                width = if (active) 1.5.dp else 0.dp,
+                color = if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
+                shape = shape,
             )
             .padding(vertical = 12.dp, horizontal = 8.dp),
     ) {
