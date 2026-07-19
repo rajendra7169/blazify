@@ -76,6 +76,8 @@ import com.blazify.music.constants.LyricsTextPositionKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.NavBarStyle
+import com.blazify.music.constants.NavBarStyleKey
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
@@ -171,6 +173,8 @@ fun LookAndFeelScreen(
         rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
     var showGridSizeDialog by rememberSaveable { mutableStateOf(false) }
     val (slimNavBar, onSlimNavBarChange) = rememberPreference(SlimNavBarKey, defaultValue = false)
+    val (navBarStyle, onNavBarStyleChange) = rememberEnumPreference(NavBarStyleKey, NavBarStyle.PILL)
+    var showNavBarStyleDialog by rememberSaveable { mutableStateOf(false) }
     val (showHomeGreeting, onShowHomeGreetingChange) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
     val (showHomeSearchBar, onShowHomeSearchBarChange) = rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
 
@@ -269,6 +273,12 @@ fun LookAndFeelScreen(
                                     title = { Text(stringResource(R.string.grid_cell_size)) },
                                     description = { Text(gridItemSize.label()) },
                                     onClick = { showGridSizeDialog = true },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.nav_bar),
+                                    title = { Text(stringResource(R.string.nav_bar_style)) },
+                                    description = { Text(navBarStyle.label()) },
+                                    onClick = { showNavBarStyleDialog = true },
                                 ),
                                 Material3SettingsItem(
                                     icon = painterResource(R.drawable.nav_bar),
@@ -397,6 +407,17 @@ fun LookAndFeelScreen(
         )
     }
 
+    if (showNavBarStyleDialog) {
+        EnumDialog(
+            onDismiss = { showNavBarStyleDialog = false },
+            onSelect = { onNavBarStyleChange(it); showNavBarStyleDialog = false },
+            title = stringResource(R.string.nav_bar_style),
+            current = navBarStyle,
+            values = NavBarStyle.entries.toList(),
+            valueText = { it.label() },
+        )
+    }
+
     if (showGridSizeDialog) {
         EnumDialog(
             onDismiss = { showGridSizeDialog = false },
@@ -424,6 +445,14 @@ private fun NavigationTab.label(): String = when (this) {
     NavigationTab.HOME -> stringResource(R.string.home)
     NavigationTab.SEARCH -> stringResource(R.string.search)
     NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+}
+
+@Composable
+private fun NavBarStyle.label(): String = when (this) {
+    NavBarStyle.PILL -> stringResource(R.string.nav_style_pill)
+    NavBarStyle.GRADIENT -> stringResource(R.string.nav_style_gradient)
+    NavBarStyle.UNDERLINE -> stringResource(R.string.nav_style_underline)
+    NavBarStyle.OUTLINED -> stringResource(R.string.nav_style_outlined)
 }
 
 @Composable

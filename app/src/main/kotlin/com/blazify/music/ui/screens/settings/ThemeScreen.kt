@@ -104,6 +104,8 @@ import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.NavBarStyle
+import com.blazify.music.constants.NavBarStyleKey
 import com.blazify.music.constants.ShowHomeGreetingKey
 import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
@@ -789,6 +791,7 @@ internal fun ThemePhonePreview(
     val (slimNav) = rememberPreference(SlimNavBarKey, defaultValue = false)
     val (showGreetingCard) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
     val (showSearchPill) = rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
+    val (navStyle) = rememberEnumPreference(NavBarStyleKey, NavBarStyle.PILL)
     BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
         val cs = MaterialTheme.colorScheme
         Column(
@@ -1023,14 +1026,36 @@ internal fun ThemePhonePreview(
                 navItems.forEach { (tab, iconRes) ->
                     val active = tab != null && tab == defaultTab
                     val tint = if (active) cs.primary else cs.onSurfaceVariant.copy(alpha = 0.55f)
+                    // Mirror the chosen navigation bar style so the preview matches.
+                    val activeShape = RoundedCornerShape(5.dp)
+                    val highlight: Modifier = when {
+                        !active -> Modifier
+                        navStyle == NavBarStyle.PILL ->
+                            Modifier.clip(RoundedCornerShape(50)).background(cs.primary.copy(alpha = 0.22f))
+                        navStyle == NavBarStyle.GRADIENT ->
+                            Modifier.clip(activeShape).background(
+                                Brush.horizontalGradient(listOf(cs.primary, cs.tertiary)),
+                            )
+                        navStyle == NavBarStyle.OUTLINED ->
+                            Modifier.clip(activeShape).background(cs.primary.copy(alpha = 0.14f))
+                        else -> Modifier
+                    }
+                    val iconTint = if (active && navStyle == NavBarStyle.GRADIENT) cs.onPrimary else tint
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Icon(
-                            painter = painterResource(iconRes),
-                            contentDescription = null,
-                            tint = tint,
-                            modifier = Modifier.size(if (slimNav) 11.dp else 13.dp),
-                        )
-                        if (!slimNav) {
+                        Box(
+                            modifier = highlight.padding(
+                                horizontal = if (active && navStyle != NavBarStyle.UNDERLINE) 5.dp else 0.dp,
+                                vertical = if (active && navStyle != NavBarStyle.UNDERLINE) 2.dp else 0.dp,
+                            ),
+                        ) {
+                            Icon(
+                                painter = painterResource(iconRes),
+                                contentDescription = null,
+                                tint = iconTint,
+                                modifier = Modifier.size(if (slimNav) 11.dp else 13.dp),
+                            )
+                        }
+                        if (!slimNav && navStyle != NavBarStyle.GRADIENT) {
                             Box(Modifier.width(12.dp).height(2.5.dp).clip(RoundedCornerShape(2.dp)).background(tint.copy(alpha = if (active) 1f else 0.5f)))
                         }
                     }

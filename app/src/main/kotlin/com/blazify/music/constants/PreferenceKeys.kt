@@ -759,3 +759,17 @@ val CountryCodeToName =
 // Home header visibility (greeting card + search bar can be hidden).
 val ShowHomeGreetingKey = booleanPreferencesKey("showHomeGreeting")
 val ShowHomeSearchBarKey = booleanPreferencesKey("showHomeSearchBar")
+
+// How the selected item is highlighted in the bottom navigation bar.
+val NavBarStyleKey = stringPreferencesKey("navBarStyle")
+
+enum class NavBarStyle {
+    /** Material pill behind the icon (the original look). */
+    PILL,
+    /** Gradient capsule covering icon + label, with a soft border. */
+    GRADIENT,
+    /** Minimal: a short accent bar under the active item. */
+    UNDERLINE,
+    /** Tinted, outlined rounded box around icon + label. */
+    OUTLINED,
+}
