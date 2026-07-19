@@ -39,7 +39,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
@@ -110,7 +113,20 @@ fun CapsuleSeekBar(
         Spacer(Modifier.width(gap))
 
         val textMeasurer = rememberTextMeasurer()
-        val labelStyle = TextStyle(fontSize = labelSize, fontWeight = FontWeight.SemiBold)
+        // One style for both measuring and drawing, or the capsule ends up sized for
+        // text that renders differently. Trimming the line box is what actually
+        // centres the label: the inherited one is taller than the glyphs and pushes
+        // them off-centre inside a capsule this short.
+        val labelStyle = TextStyle(
+            fontSize = labelSize,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = labelSize,
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center,
+                trim = LineHeightStyle.Trim.Both,
+            ),
+        )
         val density = LocalDensity.current
         // Measure the capsule up front so it can be positioned in the same frame —
         // reacting to onSizeChanged instead would make it jump on first layout.
@@ -189,8 +205,8 @@ fun CapsuleSeekBar(
                 Text(
                     text = label,
                     color = labelColor,
-                    fontSize = labelStyle.fontSize,
-                    fontWeight = labelStyle.fontWeight,
+                    style = labelStyle,
+                    textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -275,13 +291,22 @@ private fun SeekTenButton(
             }
             drawPath(path, color)
         }
+        // Same line-box trim as the capsule label; the manual nudge this replaces
+        // only masked the inherited padding at one particular size.
         Text(
             text = "10",
             color = color,
-            fontSize = (diameter.value * 0.35f).sp,
-            lineHeight = (diameter.value * 0.38f).sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 1.dp),
+            style = TextStyle(
+                fontSize = (diameter.value * 0.35f).sp,
+                lineHeight = (diameter.value * 0.35f).sp,
+                fontWeight = FontWeight.SemiBold,
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.Both,
+                ),
+            ),
+            textAlign = TextAlign.Center,
         )
     }
 }
