@@ -18,9 +18,14 @@
 ---
 
 <div align="center">
-<img src="docs/assets/home.png" width="260" />
-&nbsp;&nbsp;&nbsp;
-<img src="docs/assets/player.png" width="260" />
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/assets/splash.png" width="230" /> | <img src="docs/assets/home.png" width="230" /> | <img src="docs/assets/player.png" width="230" /> |
+| **Splash** | **Home** | **Player** |
+| <img src="docs/assets/lyrics.png" width="230" /> | <img src="docs/assets/equalizer.png" width="230" /> | <img src="docs/assets/look-and-feel.png" width="230" /> |
+| **Synced lyrics** | **Equalizer** | **Look & Feel** |
+
 </div>
 
 ---
