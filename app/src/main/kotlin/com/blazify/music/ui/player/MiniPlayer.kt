@@ -11,6 +11,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -337,6 +338,7 @@ private fun NewMiniPlayer(
                 .let { baseModifier ->
                     if (swipeThumbnail) {
                         baseModifier.pointerInput(Unit) {
+                            val containerWidth = size.width.toFloat()
                             detectHorizontalDragGestures(
                                 onDragStart = {
                                     dragStartTime = System.currentTimeMillis()
@@ -347,7 +349,9 @@ private fun NewMiniPlayer(
                                         offsetXAnimatable.animateTo(0f, animationSpec)
                                     }
                                 },
-                                onHorizontalDrag = { _, dragAmount ->
+                                onHorizontalDrag = { change, dragAmount ->
+                                    // Claim the gesture so the parent sheet doesn't fight it mid-swipe.
+                                    change.consume()
                                     val adjustedDragAmount =
                                         if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
                                     val canSkipPrevious = playerConnection.player.previousMediaItemIndex != -1
@@ -379,15 +383,28 @@ private fun NewMiniPlayer(
                                         (kotlin.math.abs(currentOffset) > minDistanceThreshold && velocity > velocityThreshold) ||
                                             (kotlin.math.abs(currentOffset) > autoSwipeThreshold)
 
-                                    if (shouldChangeSong) {
-                                        if (currentOffset > 0 && canSkipPrevious) {
-                                            playerConnection.player.seekToPreviousMediaItem()
-                                        } else if (currentOffset <= 0 && canSkipNext) {
-                                            playerConnection.player.seekToNext()
-                                        }
-                                    }
+                                    val goingToPrevious = currentOffset > 0
+                                    val canChange =
+                                        shouldChangeSong &&
+                                            ((goingToPrevious && canSkipPrevious) || (!goingToPrevious && canSkipNext))
+
                                     coroutineScope.launch {
-                                        offsetXAnimatable.animateTo(0f, animationSpec)
+                                        if (canChange) {
+                                            // Carry the card the rest of the way off-screen, swap the
+                                            // song, then bring the next one in from the other side -
+                                            // instead of snapping back to centre while it reloads.
+                                            val exitTarget = if (goingToPrevious) containerWidth else -containerWidth
+                                            offsetXAnimatable.animateTo(exitTarget, tween(durationMillis = 160))
+                                            if (goingToPrevious) {
+                                                playerConnection.player.seekToPreviousMediaItem()
+                                            } else {
+                                                playerConnection.player.seekToNext()
+                                            }
+                                            offsetXAnimatable.snapTo(-exitTarget)
+                                            offsetXAnimatable.animateTo(0f, tween(durationMillis = 240))
+                                        } else {
+                                            offsetXAnimatable.animateTo(0f, animationSpec)
+                                        }
                                     }
                                 },
                             )
