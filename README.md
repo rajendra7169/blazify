@@ -1,131 +1,89 @@
+<div align="center">
+
+<img src="docs/assets/logo.png" alt="Blazify" width="120" />
+
 # Blazify 🔥
 
-**Blazify** is a modern, feature-rich music streaming player for Android, built
-entirely with Kotlin and Jetpack Compose. It combines a vast online music
-catalog with a fast, elegant interface, offline listening, synced lyrics, and
-deep personalization.
+**A modern music streaming player for Android — Kotlin, Jetpack Compose, Material 3.**
 
-> Stream it. Feel it. Blaze it.
+*Stream it. Feel it. Blaze it.*
 
----
+[![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
+[![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
+![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
+![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
 
-## ✨ Features
-
-### 🎵 Streaming & Playback
-- **Massive online catalog** — search and stream millions of songs, albums,
-  artists, playlists, and podcasts
-- **Gapless, high-quality audio** powered by Media3/ExoPlayer with configurable
-  audio quality
-- **Radio & autoplay queues** — start a song and Blazify keeps the music going
-  with related tracks
-- **Full queue management** — reorder by drag, swipe to remove, shuffle,
-  repeat-one/all, and a persistent queue that survives restarts
-- **Audio normalization, tempo and pitch controls, skip-silence** for a tailored
-  listening experience
-- **Android Auto** support for in-car playback
-
-### 🔍 Discovery
-- **Personalized home** — quick picks, mood chips (Energize, Relax, Feel good,
-  Workout), fresh releases, charts, and listening-history-based suggestions
-- **Powerful search** with suggestions, filters (songs / albums / artists /
-  playlists), and both online and local-library results
-- **Song recognition** — a built-in recognizer (tap the mic in the search bar)
-  identifies music playing around you and takes you straight to it
-
-### 📚 Library & Offline
-- **Full library management** — like songs, follow artists, save albums and
-  playlists, all synced with your account
-- **Offline downloads** — save any song, album, or playlist for playback
-  without a connection
-- **Local playlist tools** — create, rename, reorder, import/export (M3U/CSV)
-- **Listening history and detailed stats** — most played songs, artists,
-  albums, and a yearly recap
-
-### 🎤 Lyrics
-- **Synced lyrics** with word-by-word or line-by-line highlighting from
-  multiple providers, with automatic fallback
-- **Lyrics offset adjustment, romanization** (CJK and Cyrillic), and a
-  full-screen immersive lyrics view
-- **Shareable lyric cards** — turn a lyric into a stylized image
-
-### 🎨 Design & Personalization
-- **Signature Blazify look** — amber-to-orange gradient identity, greeting
-  card home header, pure-black dark theme for OLED displays
-- **Dynamic theming** — the interface recolors itself from the current song's
-  album artwork in real time
-- **Player styles** — gradient or blurred artwork backgrounds, multiple slider
-  styles, configurable player buttons
-- **Home-screen widgets** — multiple sizes and styles, plus a recognizer widget
-- **60+ interface languages**
-
-### ⏰ Smart Extras
-- **Sleep timer** — preset chips (15/30/45/60 min), custom duration, live
-  countdown, and an *end-of-song* mode that stops after the current track
-- **Listen Together** — real-time shared listening sessions with friends
-- **Scrobbling** — Last.fm integration with love/unlove sync
-- **Discord Rich Presence** — show friends what you're playing
-- **Backup & restore** — take your whole library and settings to a new device
+</div>
 
 ---
 
-## 📱 Screenshots
-
-| Home | Player | Lyrics |
-|---|---|---|
-| _coming soon_ | _coming soon_ | _coming soon_ |
-
----
-
-## 📦 Download
-
-Grab the latest APK from the [Releases](../../releases) page.
-Each release ships with proper release notes describing what changed.
-
-> Blazify is distributed as a direct APK. It is not available on Google Play.
+<div align="center">
+<img src="docs/assets/home.png" width="200" />
+<img src="docs/assets/player.png" width="200" />
+<img src="docs/assets/look-and-feel.png" width="200" />
+<img src="docs/assets/splash.png" width="200" />
+</div>
 
 ---
 
-## 🛠 Tech Stack
+## What it does
 
-| Layer | Technology |
-|---|---|
-| Language | Kotlin (JVM 21) |
-| UI | Jetpack Compose + Material 3 (expressive) |
-| Playback | AndroidX Media3 / ExoPlayer |
-| DI | Hilt |
-| Persistence | Room (38 schema versions), DataStore preferences |
-| Networking | Ktor client |
-| Images | Coil |
-| Realtime | Protocol Buffers over WebSocket (Listen Together) |
+Blazify streams from a vast online catalogue, plays gapless with Media3/ExoPlayer,
+shows word-by-word synced lyrics, and lets you restyle almost every surface —
+with a live preview while you do it. No ads, no tracking.
 
-## 🏗 Architecture
+## Features
 
-```
-blazify/
-├── app/            # Application: UI (Compose screens/components), playback
-│   │               # service, database, DI, widgets, viewmodels
-│   ├── ui/         #   screens, player, components, menus, theme
-│   ├── playback/   #   MusicService (Media3), PlayerConnection, queues
-│   ├── db/         #   Room database, DAOs, entities
-│   └── di/         #   Hilt modules
-├── innertube/      # Online music catalog client (search, browse, streams)
-├── betterlyrics/   # Lyrics provider
-├── lrclib/         # Synced-lyrics provider
-├── kugou/          # Lyrics provider
-├── lastfm/         # Scrobbling client
-├── shazamkit/      # Song recognition
-├── paxsenix/       # Auxiliary API provider
-└── proto/          # Protobuf definitions (Listen Together)
-```
+### 🎵 Streaming & playback
+- Search and stream millions of songs, albums, artists, playlists and podcasts
+- Gapless playback with configurable audio quality
+- Radio and autoplay queues that keep going after the song ends
+- Offline downloads with a persistent cache
+- Full queue management — drag to reorder, swipe to remove, shuffle, repeat
+- Audio normalisation, tempo and pitch control, skip-silence
+- Sleep timer with a live countdown, plus an end-of-song mode
+- Song recognition — identify what's playing around you
+- Android Auto and home-screen widgets
 
-The UI layer observes state exposed by Hilt viewmodels and a `PlayerConnection`
-bridge to the Media3 service; all remote access flows through the `innertube`
-module. Stream resolution is handled by
-[BlazifyExtractor](https://github.com/rajendra7169/BlazifyExtractor).
+### 🎚️ Sound
+- **Ten-band equalizer** with a live frequency-response curve
+- **13 built-in presets** — Rock, Pop, Jazz, Classical, Hip-hop, Electronic,
+  Acoustic, Vocal, Bass boost, Treble boost, Loudness, Podcast, Flat
+- Preamp control, with each preset pre-compensated so boosts never clip
+- **Bass boost, surround and reverb** layered on top of the parametric EQ
+- Import AutoEQ profiles, or run the headphone wizard to fetch one
+- **Audio output switching** — speaker, wired, USB or Bluetooth, from the player
 
-## 🔨 Building from Source
+### 🎨 Look & Feel
+- A dedicated hub with a **live phone-frame preview** across five tabs
+- **Dynamic theming** that follows your album art, or pick any accent —
+  including a full custom colour picker (saturation/value field, hue rail, hex)
+- Pure-black dark mode for OLED panels
+- **Five player layouts** — Classic, Ring, Full art, Record, Cassette
+- **Four seek-bar styles** — Capsule, Wavy, Slim, Squiggly
+- Mini-player designs, four navigation-bar styles, configurable home header
 
-Requirements: **JDK 21**, Android SDK 37.
+### 📖 Lyrics
+- Word-by-word synced lyrics from multiple providers, with priority ordering
+- Translation and romanization for singing along in any language
+- Adjustable size, spacing, alignment, glow and animation style
+
+### 👥 Social & library
+- **Listen Together** — share a room code and play in sync with friends
+- Playlist import, last.fm scrobbling, library sync
+
+---
+
+## Install
+
+Download the latest APK from **[Releases](https://github.com/rajendra7169/blazify/releases/latest)**.
+
+Requires **Android 8.0 (API 26)** or newer.
+
+> Signed with the project's own release key. If you have an earlier build that
+> came from a different key, uninstall it before installing this one.
+
+## Build from source
 
 ```bash
 git clone https://github.com/rajendra7169/blazify.git
@@ -133,17 +91,31 @@ cd blazify
 ./gradlew :app:assembleFossRelease
 ```
 
-The APK is produced at `app/build/outputs/apk/foss/release/`.
+Requires **JDK 21**. Output lands in `app/build/outputs/apk/foss/release/`.
 
-Build flavors: `foss` (default), `gms` (Google Cast support), `izzy`.
+Three flavours are available: `foss` (default), `gms` (adds Google Cast) and `izzy`.
 
-## 🗺 Roadmap
+## Tech
 
-- [ ] Release signing & first public release APK
-- [ ] Screenshot gallery
-- [ ] More home personalization (rails, moods)
-- [ ] Equalizer presets
+| | |
+|---|---|
+| Language | Kotlin |
+| UI | Jetpack Compose, Material 3 |
+| Playback | Media3 / ExoPlayer |
+| DI | Hilt |
+| Database | Room |
+| Images | Coil |
+| Async | Coroutines + Flow |
 
 ---
 
-*Made with ❤️ by Rajendra Pandey*
+## License
+
+Blazify is released under the **[GNU General Public License v3.0](LICENSE)**.
+
+The user interface, theming, branding and feature work are original. The
+streaming core derives from [Metrolist](https://github.com/MetrolistGroup/Metrolist),
+itself derived from InnerTune — both GPL-3.0. See [NOTICE](NOTICE) for details.
+
+If you distribute this app or a build of it, GPL-3.0 asks you to pass on the
+same freedoms: keep the licence, keep the notices, and make the source available.
