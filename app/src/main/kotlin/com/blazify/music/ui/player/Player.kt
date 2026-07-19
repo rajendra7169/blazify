@@ -1448,31 +1448,35 @@ fun BottomSheetPlayer(
                 ),
             )
 
-            Spacer(Modifier.height(4.dp))
+            // The capsule style already carries "elapsed / total" in its thumb, so
+            // the separate end labels would just repeat it.
+            if (sliderStyle != SliderStyle.DEFAULT) {
+                Spacer(Modifier.height(4.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = PlayerHorizontalPadding + 4.dp),
-            ) {
-                Text(
-                    text = makeTimeString(sliderPosition ?: effectivePosition),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = TextBackgroundColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = PlayerHorizontalPadding + 4.dp),
+                ) {
+                    Text(
+                        text = makeTimeString(sliderPosition ?: effectivePosition),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = TextBackgroundColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
 
-                Text(
-                    text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = TextBackgroundColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                    Text(
+                        text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = TextBackgroundColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -2673,16 +2677,20 @@ private fun RingPlayerLayout(
 
         // --- progress + times (uses the Settings slider style, same as classic) ---
         sliderContent(Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding + 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
-            Text(
-                text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-                style = MaterialTheme.typography.labelMedium,
-                color = textColor,
-            )
+        // The capsule style already carries "elapsed / total" in its thumb.
+        val ringSliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+        if (ringSliderStyle != SliderStyle.DEFAULT) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding + 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
+                Text(
+                    text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = textColor,
+                )
+            }
         }
 
         Spacer(Modifier.height(10.dp))

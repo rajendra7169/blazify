@@ -132,6 +132,7 @@ import com.blazify.music.constants.SwipeToRemoveSongKey
 import com.blazify.music.constants.SwipeToSongKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.constants.UseNewPlayerDesignKey
+import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.EnumDialog
 import com.blazify.music.ui.component.IconButton
@@ -638,17 +639,21 @@ fun AppearanceSettings(
                                     showSliderOptionDialog = false
                                 }.padding(12.dp),
                     ) {
-                        val sliderValue = 0.35f
-                        Slider(
-                            value = sliderValue,
-                            valueRange = 0f..1f,
-                            onValueChange = { /* preview only */ },
-                            colors = sliderPreviewColors,
-                            enabled = false,
+                        Box(
                             modifier = Modifier.weight(1f),
-                        )
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CapsuleSeekBar(
+                                position = 36_000L,
+                                duration = 179_000L,
+                                onSeek = { /* preview only */ },
+                                colors = sliderPreviewColors,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                enabled = false,
+                            )
+                        }
                         Text(
-                            text = stringResource(R.string.default_),
+                            text = stringResource(R.string.slider_style_capsule),
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -1084,7 +1089,7 @@ fun AppearanceSettings(
                             Text(
                                 when (sliderStyle) {
                                     SliderStyle.DEFAULT -> {
-                                        stringResource(R.string.default_)
+                                        stringResource(R.string.slider_style_capsule)
                                     }
 
                                     SliderStyle.WAVY -> {
