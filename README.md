@@ -9,7 +9,6 @@
 *Stream it. Feel it. Blaze it.*
 
 [![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/rajendra7169/blazify/total?color=FFA726&label=downloads)](https://github.com/rajendra7169/blazify/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
