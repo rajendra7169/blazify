@@ -60,6 +60,7 @@ import kotlinx.coroutines.delay
 fun BlazeSplash(
     visible: Boolean,
     modifier: Modifier = Modifier,
+    onIntroFinished: () -> Unit = {},
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -96,6 +97,9 @@ fun BlazeSplash(
         LaunchedEffect(Unit) {
             delay(300)
             barProgress.animateTo(1f, tween(760, easing = FastOutSlowInEasing))
+            // Intro is done and the main thread is still free — this is the cue to
+            // start composing the app underneath, where its startup jank is hidden.
+            onIntroFinished()
         }
 
         // Slow breathing halo behind the glyph.

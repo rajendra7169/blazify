@@ -462,22 +462,38 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            BlazifyApp(
-                latestVersionName = latestVersionName,
-                onLatestVersionNameChange = { latestVersionName = it },
-                playerConnection = playerConnectionSnapshot,
-                database = database,
-                downloadUtil = downloadUtil,
-                syncUtils = syncUtils,
+            // Startup is staged so the splash never animates against a busy UI
+            // thread. Composing the app alongside it starved the animation to
+            // ~9fps, which read as stuttering because wall-clock tweens jump
+            // rather than slow down when frames are dropped. Instead: animate the
+            // splash alone, then compose the app behind it while it is still
+            // fully opaque, so the startup jank happens out of sight.
+            var splashVisible by rememberSaveable { mutableStateOf(true) }
+            var appComposed by rememberSaveable { mutableStateOf(false) }
+
+            if (appComposed) {
+                BlazifyApp(
+                    latestVersionName = latestVersionName,
+                    onLatestVersionNameChange = { latestVersionName = it },
+                    playerConnection = playerConnectionSnapshot,
+                    database = database,
+                    downloadUtil = downloadUtil,
+                    syncUtils = syncUtils,
+                )
+            }
+
+            BlazeSplash(
+                visible = splashVisible,
+                onIntroFinished = { appComposed = true },
             )
 
-            // Branded splash on top of the app while it settles, then fades away.
-            var splashVisible by rememberSaveable { mutableStateOf(true) }
-            LaunchedEffect(Unit) {
-                delay(1250)
+            LaunchedEffect(appComposed) {
+                if (!appComposed) return@LaunchedEffect
+                // Wait for the app to actually put frames up before uncovering it;
+                // a fixed delay would either cut in early or idle for no reason.
+                repeat(3) { withFrameNanos { } }
                 splashVisible = false
             }
-            BlazeSplash(visible = splashVisible)
 
             // First run: introduce what the app does before dropping into it.
             val (onboardingCompleted, setOnboardingCompleted) =
