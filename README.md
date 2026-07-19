@@ -111,11 +111,7 @@ Three flavours are available: `foss` (default), `gms` (adds Google Cast) and `iz
 
 ## License
 
-Blazify is released under the **[GNU General Public License v3.0](LICENSE)**.
-
-The user interface, theming, branding and feature work are original. The
-streaming core derives from [Metrolist](https://github.com/MetrolistGroup/Metrolist),
-itself derived from InnerTune — both GPL-3.0. See [NOTICE](NOTICE) for details.
+Released under the **[GNU General Public License v3.0](LICENSE)** — see [NOTICE](NOTICE).
 
 If you distribute this app or a build of it, GPL-3.0 asks you to pass on the
 same freedoms: keep the licence, keep the notices, and make the source available.
