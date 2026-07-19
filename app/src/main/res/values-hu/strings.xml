@@ -273,7 +273,6 @@
     <string name="disable_screenshot_desc">Ha ez be van kapcsolva, a képernyőkép készítés nem lehetséges, és az előzmények sem látszódnak.</string>
     <string name="enable_lrclib">A LrcLib dalszöveg szolgáltató engedélyezése</string>
     <string name="hide_explicit">Felnőtt tartalom elrejtése</string>
-    <string name="discord_information">Az Blazify a KizzyRPC könyvtárat használja a Discord fiók státusz beállításhoz. Ez a Discord Gateway kapcsolatot használja, amely tekinthető a Discord felhasználási feltételek megszegésének is tágabb értelemben. Habár a múltban nem történt fiók tiltás emiatt, ettől függetlenül kérem használja saját felelősségre.\n\nAz Blazify csak a token-jét fogja kinyerni, minden más helyben tárolt.</string>
     <string name="dismiss">Elrejtés</string>
     <string name="options">Opciók</string>
     <string name="preview">Előnézet</string>
