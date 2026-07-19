@@ -144,6 +144,10 @@
     <string name="auto_scroll">Re-sync</string>
     <string name="slim">Slim</string>
     <string name="slider_style_capsule">Capsule</string>
+    <string name="palette_custom">Custom</string>
+    <string name="custom_color">Custom colour</string>
+    <string name="custom_color_hex">Hex</string>
+    <string name="custom_color_hsv">H %1$d°  ·  S %2$d%%  ·  V %3$d%%</string>
     <string name="slim_navbar">Slim bottom navigation bar</string>
     <string name="auto_playlists">Auto playlists</string>
     <string name="show_liked_playlist">Show Liked playlist</string>

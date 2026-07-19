@@ -68,13 +68,18 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.graphicsLayer
@@ -95,6 +100,7 @@ import com.materialkolor.rememberDynamicColorScheme
 import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.ui.component.ColorPickerDialog
 import com.blazify.music.models.MediaMetadata
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.blazify.music.constants.DarkModeKey
@@ -430,6 +436,12 @@ fun ThemeControls(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
+                // A colour the user mixed themselves matches no preset, so the row
+                // needs its own swatch to show it as the active choice.
+                val isCustomColor = selectedThemeColor != DefaultThemeColor &&
+                    PaletteColors.none { it.seedColor == selectedThemeColor }
+                var showColorPicker by rememberSaveable { mutableStateOf(false) }
+
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                     contentPadding = PaddingValues(horizontal = 4.dp)
@@ -441,16 +453,41 @@ fun ThemeControls(
                         } else {
                             selectedThemeColor == palette.seedColor
                         }
-                        
+
                         PaletteItem(
                             palette = palette,
                             isSelected = isSelected,
-                            onClick = { 
+                            onClick = {
                                 val colorToSave = if (isDynamicPalette) DefaultThemeColor else palette.seedColor
-                                onSelectedThemeColorChange(colorToSave) 
+                                onSelectedThemeColorChange(colorToSave)
                             }
                         )
                     }
+                    item {
+                        CustomPaletteItem(
+                            currentColor = selectedThemeColor,
+                            isSelected = isCustomColor,
+                            onClick = { showColorPicker = true },
+                        )
+                    }
+                }
+
+                if (showColorPicker) {
+                    ColorPickerDialog(
+                        initialColor = if (isCustomColor) selectedThemeColor else BlazeThemeColor,
+                        onDismiss = { showColorPicker = false },
+                        onConfirm = { picked ->
+                            // DefaultThemeColor is the sentinel that switches theming
+                            // back to dynamic, so a custom pick must never land on it.
+                            val safe = if (picked == DefaultThemeColor) {
+                                Color(picked.toArgb() xor 0x00000001)
+                            } else {
+                                picked
+                            }
+                            onSelectedThemeColorChange(safe)
+                            showColorPicker = false
+                        },
+                    )
                 }
             }
         }
@@ -1283,5 +1320,76 @@ fun ThemeMockupPortrait(
                 }
             }
         }
+    }
+}
+
+/**
+ * Trailing swatch that opens the free colour picker. Shows the user's own colour
+ * once they have one, and a hue wheel as an invitation before that.
+ */
+@Composable
+fun CustomPaletteItem(
+    currentColor: Color,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
+    val cornerRadius by animateDpAsState(
+        targetValue = if (isSelected) 48.dp * 0.25f else 24.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "customCorner",
+    )
+    val borderWidth by animateDpAsState(
+        targetValue = if (isSelected) 3.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "customBorder",
+    )
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.08f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "customScale",
+    )
+    val shape = RoundedCornerShape(cornerRadius)
+    val hueWheel = remember {
+        Brush.sweepGradient((0..6).map { Color(android.graphics.Color.HSVToColor(floatArrayOf(it * 60f, 1f, 1f))) })
+    }
+
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(shape)
+            .then(
+                if (borderWidth > 0.dp) {
+                    Modifier.border(borderWidth, MaterialTheme.colorScheme.inversePrimary, shape)
+                } else {
+                    Modifier
+                }
+            )
+            .background(if (isSelected) SolidColor(currentColor) else hueWheel)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.palette),
+            contentDescription = stringResource(R.string.custom_color),
+            tint = if (isSelected) {
+                if (currentColor.luminance() > 0.5f) Color.Black else Color.White
+            } else {
+                Color.White
+            },
+            modifier = Modifier.size(22.dp),
+        )
     }
 }
