@@ -109,26 +109,6 @@ Three flavours are available: `foss` (default), `gms` (adds Google Cast) and `iz
 
 ---
 
-## Acknowledgements 💛
-
-Blazify stands on the shoulders of some genuinely excellent open-source work.
-The streaming core that makes this app possible was not built from nothing —
-it comes from years of effort by people who gave it away for free.
-
-- **[InnerTune](https://github.com/z-huang/InnerTune)** — where it all began.
-  The original Compose music client, and the foundation everything here rests on.
-- **[OuterTune](https://github.com/OuterTune/OuterTune)** — for carrying the
-  project forward and for the many refinements that came out of it.
-- **[Metrolist](https://github.com/MetrolistGroup/Metrolist)** — Blazify's direct
-  upstream, and the base this app was forked from.
-
-Thank you to every contributor to those projects. Blazify's interface, theming
-and features are my own work, but none of it would exist without yours. 🙏
-
-All three are GPL-3.0, and so is Blazify — the same freedoms carry on.
-
----
-
 ## License
 
 Released under the **[GNU General Public License v3.0](LICENSE)** — see [NOTICE](NOTICE).
