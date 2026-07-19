@@ -12,6 +12,12 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
+    <!-- Cold-start theme: shows the branded window background until the activity
+         draws, then MainActivity swaps back to Theme.Blazify. -->
+    <style name="Theme.Blazify.Splash" parent="Theme.Blazify">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
     <!-- Widget Theme with Material 3 colors fallback for API < 31 -->
     <style name="Theme.Widget.Blazify" parent="@android:style/Theme.DeviceDefault.DayNight">
         <item name="android:colorBackground">#E6E1E5</item>

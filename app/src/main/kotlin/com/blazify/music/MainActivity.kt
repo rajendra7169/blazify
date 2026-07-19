@@ -172,6 +172,7 @@ import com.blazify.music.playback.MusicService
 import com.blazify.music.playback.MusicService.MusicBinder
 import com.blazify.music.playback.PlayerConnection
 import com.blazify.music.playback.queues.YouTubeQueue
+import com.blazify.music.ui.component.BlazeSplash
 import com.blazify.music.ui.component.AccountSettingsDialog
 import com.blazify.music.ui.component.AppNavigationBar
 import com.blazify.music.ui.component.AppNavigationRail
@@ -214,6 +215,7 @@ import com.blazify.music.viewmodels.HomeViewModel
 import com.blazify.music.widget.PlaylistWidgetReceiver
 import com.valentinilk.shimmer.LocalShimmerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -385,6 +387,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        // The launcher theme carries the branded splash window background; swap back
+        // to the normal theme now that we're about to draw the real UI.
+        setTheme(R.style.Theme_Blazify)
         super.onCreate(savedInstanceState)
         window.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -463,6 +468,14 @@ class MainActivity : ComponentActivity() {
                 downloadUtil = downloadUtil,
                 syncUtils = syncUtils,
             )
+
+            // Branded splash on top of the app while it settles, then fades away.
+            var splashVisible by rememberSaveable { mutableStateOf(true) }
+            LaunchedEffect(Unit) {
+                delay(1250)
+                splashVisible = false
+            }
+            BlazeSplash(visible = splashVisible)
         }
     }
 
