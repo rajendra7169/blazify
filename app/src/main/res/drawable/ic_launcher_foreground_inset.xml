@@ -4,8 +4,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:drawable="@mipmap/ic_launcher_fg_blaze"
-        android:left="22dp"
-        android:top="22dp"
-        android:right="22dp"
-        android:bottom="22dp" />
+        android:left="18dp"
+        android:top="18dp"
+        android:right="18dp"
+        android:bottom="18dp" />
 </layer-list>
