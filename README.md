@@ -145,6 +145,20 @@ this project belong to their respective owners.
 
 ---
 
+## Support ☕
+
+If Blazify made your day a little better, you can buy me a coffee.
+
+<div align="center">
+
+<img src="docs/assets/coffee-qr.png" width="200" />
+
+**Scan to support Blazify**
+
+</div>
+
+---
+
 ## License
 
 Released under the **[GNU General Public License v3.0](LICENSE)** — see [NOTICE](NOTICE).
