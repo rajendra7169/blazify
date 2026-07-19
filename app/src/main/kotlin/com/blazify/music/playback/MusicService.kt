@@ -178,6 +178,7 @@ import com.blazify.music.db.entities.RelatedSongMap
 import com.blazify.music.db.entities.Song
 import com.blazify.music.di.DownloadCache
 import com.blazify.music.di.PlayerCache
+import com.blazify.music.eq.AudioEffectsService
 import com.blazify.music.eq.EqualizerService
 import com.blazify.music.eq.audio.CustomEqualizerAudioProcessor
 import com.blazify.music.eq.data.EQProfileRepository
@@ -287,6 +288,9 @@ class MusicService :
 
     @Inject
     lateinit var equalizerService: EqualizerService
+
+    @Inject
+    lateinit var audioEffectsService: AudioEffectsService
 
     @Inject
     lateinit var eqProfileRepository: EQProfileRepository
@@ -2469,6 +2473,10 @@ class MusicService :
         isAudioEffectSessionOpened = true
         openedAudioEffectSessionId = audioSessionId
 
+        // Bass boost / surround / reverb live on the output session, so they have
+        // to be rebound whenever it changes.
+        audioEffectsService.attach(audioSessionId)
+
         sendBroadcast(
             Intent(android.media.audiofx.AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
                 putExtra(android.media.audiofx.AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
@@ -2495,6 +2503,7 @@ class MusicService :
 
             isAudioEffectSessionOpened = false
             openedAudioEffectSessionId = C.AUDIO_SESSION_ID_UNSET
+            audioEffectsService.release()
         }
 
         if (sessionIdToClose != C.AUDIO_SESSION_ID_UNSET && sessionIdToClose > 0) {

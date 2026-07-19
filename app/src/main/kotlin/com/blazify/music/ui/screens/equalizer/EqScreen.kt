@@ -61,6 +61,7 @@ fun EqScreen(
 ) {
     val navController = LocalNavController.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val effects by viewModel.effects.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     var showError by remember { mutableStateOf<String?>(null) }
@@ -129,7 +130,24 @@ fun EqScreen(
             showAddMenu = false
             filePickerLauncher.launch("text/plain")
         },
-        onDeleteProfile = { viewModel.deleteProfile(it) }
+        onDeleteProfile = { viewModel.deleteProfile(it) },
+        editor = {
+            EqEditor(
+                enabled = state.eqEnabled,
+                onEnabledChange = viewModel::setEqEnabled,
+                bandGains = state.bandGains,
+                onBandGainChange = viewModel::setBandGain,
+                preamp = state.preamp,
+                onPreampChange = viewModel::setPreamp,
+                presetId = state.presetId,
+                onPresetSelected = viewModel::selectPreset,
+                onReset = viewModel::resetBands,
+                effects = effects,
+                onBassBoostChange = viewModel::setBassBoost,
+                onVirtualizerChange = viewModel::setVirtualizer,
+                onReverbChange = viewModel::setReverbPreset,
+            )
+        },
     )
 
     // Error dialog
@@ -182,7 +200,8 @@ private fun EqScreenContent(
     onAddMenuDismissed: () -> Unit,
     onWizardClicked: () -> Unit,
     onImportClicked: () -> Unit,
-    onDeleteProfile: (String) -> Unit
+    onDeleteProfile: (String) -> Unit,
+    editor: @Composable () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -242,11 +261,15 @@ private fun EqScreenContent(
             contentPadding = PaddingValues(bottom = LocalPlayerAwareWindowInsets.current
                 .asPaddingValues().calculateBottomPadding())
         ) {
-            // Frequency response graph
+            // Band editor: master switch, live curve, presets, sliders, effects.
+            item { editor() }
+
             item {
-                EqFrequencyResponseGraph(
-                    bands = activeProfile?.bands ?: emptyList(),
-                    preamp = activeProfile?.preamp ?: 0.0
+                Text(
+                    text = stringResource(R.string.ex_profiles),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 20.dp, top = 18.dp, bottom = 8.dp),
                 )
             }
 
