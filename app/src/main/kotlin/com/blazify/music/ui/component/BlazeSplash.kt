@@ -39,16 +39,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blazify.music.R
 import com.blazify.music.ui.theme.BlazeGradientEnd
 import com.blazify.music.ui.theme.BlazeThemeColor
 import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Cold-start splash: the Blaze glyph settles in over a warm radial glow, the
@@ -129,27 +135,9 @@ fun BlazeSplash(
                 .background(Color.Black),
             contentAlignment = Alignment.Center,
         ) {
-            // Slowly turning conic sheen, so the backdrop has motion of its own.
-            Box(
-                modifier = Modifier
-                    .size(300.dp)
-                    .graphicsLayer {
-                        rotationZ = shimmer * 360f
-                        alpha = 0.55f * logoAlpha.value
-                    }
-                    .background(
-                        Brush.sweepGradient(
-                            listOf(
-                                Color.Transparent,
-                                BlazeThemeColor.copy(alpha = 0.22f),
-                                Color.Transparent,
-                                BlazeGradientEnd.copy(alpha = 0.16f),
-                                Color.Transparent,
-                            ),
-                        ),
-                        shape = CircleShape,
-                    ),
-            )
+            // Music glyphs drifting around the logo — a spinning sheen said nothing
+            // about the app, and this reads as "music" straight away.
+            SplashNotes(phase = shimmer, alpha = logoAlpha.value)
 
             // Warm glow so the black isn't flat.
             Box(
@@ -224,5 +212,75 @@ fun BlazeSplash(
                 }
             }
         }
+    }
+}
+
+/** One drifting glyph: where it sits, how big, and how far out of step it is. */
+private data class SplashNote(
+    val iconRes: Int,
+    /** Position on the ring, in degrees clockwise from 12 o'clock. */
+    val angle: Float,
+    val radius: Dp,
+    val size: Dp,
+    /** Offset into the shared cycle, so they don't all bob together. */
+    val phaseShift: Float,
+    val maxAlpha: Float,
+)
+
+/**
+ * Music glyphs arranged on a ring around the logo, each bobbing and fading on its
+ * own offset. Driven by one shared [phase] rather than an animation per note, and
+ * applied inside graphicsLayer so the motion never triggers recomposition — cold
+ * start is already tight on the main thread.
+ *
+ * @param phase 0..1, looping.
+ * @param alpha fades the whole group in with the logo.
+ */
+@Composable
+private fun SplashNotes(phase: Float, alpha: Float) {
+    val notes = remember {
+        listOf(
+            // Angles avoid the bottom of the ring (roughly 130°–230°), where the
+            // wordmark and progress bar sit — notes there collided with them.
+            SplashNote(R.drawable.music_note, angle = 26f, radius = 104.dp, size = 22.dp, phaseShift = 0.0f, maxAlpha = 0.85f),
+            SplashNote(R.drawable.queue_music, angle = 68f, radius = 128.dp, size = 18.dp, phaseShift = 0.30f, maxAlpha = 0.50f),
+            SplashNote(R.drawable.music_note, angle = 108f, radius = 112.dp, size = 15.dp, phaseShift = 0.62f, maxAlpha = 0.45f),
+            SplashNote(R.drawable.music_note, angle = 252f, radius = 112.dp, size = 17.dp, phaseShift = 0.18f, maxAlpha = 0.55f),
+            SplashNote(R.drawable.graphic_eq, angle = 292f, radius = 130.dp, size = 20.dp, phaseShift = 0.78f, maxAlpha = 0.50f),
+            SplashNote(R.drawable.music_note, angle = 334f, radius = 100.dp, size = 16.dp, phaseShift = 0.45f, maxAlpha = 0.70f),
+        )
+    }
+    val density = LocalDensity.current
+
+    notes.forEach { note ->
+        // Resolve the ring position once; only the bob and fade change per frame.
+        val base = remember(note, density) {
+            val radians = Math.toRadians((note.angle - 90f).toDouble())
+            with(density) {
+                (note.radius.toPx() * cos(radians).toFloat()) to
+                    (note.radius.toPx() * sin(radians).toFloat())
+            }
+        }
+        val bobRange = with(density) { 7.dp.toPx() }
+
+        Image(
+            painter = painterResource(note.iconRes),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(BlazeThemeColor),
+            modifier = Modifier
+                .size(note.size)
+                .graphicsLayer {
+                    val local = ((phase + note.phaseShift) % 1f) * 2f * PI.toFloat()
+                    translationX = base.first
+                    translationY = base.second + sin(local) * bobRange
+                    // Breathe opacity and scale together so each note feels alive
+                    // without pulling attention from the logo.
+                    val breath = 0.5f + 0.5f * sin(local)
+                    this.alpha = alpha * note.maxAlpha * (0.45f + 0.55f * breath)
+                    val s = 0.9f + 0.12f * breath
+                    scaleX = s
+                    scaleY = s
+                },
+        )
     }
 }
