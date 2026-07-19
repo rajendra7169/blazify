@@ -104,6 +104,8 @@ import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
 import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
+import com.blazify.music.constants.ShowHomeGreetingKey
+import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.ui.player.MiniPlayerDesign
@@ -785,6 +787,8 @@ internal fun ThemePhonePreview(
     val (defaultTab) = rememberEnumPreference(DefaultOpenTabKey, NavigationTab.HOME)
     val (gridSize) = rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
     val (slimNav) = rememberPreference(SlimNavBarKey, defaultValue = false)
+    val (showGreetingCard) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
+    val (showSearchPill) = rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
     BlazifyTheme(darkTheme = useDark, pureBlack = pureBlack, themeColor = themeColor) {
         val cs = MaterialTheme.colorScheme
         Column(
@@ -815,7 +819,7 @@ internal fun ThemePhonePreview(
             // UN-clipped sibling of an un-clipped outer box, so the hero spills out of
             // the card and a little over the wordmark — exactly like the real home.
             val onCard = cs.onPrimary
-            Box(modifier = Modifier.fillMaxWidth().height(68.dp)) {
+            if (showGreetingCard) Box(modifier = Modifier.fillMaxWidth().height(68.dp)) {
                 // Card background (rounded, clipped).
                 Box(
                     modifier = Modifier
@@ -856,7 +860,7 @@ internal fun ThemePhonePreview(
             Spacer(Modifier.height(9.dp))
             // Search pill (icon · placeholder · mic).
             val searchTint = if (useDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000)
-            Row(
+            if (showSearchPill) Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()

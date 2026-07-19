@@ -755,3 +755,7 @@ val CountryCodeToName =
         "YE" to "Yemen",
         "ZW" to "Zimbabwe",
     )
+
+// Home header visibility (greeting card + search bar can be hidden).
+val ShowHomeGreetingKey = booleanPreferencesKey("showHomeGreeting")
+val ShowHomeSearchBarKey = booleanPreferencesKey("showHomeSearchBar")

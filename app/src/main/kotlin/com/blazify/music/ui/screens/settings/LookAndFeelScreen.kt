@@ -80,6 +80,8 @@ import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.SelectedThemeColorKey
+import com.blazify.music.constants.ShowHomeGreetingKey
+import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.models.MediaMetadata
@@ -169,6 +171,8 @@ fun LookAndFeelScreen(
         rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
     var showGridSizeDialog by rememberSaveable { mutableStateOf(false) }
     val (slimNavBar, onSlimNavBarChange) = rememberPreference(SlimNavBarKey, defaultValue = false)
+    val (showHomeGreeting, onShowHomeGreetingChange) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
+    val (showHomeSearchBar, onShowHomeSearchBarChange) = rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
 
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
 
@@ -273,6 +277,24 @@ fun LookAndFeelScreen(
                                         Switch(checked = slimNavBar, onCheckedChange = onSlimNavBarChange)
                                     },
                                     onClick = { onSlimNavBarChange(!slimNavBar) },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.home_outlined),
+                                    title = { Text(stringResource(R.string.show_home_greeting)) },
+                                    description = { Text(stringResource(R.string.show_home_greeting_desc)) },
+                                    trailingContent = {
+                                        Switch(checked = showHomeGreeting, onCheckedChange = onShowHomeGreetingChange)
+                                    },
+                                    onClick = { onShowHomeGreetingChange(!showHomeGreeting) },
+                                ),
+                                Material3SettingsItem(
+                                    icon = painterResource(R.drawable.search),
+                                    title = { Text(stringResource(R.string.show_home_search_bar)) },
+                                    description = { Text(stringResource(R.string.show_home_search_bar_desc)) },
+                                    trailingContent = {
+                                        Switch(checked = showHomeSearchBar, onCheckedChange = onShowHomeSearchBarChange)
+                                    },
+                                    onClick = { onShowHomeSearchBarChange(!showHomeSearchBar) },
                                 ),
                             ),
                         )

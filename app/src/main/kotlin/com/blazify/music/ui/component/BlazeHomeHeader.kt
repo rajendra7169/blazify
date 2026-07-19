@@ -45,10 +45,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
+import com.blazify.music.constants.ShowHomeGreetingKey
+import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.theme.BlazeGradientEnd
 import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.utils.rememberEnumPreference
+import com.blazify.music.utils.rememberPreference
 import java.util.Calendar
 
 /**
@@ -66,6 +69,9 @@ fun BlazeHomeHeader(
 ) {
     val darkMode by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
     val isDark = if (darkMode == DarkMode.AUTO) isSystemInDarkTheme() else darkMode == DarkMode.ON
+    // Both blocks are optional — some people want a compact home (Look & Feel → Home).
+    val showGreeting by rememberPreference(ShowHomeGreetingKey, defaultValue = true)
+    val showSearchBar by rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
     val iconTint = if (isDark) Color.White else Color(0xDE000000)
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -137,7 +143,7 @@ fun BlazeHomeHeader(
         val cardStart = MaterialTheme.colorScheme.primary
         val cardEnd = lerp(cardStart, Color.Black, if (isDark) 0.30f else 0.20f)
         val onCard = if (cardStart.luminance() > 0.6f) Color.Black else Color.White
-        Box(
+        if (showGreeting) Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -209,7 +215,7 @@ fun BlazeHomeHeader(
         Spacer(Modifier.height(8.dp))
 
         // Search bar
-        Row(
+        if (showSearchBar) Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
