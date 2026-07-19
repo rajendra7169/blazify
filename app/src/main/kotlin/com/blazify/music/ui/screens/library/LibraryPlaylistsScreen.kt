@@ -75,7 +75,23 @@ import com.blazify.music.constants.ShowUploadedPlaylistKey
 import com.blazify.music.constants.YtmSyncKey
 import com.blazify.music.db.entities.Playlist
 import com.blazify.music.db.entities.PlaylistEntity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.collectAsState
+import com.blazify.music.LocalPlayerConnection
+import com.blazify.music.constants.MiniPlayerHeight
+import com.blazify.music.db.entities.Song
 import com.blazify.music.ui.component.CreatePlaylistDialog
+import com.blazify.music.ui.menu.AddToPlaylistDialogOnline
+import com.blazify.music.ui.menu.LoadingScreen
+import com.blazify.music.viewmodels.BackupRestoreViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import com.blazify.music.ui.component.LibrarySearchEmptyPlaceholder
 import com.blazify.music.ui.component.LibrarySearchHeader
 import com.blazify.music.ui.component.LibraryPlaylistGridItem
@@ -328,6 +344,48 @@ fun LibraryPlaylistsScreen(
         )
     }
 
+    // ── Playlist import (reuses the same tested flow as Backup & Restore) ──
+    val importContext = LocalContext.current
+    val importViewModel: BackupRestoreViewModel = hiltViewModel()
+    val importedSongs = remember { mutableStateListOf<Song>() }
+    var showImportPlaylistDialog by rememberSaveable { mutableStateOf(false) }
+    var importProgressStarted by remember { mutableStateOf(false) }
+    var importProgress by remember { mutableIntStateOf(0) }
+    var importCurrentSong by remember { mutableStateOf("") }
+    var showFabMenu by remember { mutableStateOf(false) }
+
+    val importM3uLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@rememberLauncherForActivityResult
+            importedSongs.clear()
+            importedSongs.addAll(importViewModel.loadM3UOnline(importContext, uri))
+            if (importedSongs.isNotEmpty()) showImportPlaylistDialog = true
+        }
+    val importCsvLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@rememberLauncherForActivityResult
+            coroutineScope.launch {
+                importedSongs.clear()
+                importedSongs.addAll(importViewModel.importPlaylistFromCsv(importContext, uri))
+                if (importedSongs.isNotEmpty()) showImportPlaylistDialog = true
+            }
+        }
+
+    AddToPlaylistDialogOnline(
+        isVisible = showImportPlaylistDialog,
+        allowSyncing = false,
+        songs = importedSongs,
+        onDismiss = { showImportPlaylistDialog = false },
+        onProgressStart = { importProgressStarted = it },
+        onPercentageChange = { importProgress = it },
+        onSongChange = { importCurrentSong = it },
+    )
+    LoadingScreen(
+        isVisible = importProgressStarted,
+        value = importProgress,
+        songTitle = importCurrentSong,
+    )
+
     val headerContent = @Composable {
         LibrarySearchHeader(
             isSearchActive = isSearchActive,
@@ -540,9 +598,12 @@ fun LibraryPlaylistsScreen(
             }
         }
 
-        // Always visible + button (no scroll hiding)
-        FloatingActionButton(
-            onClick = { showCreatePlaylistDialog = true },
+        // Always visible + button (no scroll hiding). Tap = menu: create or import.
+        // The floating mini-player isn't part of the player-aware inset, so lift the
+        // FAB clear of it while something is playing - otherwise it sits underneath.
+        val fabPlayerConnection = LocalPlayerConnection.current
+        val fabNowPlaying by (fabPlayerConnection?.mediaMetadata ?: remember { MutableStateFlow(null) }).collectAsState()
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .windowInsetsPadding(
@@ -550,11 +611,45 @@ fun LibraryPlaylistsScreen(
                         .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
                 )
                 .padding(16.dp)
+                .padding(bottom = if (fabNowPlaying != null) MiniPlayerHeight else 0.dp)
         ) {
-            Icon(
-                painter = painterResource(R.drawable.add),
-                contentDescription = stringResource(R.string.create_playlist),
-            )
+            FloatingActionButton(onClick = { showFabMenu = true }) {
+                Icon(
+                    painter = painterResource(R.drawable.add),
+                    contentDescription = stringResource(R.string.create_playlist),
+                )
+            }
+            DropdownMenu(
+                expanded = showFabMenu,
+                onDismissRequest = { showFabMenu = false },
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.create_playlist)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.add), null) },
+                    onClick = {
+                        showFabMenu = false
+                        showCreatePlaylistDialog = true
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.import_online)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.playlist_add), null) },
+                    onClick = {
+                        showFabMenu = false
+                        importM3uLauncher.launch(arrayOf("audio/*"))
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.import_csv)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.playlist_add), null) },
+                    onClick = {
+                        showFabMenu = false
+                        importCsvLauncher.launch(
+                            arrayOf("text/csv", "text/comma-separated-values", "application/csv", "text/plain"),
+                        )
+                    },
+                )
+            }
         }
     }
 }
