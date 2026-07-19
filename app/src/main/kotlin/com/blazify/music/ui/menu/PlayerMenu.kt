@@ -85,6 +85,8 @@ import com.blazify.music.LocalDownloadUtil
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.ui.component.AudioOutputDialog
+import com.blazify.music.utils.AudioOutput
 import com.blazify.music.constants.ListItemHeight
 import com.blazify.music.constants.VarispeedKey
 import com.blazify.music.listentogether.ConnectionState
@@ -103,6 +105,7 @@ import com.blazify.music.ui.component.VolumeSlider
 import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.math.round
@@ -168,6 +171,30 @@ fun PlayerMenu(
     val systemEqLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { }
+
+    // Resolved once when the sheet opens; the sheet is short-lived enough that
+    // watching for device changes while it is up would not earn its keep.
+    var currentOutputName by remember { mutableStateOf<String?>(null) }
+    var selectedOutputId by remember { mutableStateOf<Int?>(null) }
+    var showAudioOutputDialog by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        currentOutputName = withContext(Dispatchers.IO) { AudioOutput.currentDeviceName(context) }
+    }
+
+    if (showAudioOutputDialog) {
+        AudioOutputDialog(
+            currentDeviceId = selectedOutputId,
+            onSelect = { device ->
+                // ExoPlayer routes to this device until it disappears, at which
+                // point the platform falls back on its own.
+                playerConnection.player.setPreferredAudioDevice(device)
+                selectedOutputId = device?.id
+                currentOutputName = device?.let { AudioOutput.nameFor(context, it) }
+                    ?: AudioOutput.currentDeviceName(context)
+            },
+            onDismiss = { showAudioOutputDialog = false },
+        )
+    }
 
     AddToPlaylistDialog(
         isVisible = showChoosePlaylistDialog,
@@ -710,6 +737,27 @@ fun PlayerMenu(
                         )
 
                         if (isQueueTrigger != true) {
+                            add(
+                                Material3MenuItemData(
+                                    title = { Text(text = stringResource(R.string.audio_output)) },
+                                    description = {
+                                        // Name the current route so the row says something
+                                        // useful before it is even opened.
+                                        Text(
+                                            text = currentOutputName
+                                                ?: stringResource(R.string.audio_output_desc),
+                                        )
+                                    },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.bluetooth),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                    },
+                                    onClick = { showAudioOutputDialog = true },
+                                ),
+                            )
                             add(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(R.string.equalizer)) },

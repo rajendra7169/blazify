@@ -145,6 +145,15 @@
     <string name="slim">Slim</string>
     <string name="slider_style_capsule">Capsule</string>
     <string name="palette_custom">Custom</string>
+    <string name="audio_output">Audio output</string>
+    <string name="audio_output_desc">Choose speaker, headphones or a Bluetooth device</string>
+    <string name="output_phone_speaker">Phone speaker</string>
+    <string name="output_wired_headphones">Wired headphones</string>
+    <string name="output_usb">USB audio</string>
+    <string name="output_bluetooth">Bluetooth device</string>
+    <string name="output_unknown">This device</string>
+    <string name="output_more">Bluetooth settings</string>
+    <string name="output_none">No other outputs connected</string>
     <string name="custom_color">Custom colour</string>
     <string name="custom_color_hex">Hex</string>
     <string name="custom_color_hsv">H %1$d°  ·  S %2$d%%  ·  V %3$d%%</string>
