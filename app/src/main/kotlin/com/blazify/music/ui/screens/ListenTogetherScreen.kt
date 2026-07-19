@@ -17,6 +17,13 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -491,8 +498,37 @@ private fun HeaderSection(isInRoom: Boolean = false) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Branded hero: a soft Blaze halo behind a gradient disc holding the
-        // group-with-plus icon (create / join a room).
+        // Branded hero: a softly pulsing halo behind a gradient disc holding the
+        // group-with-plus icon. Colours follow the dynamic theme, and the halo
+        // breathes so the "listening together" idea reads as live.
+        val pulseTransition = rememberInfiniteTransition(label = "togetherHero")
+        val haloScale by pulseTransition.animateFloat(
+            initialValue = 0.90f,
+            targetValue = 1.10f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "haloScale",
+        )
+        val haloAlpha by pulseTransition.animateFloat(
+            initialValue = 0.22f,
+            targetValue = 0.07f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "haloAlpha",
+        )
+        val discScale by pulseTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.04f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "discScale",
+        )
         Box(
             modifier = Modifier.size(112.dp),
             contentAlignment = Alignment.Center,
@@ -501,23 +537,36 @@ private fun HeaderSection(isInRoom: Boolean = false) {
                 modifier =
                     Modifier
                         .size(112.dp)
+                        .graphicsLayer {
+                            scaleX = haloScale
+                            scaleY = haloScale
+                        }
                         .clip(CircleShape)
-                        .background(BlazeThemeColor.copy(alpha = 0.12f)),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = haloAlpha)),
             )
             Box(
                 modifier =
                     Modifier
                         .size(88.dp)
+                        .graphicsLayer {
+                            scaleX = discScale
+                            scaleY = discScale
+                        }
                         .clip(CircleShape)
                         .background(
-                            Brush.linearGradient(listOf(BlazeThemeColor, BlazeGradientEnd)),
+                            Brush.linearGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.tertiary,
+                                ),
+                            ),
                         ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.group_add),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(46.dp),
                 )
             }
