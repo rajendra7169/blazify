@@ -1,8 +1,14 @@
 Blazify
 Copyright (C) 2026 Rajendra Pandey
 
-Blazify is licensed under the GNU General Public License v3.0. See LICENSE for
-the full text.
+The user interface, theming, branding, and feature work in this application are
+original.
 
-Portions derive from Metrolist and InnerTune, both GPL-3.0; their copyright
-notices are retained as that license requires.
+Blazify's streaming core derives from InnerTune, licensed under the GNU General
+Public License v3.0. Its copyright notice is preserved here as that license
+requires.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See the LICENSE file for the full license text.
