@@ -33,7 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +80,10 @@ fun BlazeSplash(
         val wordmarkAlpha = remember { Animatable(0f) }
         val wordmarkLift = remember { Animatable(18f) }
         val barProgress = remember { Animatable(0f) }
+        // Motion stops once the app starts composing behind us: that work saturates
+        // the UI thread, so anything still moving would visibly stutter. A still
+        // splash for those few hundred milliseconds reads as deliberate.
+        var motionEnabled by remember { mutableStateOf(true) }
 
         LaunchedEffect(Unit) {
             logoAlpha.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
@@ -105,6 +111,7 @@ fun BlazeSplash(
             barProgress.animateTo(1f, tween(760, easing = FastOutSlowInEasing))
             // Intro is done and the main thread is still free — this is the cue to
             // start composing the app underneath, where its startup jank is hidden.
+            motionEnabled = false
             onIntroFinished()
         }
 
@@ -137,15 +144,18 @@ fun BlazeSplash(
         ) {
             // Music glyphs drifting around the logo — a spinning sheen said nothing
             // about the app, and this reads as "music" straight away.
-            SplashNotes(phase = shimmer, alpha = logoAlpha.value)
+            // Passed as lambdas, not values: reading an animated float here in the
+            // composition scope would recompose the whole splash every frame.
+            SplashNotes(phase = { if (motionEnabled) shimmer else FROZEN_PHASE }, alpha = { logoAlpha.value })
 
             // Warm glow so the black isn't flat.
             Box(
                 modifier = Modifier
                     .size(320.dp)
                     .graphicsLayer {
-                        scaleX = halo
-                        scaleY = halo
+                        val s = if (motionEnabled) halo else 1f
+                        scaleX = s
+                        scaleY = s
                     }
                     .background(
                         Brush.radialGradient(
@@ -203,7 +213,11 @@ fun BlazeSplash(
                             .graphicsLayer {
                                 scaleX = barProgress.value
                                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0.5f)
-                                alpha = 0.55f + 0.45f * kotlin.math.abs(kotlin.math.sin(shimmer * Math.PI).toFloat())
+                                alpha = if (motionEnabled) {
+                                    0.55f + 0.45f * kotlin.math.abs(kotlin.math.sin(shimmer * Math.PI).toFloat())
+                                } else {
+                                    1f
+                                }
                             }
                             .background(
                                 Brush.horizontalGradient(listOf(BlazeThemeColor, BlazeGradientEnd)),
@@ -233,11 +247,11 @@ private data class SplashNote(
  * applied inside graphicsLayer so the motion never triggers recomposition — cold
  * start is already tight on the main thread.
  *
- * @param phase 0..1, looping.
- * @param alpha fades the whole group in with the logo.
+ * @param phase 0..1, looping. A lambda so the read lands in the draw phase.
+ * @param alpha fades the whole group in with the logo. Also deferred.
  */
 @Composable
-private fun SplashNotes(phase: Float, alpha: Float) {
+private fun SplashNotes(phase: () -> Float, alpha: () -> Float) {
     val notes = remember {
         listOf(
             // Angles avoid the bottom of the ring (roughly 130°–230°), where the
@@ -270,13 +284,15 @@ private fun SplashNotes(phase: Float, alpha: Float) {
             modifier = Modifier
                 .size(note.size)
                 .graphicsLayer {
-                    val local = ((phase + note.phaseShift) % 1f) * 2f * PI.toFloat()
+                    // Both reads happen here, in the draw phase, so the animation
+                    // never invalidates composition.
+                    val local = ((phase() + note.phaseShift) % 1f) * 2f * PI.toFloat()
                     translationX = base.first
                     translationY = base.second + sin(local) * bobRange
                     // Breathe opacity and scale together so each note feels alive
                     // without pulling attention from the logo.
                     val breath = 0.5f + 0.5f * sin(local)
-                    this.alpha = alpha * note.maxAlpha * (0.45f + 0.55f * breath)
+                    this.alpha = alpha() * note.maxAlpha * (0.45f + 0.55f * breath)
                     val s = 0.9f + 0.12f * breath
                     scaleX = s
                     scaleY = s
@@ -284,3 +300,6 @@ private fun SplashNotes(phase: Float, alpha: Float) {
         )
     }
 }
+
+/** Where the drifting notes settle when motion stops. */
+private const val FROZEN_PHASE = 0.25f
