@@ -24,6 +24,19 @@ val applicationIdOverride = System.getenv("BLAZIFY_APPLICATION_ID")?.takeIf { it
 val appNameOverride = System.getenv("BLAZIFY_APP_NAME")?.takeIf { it.isNotBlank() }
 val debugKeystorePathOverride = System.getenv("BLAZIFY_DEBUG_KEYSTORE_PATH")?.takeIf { it.isNotBlank() }
 val debugKeystorePassword = System.getenv("BLAZIFY_DEBUG_KEYSTORE_PASSWORD")?.takeIf { it.isNotBlank() } ?: "android"
+
+/**
+ * Release signing credentials, from the environment or local.properties.
+ *
+ * Null when they are not set anywhere, which is the signal to sign with the
+ * debug keystore instead of failing the build.
+ */
+fun releaseSecret(name: String): String? =
+    (System.getenv(name) ?: localProperties.getProperty(name))?.takeIf { it.isNotBlank() }
+
+val releaseStorePassword = releaseSecret("STORE_PASSWORD")
+val releaseKeyAlias = releaseSecret("KEY_ALIAS")
+val releaseKeyPassword = releaseSecret("KEY_PASSWORD")
 val debugKeyAlias = System.getenv("BLAZIFY_DEBUG_KEY_ALIAS")?.takeIf { it.isNotBlank() } ?: "androiddebugkey"
 val debugKeyPassword = System.getenv("BLAZIFY_DEBUG_KEY_PASSWORD")?.takeIf { it.isNotBlank() } ?: "android"
 val persistentDebugKeystoreFile = file("persistent-debug.keystore")
@@ -162,9 +175,12 @@ android {
         }
         create("release") {
             storeFile = file("keystore/release.keystore")
-            storePassword = System.getenv("STORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            // From the environment, or from local.properties for a machine
+            // where exporting three variables before every build is a chore.
+            // Neither is committed.
+            storePassword = releaseStorePassword
+            keyAlias = releaseKeyAlias
+            keyPassword = releaseKeyPassword
         }
         getByName("debug") {
             keyAlias = "androiddebugkey"
@@ -186,8 +202,12 @@ android {
             )
             // Sign with the real release keystore when present; otherwise fall back
             // to the local debug keystore so optimized builds can be sideloaded.
+            // The keystore alone is not enough — without its passwords the
+            // release config cannot sign, and the build used to fail outright
+            // rather than fall back. A keystore you have no credentials for is
+            // the same situation as not having one.
             signingConfig =
-                if (file("keystore/release.keystore").exists()) {
+                if (file("keystore/release.keystore").exists() && releaseStorePassword != null) {
                     signingConfigs.getByName("release")
                 } else {
                     signingConfigs.getByName("debug")
