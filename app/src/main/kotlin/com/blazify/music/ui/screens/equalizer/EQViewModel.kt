@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.InputStream
@@ -90,7 +92,7 @@ class EQViewModel @Inject constructor(
                 eqEnabled = true,
             )
         }
-        viewModelScope.launch { applyBandEditor() }
+        applyBandEditor()
     }
 
     fun setBandGain(index: Int, gain: Double) {
@@ -104,18 +106,27 @@ class EQViewModel @Inject constructor(
                 eqEnabled = true,
             )
         }
-        viewModelScope.launch { applyBandEditor() }
+        applyBandEditor()
     }
 
     fun setPreamp(preamp: Double) {
         _state.update { it.copy(preamp = preamp, eqEnabled = true) }
-        viewModelScope.launch { applyBandEditor() }
+        applyBandEditor()
     }
 
     fun resetBands() = selectPreset(EqPresets.FLAT_ID)
 
-    /** Persists the current gains and pushes them into the audio chain. */
-    private suspend fun applyBandEditor() {
+    /**
+     * Waiting to be written to disk, so a drag isn't a hundred small writes.
+     *
+     * The sound follows the finger immediately; only the saving waits. Storage
+     * on every pixel of a slider is what made adjusting a band feel like the
+     * app was struggling rather than responding.
+     */
+    private var saveJob: Job? = null
+
+    /** Pushes the current gains into the audio chain, and saves them shortly after. */
+    private fun applyBandEditor() {
         val current = _state.value
         val preset = current.presetId?.let { id -> EqPresets.ALL.find { it.id == id } }
         val profile = SavedEQProfile(
@@ -132,14 +143,24 @@ class EQViewModel @Inject constructor(
             preamp = current.preamp,
             isCustom = false,
         )
-        eqProfileRepository.saveProfile(profile)
+        // Heard now.
         equalizerService.applyProfile(profile)
-            .onSuccess { eqProfileRepository.setActiveProfile(BAND_PROFILE_ID) }
             .onFailure { e -> _state.update { it.copy(error = e.message) } }
+
+        // Written once the hand stops moving.
+        saveJob?.cancel()
+        saveJob = viewModelScope.launch {
+            delay(SAVE_DELAY_MS)
+            eqProfileRepository.saveProfile(profile)
+            eqProfileRepository.setActiveProfile(BAND_PROFILE_ID)
+        }
     }
 
     private companion object {
         const val BAND_PROFILE_ID = "blazify_band_eq"
+
+        /** Long enough to cover a drag, short enough to survive a quick exit. */
+        const val SAVE_DELAY_MS = 400L
     }
 
     /**

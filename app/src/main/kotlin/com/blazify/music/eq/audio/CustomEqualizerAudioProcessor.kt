@@ -28,9 +28,27 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
     private var outputBuffer: ByteBuffer = EMPTY_BUFFER
     private var inputEnded = false
 
+    // Read on the audio thread, replaced from the UI thread. Volatile so the
+    // swap is published whole: without it the audio thread can be handed a list
+    // that is still being built, and process a song through half an equaliser.
+    @Volatile
     private var filters: List<BiquadFilter> = emptyList()
+
+    @Volatile
     private var preampGain: Double = 1.0  // Linear preamp gain multiplier
-    private var pendingProfile: ParametricEQ? = null
+
+    /**
+     * The profile in force, kept for as long as it is in force.
+     *
+     * Biquad coefficients are computed for one sample rate. When the player
+     * reconfigures — a new track at 44.1kHz after one at 48kHz — every filter
+     * has to be built again for the new rate, and that needs the profile, not
+     * just a note that one was applied once. Keeping it only until the first
+     * configure is why the sound could collapse to bass and stay there until
+     * the app was restarted: the old filters were still in place, designed for
+     * a rate the audio no longer had.
+     */
+    private var currentProfile: ParametricEQ? = null
 
     companion object {
         private const val TAG = "CustomEqualizerAudioProcessor"
@@ -42,22 +60,28 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
      */
     @Synchronized
     fun applyProfile(parametricEQ: ParametricEQ) {
+        currentProfile = parametricEQ
+        equalizerEnabled = true
+
         if (sampleRate == 0) {
-            // Audio processor not configured yet, store as pending
+            // Nothing to build against yet. It will be built in configure().
             Timber.tag(TAG)
-                .d("Audio processor not configured yet. Storing profile as pending with ${parametricEQ.bands.size} bands")
-            pendingProfile = parametricEQ
+                .d("Not configured yet; holding profile with ${parametricEQ.bands.size} bands")
             return
         }
 
         // Convert preamp from dB to linear gain
         preampGain = 10.0.pow(parametricEQ.preamp / 20.0)
 
+        // Built whole, then swapped in one assignment. The old filters keep
+        // working right up to that moment, so a slider being dragged changes
+        // the sound rather than interrupting it.
+        //
+        // Their state is deliberately NOT reset. Zeroing a filter's memory
+        // mid-song is a discontinuity, and a discontinuity is a click — which
+        // is what made every adjustment audible as a fault rather than as a
+        // change.
         createFilters(parametricEQ.bands)
-        equalizerEnabled = true
-
-        // Reset filter states to ensure clean transition
-        filters.forEach { it.reset() }
 
         Timber.tag(TAG)
             .d("Applied EQ profile with ${filters.size} bands and ${parametricEQ.preamp} dB preamp")
@@ -71,7 +95,7 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
         equalizerEnabled = false
         filters = emptyList()
         preampGain = 1.0
-        pendingProfile = null
+        currentProfile = null
         Timber.tag(TAG).d("Equalizer disabled")
     }
 
@@ -109,6 +133,7 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
     }
 
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
+        val rateChanged = sampleRate != inputAudioFormat.sampleRate
         sampleRate = inputAudioFormat.sampleRate
         channelCount = inputAudioFormat.channelCount
         encoding = inputAudioFormat.encoding
@@ -116,14 +141,17 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
         Timber.tag(TAG)
             .d("Configured: sampleRate=$sampleRate, channels=$channelCount, encoding=$encoding")
 
-        // Apply pending profile if one exists
-        pendingProfile?.let { profile ->
-            preampGain = 10.0.pow(profile.preamp / 20.0)
-            createFilters(profile.bands)
-            equalizerEnabled = true
-            pendingProfile = null
-            Timber.tag(TAG)
-                .d("Applied pending profile with ${filters.size} bands and ${profile.preamp} dB preamp")
+        // Always rebuilt for the rate now in play, every time, rather than only
+        // the first time. A filter designed for one rate applied to another has
+        // every centre frequency in the wrong place — which is heard as the
+        // whole equaliser collapsing towards the bass.
+        currentProfile?.let { profile ->
+            if (rateChanged || filters.isEmpty()) {
+                preampGain = 10.0.pow(profile.preamp / 20.0)
+                createFilters(profile.bands)
+                Timber.tag(TAG)
+                    .d("Rebuilt ${filters.size} filters for ${sampleRate}Hz")
+            }
         }
 
         // Only support 16-bit PCM stereo/mono
@@ -271,7 +299,10 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
         outputBuffer = EMPTY_BUFFER
         inputEnded = false
 
-        // Reset filter states
+        // Cleared here and only here. A flush means the audio itself jumped —
+        // a seek, or a new track — so the filters' memory of the last samples
+        // is genuinely worthless. Changing a band is not that, which is why
+        // applyProfile leaves it alone.
         filters.forEach { it.reset() }
     }
 
@@ -283,7 +314,11 @@ class CustomEqualizerAudioProcessor : AudioProcessor {
         channelCount = 0
         encoding = C.ENCODING_INVALID
         isActive = false
-        filters.forEach { it.reset() }
+        // Dropped, not merely quietened. Without a sample rate these filters
+        // describe nothing, and leaving them in place is what let a stale set
+        // survive into the next track. The profile is kept, so configure()
+        // builds a correct set the moment it knows the new rate.
+        filters = emptyList()
     }
 
     override fun queueEndOfStream() {
