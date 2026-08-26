@@ -206,7 +206,26 @@ class App :
                 .map { it[VisitorDataKey] }
                 .distinctUntilChanged()
                 .collect { visitorData ->
-                    YouTube.visitorData = visitorData?.takeIf { it != "null" }
+                    // Blank counts as absent. Anybody who signed in before this
+                    // was fixed has an empty string saved here, and an empty
+                    // string is not a value — it is the thing that made every
+                    // play fail. Treated as missing, it is replaced below.
+                    YouTube.visitorData = visitorData?.takeIf {
+                        it.isNotBlank() && it != "null" && it != "undefined"
+                    }
+                        ?: run {
+                            // Asked for while holding the session, where there
+                            // is one. An identity minted as nobody and then
+                            // carried into somebody's account is a pair the
+                            // catalogue refuses — which is the same fault in a
+                            // different coat.
+                            if (YouTube.cookie == null) {
+                                dataStore.data.first()[InnerTubeCookieKey]
+                                    ?.takeIf { it.isNotBlank() }
+                                    ?.let { runCatching { YouTube.cookie = it } }
+                            }
+                            null
+                        }
                         ?: YouTube.visitorData().getOrNull()?.also { newVisitorData ->
                             try {
                                 safeDataStoreEdit { settings ->
@@ -226,7 +245,7 @@ class App :
                 .distinctUntilChanged()
                 .collect { dataSyncId ->
                     YouTube.dataSyncId =
-                        dataSyncId?.let {
+                        dataSyncId?.takeIf { it.isNotBlank() }?.let {
                             it.takeIf { !it.contains("||") }
                                 ?: it.takeIf { it.endsWith("||") }?.substringBefore("||")
                                 ?: it.substringAfter("||")

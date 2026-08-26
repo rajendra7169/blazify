@@ -44,6 +44,7 @@ import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.reportException
 import com.blazify.music.utils.safeDataStoreEdit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -73,12 +74,33 @@ fun LoginScreen(navController: NavController) {
                 return@launch
             }
 
-            // Save extracted values from the WebView before validating
-            val savedVisitorData = visitorDataFromWeb
-            val savedDataSyncId = dataSyncIdFromWeb
-
-            // Initialize YouTube object with selected authentication data
+            // The cookie first, so anything fetched below belongs to the
+            // account that was just signed in to rather than to nobody.
             YouTube.cookie = currentCookie
+
+            // The page is asked for these through JavaScript, and JavaScript
+            // does not answer in the same breath as the question. This used to
+            // read them the instant the page finished — before the answer had
+            // come back — and save two empty strings over the top of whatever
+            // was there. An empty identity is refused by the catalogue on
+            // every play and every download, which is why signing in broke
+            // playing and signing out fixed it.
+            var waited = 0
+            while (visitorDataFromWeb.isBlank() && waited < 4000) {
+                delay(200)
+                waited += 200
+            }
+
+            val savedVisitorData = visitorDataFromWeb.trim()
+                .takeIf { it.isNotEmpty() && it != "null" && it != "undefined" }
+                // Never nothing: if the page would not say, the catalogue is
+                // asked directly, and asked while holding the cookie so the
+                // answer belongs to this account.
+                ?: YouTube.visitorData().getOrNull()
+
+            val savedDataSyncId = dataSyncIdFromWeb.trim()
+                .takeIf { it.isNotEmpty() && it != "null" && it != "undefined" }
+
             YouTube.dataSyncId = savedDataSyncId
             YouTube.visitorData = savedVisitorData
 
@@ -104,8 +126,13 @@ fun LoginScreen(navController: NavController) {
                     val saved = withContext(Dispatchers.IO) {
                         context.safeDataStoreEdit { settings ->
                             settings[InnerTubeCookieKey] = currentCookie
-                            settings[VisitorDataKey] = savedVisitorData
-                            settings[DataSyncIdKey] = savedDataSyncId
+                            // Written only where there is something to write.
+                            // A key holding an empty string is read back as a
+                            // value, and read back as a value it is used.
+                            savedVisitorData?.let { settings[VisitorDataKey] = it }
+                                ?: settings.remove(VisitorDataKey)
+                            savedDataSyncId?.let { settings[DataSyncIdKey] = it }
+                                ?: settings.remove(DataSyncIdKey)
                             settings[AccountNameKey] = info.name
                             settings[AccountEmailKey] = info.email.orEmpty()
                             settings[AccountChannelHandleKey] = info.channelHandle.orEmpty()

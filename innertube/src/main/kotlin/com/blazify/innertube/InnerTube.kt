@@ -46,8 +46,26 @@ class InnerTube {
         gl = Locale.getDefault().country,
         hl = Locale.getDefault().toLanguageTag()
     )
+    /**
+     * Who the catalogue thinks is asking.
+     *
+     * Blank is not a value, and this is where that has to be decided rather
+     * than at each of the dozen places that set it. An empty string reaches
+     * the catalogue as an empty identity header, which is worse than sending
+     * none at all: no header and it mints one for you, an empty one and it
+     * refuses — as "Video unavailable" on every play and every download, for
+     * anybody signed in.
+     */
     var visitorData: String? = null
+        set(value) {
+            field = value?.trim()?.takeIf { it.isNotEmpty() && it != "null" && it != "undefined" }
+        }
+
+    /** Which account, where somebody has several. Blank means the same nothing. */
     var dataSyncId: String? = null
+        set(value) {
+            field = value?.trim()?.takeIf { it.isNotEmpty() && it != "null" && it != "undefined" }
+        }
     var cookie: String? = null
         set(value) {
             field = value
