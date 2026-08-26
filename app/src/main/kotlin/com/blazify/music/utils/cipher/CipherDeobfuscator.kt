@@ -52,6 +52,18 @@ object CipherDeobfuscator {
     private var currentPlayerHash: String? = null
 
     /**
+     * A player this device has looked at and cannot decipher.
+     *
+     * The site rewrites its player script every few weeks, and the reader here
+     * works from a table of shapes it has been taught. A shape nobody has
+     * taught it yet leaves it unable to decipher anything at all — which is
+     * survivable on its own, because other paths can, but not while it is still
+     * naming the player generation the request asks for. See [signatureTimestamp].
+     */
+    @Volatile
+    private var undecipherablePlayerHash: String? = null
+
+    /**
      * The player_ias hash last used to decipher a web stream (sig/n), or null if none yet.
      * Diagnostic only — surfaced in the song-details sheet. Direct-URL clients (ANDROID_VR/IOS)
      * never run the cipher, so this reflects the last web stream.
@@ -78,6 +90,17 @@ object CipherDeobfuscator {
         Timber.tag(TAG).d("Resolving cipher player signatureTimestamp...")
         val (playerJs, hash) = PlayerJsFetcher.getPlayerJs(forceRefresh = false) ?: run {
             Timber.tag(TAG).w("signatureTimestamp: could not fetch player JS")
+            return null
+        }
+        if (hash == undecipherablePlayerHash) {
+            // Naming a player we cannot decipher is worse than naming none. The
+            // number sent here decides which player generation the site mints
+            // the signature for, and a signature minted for one generation and
+            // deciphered by another is refused by the content server — so
+            // answering with this hash guarantees a 403 on a step that reports
+            // no error. Silence hands the choice to whoever can actually do the
+            // deciphering, and the two then agree.
+            Timber.tag(TAG).w("Player $hash cannot be deciphered here — leaving the STS to another source")
             return null
         }
         val sts = FunctionNameExtractor.extractSignatureTimestamp(playerJs, hash)
@@ -369,6 +392,9 @@ object CipherDeobfuscator {
 
         if (analysis.sigInfo == null) {
             Timber.tag(TAG).e("Could not extract signature function info from player JS")
+            // Remembered, so the STS this player would be asked for is not
+            // quoted by something that cannot follow through on it.
+            undecipherablePlayerHash = hash
             return null
         }
 
@@ -396,6 +422,10 @@ object CipherDeobfuscator {
         cipherWebView = webView
         currentPlayerHash = hash
         builtConfigEpoch = builtEpoch
+        // A config refresh can teach it a shape it failed on earlier, so the
+        // verdict is lifted the moment the build succeeds rather than standing
+        // for the life of the process.
+        if (undecipherablePlayerHash == hash) undecipherablePlayerHash = null
         return webView
     }
 
