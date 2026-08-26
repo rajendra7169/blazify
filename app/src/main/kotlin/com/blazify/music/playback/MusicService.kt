@@ -968,6 +968,24 @@ class MusicService :
                 }
             }
 
+        // Have the next song's address ready before it is needed — see warmNextStream.
+        currentMediaMetadata
+            .distinctUntilChangedBy { it?.id }
+            .collectLatest(scope) {
+                // Let the song that is starting have the network to itself first;
+                // a prefetch that competes with the song being waited on is worse
+                // than no prefetch at all.
+                delay(5000)
+                // Off the main thread deliberately: this scope runs there, and the
+                // work below is a network round trip. Said out loud when it fails —
+                // a prefetch that quietly does nothing is indistinguishable from one
+                // that was never written.
+                withContext(Dispatchers.IO) {
+                    runCatching { warmNextStream() }
+                        .onFailure { Timber.tag(TAG).w(it, "Could not warm the next stream") }
+                }
+            }
+
         dataStore.data
             .map { (it[SkipSilenceKey] ?: false) to (it[SkipSilenceInstantKey] ?: false) }
             .distinctUntilChanged()
@@ -3726,6 +3744,71 @@ class MusicService :
             Timber.tag("DiscordSvc").w(e, "fetchArtistThumbnail: failed for artist=%s", artist.name)
             null
         }
+    }
+
+    /**
+     * Resolve the next song's address while this one is still playing.
+     *
+     * Resolution happens inside the data source, at the moment the player opens
+     * a song — which means it happens in the gap between two songs, where
+     * nothing is playing and the person is listening to silence. It is an API
+     * call, a decipher, often a token, sometimes a fallback client or two:
+     * measured on a phone here at two and a half seconds for an easy song and
+     * thirteen for an awkward one, every second of it audible.
+     *
+     * None of it has to happen then. The next song is known well in advance and
+     * the address it needs is good for hours, so fetching it a minute early
+     * costs one request nobody hears and turns the gap into a handover. The
+     * audio itself is deliberately left alone — the player still fetches that
+     * when it is ready — so this spends no one's data on a song they skip past.
+     */
+    private suspend fun warmNextStream() {
+        val nextId = withContext(Dispatchers.Main) {
+            val index = player.nextMediaItemIndex
+            if (index == C.INDEX_UNSET) {
+                null
+            } else {
+                player.getMediaItemAt(index).let { it.metadata?.id ?: it.mediaId }
+            }
+        } ?: return
+
+        // Already answered: a live address, a download, or a song held in the cache.
+        if (songUrlCache[nextId]?.takeIf { it.second > System.currentTimeMillis() } != null) return
+        if (downloadCache.isCached(nextId, 0, 1)) return
+        if (dataStore.get(EnableSongCacheKey, true) && playerCache.isCached(nextId, 0, 1)) return
+
+        val playback = YTPlayerUtils.playerResponseForPlayback(
+            nextId,
+            audioQuality = audioQuality,
+            connectivityManager = connectivityManager,
+        ).getOrNull() ?: return
+
+        // The loudness that levelling needs travels with the same answer, so take
+        // it now too — otherwise the first seconds of the next song play at the
+        // wrong volume while it is fetched again.
+        val format = playback.format
+        format.contentLength?.let { contentLength ->
+            database.query {
+                upsert(
+                    FormatEntity(
+                        id = nextId,
+                        itag = format.itag,
+                        mimeType = format.mimeType.split(";")[0],
+                        codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
+                        bitrate = format.bitrate,
+                        sampleRate = format.audioSampleRate,
+                        contentLength = contentLength,
+                        loudnessDb = playback.audioConfig?.loudnessDb,
+                        perceptualLoudnessDb = playback.audioConfig?.perceptualLoudnessDb,
+                        playbackUrl = playback.playbackTracking?.videostatsPlaybackUrl?.baseUrl,
+                    ),
+                )
+            }
+        }
+
+        songUrlCache[nextId] =
+            playback.streamUrl to System.currentTimeMillis() + (playback.streamExpiresInSeconds * 1000L)
+        Timber.tag(TAG).d("Warmed next stream: $nextId via ${playback.streamClient}")
     }
 
     private fun createDataSourceFactory(): DataSource.Factory {
