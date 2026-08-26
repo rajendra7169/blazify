@@ -3287,10 +3287,7 @@ class MusicService :
         incrementRetryCount(mediaId)
 
         songUrlCache.remove(mediaId)
-        // A 403/410 on GET means the (HEAD-unvalidated) WEB_REMIX stream URL was bad — mark it so the
-        // re-resolution falls through to the fallback clients instead of retrying WEB_REMIX.
-        YTPlayerUtils.markWebRemixFailed(mediaId)
-        Timber.tag(TAG).d("Cleared cached URL for $mediaId, marked WEB_REMIX failed")
+        Timber.tag(TAG).d("Cleared cached URL for $mediaId")
 
         try {
             YTPlayerUtils.forceRefreshForVideo(mediaId)
@@ -3301,12 +3298,11 @@ class MusicService :
         // A 403 can also mean the cipher produced a wrong-but-non-throwing signature from a
         // stale/wrong player config — invisible to the cipher's own exception-retry. Ask it to
         // re-fetch its config (rate-limited); if that corrects the table, the cipher rebuilds its
-        // WebView on the next decipher, so we clear the WEB_REMIX failure set to let playback return
-        // to WEB_REMIX — no app restart. Affects every cipher client (WEB_REMIX/WEB_CREATOR/TVHTML5/WEB).
+        // WebView on the next decipher — no app restart. Affects every cipher client
+        // (WEB_REMIX/WEB_CREATOR/TVHTML5/WEB).
         scope.launch {
             if (CipherDeobfuscator.onStreamRejected()) {
-                Timber.tag(TAG).d("Player config changed after stream rejection — restoring WEB_REMIX")
-                YTPlayerUtils.clearWebRemixFailures()
+                Timber.tag(TAG).d("Player config changed after stream rejection")
             }
         }
 

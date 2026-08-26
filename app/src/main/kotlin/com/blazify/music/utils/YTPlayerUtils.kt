@@ -52,25 +52,6 @@ object YTPlayerUtils {
 
     private val poTokenGenerator = PoTokenGenerator()
 
-    // Track videoIds whose WEB_REMIX stream URL 403'd on the ExoPlayer GET, so the next resolution
-    // falls through to the fallback clients instead of skipping HEAD validation and looping.
-    private val webRemixFailedIds = java.util.Collections.newSetFromMap(
-        java.util.concurrent.ConcurrentHashMap<String, Boolean>(),
-    )
-
-    fun markWebRemixFailed(videoId: String) {
-        webRemixFailedIds.add(videoId)
-    }
-
-    /**
-     * Cleared when the cipher recovers (player config refreshed after a stream rejection): the
-     * prior WEB_REMIX failures were caused by the stale cipher, so let resolution try WEB_REMIX
-     * again instead of staying pinned to a lower fallback client for the rest of the process.
-     */
-    fun clearWebRemixFailures() {
-        webRemixFailedIds.clear()
-    }
-
     // Fire-and-forget scope for the cipher config self-heal triggered when a cipher client fails
     // stream validation during resolution. Only WEB_REMIX skips HEAD validation (so its bad URL
     // 403s on ExoPlayer and hits MusicService's handler); WEB_CREATOR / TVHTML5 / WEB are validated
@@ -536,19 +517,6 @@ object YTPlayerUtils {
                     break
                 }
 
-                // WEB_REMIX authenticated CDN URLs can 403 on HEAD yet serve fine on the byte-range
-                // GET that ExoPlayer makes. Skip HEAD validation for the main client and let ExoPlayer
-                // try directly, UNLESS this videoId already 403'd on GET (markWebRemixFailed) — then
-                // fall through to the fallback clients. Saves a validateStatus round-trip per resolve.
-                if (clientIndex == -1 && currentClient.clientName == "WEB_REMIX" &&
-                    !webRemixFailedIds.contains(videoId)
-                ) {
-                    Timber.tag(logTag).d("WEB_REMIX — skipping HEAD validation, letting ExoPlayer try directly")
-                    Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId")
-                    successClient = currentClient.clientName
-                    break
-                }
-
                 if (validateStatus(streamUrl)) {
                     // working stream found
                     Timber.tag(logTag).d("Stream validated successfully with client: ${currentClient.clientName}")
@@ -565,9 +533,7 @@ object YTPlayerUtils {
                     // cipher rebuilds its WebView and the next resolution returns to this client — no
                     // app restart. This is what covers WEB_CREATOR/TVHTML5/WEB-only users.
                     if (needsNTransform) {
-                        cipherRefreshScope.launch {
-                            if (CipherDeobfuscator.onStreamRejected()) clearWebRemixFailures()
-                        }
+                        cipherRefreshScope.launch { CipherDeobfuscator.onStreamRejected() }
                     }
                 }
             } else {
@@ -748,11 +714,25 @@ object YTPlayerUtils {
      * If this returns true the url is likely to work.
      * If this returns false the url might cause an error during playback.
      */
+    /**
+     * Ask the content server the same question the player is about to ask.
+     *
+     * Two bytes of the actual stream, by the same method and with the same
+     * range header the player uses. It used to ask with HEAD, which is a
+     * different question and sometimes gets a different answer: these
+     * addresses can refuse a HEAD and serve the song perfectly on the ranged
+     * GET that follows. That made the check untrustworthy for the main client,
+     * which was therefore exempted from it and left to discover its own
+     * failures through the player — a whole failed load, a cache clear and a
+     * re-resolve, thirteen seconds of silence, where one round trip would have
+     * moved on to the next client in four.
+     */
     private fun validateStatus(url: String): Boolean {
         Timber.tag(logTag).d("Validating stream URL status")
         try {
             val requestBuilder = okhttp3.Request.Builder()
-                .head()
+                .get()
+                .header("Range", "bytes=0-1")
                 .url(url)
 
             // Add authentication cookie for privately owned tracks
@@ -761,10 +741,11 @@ object YTPlayerUtils {
                 println("[PLAYBACK_DEBUG] Added cookie to validation request")
             }
 
-            val response = httpClient.newCall(requestBuilder.build()).execute()
-            val isSuccessful = response.isSuccessful
-            Timber.tag(logTag).d("Stream URL validation result: ${if (isSuccessful) "Success" else "Failed"} (${response.code})")
-            return isSuccessful
+            httpClient.newCall(requestBuilder.build()).execute().use { response ->
+                val isSuccessful = response.isSuccessful
+                Timber.tag(logTag).d("Stream URL validation result: ${if (isSuccessful) "Success" else "Failed"} (${response.code})")
+                return isSuccessful
+            }
         } catch (e: Exception) {
             Timber.tag(logTag).e(e, "Stream URL validation failed with exception")
             reportException(e)
