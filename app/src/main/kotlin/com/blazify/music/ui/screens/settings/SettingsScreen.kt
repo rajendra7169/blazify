@@ -72,6 +72,7 @@ import com.blazify.music.constants.InnerTubeCookieKey
 import com.blazify.music.constants.PureBlackKey
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.ReleaseNotesCard
+import com.blazify.music.utils.Updater
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
@@ -102,7 +103,12 @@ fun SettingsScreen(
         }
     }
     val showChangelog = LocalChangelogState.current
-    val hasUpdate = BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME
+    // Newer, not merely different. An inequality also fires when this build is
+    // ahead of the last published one — which is every development build, and
+    // was every build at all while the version being compared was the release
+    // headline rather than a version. The badge was permanently on.
+    val hasUpdate = BuildConfig.UPDATER_AVAILABLE &&
+        Updater.isUpdateAvailable(BuildConfig.VERSION_NAME, latestVersionName)
     var query by rememberSaveable { mutableStateOf("") }
 
     // Profile + quick-toggle state for the landing header.

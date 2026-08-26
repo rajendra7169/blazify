@@ -79,42 +79,63 @@ object Updater {
     }
 
     /**
-     * Parse release assets from GitHub API response
+     * Read the downloadable builds off a release.
+     *
+     * This used to insist on a handful of exact filenames inherited from the
+     * project this was forked from, and recognised none of the names actually
+     * published here — so every release looked like a release with nothing in
+     * it, and the updater had nothing to offer however well it worked.
+     *
+     * Any .apk is a candidate now. The name is read for hints about which build
+     * it is, and anything it does not recognise is treated as the ordinary
+     * universal one, because a build nobody can identify is still better offered
+     * than silently dropped.
      */
     private fun parseAssets(assetsArray: JSONArray): List<ReleaseAsset> {
         val assets = mutableListOf<ReleaseAsset>()
-        
+
         for (i in 0 until assetsArray.length()) {
             val asset = assetsArray.getJSONObject(i)
             val name = asset.getString("name")
-            
-            // Skip non-APK files
-            if (!name.endsWith(".apk")) continue
-            
-            val downloadUrl = asset.getString("browser_download_url")
-            val size = asset.getLong("size")
-            
-            // Parse architecture and variant from filename
-            val (arch, variant) = when {
-                name == "Blazify.apk" -> "universal" to "foss"
-                name == "Blazify-with-Google-Cast.apk" -> "universal" to "gms"
-                name.startsWith("app-") && name.endsWith("-release.apk") -> {
-                    val arch = name.removePrefix("app-").removeSuffix("-release.apk")
-                    arch to "foss"
-                }
-                name.startsWith("app-") && name.endsWith("-with-Google-Cast.apk") -> {
-                    val arch = name.removePrefix("app-").removeSuffix("-with-Google-Cast.apk")
-                    arch to "gms"
-                }
-                else -> null to null
+            if (!name.endsWith(".apk", ignoreCase = true)) continue
+
+            val lower = name.lowercase()
+            val variant = when {
+                "google-cast" in lower || "-gms" in lower -> "gms"
+                else -> "foss"
             }
-            
-            if (arch != null && variant != null) {
-                assets.add(ReleaseAsset(name, downloadUrl, size, arch, variant))
-            }
+            val arch = ARCHITECTURES.firstOrNull { it in lower } ?: "universal"
+
+            assets.add(
+                ReleaseAsset(
+                    name = name,
+                    downloadUrl = asset.getString("browser_download_url"),
+                    size = asset.getLong("size"),
+                    architecture = arch,
+                    variant = variant,
+                ),
+            )
         }
-        
+
         return assets
+    }
+
+    private val ARCHITECTURES = listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
+
+    /**
+     * The build to offer somebody, out of whatever a release happens to carry.
+     *
+     * Preferring an exact match on architecture and variant, then the universal
+     * build, then simply the first one there — a release with a single APK on it
+     * is the common case and should not need to match anything to be offered.
+     */
+    fun pickAsset(assets: List<ReleaseAsset>): ReleaseAsset? {
+        if (assets.isEmpty()) return null
+        val (arch, variant) = getCurrentAppVariant()
+        return assets.firstOrNull { it.architecture == arch && it.variant == variant }
+            ?: assets.firstOrNull { it.architecture == "universal" && it.variant == variant }
+            ?: assets.firstOrNull { it.variant == variant }
+            ?: assets.first()
     }
 
     /**
@@ -132,9 +153,17 @@ object Updater {
                     .bodyAsText()
                 val json = JSONObject(response)
                 
+                val tag = json.getString("tag_name")
                 val releaseInfo = ReleaseInfo(
-                    tagName = json.getString("tag_name"),
-                    versionName = json.getString("name"),
+                    tagName = tag,
+                    // The version, taken from the tag rather than from the
+                    // release headline. The headline is prose — "Blazify 9.12.3"
+                    // — and comparing it as a version read the first component
+                    // as zero, so every release looked older than the build
+                    // asking about it and no update was ever offered. It is also
+                    // what the About page compared against to decide whether to
+                    // show its badge, which is why the badge was always on.
+                    versionName = tag.removePrefix("v"),
                     description = json.getString("body"),
                     releaseDate = json.getString("published_at"),
                     assets = parseAssets(json.getJSONArray("assets"))
@@ -174,7 +203,7 @@ object Updater {
                         val releaseObj = json.getJSONObject(i)
                         releases.add(ReleaseInfo(
                             tagName = releaseObj.getString("tag_name"),
-                            versionName = releaseObj.getString("name"),
+                            versionName = releaseObj.getString("tag_name").removePrefix("v"),
                             description = releaseObj.getString("body"),
                             releaseDate = releaseObj.getString("published_at"),
                             assets = parseAssets(releaseObj.getJSONArray("assets"))
