@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.blazify.music.R
+import com.blazify.music.ui.screens.settings.MarkdownText
 import com.blazify.music.utils.Updater
 
 @Composable
@@ -43,11 +44,10 @@ fun ReleaseNotesCard() {
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = releaseInfo.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 2.dp)
-            )
+            // Rendered, not printed. These notes are written in markdown, and as
+            // plain text they reached the screen with their asterisks and hashes
+            // still on — the one card whose entire content is prose.
+            MarkdownText(releaseInfo.description)
         }
     }
     Spacer(modifier = Modifier.height(16.dp))
