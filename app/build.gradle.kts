@@ -137,12 +137,16 @@ android {
 
     flavorDimensions += listOf("variant")
     productFlavors {
-        // FOSS - no gcast; updater disabled (would offer upstream Blazify releases)
+        // FOSS - no gcast. The updater is on: it was off while it pointed at the
+        // repository this project was forked from, where a "new version" was
+        // somebody else's app. It reads this project's own releases now, and
+        // this is the build people are handed directly, so it is also the build
+        // that most needs to be able to tell them a new one exists.
         create("foss") {
             dimension = "variant"
             isDefault = true
             buildConfigField("Boolean", "CAST_AVAILABLE", "false")
-            buildConfigField("Boolean", "UPDATER_AVAILABLE", "false")
+            buildConfigField("Boolean", "UPDATER_AVAILABLE", "true")
         }
 
         // GMS - Updater and gcast
