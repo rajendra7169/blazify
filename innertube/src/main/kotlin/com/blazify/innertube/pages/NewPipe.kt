@@ -101,17 +101,40 @@ private class NewPipeDownloaderImpl(
     }
 }
 
-object NewPipeUtils {
-    init {
-        NewPipe.init(NewPipeDownloaderImpl(YouTube.proxy, YouTube.proxyAuth))
-    }
+/**
+ * Hand the extractor something to fetch with, once, before it is asked anything.
+ *
+ * It is built around a downloader the host supplies and has none of its own, so
+ * every call into it before this has run dies on a null reference deep inside —
+ * which surfaces as "signature timestamp unavailable" and an empty list of
+ * streams, never as "nothing was ever wired up". That is exactly what happened
+ * here: the wiring sat in the initialiser of an object nothing referenced, so
+ * it never ran, and the deciphering fallbacks were dead for every song.
+ *
+ * Called from each entry point rather than from an initialiser, so it cannot go
+ * quiet again the moment the object that holds it stops being used. Re-run when
+ * the proxy changes, because the downloader takes its route at construction and
+ * a route chosen before the change is the wrong one afterwards.
+ */
+private var wiredFor: Pair<java.net.Proxy?, String?>? = null
 
+@Synchronized
+internal fun ensureNewPipeReady() {
+    val route = YouTube.proxy to YouTube.proxyAuth
+    if (wiredFor == route) return
+    NewPipe.init(NewPipeDownloaderImpl(route.first, route.second))
+    wiredFor = route
+}
+
+object NewPipeUtils {
     fun getSignatureTimestamp(videoId: String): Result<Int> = runCatching {
+        ensureNewPipeReady()
         YoutubeJavaScriptPlayerManager.getSignatureTimestamp(videoId)
     }
 
     fun getStreamUrl(format: PlayerResponse.StreamingData.Format, videoId: String): Result<String> =
         runCatching {
+            ensureNewPipeReady()
             val url =
                 format.url ?: format.signatureCipher?.let { signatureCipher ->
                     val params = parseQueryString(signatureCipher)
@@ -142,6 +165,7 @@ object NewPipeUtils {
 object NewPipeExtractor {
     fun newPipePlayer(videoId: String): List<Pair<Int, String>> {
         return try {
+            ensureNewPipeReady()
             val streamInfo =
                 StreamInfo.getInfo(
                     NewPipe.getService(0),
@@ -157,11 +181,34 @@ object NewPipeExtractor {
     }
 
     fun getSignatureTimestamp(videoId: String): Result<Int> = runCatching {
+        ensureNewPipeReady()
         YoutubeJavaScriptPlayerManager.getSignatureTimestamp(videoId)
+    }
+
+    /**
+     * Undo the throttle on a URL that already has one.
+     *
+     * A stream address carries an `n` parameter the site scrambles, and the
+     * content server serves a whole song to whoever unscrambles it and a 403 to
+     * everyone else. The unscrambling lives in the site's own player script and
+     * is rewritten every few weeks, so anything that reads that script by
+     * pattern eventually meets a shape it has never seen — at which point it
+     * hands the address back untouched, which looks like success and plays like
+     * nothing at all.
+     *
+     * This is the second opinion for that moment: the same job done by a
+     * library whose whole purpose is keeping up with the rewrites.
+     */
+    fun deobfuscateThrottling(videoId: String, url: String): String? = try {
+        ensureNewPipeReady()
+        YoutubeJavaScriptPlayerManager.getUrlWithThrottlingParameterDeobfuscated(videoId, url)
+    } catch (e: Exception) {
+        null
     }
 
     fun getStreamUrl(format: PlayerResponse.StreamingData.Format, videoId: String): String? {
         return try {
+            ensureNewPipeReady()
             val url = format.url ?: format.signatureCipher?.let { signatureCipher ->
                 val params = parseQueryString(signatureCipher)
                 val obfuscatedSignature = params["s"]

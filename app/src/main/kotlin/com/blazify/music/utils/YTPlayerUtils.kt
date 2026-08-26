@@ -443,6 +443,26 @@ object YTPlayerUtils {
                         Timber.tag(TAG).d("  Transformed URL length: ${streamUrl.length}")
                         Timber.tag(TAG).d("  URL changed: ${originalUrl != streamUrl}")
 
+                        // Unchanged means it could not be done, not that there was
+                        // nothing to do — the transform hands the address back as it
+                        // found it when the player script has been rewritten into a
+                        // shape it cannot read. That address still carries its
+                        // throttle, and the content server answers it with a 403, so
+                        // the song fails on a step that reported no error at all.
+                        // Ask the library that follows those rewrites for a second
+                        // opinion before giving up on the client entirely.
+                        if (streamUrl == originalUrl && ("&n=" in originalUrl || "?n=" in originalUrl)) {
+                            val viaNewPipe = withContext(Dispatchers.IO) {
+                                NewPipeExtractor.deobfuscateThrottling(videoId, originalUrl)
+                            }
+                            if (viaNewPipe != null && viaNewPipe != originalUrl) {
+                                Timber.tag(TAG).d("N-transform recovered via NewPipe")
+                                streamUrl = viaNewPipe
+                            } else {
+                                Timber.tag(TAG).w("N-transform unavailable from both sources")
+                            }
+                        }
+
                         // Append pot= parameter with streaming data poToken
                         val needsPoToken = currentClient.useWebPoTokens && poToken?.streamingDataPoToken != null
                         Timber.tag(TAG).d("PoToken decision:")
