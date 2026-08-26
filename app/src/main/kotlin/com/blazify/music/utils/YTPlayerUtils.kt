@@ -104,6 +104,45 @@ object YTPlayerUtils {
     @Volatile
     var disabledStreamClients: Set<String> = emptySet()
 
+    /**
+     * Told when the session identity has to be replaced, so it can be kept.
+     *
+     * Set by the application, which is the only thing here that can write to
+     * disk. Without it a stale identity is mended for as long as the
+     * application stays open and is stale again the moment it is reopened.
+     */
+    @Volatile
+    var onIdentityRenewed: ((String) -> Unit)? = null
+
+    /** When the identity was last replaced, so a bad night cannot become a storm. */
+    @Volatile
+    private var renewedAt = 0L
+
+    /**
+     * Mint a new session identity, at most once every few minutes.
+     *
+     * The identity that says who is asking is minted once and then kept, and
+     * it does not last forever. When it goes stale the catalogue stops
+     * answering — every client, every song, and the token generated against it
+     * is refused with the rest — which reads as "Video unavailable" on a
+     * library that played yesterday. Reinstalling fixed it because it threw
+     * the old identity away; this does the same thing without the reinstall.
+     *
+     * Rate limited, because a machine that cannot reach the catalogue at all
+     * would otherwise mint identities as fast as somebody presses play.
+     */
+    private suspend fun renewIdentity(): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - renewedAt < 3 * 60 * 1000) return false
+        renewedAt = now
+
+        val fresh = YouTube.visitorData().getOrNull()?.takeIf { it.isNotBlank() } ?: return false
+        Timber.tag(TAG).w("Session identity refused; minting a new one")
+        YouTube.visitorData = fresh
+        onIdentityRenewed?.invoke(fresh)
+        return true
+    }
+
     // A stable video id used only to warm the local BotGuard token generator; the token is
     // discarded. PoToken generation is a local WebView computation (no YouTube /player call), so
     // this triggers no network request to YouTube for the video itself.
@@ -139,7 +178,30 @@ object YTPlayerUtils {
      * Metadata like audioConfig and videoDetails are from [MAIN_CLIENT].
      * Format & stream can be from [MAIN_CLIENT] or [STREAM_FALLBACK_CLIENTS].
      */
+    /**
+     * A stream to play, and a second attempt on a fresh identity if the first
+     * is refused outright.
+     *
+     * Every client failing together is not a broken song, it is a session the
+     * catalogue has stopped recognising — one song failing that way means the
+     * next one will too. So the identity is renewed and the whole thing tried
+     * once more, which is the difference between a library that mends itself
+     * and one somebody has to reinstall.
+     */
     suspend fun playerResponseForPlayback(
+        videoId: String,
+        playlistId: String? = null,
+        audioQuality: AudioQuality,
+        connectivityManager: ConnectivityManager,
+    ): Result<PlaybackData> {
+        val first = resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
+        if (first.isSuccess) return first
+
+        if (!renewIdentity()) return first
+        return resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
+    }
+
+    private suspend fun resolveForPlayback(
         videoId: String,
         playlistId: String? = null,
         audioQuality: AudioQuality,

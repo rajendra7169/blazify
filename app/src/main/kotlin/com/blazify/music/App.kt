@@ -119,6 +119,18 @@ class App :
                 runCatching { YTPlayerUtils.prewarmPoToken() }
             }
 
+            // A renewed identity is written down where the old one was. The
+            // player mints a new one when the catalogue stops recognising the
+            // old — without keeping it, every launch would start stale again
+            // and mend itself only after the first song had already failed.
+            YTPlayerUtils.onIdentityRenewed = { fresh ->
+                applicationScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        safeDataStoreEdit { settings -> settings[VisitorDataKey] = fresh }
+                    }
+                }
+            }
+
             observeSettingsChanges()
         }
     }
