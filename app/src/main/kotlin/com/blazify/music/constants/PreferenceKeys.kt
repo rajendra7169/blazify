@@ -275,6 +275,15 @@ val QueueEditLockKey = booleanPreferencesKey("queueEditLock")
 val ShowWrappedCardKey = booleanPreferencesKey("show_wrapped_card")
 val WrappedSeenKey = booleanPreferencesKey("wrapped_seen")
 val LastSeenVersionKey = stringPreferencesKey("lastSeenVersion")
+
+/**
+ * The release somebody has already been offered and waved away.
+ *
+ * Without it the offer returns on every launch, which is how a helpful notice
+ * becomes something people learn to dismiss without reading. Held by tag, so the
+ * next release asks again exactly once.
+ */
+val UpdateDeclinedVersionKey = stringPreferencesKey("updateDeclinedVersion")
 val RandomizeHomeOrderKey = booleanPreferencesKey("randomizeHomeOrder")
 
 val ShowLikedPlaylistKey = booleanPreferencesKey("show_liked_playlist")

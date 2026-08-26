@@ -141,7 +141,9 @@ import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.EnableHighRefreshRateKey
 import com.blazify.music.constants.EnableLandscapeScalingKey
 import com.blazify.music.constants.ExperimentalLyricsKey
+import androidx.datastore.preferences.core.edit
 import com.blazify.music.constants.LastSeenVersionKey
+import com.blazify.music.constants.UpdateDeclinedVersionKey
 import com.blazify.music.constants.ListenTogetherInTopBarKey
 import com.blazify.music.constants.ListenTogetherUsernameKey
 import com.blazify.music.constants.LyricsProviderOrderKey
@@ -189,6 +191,7 @@ import com.blazify.music.ui.menu.YouTubeSongMenu
 import com.blazify.music.ui.player.BottomSheetPlayer
 import com.blazify.music.ui.screens.Screens
 import com.blazify.music.ui.screens.navigationBuilder
+import com.blazify.music.ui.component.UpdateDialog
 import com.blazify.music.ui.screens.settings.ChangelogScreen
 import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.screens.settings.NavigationTab
@@ -205,6 +208,7 @@ import com.blazify.music.ui.utils.appBarScrollBehavior
 import com.blazify.music.ui.utils.resetHeightOffset
 import com.blazify.music.utils.SearchRoutes
 import com.blazify.music.utils.SyncUtils
+import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.safeDataStoreEdit
@@ -517,6 +521,10 @@ class MainActivity : ComponentActivity() {
     ) {
         val checkForUpdates by rememberPreference(CheckForUpdatesKey, defaultValue = true)
 
+        // The release being offered in the app, if any. Declared here because the
+        // check below is what fills it in.
+        val offeredRelease = remember { mutableStateOf<ReleaseInfo?>(null) }
+
         if (BuildConfig.UPDATER_AVAILABLE) {
             LaunchedEffect(checkForUpdates) {
                 if (checkForUpdates) {
@@ -528,6 +536,16 @@ class MainActivity : ComponentActivity() {
                         Updater.checkForUpdate().onSuccess { (releaseInfo, hasUpdate) ->
                             if (releaseInfo != null) {
                                 onLatestVersionNameChange(releaseInfo.versionName)
+                                // Offer it in the app, once. A notification can be
+                                // swiped away before it is read, and on a device
+                                // that never granted notifications it is never seen
+                                // at all — but somebody who has just opened the app
+                                // is, by definition, looking at it.
+                                if (hasUpdate &&
+                                    dataStore.get(UpdateDeclinedVersionKey, "") != releaseInfo.tagName
+                                ) {
+                                    offeredRelease.value = releaseInfo
+                                }
                                 if (hasUpdate && notifEnabled) {
                                     val downloadUrl = Updater.getDownloadUrlForCurrentVariant(releaseInfo)
                                     if (downloadUrl != null) {
@@ -729,6 +747,7 @@ class MainActivity : ComponentActivity() {
                         showChangelog.value = true
                     }
                 }
+
 
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 val accountImageUrl by homeViewModel.accountImageUrl.collectAsStateWithLifecycle()
@@ -1050,6 +1069,19 @@ class MainActivity : ComponentActivity() {
                 ) {
                     if (showChangelog.value) {
                         ChangelogScreen(onDismiss = { showChangelog.value = false })
+                    }
+
+                    offeredRelease.value?.let { release ->
+                        val scope = rememberCoroutineScope()
+                        UpdateDialog(
+                            release = release,
+                            onDismiss = {
+                                offeredRelease.value = null
+                                scope.launch {
+                                    dataStore.edit { it[UpdateDeclinedVersionKey] = release.tagName }
+                                }
+                            },
+                        )
                     }
 
                     Scaffold(

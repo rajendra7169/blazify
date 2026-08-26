@@ -13,6 +13,17 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Installing an update fetched from the releases page. Without this the
+         installer opens on a screen that refuses rather than on the button. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Only to place that download in the shared Downloads folder, and only on
+         the versions that still require asking: from Android 10 the MediaStore
+         entry needs no permission at all. It has to be the shared folder because
+         a build signed with a different key can only be installed after the old
+         one is removed, and removing it would delete anything kept inside. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Microphone feature for music recognition (not required) -->
     <uses-feature android:name="android.hardware.microphone" android:required="false" />

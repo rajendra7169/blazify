@@ -443,6 +443,22 @@
     <string name="update_available_title">Update available</string>
     <string name="update_channel_name">App updates</string>
     <string name="update_channel_desc">Notifications about new app versions</string>
+    <!-- Downloading and installing an update -->
+    <string name="update_new_version">Blazify %s is available</string>
+    <string name="update_download">Download</string>
+    <string name="update_downloading">Downloading… %1$d%%</string>
+    <string name="update_downloading_indeterminate">Downloading…</string>
+    <string name="update_install_now">Install</string>
+    <string name="update_later">Later</string>
+    <string name="update_saved_to_downloads">Saved to Downloads as %s</string>
+    <string name="update_failed">Download failed: %s</string>
+    <string name="update_allow_installs">Blazify needs permission to install apps. Grant it, then press Install again.</string>
+    <string name="update_allow_installs_button">Open settings</string>
+    <string name="update_uninstall_first_title">Uninstall this version first</string>
+    <string name="update_uninstall_first_body">This build is signed with a different key, so Android will not install it over the current one. The download is kept in your Downloads folder and will still be there afterwards.\n\n1. Back up first — Settings → Backup and restore → Backup.\n2. Uninstall Blazify.\n3. Open Downloads and tap %s.</string>
+    <string name="update_open_downloads">Open Downloads</string>
+    <string name="update_no_download">This release has no downloadable build attached.</string>
+    <string name="update_up_to_date">You are on the latest version</string>
 
     <!-- Offload -->
     <string name="audio_offload">Enable audio offload</string>

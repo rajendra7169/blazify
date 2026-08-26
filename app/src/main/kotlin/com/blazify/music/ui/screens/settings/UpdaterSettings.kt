@@ -39,6 +39,8 @@ import androidx.navigation.NavController
 import com.blazify.music.BuildConfig
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
+import com.blazify.music.utils.ReleaseInfo
+import com.blazify.music.ui.component.UpdateDialog
 import com.blazify.music.constants.CheckForUpdatesKey
 import com.blazify.music.constants.UpdateNotificationsEnabledKey
 import com.blazify.music.ui.component.IconButton
@@ -63,6 +65,12 @@ fun UpdaterScreen(
     var isChecking by remember { mutableStateOf(false) }
     var updateAvailable by remember { mutableStateOf(false) }
     var latestVersion by remember { mutableStateOf<String?>(null) }
+    // Kept whole: the download needs the assets, which a version string does not
+    // carry. Checking used to end at "there is a newer one" and leave somebody to
+    // find the file themselves on a web page.
+    var latestRelease by remember { mutableStateOf<ReleaseInfo?>(null) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    var checkedOnce by remember { mutableStateOf(false) }
     var showChangelog by remember { mutableStateOf(false) }
     var changelogContent by remember { mutableStateOf<String?>(null) }
     var checkError by remember { mutableStateOf<String?>(null) }
@@ -82,7 +90,9 @@ fun UpdaterScreen(
                             latestVersion = releaseInfo.versionName
                             updateAvailable = hasUpdate
                             changelogContent = releaseInfo.description
+                            latestRelease = releaseInfo
                         }
+                        checkedOnce = true
                     }.onFailure {
                         checkError = String.format(failedToCheckUpdatesTemplate, it.message ?: "Unknown error")
                     }
@@ -214,6 +224,28 @@ fun UpdaterScreen(
             )
         }
 
+        if (checkedOnce && !updateAvailable && checkError == null) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = stringResource(R.string.update_up_to_date),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+
+        if (updateAvailable && latestRelease != null) {
+            Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = { showUpdateDialog = true },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+            ) {
+                Text(stringResource(R.string.update_download))
+            }
+        }
+
         if (updateAvailable && latestVersion != null) {
             Spacer(Modifier.height(16.dp))
             Button(
@@ -240,6 +272,12 @@ fun UpdaterScreen(
         }
 
         Spacer(Modifier.height(32.dp))
+    }
+
+    if (showUpdateDialog) {
+        latestRelease?.let { release ->
+            UpdateDialog(release = release, onDismiss = { showUpdateDialog = false })
+        }
     }
 
     TopAppBar(
