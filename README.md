@@ -9,6 +9,7 @@
 *Stream it. Feel it. Blaze it.*
 
 [![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/rajendra7169/blazify/total?color=FFA726&label=downloads)](https://github.com/rajendra7169/blazify/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
@@ -95,6 +96,8 @@ app — with a live preview while you do it. No ads, no tracking.
 | **last.fm** | Scrobble what you play |
 | **Android Auto** | Full in-car playback |
 | **Widgets** | Home-screen controls |
+| **Backup & restore** | Your whole library in one file — songs, playlists, history, sign-in |
+| **In-app updates** | Tells you when a new version is out, downloads it, and installs it |
 
 ---
 
@@ -102,10 +105,24 @@ app — with a live preview while you do it. No ads, no tracking.
 
 Download the latest APK from **[Releases](https://github.com/rajendra7169/blazify/releases/latest)**.
 
-Requires **Android 8.0 (API 26)** or newer.
+Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK — nothing else to do.
 
-> Signed with the project's own release key. If you have an earlier build that
-> came from a different key, uninstall it before installing this one.
+### ⚠️ Coming from 9.12.3 or earlier
+
+**9.12.4 is signed with a new key, so Android will not install it over an older
+build.** You have to uninstall first — and uninstalling erases your library
+unless you back it up. Two minutes, in this order:
+
+1. In your current version: **Settings → Backup and restore → Backup**, saved to **Downloads**.
+2. Download `Blazify-9.12.4.apk` from Releases.
+3. Uninstall Blazify.
+4. Open Downloads and tap the APK.
+5. **Settings → Backup and restore → Restore**, and pick the file from step 1.
+
+Liked songs, playlists, history and your sign-in all come back.
+
+This is a one-time break. From 9.12.4 onward the app checks for new versions
+itself, downloads them, and installs them over the top without any of this.
 
 ---
 
