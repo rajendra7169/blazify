@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -33,10 +34,19 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.blazify.music.R
 import com.blazify.music.BuildConfig
+import com.blazify.music.utils.BundledChangelog
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 
-private val markdownLinkRegex = Regex("(@[a-zA-Z0-9_-]+)|(https?://[\\w-]+(\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])")
+// Links, mentions, and the two emphases release notes are actually written in.
+// Emphasis used to be missing here, which did not leave it unstyled — it left the
+// asterisks on screen, in a page whose whole job is to be read.
+private val markdownInlineRegex = Regex(
+    "(\\*\\*[^*\\n]+\\*\\*)" +
+        "|(\\*[^*\\n]+\\*)" +
+        "|(@[a-zA-Z0-9_-]+)" +
+        "|(https?://[\\w-]+(\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])",
+)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -47,15 +57,27 @@ fun ChangelogScreen(
     var isLoading by remember { mutableStateOf(true) }
     val uriHandler = LocalUriHandler.current
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     LaunchedEffect(Unit) {
+        // What shipped in this build, which is known without asking anybody.
+        val bundled = BundledChangelog.read(context)
+        releases = bundled
+        isLoading = bundled.isEmpty()
+
+        // Then whatever the site can add to it — older releases, mostly. It is no
+        // longer the only source, so a private repository or no connection at all
+        // costs the earlier entries rather than the whole page.
         Updater.getAllReleases().onSuccess { allReleases ->
-            releases = allReleases.filter { release ->
-                Updater.compareVersions(BuildConfig.VERSION_NAME, release.tagName) >= 0
+            val extra = allReleases.filter { release ->
+                Updater.compareVersions(BuildConfig.VERSION_NAME, release.tagName) >= 0 &&
+                    bundled.none { it.tagName == release.tagName }
             }
-            isLoading = false
-        }.onFailure {
-            isLoading = false
+            releases = (bundled + extra).sortedWith { a, b ->
+                Updater.compareVersions(b.tagName, a.tagName)
+            }
         }
+        isLoading = false
     }
 
     val sheetState = rememberModalBottomSheetState(
@@ -225,23 +247,40 @@ fun MarkdownText(text: String) {
                     trimmedLine
                 }
 
+                val linkColour = MaterialTheme.colorScheme.primary
                 val annotatedString = buildAnnotatedString {
                     var lastIndex = 0
-                    markdownLinkRegex.findAll(contentText).forEach { result ->
+                    markdownInlineRegex.findAll(contentText).forEach { result ->
                         append(contentText.substring(lastIndex, result.range.first))
-                        
+
                         val match = result.value
-                        val link = if (match.startsWith("@")) "https://github.com/${match.substring(1)}" else match
-                        
-                        pushStringAnnotation(tag = "URL", annotation = link)
-                        withStyle(style = SpanStyle(
-                            color = MaterialTheme.colorScheme.primary, 
-                            fontWeight = if (match.startsWith("@")) FontWeight.Bold else FontWeight.Normal,
-                            textDecoration = if (match.startsWith("@")) TextDecoration.None else TextDecoration.Underline
-                        )) {
-                            append(match)
+                        when {
+                            match.startsWith("**") && match.endsWith("**") ->
+                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(match.removeSurrounding("**"))
+                                }
+
+                            match.startsWith("*") && match.endsWith("*") ->
+                                withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                                    append(match.removeSurrounding("*"))
+                                }
+
+                            else -> {
+                                val isMention = match.startsWith("@")
+                                val link = if (isMention) "https://github.com/${match.substring(1)}" else match
+                                pushStringAnnotation(tag = "URL", annotation = link)
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = linkColour,
+                                        fontWeight = if (isMention) FontWeight.Bold else FontWeight.Normal,
+                                        textDecoration = if (isMention) TextDecoration.None else TextDecoration.Underline,
+                                    ),
+                                ) {
+                                    append(match)
+                                }
+                                pop()
+                            }
                         }
-                        pop()
                         lastIndex = result.range.last + 1
                     }
                     append(contentText.substring(lastIndex))
