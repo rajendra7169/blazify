@@ -107,6 +107,23 @@ Download the latest APK from **[Releases](https://github.com/rajendra7169/blazif
 
 Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK — nothing else to do.
 
+### Automatic updates with Obtainium
+
+[Obtainium](https://github.com/ImranR98/Obtainium) watches this repository and
+installs each new release for you, so you never have to come back here.
+
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.blazify.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Frajendra7169%2Fblazify%22%2C%22author%22%3A%22rajendra7169%22%2C%22name%22%3A%22Blazify%22%7D"><img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png?raw=true" alt="Get it on Obtainium" height="48"></a>
+
+Tap that on your phone with Obtainium installed and Blazify is added. Or open
+Obtainium, tap **Add App**, and paste:
+
+```
+https://github.com/rajendra7169/blazify
+```
+
+Blazify also checks for its own updates and can install them itself — Obtainium
+is for people who prefer one app managing everything they sideload.
+
 ### ⚠️ Coming from 9.12.3 or earlier
 
 **9.12.4 is signed with a new key, so Android will not install it over an older
