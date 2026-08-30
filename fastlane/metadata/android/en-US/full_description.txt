@@ -1,0 +1,51 @@
+Blazify is a music player for Android, built with Kotlin and Jetpack Compose. It streams from a large online catalogue, keeps what you want for offline listening, and follows the words as they are sung — with no ads, no accounts required, and no tracking.
+
+<b>Listening</b>
+
+* Millions of songs, searched by name or found by browsing — songs, albums, artists, playlists and videos
+* Gapless playback through Media3/ExoPlayer, with the next track prepared while the current one is still playing
+* Download anything for offline listening, or let it keep songs as you play them
+* A queue that you can reorder by dragging, save as a playlist, or start a radio from
+* Sleep timer, with an end-of-track option so it never cuts off mid-song
+
+<b>Sound</b>
+
+* Ten-band equalizer with a live frequency-response curve and 13 presets
+* Preamp control, each preset pre-compensated so boosts never clip
+* Bass boost, surround and reverb
+* Volume levelling, for queues that mix a record mastered in 1975 with one mastered last year
+* Skip silence, playback speed and pitch
+
+<b>Lyrics</b>
+
+* Time-synced lyrics with word-by-word highlighting
+* Several sources asked in an order you choose, because no single one has everything
+* Translation and romanisation, for singing along to a script you cannot read
+* A full-screen view, and lyric cards you can share as an image
+
+<b>Look and feel</b>
+
+* Material 3 with Material You dynamic colour
+* Colour taken from the album artwork, accent only or the whole screen
+* Several player designs to choose between, with a live preview while you pick
+* Light, dark, pure-black, or whatever the system is doing
+
+<b>Library and sharing</b>
+
+* Liked songs, listening history, your own playlists and a Top 50 built from what you actually play
+* Listen Together — share a room code and play in sync with friends
+* Playlist import from a file or a link
+* last.fm scrobbling and Discord presence, both optional and with your own credentials
+* Music recognition — hold up your phone and name what is playing
+* Android Auto and home-screen widgets
+* Back up your whole library to a single file and restore it on another device
+
+<b>Privacy</b>
+
+Blazify has no advertising, no analytics and no tracking libraries of any kind. Nothing is sent anywhere except to the services you switch on yourself. Signing in is entirely optional — everything except your personal YouTube Music library works signed out.
+
+<b>Free software</b>
+
+Blazify is licensed under the GNU General Public License v3.0. Its streaming core builds on the work of the InnerTune, OuterTune and Metrolist projects, all GPL-3.0; the interface, theming, branding and feature work are original. See the NOTICE file in the source repository.
+
+Blazify is not affiliated with, funded, authorised or endorsed by YouTube, Google LLC, or any of their affiliates.
