@@ -1,4 +1,4 @@
-Blazify is a music player for Android, built with Kotlin and Jetpack Compose. It streams from a large online catalogue, keeps what you want for offline listening, and follows the words as they are sung — with no ads, no accounts required, and no tracking.
+Blazify is a music player for Android devices, built with Kotlin and Jetpack Compose. It streams from a large online catalogue as you want, keeps what you want for offline listening when you do not have internet, and follows the words as they are sung — with no ads, no disturbance and no account required. You can sign in with Google for better song recommendations if you want to, and there is no tracking. Nothing is sent anywhere except to the services you turn on yourself.
 
 <b>Listening</b>
 
@@ -42,7 +42,7 @@ Blazify is a music player for Android, built with Kotlin and Jetpack Compose. It
 
 <b>Privacy</b>
 
-Blazify has no advertising, no analytics and no tracking libraries of any kind. Nothing is sent anywhere except to the services you switch on yourself. Signing in is entirely optional — everything except your personal YouTube Music library works signed out.
+Blazify has no advertising, no analytics and no tracking libraries of any kind. Signing in is entirely optional — everything except your personal YouTube Music library works signed out.
 
 <b>Free software</b>
 
