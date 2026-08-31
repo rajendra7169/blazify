@@ -254,9 +254,10 @@ svg.mark{
 /* a loop that runs by itself; hovering stops it so a screenshot can be read */
 .rail{overflow:hidden;padding:6px 0 22px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
       mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-.track{display:flex;gap:22px;width:max-content;animation:roll var(--dur,52s) linear infinite}
-.rail:hover .track{animation-play-state:paused}
-@keyframes roll{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 11px))}}
+.track{display:flex;gap:22px;width:max-content;will-change:transform;touch-action:pan-y}
+.rail{cursor:grab}
+.rail.dragging{cursor:grabbing}
+.rail.dragging .shot{pointer-events:none}
 .shot{flex:0 0 auto;width:258px;scroll-snap-align:start}
 .shot .device,.shot .win{transition:transform .35s}
 .shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
@@ -331,6 +332,71 @@ svg.mark{
   .ln,.ln w{transition:none}
 }
 
+/* ── the page as a track ──────────────────────────────────────────
+   Scroll position drawn as a seek bar, because that is what scrolling
+   through a page about a music player ought to feel like. */
+.seek{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(255,167,38,.10);z-index:60}
+.seek i{display:block;height:100%;width:0;background:var(--flame);position:relative;
+        box-shadow:0 0 14px rgba(255,167,38,.65)}
+.seek i::after{
+  content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:#FFE0B8;box-shadow:0 0 12px #FFA726;
+}
+
+/* ── a mini player, the way the app has one ───────────────────── */
+.mp{
+  position:fixed;left:50%;bottom:20px;transform:translate(-50%,140%);
+  z-index:55;display:flex;align-items:center;gap:16px;
+  width:min(560px,92vw);padding:11px 12px 11px 11px;border-radius:99px;
+  background:rgba(24,20,17,.86);backdrop-filter:blur(20px);
+  border:1px solid var(--line);box-shadow:0 22px 50px rgba(0,0,0,.55);
+  transition:transform .55s cubic-bezier(.2,.8,.3,1),opacity .4s;opacity:0;
+}
+.mp.up{transform:translate(-50%,0);opacity:1}
+.mp .cover{
+  width:44px;height:44px;border-radius:50%;flex:0 0 auto;position:relative;
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.07) 0 1px,rgba(0,0,0,.6) 1px 3px),#0d0d10;
+  animation:spin 4.5s linear infinite;
+}
+.mp .cover::after{content:'';position:absolute;inset:36%;border-radius:50%;background:var(--flame)}
+.mp .txt{min-width:0;flex:1}
+.mp .txt b{display:block;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--cream)}
+.mp .txt span{display:block;font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp .wave{display:flex;align-items:flex-end;gap:3px;height:20px;flex:0 0 auto}
+.mp .wave b{width:3px;border-radius:2px;background:var(--amber);opacity:.85;animation:bounce 1s ease-in-out infinite}
+.mp .go{
+  flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:99px;
+  background:var(--flame);color:#1A0E00;font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:640px){
+  .mp{gap:11px;padding:9px 10px 9px 9px;bottom:14px}
+  .mp .wave{display:none}
+  .mp .txt span{display:none}
+  .mp .go{padding:9px 16px;font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  .mp .cover,.mp .wave b{animation:none}
+  .mp{transition:none}
+}
+
+/* a real record in the demo, not a disc icon */
+.art .vinyl{
+  width:66%;aspect-ratio:1;border-radius:50%;position:relative;
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.06) 0 1px,rgba(0,0,0,.62) 1px 3.4px),#0a0a0c;
+  box-shadow:0 16px 34px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.06);
+  animation:spin 7s linear infinite;
+}
+.art .vinyl::after{
+  content:'';position:absolute;inset:33%;border-radius:50%;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--accent,#FFA726) 92%,#fff),var(--accent,#FFA726));
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.35);transition:background .9s ease;
+}
+.art .vinyl::before{
+  content:'';position:absolute;inset:47.5%;border-radius:50%;background:#0a0a0c;z-index:2;
+}
+@media (prefers-reduced-motion:reduce){.art .vinyl{animation:none}}
+
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -370,7 +436,7 @@ svg.mark{
 }
 
 /* footer */
-footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-index:1}
+footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z-index:1}
 .f-grid{display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:36px}
 .f-col h5{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin:0 0 14px;font-weight:500}
 .f-col a{display:block;color:var(--dim);text-decoration:none;font-size:15px;margin-bottom:9px;transition:color .25s}
@@ -400,11 +466,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
   .shot{width:72vw;max-width:290px}
   .wide{width:88vw;max-width:none}
   .sub{margin:32px 0 14px}
-  .rail{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-mask-image:none;mask-image:none}
-  .track{animation:none;width:auto}
-  .shot{scroll-snap-align:center}
-  .rail::-webkit-scrollbar{height:4px}
-  .rail::-webkit-scrollbar-thumb{background:rgba(255,167,38,.3);border-radius:9px}
+  .rail{-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);
+        mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -431,6 +494,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
 <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
 </defs></svg>
+<div class="seek"><i id="seekBar"></i></div>
 <div class="glow"></div>
 
 <nav>
@@ -566,12 +630,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
     <p class="lede rise">Not a block of text scrolling past — every word lights up on its beat. And the colour comes from the artwork, so the app looks different for every song.</p>
     <div class="stage rise" id="stage">
       <div class="now">
-        <div class="art">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(26,14,0,.55)" stroke-width="1.4">
-            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/>
-            <path d="M12 3a9 9 0 0 1 9 9" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <div class="art"><span class="vinyl"></span></div>
         <div>
           <p class="t" id="dTitle">Ember</p>
           <p class="a" id="dArtist">Blazify demo</p>
@@ -679,6 +738,13 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
     </div>
   </div>
 </section>
+
+<div class="mp" id="mp" role="complementary" aria-label="Get Blazify">
+  <span class="cover" aria-hidden="true"></span>
+  <span class="txt"><b>Blazify</b><span>Stream it. Feel it. Blaze it.</span></span>
+  <span class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span>
+  <a class="go" href="#get">Get it free</a>
+</div>
 
 <footer>
   <div class="shell">
@@ -827,6 +893,90 @@ if (eq) {
       else requestAnimationFrame(frame);
     }
   }), { threshold: .25 }).observe(stage);
+})();
+
+
+/* ── the galleries ─────────────────────────────────────────────────
+   Always drifting, on every screen. A pointer resting on it stops it so
+   a screenshot can be read; a drag takes it over and throws it, and the
+   throw decays back into the drift. On a phone the previous version just
+   stopped being a loop, which is the one place a loop is most useful —
+   there is no hover there to reveal that the rail moves at all. */
+document.querySelectorAll('.rail').forEach(rail => {
+  const track = rail.querySelector('.track');
+  if (!track) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const DRIFT = parseFloat(rail.dataset.speed || 0.4);
+  let x = 0, vel = 0, held = false, hover = false;
+  let lastPointer = 0, lastAt = 0;
+
+  const span = () => (track.scrollWidth + 22) / 2;   // one copy of the set
+
+  function frame() {
+    if (!held) {
+      if (Math.abs(vel) > 0.06) { x += vel; vel *= 0.945; }
+      else if (!hover) { x -= DRIFT; vel = 0; }
+    }
+    const w = span();
+    if (w > 0) { while (x <= -w) x += w; while (x > 0) x -= w; }
+    track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  rail.addEventListener('pointerenter', () => { hover = true; });
+  rail.addEventListener('pointerleave', () => { hover = false; });
+
+  rail.addEventListener('pointerdown', e => {
+    held = true; vel = 0; rail.classList.add('dragging');
+    lastPointer = e.clientX; lastAt = performance.now();
+    // a pointer can be gone before this runs; losing capture is survivable,
+    // an exception here would leave the rail stuck mid-drag
+    try { rail.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  rail.addEventListener('pointermove', e => {
+    if (!held) return;
+    const dx = e.clientX - lastPointer;
+    const now = performance.now();
+    const dt = Math.max(1, now - lastAt);
+    x += dx;
+    vel = dx / dt * 16;                    // carry the speed of the flick
+    lastPointer = e.clientX; lastAt = now;
+  });
+
+  const release = () => {
+    if (!held) return;
+    held = false; hover = false;
+    rail.classList.remove('dragging');
+    vel = Math.max(-42, Math.min(42, vel));
+  };
+  rail.addEventListener('pointerup', release);
+  rail.addEventListener('pointercancel', release);
+});
+
+
+/* the page's own seek bar, and a mini player that arrives once the hero
+   is behind you — the same two things the app puts on screen */
+(function () {
+  const bar = document.getElementById('seekBar');
+  const mp  = document.getElementById('mp');
+  const wave = mp && mp.querySelector('.wave');
+  if (wave) [...wave.children].forEach(b => {
+    b.style.animationDelay = (Math.random() * -1) + 's';
+    b.style.animationDuration = (0.6 + Math.random() * 0.7) + 's';
+  });
+  let ticking = false;
+  function paint() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const pct = max > 0 ? (scrollY / max) * 100 : 0;
+    if (bar) bar.style.width = pct.toFixed(2) + '%';
+    if (mp) mp.classList.toggle('up', scrollY > innerHeight * 0.75);
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+  paint();
 })();
 
 // reveal on scroll
