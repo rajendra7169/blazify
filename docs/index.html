@@ -457,6 +457,31 @@ details p:last-child{margin-bottom:0}
 details a{color:var(--amber)}
 
 /* ── the comparison ───────────────────────────────────────────── */
+/* ── back to the top ──────────────────────────────────────────────
+   Appears near the end, where somebody has run out of page and would
+   otherwise have to swipe all the way back. Sits clear of the mini
+   player, which is centred and nearly full width on a phone: to its
+   right on a wide screen, above it on a narrow one. */
+.totop{
+  position:fixed;right:24px;bottom:24px;z-index:56;
+  width:50px;height:50px;border-radius:50%;display:grid;place-items:center;
+  background:var(--flame);color:#1A0E00;border:none;cursor:pointer;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+  opacity:0;transform:translateY(80%) scale(.85);pointer-events:none;
+  transition:opacity .38s ease,transform .38s cubic-bezier(.2,.8,.3,1);
+}
+.totop.up{opacity:1;transform:none;pointer-events:auto}
+.totop:hover{transform:translateY(-3px)}
+.totop:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.totop .ic{width:23px;height:23px;stroke-width:2.1;color:#1A0E00}
+@media (max-width:640px){
+  .totop{right:16px;bottom:96px;width:46px;height:46px}
+}
+@media (prefers-reduced-motion:reduce){
+  .totop{transition:none}
+  .totop:hover{transform:none}
+}
+
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -655,6 +680,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
 <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
 <symbol id="i-devices" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="9.5" rx="1.4"/><path d="M6 18.2h6.2"/><path d="M9 14.5v3.7"/><rect x="16.5" y="9.5" width="5" height="9.5" rx="1.4"/><path d="M18.4 16.9h1.2"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19.5V5.2"/><path d="M5.6 11.6L12 5.2l6.4 6.4"/></symbol>
 <symbol id="i-bgplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6l5.4 3.4-5.4 3.4z"/></symbol>
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
@@ -970,6 +996,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   <a class="go" href="#get">Get it free</a>
 </div>
 
+<button class="totop" id="toTop" type="button" aria-label="Back to top"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg></button>
+
 <footer>
   <div class="shell">
     <div class="f-grid">
@@ -1223,6 +1251,7 @@ document.querySelectorAll('.rail').forEach(rail => {
   const bar = document.getElementById('seekBar');
   const mp  = document.getElementById('mp');
   const gate = document.getElementById('lyrics');
+  const top = document.getElementById('toTop');
   const wave = mp && mp.querySelector('.wave');
   if (wave) [...wave.children].forEach(b => {
     b.style.animationDelay = (Math.random() * -1) + 's';
@@ -1236,9 +1265,22 @@ document.querySelectorAll('.rail').forEach(rail => {
     // only once the lyrics demo is behind you. Before that the page is
     // still making its case and a floating button is just in the way
     if (mp && gate) mp.classList.toggle('up', gate.getBoundingClientRect().bottom < 72);
+    // near the end of the page, where there is nothing left to scroll to
+    if (top) top.classList.toggle('up', scrollY + innerHeight > document.documentElement.scrollHeight - 420);
     ticking = false;
   }
+  if (top) top.addEventListener('click', () => {
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+  });
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+
+  // The page grows as deferred images arrive, which moves the bottom away from
+  // under a reader who has already stopped scrolling. No scroll event follows
+  // that, so without this the back-to-top button never appears for anyone who
+  // scrolls straight to the end and waits.
+  if (window.ResizeObserver) new ResizeObserver(paint).observe(document.body);
+  addEventListener('resize', paint, { passive: true });
   paint();
 })();
 
