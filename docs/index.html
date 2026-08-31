@@ -31,7 +31,7 @@
   --dim:#A89A8B;
   --flame:linear-gradient(120deg,#FFA726 0%,#FF8A3D 45%,#FF7043 100%);
   --r-lg:40px; --r-md:24px; --r-sm:16px;
-  --shell:min(1240px,92vw);
+  --shell:min(1560px,93vw);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -138,10 +138,9 @@ nav{
 
 /* phone rises above the slab */
 .phone{position:relative;width:clamp(186px,17vw,238px);margin-top:-132px;z-index:3}
-.phone img{
-  border-radius:26px;border:7px solid #0B0A09;
-  box-shadow:0 34px 70px rgba(0,0,0,.55);background:#0B0A09;
-}
+.phone .device{border-radius:38px;padding:8px}
+.phone .device .screen{border-radius:31px}
+.phone .device .notch{height:17px}
 .slab-side{display:flex;flex-direction:column;gap:20px}
 .mini{
   display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.2);
@@ -195,16 +194,56 @@ section{position:relative;z-index:1;padding:84px 0}
   color:var(--amber);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-weight:500;
 }
 
+/* ── device mockups ───────────────────────────────────── */
+.device{
+  position:relative;padding:10px;border-radius:44px;
+  background:linear-gradient(152deg,#43434c 0%,#1a1a1f 38%,#0c0c0f 100%);
+  box-shadow:0 42px 80px rgba(0,0,0,.62),0 0 0 1px rgba(255,255,255,.07),
+             inset 0 1px 2px rgba(255,255,255,.16);
+}
+.device .screen{position:relative;border-radius:35px;overflow:hidden;background:#000;line-height:0}
+.device .screen img{border-radius:0}
+.device .notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:36%;height:20px;background:#0a0a0c;border-radius:0 0 14px 14px;z-index:3;
+}
+.device .vol,.device .pwr{
+  position:absolute;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,#55555f,#26262d);
+}
+.device .vol{left:-3px;top:19%;height:6%}
+.device .vol.b{top:27%;height:6%}
+.device .pwr{right:-3px;top:24%;height:9%;border-radius:3px}
+
+/* a native app window, not a browser — this is a desktop app */
+.win{
+  border-radius:14px;overflow:hidden;background:#15151a;
+  box-shadow:0 36px 76px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);
+  line-height:0;
+}
+.win .bar{
+  height:34px;display:flex;align-items:center;gap:8px;padding:0 14px;
+  background:linear-gradient(#2b2b32,#1f1f25);border-bottom:1px solid rgba(255,255,255,.06);
+}
+.win .bar i{width:11px;height:11px;border-radius:50%;display:block}
+.win .bar i:nth-child(1){background:#FF5F57}
+.win .bar i:nth-child(2){background:#FEBC2E}
+.win .bar i:nth-child(3){background:#28C840}
+.win .bar span{
+  margin-left:12px;font-size:12px;color:#7d7d88;font-weight:400;line-height:34px;
+  font-family:'Outfit',sans-serif;
+}
+
 /* gallery */
+.sub{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;margin:44px 0 18px;color:var(--cream)}
 .rail{display:flex;gap:20px;overflow-x:auto;padding:6px 0 22px;scroll-snap-type:x mandatory}
 .rail::-webkit-scrollbar{height:5px}
 .rail::-webkit-scrollbar-thumb{background:rgba(255,167,38,.32);border-radius:9px}
-.shot{flex:0 0 auto;width:216px;scroll-snap-align:start}
-.shot img{border-radius:20px;border:1px solid var(--line);transition:transform .35s}
-.shot:hover img{transform:translateY(-8px)}
-.shot p{font-size:13.5px;color:var(--dim);margin:12px 0 0;text-align:center}
-.wide{width:min(560px,80vw)}
-.wide img{border-radius:16px}
+.shot{flex:0 0 auto;width:258px;scroll-snap-align:start}
+.shot .device,.shot .win{transition:transform .35s}
+.shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
+.shot p{font-size:14px;color:var(--dim);margin:16px 0 0;text-align:center;line-height:1.4}
+.wide{width:min(760px,86vw)}
 
 /* features */
 .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
@@ -250,6 +289,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
   .strip{padding:22px;border-radius:0 0 var(--r-md) var(--r-md)}
   .band{padding:40px 22px;border-radius:var(--r-md)}
   section{padding:76px 0}
+  .shot{width:72vw;max-width:290px}
+  .wide{width:88vw;max-width:none}
+  .sub{margin:32px 0 14px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -304,7 +346,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
         </div>
 
         <div class="phone">
-          <img src="assets/home.png" alt="Blazify running on an Android phone" width="480" height="1040">
+          <div class="device">
+            <span class="vol"></span><span class="vol b"></span><span class="pwr"></span>
+            <div class="screen"><span class="notch"></span>
+              <img src="assets/home.png" alt="Blazify running on an Android phone">
+            </div>
+          </div>
         </div>
 
         <div class="slab-side">
@@ -335,57 +382,59 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
         <span class="icon">🤖</span>
         <h3>Android</h3>
         <div class="ver">Version 9.12.4 · 25 MB · Android 8+</div>
-        <p>The full app — streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
+        <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
         <a class="dl" href="https://github.com/rajendra7169/blazify/releases/latest">Download APK</a>
+      </article>
+
+      <article class="card rise">
+        <span class="icon">🪟</span>
+        <h3>Windows</h3>
+        <div class="ver">Version 1.0.4 · installer</div>
+        <p>The desktop player with its audio library bundled in. Installs without an administrator password.</p>
+        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Download for Windows</a>
       </article>
 
       <article class="card rise">
         <span class="icon">🐧</span>
         <h3>Linux</h3>
-        <div class="ver">Version 1.0.4 · deb, AppImage, tar.gz</div>
-        <p>A desktop player with podcasts, chapters, transcripts and media-key support. Bring your own music folder or stream.</p>
-        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Download</a>
+        <div class="ver">Version 1.0.4 · deb · AppImage · tar.gz</div>
+        <p>Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.</p>
+        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Download for Linux</a>
       </article>
 
       <article class="card rise">
-        <span class="soon">Coming soon</span>
-        <span class="icon">🪟</span>
-        <h3>Windows</h3>
-        <div class="ver">Installer in preparation</div>
-        <p>The same desktop player, packaged as a Windows installer with its audio library bundled inside.</p>
-        <a class="dl ghost" href="https://github.com/rajendra7169/blazify-desktop">Follow progress</a>
-      </article>
-
-      <article class="card rise">
-        <span class="soon">In development</span>
         <span class="icon">🍏</span>
         <h3>iOS</h3>
-        <div class="ver">Build pipeline working</div>
-        <p>Background audio and lock-screen controls are proven on device. The full player is being built on top.</p>
-        <a class="dl ghost" href="https://github.com/rajendra7169/blazify">Follow progress</a>
+        <div class="ver">iPhone · sideload</div>
+        <p>Background audio and lock-screen controls, sideloaded with SideStore or AltStore — no App Store needed.</p>
+        <a class="dl" href="https://github.com/rajendra7169/blazify-ios/releases/latest">Download for iPhone</a>
       </article>
-    </div>
   </div>
 </section>
 
 <section id="look">
   <div class="shell">
     <h2 class="title rise">See it <em>move</em></h2>
-    <p class="lede rise">Real screens, no mock-ups. Colour is pulled from whatever is playing.</p>
+    <p class="lede rise">Real screens, straight from the app. Colour is pulled from whatever is playing.</p>
 
     <div class="rail rise">
-      <figure class="shot"><img src="assets/home.png" alt="Home screen" loading="lazy"><p>Home</p></figure>
-      <figure class="shot"><img src="assets/player.png" alt="Now playing" loading="lazy"><p>Player</p></figure>
-      <figure class="shot"><img src="assets/lyrics.png" alt="Synced lyrics" loading="lazy"><p>Synced lyrics</p></figure>
-      <figure class="shot"><img src="assets/equalizer.png" alt="Equalizer" loading="lazy"><p>Equalizer</p></figure>
-      <figure class="shot"><img src="assets/look-and-feel.png" alt="Look and feel" loading="lazy"><p>Look &amp; Feel</p></figure>
-      <figure class="shot"><img src="assets/splash.png" alt="Splash" loading="lazy"><p>Splash</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/home.png" alt="Home screen" loading="lazy"></div></div><p>Home — colour follows the artwork</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/player.png" alt="Now playing" loading="lazy"></div></div><p>Player — five designs to choose from</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/lyrics.png" alt="Synced lyrics" loading="lazy"></div></div><p>Lyrics — highlighted word by word</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/equalizer.png" alt="Equalizer" loading="lazy"></div></div><p>Equalizer — ten bands, 13 presets</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/look-and-feel.png" alt="Look and feel" loading="lazy"></div></div><p>Look &amp; Feel — with a live preview</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/splash.png" alt="Splash screen" loading="lazy"></div></div><p>Splash</p></figure>
     </div>
 
-    <div class="rail rise" style="margin-top:14px">
-      <figure class="shot wide"><img src="assets/desktop/home.png" alt="Blazify on desktop" loading="lazy"><p>Desktop — home</p></figure>
-      <figure class="shot wide"><img src="assets/desktop/player.png" alt="Desktop player" loading="lazy"><p>Desktop — player</p></figure>
-      <figure class="shot wide"><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" loading="lazy"><p>Desktop — lyrics</p></figure>
+    <h3 class="sub rise">On the desktop</h3>
+    <div class="rail rise">
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><img src="assets/desktop/home.png" alt="Blazify desktop home" loading="lazy"></div><p>Home</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Now playing</span></div><img src="assets/desktop/player-and-audio.png" alt="Desktop player" loading="lazy"></div><p>Player and audio</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Lyrics</span></div><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" loading="lazy"></div><p>Full-screen lyrics</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Podcasts</span></div><img src="assets/desktop/podcasts.png" alt="Podcasts" loading="lazy"></div><p>Podcasts, chapters and transcripts</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Library</span></div><img src="assets/desktop/kept-as-you-listen.png" alt="Kept as you listen" loading="lazy"></div><p>Kept as you listen</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Settings</span></div><img src="assets/desktop/look-and-feel.png" alt="Desktop look and feel" loading="lazy"></div><p>Look &amp; Feel</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Player</span></div><img src="assets/desktop/player-looks.png" alt="Player designs" loading="lazy"></div><p>Five player designs</p></figure>
     </div>
   </div>
 </section>
