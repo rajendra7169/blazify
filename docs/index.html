@@ -42,6 +42,7 @@ body{
   overflow-x:hidden;
 }
 img{max-width:100%;height:auto;display:block}
+picture{display:block;line-height:0}
 a{color:inherit}
 .shell{width:var(--shell);margin-inline:auto}
 
@@ -552,7 +553,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 
 <nav>
   <div class="shell nav-in">
-    <a class="brand" href="#top"><img src="assets/logo-512.png" alt=""><span>BLAZIFY</span></a>
+    <a class="brand" href="#top"><picture><source srcset="assets/logo-512.webp" type="image/webp"><img src="assets/logo-512.png" alt="" width="512" height="512"></picture><span>BLAZIFY</span></a>
     <div class="nav-links">
       <a href="#get">Download</a>
       <a href="#look">Screenshots</a>
@@ -597,7 +598,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
           <div class="device">
             <span class="vol"></span><span class="vol b"></span><span class="pwr"></span>
             <div class="screen"><span class="notch"></span>
-              <img src="assets/home.png" alt="Blazify running on an Android phone">
+              <picture><source srcset="assets/home.webp" type="image/webp"><img src="assets/home.png" alt="Blazify running on an Android phone" width="480" height="1040" fetchpriority="high"></picture>
             </div>
           </div>
         </div>
@@ -714,38 +715,38 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 
     <div class="rail rise">
       <div class="track" style="--dur:40s">
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/home.png" alt="Home screen" loading="lazy"></div></div><p>Home — colour follows the artwork</p></figure>
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/player.png" alt="Now playing" loading="lazy"></div></div><p>Player — five designs to choose from</p></figure>
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/lyrics.png" alt="Synced lyrics" loading="lazy"></div></div><p>Lyrics — highlighted word by word</p></figure>
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/equalizer.png" alt="Equalizer" loading="lazy"></div></div><p>Equalizer — ten bands, 13 presets</p></figure>
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/look-and-feel.png" alt="Look and feel" loading="lazy"></div></div><p>Look &amp; Feel — with a live preview</p></figure>
-      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/splash.png" alt="Splash screen" loading="lazy"></div></div><p>Splash</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/home.png" alt="Home screen" loading="lazy"></div></div><p>Home — colour follows the artwork</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/player.png" alt="Now playing" loading="lazy"></div></div><p>Player — five designs to choose from</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/lyrics.png" alt="Synced lyrics" loading="lazy"></div></div><p>Lyrics — highlighted word by word</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/equalizer.png" alt="Equalizer" loading="lazy"></div></div><p>Equalizer — ten bands, 13 presets</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/look-and-feel.png" alt="Look and feel" loading="lazy"></div></div><p>Look &amp; Feel — with a live preview</p></figure>
-      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><img src="assets/splash.png" alt="Splash screen" loading="lazy"></div></div><p>Splash</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/home.webp" type="image/webp"><img src="assets/home.png" alt="Home screen" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Home — colour follows the artwork</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/player.webp" type="image/webp"><img src="assets/player.png" alt="Now playing" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Player — five designs to choose from</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/lyrics.webp" type="image/webp"><img src="assets/lyrics.png" alt="Synced lyrics" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Lyrics — highlighted word by word</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/equalizer.webp" type="image/webp"><img src="assets/equalizer.png" alt="Equalizer" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Equalizer — ten bands, 13 presets</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/look-and-feel.webp" type="image/webp"><img src="assets/look-and-feel.png" alt="Look and feel" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Look &amp; Feel — with a live preview</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/splash.webp" type="image/webp"><img src="assets/splash.png" alt="Splash screen" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Splash</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/home.webp" type="image/webp"><img src="assets/home.png" alt="Home screen" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Home — colour follows the artwork</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/player.webp" type="image/webp"><img src="assets/player.png" alt="Now playing" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Player — five designs to choose from</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/lyrics.webp" type="image/webp"><img src="assets/lyrics.png" alt="Synced lyrics" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Lyrics — highlighted word by word</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/equalizer.webp" type="image/webp"><img src="assets/equalizer.png" alt="Equalizer" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Equalizer — ten bands, 13 presets</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/look-and-feel.webp" type="image/webp"><img src="assets/look-and-feel.png" alt="Look and feel" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Look &amp; Feel — with a live preview</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="assets/splash.webp" type="image/webp"><img src="assets/splash.png" alt="Splash screen" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>Splash</p></figure>
       </div>
     </div>
 
     <h3 class="sub rise">On the desktop</h3>
     <div class="rail rise">
       <div class="track" style="--dur:46s">
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><img src="assets/desktop/home.png" alt="Blazify desktop home" loading="lazy"></div><p>Home</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Now playing</span></div><img src="assets/desktop/player-and-audio.png" alt="Desktop player" loading="lazy"></div><p>Player and audio</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Lyrics</span></div><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" loading="lazy"></div><p>Full-screen lyrics</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Podcasts</span></div><img src="assets/desktop/podcasts.png" alt="Podcasts" loading="lazy"></div><p>Podcasts, chapters and transcripts</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Library</span></div><img src="assets/desktop/kept-as-you-listen.png" alt="Kept as you listen" loading="lazy"></div><p>Kept as you listen</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Settings</span></div><img src="assets/desktop/look-and-feel.png" alt="Desktop look and feel" loading="lazy"></div><p>Look &amp; Feel</p></figure>
-      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Player</span></div><img src="assets/desktop/player-looks.png" alt="Player designs" loading="lazy"></div><p>Five player designs</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><img src="assets/desktop/home.png" alt="Blazify desktop home" loading="lazy"></div><p>Home</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Now playing</span></div><img src="assets/desktop/player-and-audio.png" alt="Desktop player" loading="lazy"></div><p>Player and audio</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Lyrics</span></div><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" loading="lazy"></div><p>Full-screen lyrics</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Podcasts</span></div><img src="assets/desktop/podcasts.png" alt="Podcasts" loading="lazy"></div><p>Podcasts, chapters and transcripts</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Library</span></div><img src="assets/desktop/kept-as-you-listen.png" alt="Kept as you listen" loading="lazy"></div><p>Kept as you listen</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Settings</span></div><img src="assets/desktop/look-and-feel.png" alt="Desktop look and feel" loading="lazy"></div><p>Look &amp; Feel</p></figure>
-      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Player</span></div><img src="assets/desktop/player-looks.png" alt="Player designs" loading="lazy"></div><p>Five player designs</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><picture><source srcset="assets/desktop/home.webp" type="image/webp"><img src="assets/desktop/home.png" alt="Blazify desktop home" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Home</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Now playing</span></div><picture><source srcset="assets/desktop/player-and-audio.webp" type="image/webp"><img src="assets/desktop/player-and-audio.png" alt="Desktop player" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Player and audio</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Lyrics</span></div><picture><source srcset="assets/desktop/lyrics.webp" type="image/webp"><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Full-screen lyrics</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Podcasts</span></div><picture><source srcset="assets/desktop/podcasts.webp" type="image/webp"><img src="assets/desktop/podcasts.png" alt="Podcasts" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Podcasts, chapters and transcripts</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Library</span></div><picture><source srcset="assets/desktop/kept-as-you-listen.webp" type="image/webp"><img src="assets/desktop/kept-as-you-listen.png" alt="Kept as you listen" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Kept as you listen</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Settings</span></div><picture><source srcset="assets/desktop/look-and-feel.webp" type="image/webp"><img src="assets/desktop/look-and-feel.png" alt="Desktop look and feel" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Look &amp; Feel</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Player</span></div><picture><source srcset="assets/desktop/player-looks.webp" type="image/webp"><img src="assets/desktop/player-looks.png" alt="Player designs" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Five player designs</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><picture><source srcset="assets/desktop/home.webp" type="image/webp"><img src="assets/desktop/home.png" alt="Blazify desktop home" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Home</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Now playing</span></div><picture><source srcset="assets/desktop/player-and-audio.webp" type="image/webp"><img src="assets/desktop/player-and-audio.png" alt="Desktop player" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Player and audio</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Lyrics</span></div><picture><source srcset="assets/desktop/lyrics.webp" type="image/webp"><img src="assets/desktop/lyrics.png" alt="Desktop lyrics" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Full-screen lyrics</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Podcasts</span></div><picture><source srcset="assets/desktop/podcasts.webp" type="image/webp"><img src="assets/desktop/podcasts.png" alt="Podcasts" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Podcasts, chapters and transcripts</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Library</span></div><picture><source srcset="assets/desktop/kept-as-you-listen.webp" type="image/webp"><img src="assets/desktop/kept-as-you-listen.png" alt="Kept as you listen" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Kept as you listen</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Settings</span></div><picture><source srcset="assets/desktop/look-and-feel.webp" type="image/webp"><img src="assets/desktop/look-and-feel.png" alt="Desktop look and feel" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Look &amp; Feel</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify — Player</span></div><picture><source srcset="assets/desktop/player-looks.webp" type="image/webp"><img src="assets/desktop/player-looks.png" alt="Player designs" width="1920" height="1080" loading="lazy" decoding="async"></picture></div><p>Five player designs</p></figure>
       </div>
     </div>
   </div>
@@ -786,7 +787,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <section style="padding-top:0">
   <div class="shell">
     <div class="maker rise">
-      <div class="por"><img src="assets/dev.jpg" alt="Rajendra Pandey" width="132" height="132"></div>
+      <div class="por"><picture><source srcset="assets/dev.webp" type="image/webp"><img src="assets/dev.jpg" alt="Rajendra Pandey" width="460" height="460" loading="lazy" decoding="async"></picture></div>
       <div>
         <h3>Rajendra Pandey</h3>
         <div class="role">Developer · Kathmandu, Nepal</div>
@@ -813,7 +814,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   <div class="shell">
     <div class="f-grid">
       <div class="f-col" style="max-width:300px">
-        <a class="brand" href="#top" style="margin-bottom:14px"><img src="assets/logo-512.png" alt=""><span>BLAZIFY</span></a>
+        <a class="brand" href="#top" style="margin-bottom:14px"><picture><source srcset="assets/logo-512.webp" type="image/webp"><img src="assets/logo-512.png" alt="" width="512" height="512"></picture><span>BLAZIFY</span></a>
         <p style="color:var(--dim);font-size:15px;margin:0">Stream it. Feel it. Blaze it.<br>Made in Nepal.</p>
       </div>
       <div class="f-col">
