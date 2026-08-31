@@ -465,6 +465,26 @@ details p{color:var(--dim);font-size:15px;line-height:1.65;margin:14px 0 0}
 details p:last-child{margin-bottom:0}
 details a{color:var(--amber)}
 
+/* ── the comparison ───────────────────────────────────────────── */
+.cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-md);background:var(--coal)}
+table.cmp{width:100%;border-collapse:collapse;min-width:620px}
+table.cmp th,table.cmp td{padding:16px 20px;text-align:left;font-size:15px;
+  border-bottom:1px solid rgba(255,167,38,.07)}
+table.cmp tr:last-child td{border-bottom:none}
+table.cmp thead th{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:15.5px;color:var(--cream);
+  background:rgba(255,167,38,.04);white-space:nowrap;
+}
+table.cmp thead th:first-child{color:var(--dim);font-weight:400}
+table.cmp thead th.us{color:var(--amber)}
+table.cmp td:first-child{color:var(--dim)}
+table.cmp td.us{color:var(--cream);background:rgba(255,167,38,.045);font-weight:500}
+table.cmp td{color:var(--dim)}
+.yes,.no{display:inline-flex;align-items:center;gap:8px}
+.yes::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--amber);flex:0 0 auto}
+.no::before{content:'';width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);flex:0 0 auto}
+.cmp-note{color:var(--dim);font-size:13.5px;margin:14px 0 0}
+
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -687,6 +707,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#get">Download</a>
       <a href="#look">Screenshots</a>
       <a href="#features">Features</a>
+      <a href="#compare">Compare</a>
       <a href="#install">Install</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
@@ -838,6 +859,32 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   </div>
 </section>
 
+
+
+<section id="compare">
+  <div class="shell">
+    <h2 class="title rise">Why <em>switch</em></h2>
+    <p class="lede rise">The honest version. Compared against what the free tiers of the big two actually give you.</p>
+    <div class="cmp-wrap rise">
+      <table class="cmp">
+        <thead><tr><th>&nbsp;</th><th class="us">Blazify</th><th>Spotify Free</th><th>YouTube Music Free</th></tr></thead>
+        <tbody>
+      <tr><td>Advertisements</td><td class="us"><span class="yes">None</span></td><td class=""><span class="no">Between tracks</span></td><td class=""><span class="no">Between tracks</span></td></tr>
+      <tr><td>Cost</td><td class="us"><span class="yes">Free</span></td><td class=""><span class="no">Free tier</span></td><td class=""><span class="no">Free tier</span></td></tr>
+      <tr><td>Play any song on demand</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Shuffle only</span></td><td class=""><span class="no">Shuffle only</span></td></tr>
+      <tr><td>Listen offline</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Paid only</span></td><td class=""><span class="no">Paid only</span></td></tr>
+      <tr><td>Screen off / background</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="yes">Yes</span></td><td class=""><span class="no">Paid only</span></td></tr>
+      <tr><td>Word-by-word lyrics</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Line by line</span></td><td class=""><span class="no">Line by line</span></td></tr>
+      <tr><td>Ten-band equalizer</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Basic</span></td><td class=""><span class="no">None</span></td></tr>
+      <tr><td>Account required</td><td class="us"><span class="yes">No</span></td><td class=""><span class="no">Yes</span></td><td class=""><span class="no">Yes</span></td></tr>
+      <tr><td>Tracking / analytics</td><td class="us"><span class="yes">None</span></td><td class=""><span class="no">Yes</span></td><td class=""><span class="no">Yes</span></td></tr>
+      <tr><td>Source code</td><td class="us"><span class="yes">Public, GPL-3.0</span></td><td class=""><span class="no">Closed</span></td><td class=""><span class="no">Closed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cmp-note rise">Paid subscriptions to either service remove their advertisements and unlock offline listening. This compares the free tiers, because that is what Blazify is an alternative to.</p>
+  </div>
+</section>
 
 <section id="install">
   <div class="shell">
