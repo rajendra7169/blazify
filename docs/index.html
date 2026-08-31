@@ -156,10 +156,15 @@ nav{
 /* ── strip ────────────────────────────────────────────── */
 .strip{
   background:var(--slate);border-radius:0 0 var(--r-lg) var(--r-lg);
-  padding:26px 44px;display:flex;flex-wrap:wrap;justify-content:space-around;gap:22px;
+  padding:20px 26px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
   border:1px solid var(--line);border-top:none;
 }
-.strip div{display:flex;align-items:center;gap:11px;font-size:15px;color:var(--cream);font-weight:400}
+.strip div{
+  display:flex;align-items:center;gap:9px;font-size:14.5px;color:var(--cream);font-weight:400;
+  padding:9px 18px;border-radius:99px;background:rgba(255,167,38,.055);
+  border:1px solid rgba(255,167,38,.11);transition:border-color .25s,background .25s;
+}
+.strip div:hover{background:rgba(255,167,38,.10);border-color:rgba(255,167,38,.24)}
 .strip em{font-style:normal;font-size:20px}
 
 /* ── sections ─────────────────────────────────────────── */
@@ -254,11 +259,13 @@ svg.mark{
 /* a loop that runs by itself; hovering stops it so a screenshot can be read */
 .rail{overflow:hidden;padding:6px 0 22px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
       mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-.track{display:flex;gap:22px;width:max-content;will-change:transform;touch-action:pan-y}
+.track{display:flex;gap:22px;width:max-content;will-change:transform;touch-action:pan-y;
+       transform-style:preserve-3d;align-items:center}
 .rail{cursor:grab}
 .rail.dragging{cursor:grabbing}
 .rail.dragging .shot{pointer-events:none}
-.shot{flex:0 0 auto;width:206px;scroll-snap-align:start}
+.shot{flex:0 0 auto;width:206px;scroll-snap-align:start;transform-origin:50% 50%;
+      transition:transform .12s linear,opacity .12s linear}
 .shot .device,.shot .win{transition:transform .35s}
 .shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
 .shot p{font-size:13px;color:var(--dim);margin:13px 0 0;text-align:center;line-height:1.4}
@@ -594,7 +601,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     <div class="strip">
       <div><svg class="ic"><use href="#i-ban"/></svg> No advertisements</div>
       <div><svg class="ic"><use href="#i-noeye"/></svg> No tracking</div>
-      <div><svg class="ic"><use href="#i-user"/></svg> No account needed</div>
+      <div><svg class="ic"><use href="#i-user"/></svg> Sign-in optional</div>
       <div><svg class="ic"><use href="#i-code"/></svg> GPL-3.0 open source</div>
     </div>
   </div>
@@ -959,12 +966,49 @@ document.querySelectorAll('.rail').forEach(rail => {
     const w = span();
     if (w > 0) { while (x <= -w) x += w; while (x > 0) x -= w; }
     track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    curve();
     requestAnimationFrame(frame);
   }
+  /* Positions are worked out arithmetically rather than measured: every
+     card in a rail is the same width, so reading 26 bounding boxes a frame
+     would buy nothing but layout thrash. */
+  const kids = [...track.children];
+  let step = 0, half = 0;
+  const remeasure = () => {
+    step = kids.length > 1 ? kids[1].offsetLeft - kids[0].offsetLeft : kids[0].offsetWidth;
+    half = kids[0].offsetWidth / 2;
+  };
+  remeasure();
+  addEventListener('resize', remeasure);
+
+  function curve() {
+    if (!step) return;
+    const mid = rail.clientWidth / 2;
+    const reach = mid * 1.25;
+    for (let i = 0; i < kids.length; i++) {
+      const c = x + i * step + half;              // this card's centre in the rail
+      const off = (c - mid) / reach;
+      const d = Math.min(1, Math.abs(off));
+      // a shallow arc: cards swell at the middle and turn away at the edges,
+      // so the rail reads as curved rather than as a row that resizes
+      kids[i].style.transform =
+        'perspective(1200px) rotateY(' + (-Math.sign(off) * d * 13).toFixed(2) + 'deg)' +
+        ' scale(' + (1 - d * 0.20).toFixed(3) + ')' +
+        ' translateZ(' + (-d * 60).toFixed(1) + 'px)';
+      kids[i].style.opacity = (1 - d * 0.45).toFixed(3);
+    }
+  }
+
   requestAnimationFrame(frame);
 
-  rail.addEventListener('pointerenter', () => { hover = true; });
-  rail.addEventListener('pointerleave', () => { hover = false; });
+  // Hover-to-pause only where a hover actually exists. On a touch screen a
+  // finger scrolling past fires pointerenter and frequently never fires
+  // pointerleave, which left the rail stopped for good after the first
+  // scroll — on the one device where the drift is the only hint it moves.
+  if (matchMedia('(hover: hover)').matches) {
+    rail.addEventListener('pointerenter', () => { hover = true; });
+    rail.addEventListener('pointerleave', () => { hover = false; });
+  }
 
   rail.addEventListener('pointerdown', e => {
     held = true; vel = 0; rail.classList.add('dragging');
