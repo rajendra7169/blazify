@@ -334,6 +334,7 @@ svg.mark{
 @media (max-width:940px){
   .stage{grid-template-columns:1fr;border-radius:var(--r-md)}
   .now{padding:28px 22px;align-items:center;text-align:center}
+  .now > div{width:100%}
   .words{padding:26px 20px;min-height:230px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -362,7 +363,8 @@ svg.mark{
 /* ── the page as a track ──────────────────────────────────────────
    Scroll position drawn as a seek bar, because that is what scrolling
    through a page about a music player ought to feel like. */
-.seek{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(255,167,38,.10);z-index:60}
+.seek{position:absolute;left:0;right:0;bottom:-1px;height:3px;
+      background:rgba(255,167,38,.10);z-index:60;overflow:hidden}
 .seek i{display:block;height:100%;width:0;background:var(--flame);position:relative;
         box-shadow:0 0 14px rgba(255,167,38,.65)}
 .seek i::after{
@@ -487,7 +489,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   .slab-side{order:1}
   .proof{margin-inline:auto}
   .eq{justify-content:center}
-  .strip{padding:18px;margin-top:16px}
+  .strip{padding:14px;margin-top:16px;grid-template-columns:1fr 1fr;gap:9px}
+  .strip div{padding:11px 12px;font-size:13px;gap:9px;flex-direction:column;
+             align-items:flex-start;text-align:left}
+  .strip .ic{width:19px;height:19px}
+  .feat{grid-template-columns:1fr 1fr;gap:11px}
+  .f{padding:17px 15px}
+  .f h4{font-size:15px;margin-bottom:5px}
+  .f p{font-size:12.8px;line-height:1.5}
+  .f .ic{width:24px;height:24px;margin-bottom:10px}
   .band{padding:40px 22px;border-radius:var(--r-md)}
   section{padding:76px 0}
   .shot{width:72vw;max-width:290px}
@@ -526,7 +536,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
 <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
 </defs></svg>
-<div class="seek"><i id="seekBar"></i></div>
 <div class="waves" aria-hidden="true">
   <svg class="w1" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
     <path d="M0 100 C 100 40 200 40 300 100 S 500 160 600 100 S 800 40 900 100 S 1100 160 1200 100 S 1400 40 1500 100 S 1700 160 1800 100"
@@ -550,12 +559,13 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     </div>
     <a class="nav-cta" href="#get">Get Blazify</a>
   </div>
+  <div class="seek"><i id="seekBar"></i></div>
 </nav>
 
 <header class="hero" id="top">
   <div class="shell">
     <div class="hero-frame">
-      <span class="eyebrow">Free · Open source · No ads</span>
+      <span class="eyebrow">No ads · Offline downloads · Background play</span>
 
       <div class="headline">
         <div class="h-side">
@@ -955,7 +965,7 @@ document.querySelectorAll('.rail').forEach(rail => {
   if (!track) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const DRIFT = parseFloat(rail.dataset.speed || 0.4);
+  const DRIFT = parseFloat(rail.dataset.speed || 0.75);
   let x = 0, vel = 0, held = false, hover = false;
   let lastPointer = 0, lastAt = 0;
 
@@ -1046,6 +1056,7 @@ document.querySelectorAll('.rail').forEach(rail => {
 (function () {
   const bar = document.getElementById('seekBar');
   const mp  = document.getElementById('mp');
+  const gate = document.getElementById('lyrics');
   const wave = mp && mp.querySelector('.wave');
   if (wave) [...wave.children].forEach(b => {
     b.style.animationDelay = (Math.random() * -1) + 's';
@@ -1056,7 +1067,9 @@ document.querySelectorAll('.rail').forEach(rail => {
     const max = document.documentElement.scrollHeight - innerHeight;
     const pct = max > 0 ? (scrollY / max) * 100 : 0;
     if (bar) bar.style.width = pct.toFixed(2) + '%';
-    if (mp) mp.classList.toggle('up', scrollY > innerHeight * 0.75);
+    // only once the lyrics demo is behind you — before that the page is
+    // still making its case and a floating button is just in the way
+    if (mp && gate) mp.classList.toggle('up', gate.getBoundingClientRect().bottom < 72);
     ticking = false;
   }
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
