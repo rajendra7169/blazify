@@ -439,15 +439,6 @@ svg.mark{
 @media (prefers-reduced-motion:reduce){.art .vinyl{animation:none}}
 
 /* ── installing, and the questions that come before it ─────────── */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px;margin-bottom:56px}
-.step{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
-.step b{
-  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-bottom:15px;
-  background:var(--flame);color:#1A0E00;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;
-}
-.step h4{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;margin:0 0 7px}
-.step p{color:var(--dim);font-size:14.5px;margin:0;line-height:1.55}
-
 .qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
 details{
   background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);
@@ -466,25 +457,6 @@ details p:last-child{margin-bottom:0}
 details a{color:var(--amber)}
 
 /* ── the comparison ───────────────────────────────────────────── */
-.cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-md);background:var(--coal)}
-table.cmp{width:100%;border-collapse:collapse;min-width:620px}
-table.cmp th,table.cmp td{padding:16px 20px;text-align:left;font-size:15px;
-  border-bottom:1px solid rgba(255,167,38,.07)}
-table.cmp tr:last-child td{border-bottom:none}
-table.cmp thead th{
-  font-family:'Outfit',sans-serif;font-weight:600;font-size:15.5px;color:var(--cream);
-  background:rgba(255,167,38,.04);white-space:nowrap;
-}
-table.cmp thead th:first-child{color:var(--dim);font-weight:400}
-table.cmp thead th.us{color:var(--amber)}
-table.cmp td:first-child{color:var(--dim)}
-table.cmp td.us{color:var(--cream);background:rgba(255,167,38,.045);font-weight:500}
-table.cmp td{color:var(--dim)}
-.yes,.no{display:inline-flex;align-items:center;gap:8px}
-.yes::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--amber);flex:0 0 auto}
-.no::before{content:'';width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);flex:0 0 auto}
-.cmp-note{color:var(--dim);font-size:13.5px;margin:14px 0 0}
-
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -707,8 +679,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#get">Download</a>
       <a href="#look">Screenshots</a>
       <a href="#features">Features</a>
-      <a href="#compare">Compare</a>
-      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
     <a class="nav-cta" href="#get">Get Blazify</a>
@@ -861,43 +832,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 
 
 
-<section id="compare">
+<section id="faq">
   <div class="shell">
-    <h2 class="title rise">Why <em>switch</em></h2>
-    <p class="lede rise">The honest version. Compared against what the free tiers of the big two actually give you.</p>
-    <div class="cmp-wrap rise">
-      <table class="cmp">
-        <thead><tr><th>&nbsp;</th><th class="us">Blazify</th><th>Spotify Free</th><th>YouTube Music Free</th></tr></thead>
-        <tbody>
-      <tr><td>Advertisements</td><td class="us"><span class="yes">None</span></td><td class=""><span class="no">Between tracks</span></td><td class=""><span class="no">Between tracks</span></td></tr>
-      <tr><td>Cost</td><td class="us"><span class="yes">Free</span></td><td class=""><span class="no">Free tier</span></td><td class=""><span class="no">Free tier</span></td></tr>
-      <tr><td>Play any song on demand</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Shuffle only</span></td><td class=""><span class="no">Shuffle only</span></td></tr>
-      <tr><td>Listen offline</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Paid only</span></td><td class=""><span class="no">Paid only</span></td></tr>
-      <tr><td>Screen off / background</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="yes">Yes</span></td><td class=""><span class="no">Paid only</span></td></tr>
-      <tr><td>Word-by-word lyrics</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Line by line</span></td><td class=""><span class="no">Line by line</span></td></tr>
-      <tr><td>Ten-band equalizer</td><td class="us"><span class="yes">Yes</span></td><td class=""><span class="no">Basic</span></td><td class=""><span class="no">None</span></td></tr>
-      <tr><td>Account required</td><td class="us"><span class="yes">No</span></td><td class=""><span class="no">Yes</span></td><td class=""><span class="no">Yes</span></td></tr>
-      <tr><td>Tracking / analytics</td><td class="us"><span class="yes">None</span></td><td class=""><span class="no">Yes</span></td><td class=""><span class="no">Yes</span></td></tr>
-      <tr><td>Source code</td><td class="us"><span class="yes">Public, GPL-3.0</span></td><td class=""><span class="no">Closed</span></td><td class=""><span class="no">Closed</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cmp-note rise">Paid subscriptions to either service remove their advertisements and unlock offline listening. This compares the free tiers, because that is what Blazify is an alternative to.</p>
-  </div>
-</section>
-
-<section id="install">
-  <div class="shell">
-    <h2 class="title rise">Getting it <em>onto your phone</em></h2>
-    <p class="lede rise">Blazify is not on the Play Store, so you install the file yourself. It takes about a minute, and Android will ask you once whether you trust it.</p>
-
-    <div class="steps">
-      <div class="step rise"><b>1</b><h4>Download the APK</h4><p>Tap the Android button above. The file lands in your Downloads folder.</p></div>
-      <div class="step rise"><b>2</b><h4>Open it</h4><p>Tap the downloaded file. Android will warn you that it came from outside the Play Store — that warning appears for every app installed this way.</p></div>
-      <div class="step rise"><b>3</b><h4>Allow it once</h4><p>Choose <em>Settings</em> in that prompt, switch on <em>Allow from this source</em>, then go back and tap Install. You only do this once.</p></div>
-    </div>
-
-    <h2 class="title rise" style="font-size:clamp(28px,3.6vw,44px);margin-bottom:14px">Fair <em>questions</em></h2>
+    <h2 class="title rise">Fair <em>questions</em></h2>
     <p class="lede rise">You are being asked to install something from a stranger on the internet. These are the answers.</p>
 
     <div class="qa">
