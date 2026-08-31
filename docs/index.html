@@ -515,6 +515,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gflame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC062"/><stop offset=".5" stop-color="#FFA726"/><stop offset="1" stop-color="#FF7043"/></linearGradient>
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.2 16.2"/></symbol>
 <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.2M8.6 21.2h6.8"/></symbol>
 <symbol id="i-eq" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.2"/><circle cx="15.5" cy="12" r="2.2"/><circle cx="7" cy="18" r="2.2"/></symbol>
@@ -531,6 +532,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 0 1-14.6 5.7"/><path d="M3.6 12a8.4 8.4 0 0 1 14.6-5.7"/><path d="M18.2 2.6v3.8h-3.8M5.8 21.4v-3.8h3.8"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
 <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
+<symbol id="i-devices" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="9.5" rx="1.4"/><path d="M6 18.2h6.2"/><path d="M9 14.5v3.7"/><rect x="16.5" y="9.5" width="5" height="9.5" rx="1.4"/><path d="M18.4 16.9h1.2"/></symbol>
 <symbol id="i-bgplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6l5.4 3.4-5.4 3.4z"/></symbol>
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
@@ -603,8 +605,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <div class="slab-side">
           <div class="mini"><svg class="ic"><use href="#i-mic"/></svg><span>Word-by-word synced lyrics</span></div>
           <div class="mini"><svg class="ic"><use href="#i-eq"/></svg><span>Ten-band equalizer, 13 presets</span></div>
-          <div class="mini"><svg class="ic"><use href="#i-down"/></svg><span>Download and play offline</span></div>
           <div class="mini"><svg class="ic"><use href="#i-palette"/></svg><span>Colour taken from the artwork</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-users"/></svg><span>Listen together with friends</span></div>
         </div>
       </div>
     </div>
@@ -614,8 +616,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <div><svg class="ic"><use href="#i-account"/></svg> Sign in with Google</div>
       <div><svg class="ic"><use href="#i-bgplay"/></svg> Background playback</div>
       <div><svg class="ic"><use href="#i-down"/></svg> Offline downloads</div>
-      <div><svg class="ic"><use href="#i-mic"/></svg> Synced lyrics</div>
-      <div><svg class="ic"><use href="#i-palette"/></svg> Make it yours</div>
+      <div><svg class="ic"><use href="#i-devices"/></svg> Phone and desktop</div>
+      <div><svg class="ic"><use href="#i-code"/></svg> Free and open source</div>
     </div>
   </div>
 </header>
@@ -629,7 +631,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <article class="card rise">
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FE9B5"/><stop offset=".45" stop-color="#3DDC84"/><stop offset="1" stop-color="#1FA05C"/></linearGradient></defs>
-<path fill="url(#ga)" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.14-.52.38.38 0 0 0-.52.14l-1.86 3.23a11.5 11.5 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.52-.14.38.38 0 0 0-.14.52L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+<path fill="url(#gflame)" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.14-.52.38.38 0 0 0-.52.14l-1.86 3.23a11.5 11.5 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.52-.14.38.38 0 0 0-.14.52L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
         <h3>Android</h3>
         <div class="ver">Version 9.12.4 · 25 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
@@ -639,7 +641,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <article class="card rise">
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5FD0FF"/><stop offset=".5" stop-color="#0FA0EF"/><stop offset="1" stop-color="#0067B8"/></linearGradient></defs>
-<path fill="url(#gw)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
+<path fill="url(#gflame)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
         <h3>Windows</h3>
         <div class="ver">Version 1.0.4 · installer</div>
         <p>The desktop player with its audio library bundled in. Installs without an administrator password.</p>
@@ -647,18 +649,21 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       </article>
 
       <article class="card rise">
-        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
-<radialGradient id="gb" cx=".38" cy=".28" r=".85"><stop offset="0" stop-color="#5B5B62"/><stop offset=".55" stop-color="#1E1E22"/><stop offset="1" stop-color="#050506"/></radialGradient>
-<linearGradient id="gy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD05B"/><stop offset="1" stop-color="#F08B10"/></linearGradient></defs>
-<ellipse cx="12" cy="13.1" rx="6.5" ry="8" fill="url(#gb)"/>
-<ellipse cx="12" cy="15.4" rx="4.2" ry="5.4" fill="#FBFBF7"/>
-<ellipse cx="9.8" cy="8.6" rx="1.85" ry="2.3" fill="#fff"/>
-<ellipse cx="14.2" cy="8.6" rx="1.85" ry="2.3" fill="#fff"/>
-<ellipse cx="10.1" cy="8.9" rx=".92" ry="1.2" fill="#111"/>
-<ellipse cx="13.9" cy="8.9" rx=".92" ry="1.2" fill="#111"/>
-<path fill="url(#gy)" d="M12 10.3c1.25 0 2.15.7 2.15 1.4 0 .72-.95 1.4-2.15 1.4s-2.15-.68-2.15-1.4c0-.7.9-1.4 2.15-1.4z"/>
-<ellipse cx="8.5" cy="20.6" rx="2.5" ry="1.25" fill="url(#gy)"/>
-<ellipse cx="15.5" cy="20.6" rx="2.5" ry="1.25" fill="url(#gy)"/></svg>
+        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true">
+<!-- Tux as a single silhouette: body and head in the brand gradient, with the
+     belly, eyes and beak as lighter shapes. Built from primitives rather than a
+     traced path, so the proportions are tuned for 46px rather than for print. -->
+<ellipse cx="12" cy="9.1" rx="4.35" ry="4.6" fill="url(#gflame)"/>
+<ellipse cx="12" cy="14.6" rx="6.15" ry="6.6" fill="url(#gflame)"/>
+<ellipse cx="12" cy="15.8" rx="4.05" ry="5.05" fill="#FFE6C4"/>
+<ellipse cx="10.35" cy="8.5" rx="1.15" ry="1.5" fill="#FFF3E2"/>
+<ellipse cx="13.65" cy="8.5" rx="1.15" ry="1.5" fill="#FFF3E2"/>
+<circle cx="10.6" cy="8.75" r=".62" fill="#2E1500"/>
+<circle cx="13.4" cy="8.75" r=".62" fill="#2E1500"/>
+<path d="M12 9.9c1.02 0 1.72.52 1.72 1.06 0 .55-.73 1.06-1.72 1.06s-1.72-.51-1.72-1.06c0-.54.7-1.06 1.72-1.06z" fill="#FFC062"/>
+<ellipse cx="8.6" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(-13 8.6 20.9)"/>
+<ellipse cx="15.4" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(13 15.4 20.9)"/>
+</svg>
         <h3>Linux</h3>
         <div class="ver">Version 1.0.4 · deb · AppImage · tar.gz</div>
         <p>Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.</p>
@@ -668,7 +673,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <article class="card rise">
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D8D8DE"/><stop offset="1" stop-color="#95959E"/></linearGradient></defs>
-<path fill="url(#gp)" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+<path fill="url(#gflame)" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
         <h3>iOS</h3>
         <div class="ver">iPhone · sideload</div>
         <p>Background audio and lock-screen controls, sideloaded with SideStore or AltStore — no App Store needed.</p>
