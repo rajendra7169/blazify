@@ -271,6 +271,57 @@ svg.mark{
 .band p{margin:0 auto;max-width:58ch;font-size:17.5px;color:rgba(42,20,0,.8);font-weight:400}
 
 
+/* ── the lyrics demo: the one feature worth showing in motion ── */
+.stage{
+  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:0;
+  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+  background:var(--coal);transition:background .9s ease;
+}
+.now{
+  padding:44px;display:flex;flex-direction:column;justify-content:center;gap:22px;
+  background:linear-gradient(150deg,var(--accent,#FFA726) 0%,color-mix(in srgb,var(--accent,#FFA726) 55%,#120C05) 100%);
+  transition:background .9s ease;
+}
+.art{
+  width:min(230px,52%);aspect-ratio:1;border-radius:20px;position:relative;overflow:hidden;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--accent,#FFA726) 82%,#fff),color-mix(in srgb,var(--accent,#FFA726) 40%,#0A0705));
+  box-shadow:0 26px 50px rgba(0,0,0,.42);display:grid;place-items:center;transition:background .9s ease;
+}
+.art svg{width:44%;opacity:.9}
+.now .t{font-family:'Outfit',sans-serif;font-weight:600;font-size:26px;color:#1A0E00;margin:0;line-height:1.2}
+.now .a{color:rgba(26,14,0,.72);font-size:16px;margin:0}
+.bar{height:5px;border-radius:9px;background:rgba(26,14,0,.22);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:#1A0E00;border-radius:9px;width:0}
+.times{display:flex;justify-content:space-between;font-size:13px;color:rgba(26,14,0,.7);
+  font-variant-numeric:tabular-nums}
+
+.words{padding:46px 44px;position:relative;min-height:392px;display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden}
+.words::before,.words::after{content:'';position:absolute;left:0;right:0;height:64px;z-index:2;pointer-events:none}
+.words::before{top:0;background:linear-gradient(var(--coal),transparent)}
+.words::after{bottom:0;background:linear-gradient(transparent,var(--coal))}
+.lines{display:flex;flex-direction:column;gap:16px;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+.ln{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(19px,2vw,27px);line-height:1.35;
+  color:rgba(255,244,230,.20);transition:color .45s;
+}
+.ln.on{color:rgba(255,244,230,.42)}
+.ln w{transition:color .18s,text-shadow .18s}
+.ln.on w.lit{color:var(--accent,#FFA726);text-shadow:0 0 22px color-mix(in srgb,var(--accent,#FFA726) 55%,transparent)}
+.tag{
+  position:absolute;top:20px;right:22px;z-index:3;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 13px;
+}
+@media (max-width:940px){
+  .stage{grid-template-columns:1fr;border-radius:var(--r-md)}
+  .now{padding:28px 22px;align-items:center;text-align:center}
+  .words{padding:32px 22px;min-height:300px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lines{transition:none}
+  .ln,.ln w{transition:none}
+}
+
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -482,6 +533,36 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
   </div>
 </section>
 
+
+<section id="lyrics">
+  <div class="shell">
+    <h2 class="title rise">The words, <em>as they're sung</em></h2>
+    <p class="lede rise">Not a block of text scrolling past — every word lights up on its beat. And the colour comes from the artwork, so the app looks different for every song.</p>
+    <div class="stage rise" id="stage">
+      <div class="now">
+        <div class="art">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(26,14,0,.55)" stroke-width="1.4">
+            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/>
+            <path d="M12 3a9 9 0 0 1 9 9" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="t" id="dTitle">Ember</p>
+          <p class="a" id="dArtist">Blazify demo</p>
+        </div>
+        <div>
+          <div class="bar"><i id="dBar"></i></div>
+          <div class="times"><span id="dNow">0:00</span><span id="dEnd">0:18</span></div>
+        </div>
+      </div>
+      <div class="words">
+        <span class="tag">Live demo</span>
+        <div class="lines" id="dLines"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="look">
   <div class="shell">
     <h2 class="title rise">See it <em>move</em></h2>
@@ -618,6 +699,109 @@ if (eq) {
     eq.appendChild(b);
   }
 }
+
+
+/* ── the lyrics demo ───────────────────────────────────────────────
+   Original lines, deliberately: reproducing real song lyrics on a public
+   page is somebody else's copyright, and what this shows off is the
+   timing, not the writing. Three "tracks" so the colour change — which
+   is how the app treats real album art — is visible without waiting. */
+(function () {
+  const stage = document.getElementById('stage');
+  if (!stage) return;
+
+  const tracks = [
+    { title: 'Ember',        artist: 'Blazify demo', accent: '#FFA726',
+      lines: [['Turn','the','night','a','little','louder'],
+              ['every','ember','finds','its','air'],
+              ['and','the','quiet','gets','a','colour'],
+              ['when','you','put','the','music','there']] },
+    { title: 'Kathmandu Blue', artist: 'Blazify demo', accent: '#5AA9E6',
+      lines: [['Rain','across','the','valley','floor'],
+              ['a','city','humming','in','the','grey'],
+              ['every','rooftop','keeping','time'],
+              ['until','the','morning','finds','its','way']] },
+    { title: 'Slow Green',   artist: 'Blazify demo', accent: '#4FD18B',
+      lines: [['Nothing','here','is','in','a','hurry'],
+              ['let','the','record','take','its','turn'],
+              ['there','is','no','one','left','to','answer'],
+              ['and','no','minute','left','to','earn']] },
+  ];
+
+  const linesEl = document.getElementById('dLines');
+  const bar = document.getElementById('dBar');
+  const tNow = document.getElementById('dNow');
+  const tEnd = document.getElementById('dEnd');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const WORD = 0.30, LINE_GAP = 0.55, LEAD = 1.1;
+  let ti = -1, t0 = 0, total = 0, plan = [];
+
+  const clock = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+  function load(i) {
+    const tr = tracks[i];
+    stage.style.setProperty('--accent', tr.accent);
+    document.getElementById('dTitle').textContent = tr.title;
+    document.getElementById('dArtist').textContent = tr.artist;
+
+    linesEl.innerHTML = '';
+    plan = [];
+    let clockAt = LEAD;
+    tr.lines.forEach(words => {
+      const div = document.createElement('div');
+      div.className = 'ln';
+      const spans = words.map((w, k) => {
+        const el = document.createElement('w');
+        el.textContent = w + (k < words.length - 1 ? ' ' : '');
+        div.appendChild(el);
+        return el;
+      });
+      linesEl.appendChild(div);
+      plan.push({ el: div, spans, start: clockAt, end: clockAt + words.length * WORD });
+      clockAt += words.length * WORD + LINE_GAP;
+    });
+    total = clockAt + 1.2;
+    tEnd.textContent = clock(total);
+    t0 = performance.now();
+  }
+
+  function frame(now) {
+    const t = (now - t0) / 1000;
+    if (t >= total) { ti = (ti + 1) % tracks.length; load(ti); requestAnimationFrame(frame); return; }
+
+    bar.style.width = Math.min(100, (t / total) * 100) + '%';
+    tNow.textContent = clock(t);
+
+    let active = -1;
+    plan.forEach((ln, i) => {
+      const on = t >= ln.start && t < ln.end + LINE_GAP;
+      ln.el.classList.toggle('on', on);
+      if (on) active = i;
+      ln.spans.forEach((sp, k) => sp.classList.toggle('lit', t >= ln.start + k * WORD));
+    });
+
+    // keep the sung line in the middle, the way the app does
+    if (active >= 0) {
+      const box = linesEl.children[active];
+      const shift = box.offsetTop + box.offsetHeight / 2 - linesEl.offsetHeight / 2;
+      linesEl.style.transform = 'translateY(' + (-shift) + 'px)';
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // only run while it is on screen — an animation nobody is looking at is
+  // just a phone getting warm
+  let running = false;
+  new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting && !running) {
+      running = true;
+      ti = 0; load(0);
+      if (still) { plan.forEach(l => { l.el.classList.add('on'); l.spans.forEach(s => s.classList.add('lit')); }); }
+      else requestAnimationFrame(frame);
+    }
+  }), { threshold: .25 }).observe(stage);
+})();
 
 // reveal on scroll
 const io = new IntersectionObserver((entries) => {
