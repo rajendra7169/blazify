@@ -8,8 +8,11 @@
 
 *Stream it. Feel it. Blaze it.*
 
+**[blazify website](https://rajendra7169.github.io/blazify/)** · screenshots, features and downloads for every platform
+
 [![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/rajendra7169/blazify/total?color=FFA726&label=downloads)](https://github.com/rajendra7169/blazify/releases)
+[![Website](https://img.shields.io/badge/website-blazify-FFA726)](https://rajendra7169.github.io/blazify/)
 [![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
@@ -98,6 +101,12 @@ app — with a live preview while you do it. No ads, no tracking.
 | **Widgets** | Home-screen controls |
 | **Backup & restore** | Your whole library in one file — songs, playlists, history, sign-in |
 | **In-app updates** | Tells you when a new version is out, downloads it, and installs it |
+
+---
+
+## Roadmap
+
+What is planned, what has been asked for, and what is deliberately not being done: **[ROADMAP.md](ROADMAP.md)**. Local music support on Android is next.
 
 ---
 
