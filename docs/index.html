@@ -551,6 +551,97 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   html{scroll-behavior:auto}
 }
 </style>
+<!-- Tells a search engine this is a free Android music player rather than
+     a page of text about one, and hands it the questions it already sees
+     people asking. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Blazify",
+      "applicationCategory": "MultimediaApplication",
+      "applicationSubCategory": "Music Player",
+      "operatingSystem": "Android 8.0+, Windows, Linux, iOS",
+      "softwareVersion": "9.12.4",
+      "url": "https://rajendra7169.github.io/blazify/",
+      "downloadUrl": "https://github.com/rajendra7169/blazify/releases/latest",
+      "installUrl": "https://github.com/rajendra7169/blazify/releases/latest",
+      "fileSize": "25MB",
+      "screenshot": "https://rajendra7169.github.io/blazify/assets/share-card.png",
+      "image": "https://rajendra7169.github.io/blazify/assets/logo-512.png",
+      "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "isAccessibleForFree": true,
+      "description": "A free, open-source music player for Android, Windows, Linux and iPhone. Streams millions of songs with word-by-word synced lyrics, a ten-band equalizer and offline downloads. No advertising, no tracking, no account required.",
+      "featureList": [
+        "Word-by-word synced lyrics",
+        "Ten-band equalizer with 13 presets",
+        "Offline downloads",
+        "Background playback",
+        "Colour taken from the album artwork",
+        "Optional Google sign-in with YouTube Music sync",
+        "Listen together in sync with friends"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Rajendra Pandey",
+        "url": "https://github.com/rajendra7169"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Blazify safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every line of it is public. You can read the source, build it yourself and check the file you downloaded against what the build produces. It contains no advertising or analytics library of any kind, and sends nothing anywhere except to the services you switch on yourself."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why isn't Blazify on the Google Play Store?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Apps that stream audio from YouTube are removed from it, which is why no player in this category is there. It is a rule about distribution, not a judgement about the app."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Blazify need root?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. It is an ordinary app and runs on any phone with Android 8.0 or newer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I have to sign in to use Blazify?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Search, playback, downloads, lyrics and the equalizer all work without an account. Signing in with Google adds your own YouTube Music library, playlists and history, and is entirely optional."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does Blazify cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nothing. There is no advertising, no subscription and no paid tier. It is free software under the GPL-3.0 licence."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
