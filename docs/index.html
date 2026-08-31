@@ -438,6 +438,33 @@ svg.mark{
 }
 @media (prefers-reduced-motion:reduce){.art .vinyl{animation:none}}
 
+/* ── installing, and the questions that come before it ─────────── */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px;margin-bottom:56px}
+.step{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
+.step b{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:50%;margin-bottom:15px;
+  background:var(--flame);color:#1A0E00;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;
+}
+.step h4{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;margin:0 0 7px}
+.step p{color:var(--dim);font-size:14.5px;margin:0;line-height:1.55}
+
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+details{
+  background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:20px 24px;transition:border-color .25s;height:fit-content;
+}
+details[open]{border-color:rgba(255,167,38,.3)}
+summary{
+  cursor:pointer;list-style:none;font-family:'Outfit',sans-serif;font-weight:600;font-size:16.5px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--cream);
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';color:var(--amber);font-size:22px;font-weight:400;line-height:1;flex:0 0 auto}
+details[open] summary::after{content:'\2212'}
+details p{color:var(--dim);font-size:15px;line-height:1.65;margin:14px 0 0}
+details p:last-child{margin-bottom:0}
+details a{color:var(--amber)}
+
 /* ── the person behind it ─────────────────────────────── */
 .maker{
   position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
@@ -569,6 +596,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#get">Download</a>
       <a href="#look">Screenshots</a>
       <a href="#features">Features</a>
+      <a href="#install">Install</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
     <a class="nav-cta" href="#get">Get Blazify</a>
@@ -715,6 +743,52 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <span class="tag">Live demo</span>
         <div class="lines" id="dLines"></div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="install">
+  <div class="shell">
+    <h2 class="title rise">Getting it <em>onto your phone</em></h2>
+    <p class="lede rise">Blazify is not on the Play Store, so you install the file yourself. It takes about a minute, and Android will ask you once whether you trust it.</p>
+
+    <div class="steps">
+      <div class="step rise"><b>1</b><h4>Download the APK</h4><p>Tap the Android button above. The file lands in your Downloads folder.</p></div>
+      <div class="step rise"><b>2</b><h4>Open it</h4><p>Tap the downloaded file. Android will warn you that it came from outside the Play Store — that warning appears for every app installed this way.</p></div>
+      <div class="step rise"><b>3</b><h4>Allow it once</h4><p>Choose <em>Settings</em> in that prompt, switch on <em>Allow from this source</em>, then go back and tap Install. You only do this once.</p></div>
+    </div>
+
+    <h2 class="title rise" style="font-size:clamp(28px,3.6vw,44px);margin-bottom:14px">Fair <em>questions</em></h2>
+    <p class="lede rise">You are being asked to install something from a stranger on the internet. These are the answers.</p>
+
+    <div class="qa">
+      <details class="rise"><summary>Is it safe?</summary>
+        <p>Every line of it is public. You can read the source, build it yourself, and check the file you downloaded against the one the build produces. That is more than you can do with almost anything on the Play Store.</p>
+        <p>It asks for no permissions it does not use, contains no advertising or analytics library of any kind, and sends nothing anywhere except to the services you switch on yourself.</p></details>
+
+      <details class="rise"><summary>Why isn't it on the Play Store?</summary>
+        <p>Apps that stream audio from YouTube are removed from it. That is why none of the players in this category are there. It is a rule about distribution, not a judgement about the app.</p></details>
+
+      <details class="rise"><summary>Why does Android warn me?</summary>
+        <p>Android shows that warning for any app not installed from a store, whoever wrote it. It is telling you that nobody has vetted the file — which is true, and why the source being public matters.</p></details>
+
+      <details class="rise"><summary>Does it need root?</summary>
+        <p>No. It is an ordinary app and runs on any phone with Android 8.0 or newer.</p></details>
+
+      <details class="rise"><summary>How do I get updates?</summary>
+        <p>Blazify checks for them itself and offers to download and install a new version when there is one.</p>
+        <p>If you would rather one app managed everything you sideload, <a href="https://github.com/ImranR98/Obtainium">Obtainium</a> watches this project and updates it for you.</p></details>
+
+      <details class="rise"><summary>Do I have to sign in?</summary>
+        <p>No. Search, playback, downloads, lyrics and the equalizer all work without an account.</p>
+        <p>Signing in with Google adds your own YouTube Music library, your playlists and history, and recommendations based on what you actually play. It is entirely optional and you can sign out at any time.</p></details>
+
+      <details class="rise"><summary>Will it drain my battery?</summary>
+        <p>No more than any music player. It streams audio only — never video — so it uses less data and less battery than watching the same song on YouTube.</p></details>
+
+      <details class="rise"><summary>What does it cost?</summary>
+        <p>Nothing, and there is nothing to buy inside it. No advertisements, no subscription, no paid tier. It is free software under the GPL-3.0 licence.</p></details>
     </div>
   </div>
 </section>
