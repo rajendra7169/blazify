@@ -198,6 +198,15 @@ svg.mark{
   color:var(--amber);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-weight:500;
 }
 
+
+/* one line-icon set, so the page reads as drawn rather than assembled */
+.ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.65;
+    stroke-linecap:round;stroke-linejoin:round;display:block;flex:0 0 auto}
+.f .ic{width:29px;height:29px;color:var(--amber);margin-bottom:13px}
+.strip .ic{width:21px;height:21px;color:var(--amber)}
+.mini .ic{width:22px;height:22px;color:#2A1400}
+.proof .dots b .ic{width:14px;height:14px;color:var(--amber);stroke-width:1.9}
+
 /* ── device mockups ───────────────────────────────────── */
 .device{
   position:relative;padding:7px;border-radius:26px;
@@ -255,7 +264,7 @@ svg.mark{
 .wide{width:min(760px,86vw)}
 
 /* features */
-.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}
 .f{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:26px;
    transition:transform .3s,border-color .3s}
 .f:hover{transform:translateY(-4px);border-color:rgba(255,167,38,.38)}
@@ -405,6 +414,23 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.2 16.2"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.2M8.6 21.2h6.8"/></symbol>
+<symbol id="i-eq" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.2"/><circle cx="15.5" cy="12" r="2.2"/><circle cx="7" cy="18" r="2.2"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3.5v11.5M7.8 10.8L12 15l4.2-4.2M4 20h16"/></symbol>
+<symbol id="i-gap" viewBox="0 0 24 24"><path d="M5 4.6l9.5 7.4L5 19.4z"/><path d="M19 4.6v14.8"/></symbol>
+<symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.2c-5 0-9 3.9-9 8.8s4 8.8 9 8.8c1.1 0 1.9-.8 1.9-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H16c2.8 0 5-2.2 5-4.9 0-3.7-4-6.7-9-6.7z"/><circle cx="7.6" cy="11" r="1.15"/><circle cx="12" cy="8" r="1.15"/><circle cx="16.4" cy="11" r="1.15"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9.2" cy="8" r="3.3"/><path d="M2.8 20.2c0-3.4 2.8-5.6 6.4-5.6s6.4 2.2 6.4 5.6"/><path d="M16.2 5.1a3.3 3.3 0 0 1 0 5.8M17.8 15.1c2 .8 3.4 2.6 3.4 5.1"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4.2" rx="1.2"/><path d="M5.2 8.2v10.6c0 .7.5 1.2 1.2 1.2h11.2c.7 0 1.2-.5 1.2-1.2V8.2"/><path d="M10 12.4h4"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M5.9 5.9l12.2 12.2"/></symbol>
+<symbol id="i-noeye" viewBox="0 0 24 24"><path d="M3 12s3.6-6.2 9-6.2 9 6.2 9 6.2-3.6 6.2-9 6.2S3 12 3 12z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M8.8 18.4L2.8 12l6-6.4M15.2 5.6l6 6.4-6 6.4M13.6 3.6l-3.2 16.8"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
+</defs></svg>
 <div class="glow"></div>
 
 <nav>
@@ -443,7 +469,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
           <p>A music player that streams anything, keeps what you want offline, and never asks you to sign in or sit through an advert.</p>
           <a class="btn" href="#get">Download free <i>↓</i></a>
           <div class="proof">
-            <span class="dots"><b>🎧</b><b>🔥</b><b>🎵</b></span>
+            <span class="dots"><b><svg class="ic"><use href="#i-head"/></svg></b><b><svg class="ic"><use href="#i-flame"/></svg></b><b><svg class="ic"><use href="#i-note"/></svg></b></span>
             <small><strong>450+</strong> downloads<br>and counting</small>
           </div>
           <div class="eq" aria-hidden="true"></div>
@@ -459,19 +485,19 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
         </div>
 
         <div class="slab-side">
-          <div class="mini"><em>🎤</em><span>Word-by-word synced lyrics</span></div>
-          <div class="mini"><em>🎚️</em><span>Ten-band equalizer, 13 presets</span></div>
-          <div class="mini"><em>⬇️</em><span>Download and play offline</span></div>
-          <div class="mini"><em>🎨</em><span>Colour taken from the artwork</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-mic"/></svg><span>Word-by-word synced lyrics</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-eq"/></svg><span>Ten-band equalizer, 13 presets</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-down"/></svg><span>Download and play offline</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-palette"/></svg><span>Colour taken from the artwork</span></div>
         </div>
       </div>
     </div>
 
     <div class="strip">
-      <div><em>🚫</em> No advertisements</div>
-      <div><em>🔒</em> No tracking</div>
-      <div><em>👤</em> No account needed</div>
-      <div><em>💛</em> GPL-3.0 open source</div>
+      <div><svg class="ic"><use href="#i-ban"/></svg> No advertisements</div>
+      <div><svg class="ic"><use href="#i-noeye"/></svg> No tracking</div>
+      <div><svg class="ic"><use href="#i-user"/></svg> No account needed</div>
+      <div><svg class="ic"><use href="#i-code"/></svg> GPL-3.0 open source</div>
     </div>
   </div>
 </header>
@@ -613,14 +639,14 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;position:relative;z-
     <p class="lede rise">The things a music player should do, done properly — and nothing that gets between you and the music.</p>
 
     <div class="feat">
-      <div class="f rise"><em>🔎</em><h4>Millions of songs</h4><p>Search by name or browse songs, albums, artists and playlists.</p></div>
-      <div class="f rise"><em>🎤</em><h4>Synced lyrics</h4><p>Word-by-word highlighting, with translation and romanisation.</p></div>
-      <div class="f rise"><em>🎚️</em><h4>Ten-band equalizer</h4><p>Thirteen presets, a live response curve, bass boost and reverb.</p></div>
-      <div class="f rise"><em>⬇️</em><h4>Offline downloads</h4><p>Keep anything for later, or let it hold songs as you play them.</p></div>
-      <div class="f rise"><em>▶️</em><h4>Gapless playback</h4><p>The next track is ready before the current one ends.</p></div>
-      <div class="f rise"><em>🎨</em><h4>Your colours</h4><p>Material You, or colour taken straight from the album artwork.</p></div>
-      <div class="f rise"><em>👥</em><h4>Listen together</h4><p>Share a room code and play in sync with friends.</p></div>
-      <div class="f rise"><em>💾</em><h4>Backup &amp; restore</h4><p>Your whole library in one file — move it to any device.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-search"/></svg><h4>Millions of songs</h4><p>Search by name or browse songs, albums, artists and playlists.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-mic"/></svg><h4>Synced lyrics</h4><p>Word-by-word highlighting, with translation and romanisation.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-eq"/></svg><h4>Ten-band equalizer</h4><p>Thirteen presets, a live response curve, bass boost and reverb.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-down"/></svg><h4>Offline downloads</h4><p>Keep anything for later, or let it hold songs as you play them.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-gap"/></svg><h4>Gapless playback</h4><p>The next track is ready before the current one ends.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-palette"/></svg><h4>Your colours</h4><p>Material You, or colour taken straight from the album artwork.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-users"/></svg><h4>Listen together</h4><p>Share a room code and play in sync with friends.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-save"/></svg><h4>Backup &amp; restore</h4><p>Your whole library in one file — move it to any device.</p></div>
     </div>
   </div>
 </section>
