@@ -175,7 +175,7 @@ section{position:relative;z-index:1;padding:84px 0}
   background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);
   padding:32px;transition:transform .3s,border-color .3s;position:relative;overflow:hidden;
 }
-.card:hover{transform:translateY(-6px);border-color:rgba(255,167,38,.42)}
+.card:hover{border-color:rgba(255,167,38,.42)}
 .card h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:23px;margin:0 0 6px}
 .card .ver{color:var(--amber);font-size:14px;font-weight:500;margin-bottom:16px}
 .card p{color:var(--dim);font-size:15.5px;margin:0 0 22px;min-height:66px}
@@ -258,17 +258,17 @@ svg.mark{
 .rail{cursor:grab}
 .rail.dragging{cursor:grabbing}
 .rail.dragging .shot{pointer-events:none}
-.shot{flex:0 0 auto;width:258px;scroll-snap-align:start}
+.shot{flex:0 0 auto;width:206px;scroll-snap-align:start}
 .shot .device,.shot .win{transition:transform .35s}
 .shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
-.shot p{font-size:14px;color:var(--dim);margin:16px 0 0;text-align:center;line-height:1.4}
-.wide{width:min(760px,86vw)}
+.shot p{font-size:13px;color:var(--dim);margin:13px 0 0;text-align:center;line-height:1.4}
+.wide{width:min(600px,84vw)}
 
 /* features */
 .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}
 .f{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:26px;
    transition:transform .3s,border-color .3s}
-.f:hover{transform:translateY(-4px);border-color:rgba(255,167,38,.38)}
+.f:hover{border-color:rgba(255,167,38,.38)}
 .f em{font-style:normal;font-size:27px;display:block;margin-bottom:13px}
 .f h4{font-family:'Outfit',sans-serif;font-weight:600;font-size:17.5px;margin:0 0 7px}
 .f p{color:var(--dim);font-size:14.5px;margin:0;line-height:1.55}
@@ -283,36 +283,38 @@ svg.mark{
 
 /* ── the lyrics demo: the one feature worth showing in motion ── */
 .stage{
-  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:0;
-  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
-  background:var(--coal);transition:background .9s ease;
+  display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:0;
+  border:1px solid rgba(255,167,38,.09);border-radius:var(--r-lg);overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,167,38,.05),transparent 55%),var(--coal);
+  box-shadow:0 34px 90px -30px color-mix(in srgb,var(--accent,#FFA726) 42%,transparent);
+  transition:background .9s ease,box-shadow .9s ease;
 }
 .now{
-  padding:44px;display:flex;flex-direction:column;justify-content:center;gap:22px;
+  padding:30px 32px;display:flex;flex-direction:column;justify-content:center;gap:16px;
   background:linear-gradient(150deg,var(--accent,#FFA726) 0%,color-mix(in srgb,var(--accent,#FFA726) 55%,#120C05) 100%);
   transition:background .9s ease;
 }
 .art{
-  width:min(230px,52%);aspect-ratio:1;border-radius:20px;position:relative;overflow:hidden;
+  width:min(150px,42%);aspect-ratio:1;border-radius:20px;position:relative;overflow:hidden;
   background:linear-gradient(140deg,color-mix(in srgb,var(--accent,#FFA726) 82%,#fff),color-mix(in srgb,var(--accent,#FFA726) 40%,#0A0705));
   box-shadow:0 26px 50px rgba(0,0,0,.42);display:grid;place-items:center;transition:background .9s ease;
 }
 .art svg{width:44%;opacity:.9}
-.now .t{font-family:'Outfit',sans-serif;font-weight:600;font-size:26px;color:#1A0E00;margin:0;line-height:1.2}
-.now .a{color:rgba(26,14,0,.72);font-size:16px;margin:0}
+.now .t{font-family:'Outfit',sans-serif;font-weight:600;font-size:21px;color:#1A0E00;margin:0;line-height:1.2}
+.now .a{color:rgba(26,14,0,.72);font-size:14px;margin:0}
 .bar{height:5px;border-radius:9px;background:rgba(26,14,0,.22);overflow:hidden;margin-top:4px}
 .bar i{display:block;height:100%;background:#1A0E00;border-radius:9px;width:0}
 .times{display:flex;justify-content:space-between;font-size:13px;color:rgba(26,14,0,.7);
   font-variant-numeric:tabular-nums}
 
-.words{padding:46px 44px;position:relative;min-height:392px;display:flex;flex-direction:column;
+.words{padding:34px 36px;position:relative;min-height:286px;display:flex;flex-direction:column;
   justify-content:center;overflow:hidden}
-.words::before,.words::after{content:'';position:absolute;left:0;right:0;height:64px;z-index:2;pointer-events:none}
+.words::before,.words::after{content:'';position:absolute;left:0;right:0;height:48px;z-index:2;pointer-events:none}
 .words::before{top:0;background:linear-gradient(var(--coal),transparent)}
 .words::after{bottom:0;background:linear-gradient(transparent,var(--coal))}
-.lines{display:flex;flex-direction:column;gap:16px;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+.lines{display:flex;flex-direction:column;gap:11px;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
 .ln{
-  font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(19px,2vw,27px);line-height:1.35;
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(17px,1.5vw,22px);line-height:1.35;
   color:rgba(255,244,230,.20);transition:color .45s;
 }
 .ln.on{color:rgba(255,244,230,.42)}
@@ -325,11 +327,29 @@ svg.mark{
 @media (max-width:940px){
   .stage{grid-template-columns:1fr;border-radius:var(--r-md)}
   .now{padding:28px 22px;align-items:center;text-align:center}
-  .words{padding:32px 22px;min-height:300px}
+  .words{padding:26px 20px;min-height:230px}
 }
 @media (prefers-reduced-motion:reduce){
   .lines{transition:none}
   .ln,.ln w{transition:none}
+}
+
+/* ── sound in the background, not on top of it ────────────────────
+   Two slow waves at the very back, in the brand hue and at an opacity
+   that reads as texture rather than decoration. They drift at different
+   speeds so the page never quite repeats. */
+.waves{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.5}
+.waves svg{position:absolute;left:0;width:220%;height:auto;color:var(--amber)}
+.waves .w1{top:46%;opacity:.10;animation:drift 34s linear infinite}
+.waves .w2{top:58%;opacity:.06;animation:drift 52s linear infinite reverse}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── depth: cards lean toward the cursor ──────────────────────── */
+.plat,.feat{perspective:1100px}
+.card,.f{transform-style:preserve-3d;will-change:transform}
+@media (prefers-reduced-motion:reduce){
+  .waves{display:none}
+  .card,.f{transform:none!important}
 }
 
 /* ── the page as a track ──────────────────────────────────────────
@@ -490,11 +510,25 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-noeye" viewBox="0 0 24 24"><path d="M3 12s3.6-6.2 9-6.2 9 6.2 9 6.2-3.6 6.2-9 6.2S3 12 3 12z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6"/></symbol>
 <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.8 18.4L2.8 12l6-6.4M15.2 5.6l6 6.4-6 6.4M13.6 3.6l-3.2 16.8"/></symbol>
+<symbol id="i-account" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9.6" r="3"/><path d="M5.9 19.2c.6-3 3.1-4.6 6.1-4.6s5.5 1.6 6.1 4.6"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 0 1-14.6 5.7"/><path d="M3.6 12a8.4 8.4 0 0 1 14.6-5.7"/><path d="M18.2 2.6v3.8h-3.8M5.8 21.4v-3.8h3.8"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
+<symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
 <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
 </defs></svg>
 <div class="seek"><i id="seekBar"></i></div>
+<div class="waves" aria-hidden="true">
+  <svg class="w1" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
+    <path d="M0 100 C 100 40 200 40 300 100 S 500 160 600 100 S 800 40 900 100 S 1100 160 1200 100 S 1400 40 1500 100 S 1700 160 1800 100"
+          stroke="currentColor" stroke-width="2"/>
+  </svg>
+  <svg class="w2" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
+    <path d="M0 100 C 130 150 260 150 390 100 S 650 50 780 100 S 1040 150 1170 100 S 1430 50 1560 100 S 1820 150 1950 100"
+          stroke="currentColor" stroke-width="2.5"/>
+  </svg>
+</div>
 <div class="glow"></div>
 
 <nav>
@@ -695,7 +729,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <section id="features">
   <div class="shell">
     <h2 class="title rise">Everything, <em>nothing extra</em></h2>
-    <p class="lede rise">The things a music player should do, done properly — and nothing that gets between you and the music.</p>
+    <p class="lede rise">The things a music player should do, done properly. Works signed out; signs in when you want it to.</p>
 
     <div class="feat">
       <div class="f rise"><svg class="ic"><use href="#i-search"/></svg><h4>Millions of songs</h4><p>Search by name or browse songs, albums, artists and playlists.</p></div>
@@ -706,6 +740,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <div class="f rise"><svg class="ic"><use href="#i-palette"/></svg><h4>Your colours</h4><p>Material You, or colour taken straight from the album artwork.</p></div>
       <div class="f rise"><svg class="ic"><use href="#i-users"/></svg><h4>Listen together</h4><p>Share a room code and play in sync with friends.</p></div>
       <div class="f rise"><svg class="ic"><use href="#i-save"/></svg><h4>Backup &amp; restore</h4><p>Your whole library in one file — move it to any device.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-account"/></svg><h4>Sign in, if you want</h4><p>Optional. Sign in with Google and the recommendations start knowing what you actually play.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-sync"/></svg><h4>Synced with YouTube Music</h4><p>Your library, playlists, likes and history — the same on your phone, your desktop and the web.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-list"/></svg><h4>Playlists that travel</h4><p>Make new ones, edit them, or play the ones you already have. Changes go both ways.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-radio"/></svg><h4>Radio from anything</h4><p>Start an endless station from any song, artist or album when you want it to keep going.</p></div>
     </div>
   </div>
 </section>
@@ -978,6 +1016,27 @@ document.querySelectorAll('.rail').forEach(rail => {
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
   paint();
 })();
+
+
+/* cards lean toward the cursor — depth you feel rather than notice */
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover)').matches) {
+  document.querySelectorAll('.card, .f').forEach(el => {
+    let raf = 0;
+    el.addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        el.style.transform =
+          'perspective(1100px) rotateY(' + (x * 7).toFixed(2) + 'deg) rotateX(' +
+          (-y * 7).toFixed(2) + 'deg) translateY(-6px)';
+        raf = 0;
+      });
+    });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+}
 
 // reveal on scroll
 const io = new IntersectionObserver((entries) => {
