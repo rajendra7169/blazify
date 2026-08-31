@@ -155,16 +155,16 @@ nav{
 
 /* ── strip ────────────────────────────────────────────── */
 .strip{
-  background:var(--slate);border-radius:0 0 var(--r-lg) var(--r-lg);
-  padding:20px 26px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
-  border:1px solid var(--line);border-top:none;
+  margin-top:22px;background:var(--slate);border-radius:var(--r-md);
+  padding:24px 26px;display:grid;gap:12px;border:1px solid var(--line);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,188px),1fr));
 }
 .strip div{
-  display:flex;align-items:center;gap:9px;font-size:14.5px;color:var(--cream);font-weight:400;
-  padding:9px 18px;border-radius:99px;background:rgba(255,167,38,.055);
-  border:1px solid rgba(255,167,38,.11);transition:border-color .25s,background .25s;
+  display:flex;align-items:center;gap:12px;font-size:14.5px;color:var(--cream);font-weight:400;
+  padding:13px 16px;border-radius:var(--r-sm);background:rgba(255,167,38,.05);
+  border:1px solid rgba(255,167,38,.10);transition:border-color .25s,background .25s,transform .25s;
 }
-.strip div:hover{background:rgba(255,167,38,.10);border-color:rgba(255,167,38,.24)}
+.strip div:hover{background:rgba(255,167,38,.09);border-color:rgba(255,167,38,.26);transform:translateY(-2px)}
 .strip em{font-style:normal;font-size:20px}
 
 /* ── sections ─────────────────────────────────────────── */
@@ -208,7 +208,7 @@ svg.mark{
 .ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.65;
     stroke-linecap:round;stroke-linejoin:round;display:block;flex:0 0 auto}
 .f .ic{width:29px;height:29px;color:var(--amber);margin-bottom:13px}
-.strip .ic{width:21px;height:21px;color:var(--amber)}
+.strip .ic{width:22px;height:22px;color:var(--amber)}
 .mini .ic{width:22px;height:22px;color:#2A1400}
 .proof .dots b .ic{width:14px;height:14px;color:var(--amber);stroke-width:1.9}
 
@@ -260,12 +260,12 @@ svg.mark{
 .rail{overflow:hidden;padding:6px 0 22px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
       mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 .track{display:flex;gap:22px;width:max-content;will-change:transform;touch-action:pan-y;
-       transform-style:preserve-3d;align-items:center}
+       align-items:center}
 .rail{cursor:grab}
 .rail.dragging{cursor:grabbing}
 .rail.dragging .shot{pointer-events:none}
 .shot{flex:0 0 auto;width:206px;scroll-snap-align:start;transform-origin:50% 50%;
-      transition:transform .12s linear,opacity .12s linear}
+      transition:transform .18s ease-out,opacity .18s ease-out}
 .shot .device,.shot .win{transition:transform .35s}
 .shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
 .shot p{font-size:13px;color:var(--dim);margin:13px 0 0;text-align:center;line-height:1.4}
@@ -487,7 +487,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   .slab-side{order:1}
   .proof{margin-inline:auto}
   .eq{justify-content:center}
-  .strip{padding:22px;border-radius:0 0 var(--r-md) var(--r-md)}
+  .strip{padding:18px;margin-top:16px}
   .band{padding:40px 22px;border-radius:var(--r-md)}
   section{padding:76px 0}
   .shot{width:72vw;max-width:290px}
@@ -521,6 +521,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 0 1-14.6 5.7"/><path d="M3.6 12a8.4 8.4 0 0 1 14.6-5.7"/><path d="M18.2 2.6v3.8h-3.8M5.8 21.4v-3.8h3.8"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
 <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
+<symbol id="i-bgplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6l5.4 3.4-5.4 3.4z"/></symbol>
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
 <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
@@ -599,10 +600,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     </div>
 
     <div class="strip">
-      <div><svg class="ic"><use href="#i-ban"/></svg> No advertisements</div>
-      <div><svg class="ic"><use href="#i-noeye"/></svg> No tracking</div>
-      <div><svg class="ic"><use href="#i-user"/></svg> Sign-in optional</div>
-      <div><svg class="ic"><use href="#i-code"/></svg> GPL-3.0 open source</div>
+      <div><svg class="ic"><use href="#i-ban"/></svg> No ads, ever</div>
+      <div><svg class="ic"><use href="#i-account"/></svg> Sign in with Google</div>
+      <div><svg class="ic"><use href="#i-bgplay"/></svg> Background playback</div>
+      <div><svg class="ic"><use href="#i-down"/></svg> Offline downloads</div>
+      <div><svg class="ic"><use href="#i-mic"/></svg> Synced lyrics</div>
+      <div><svg class="ic"><use href="#i-palette"/></svg> Make it yours</div>
     </div>
   </div>
 </header>
@@ -987,15 +990,14 @@ document.querySelectorAll('.rail').forEach(rail => {
     const reach = mid * 1.25;
     for (let i = 0; i < kids.length; i++) {
       const c = x + i * step + half;              // this card's centre in the rail
-      const off = (c - mid) / reach;
-      const d = Math.min(1, Math.abs(off));
-      // a shallow arc: cards swell at the middle and turn away at the edges,
-      // so the rail reads as curved rather than as a row that resizes
-      kids[i].style.transform =
-        'perspective(1200px) rotateY(' + (-Math.sign(off) * d * 13).toFixed(2) + 'deg)' +
-        ' scale(' + (1 - d * 0.20).toFixed(3) + ')' +
-        ' translateZ(' + (-d * 60).toFixed(1) + 'px)';
-      kids[i].style.opacity = (1 - d * 0.45).toFixed(3);
+      const d = Math.min(1, Math.abs(c - mid) / reach);
+      // Smoothstep rather than a straight line: a card holds its full size
+      // through the middle and falls away toward the edges, so passing the
+      // centre reads as a swell instead of a constant resize. No rotation —
+      // a tilt makes a screenshot harder to actually look at.
+      const e = d * d * (3 - 2 * d);
+      kids[i].style.transform = 'scale(' + (1 - e * 0.15).toFixed(3) + ')';
+      kids[i].style.opacity = (1 - e * 0.34).toFixed(3);
     }
   }
 
