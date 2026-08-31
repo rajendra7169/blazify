@@ -1,0 +1,50 @@
+# Blazify
+
+> A free, open-source music player for Android, Windows, Linux and iPhone.
+> Streams millions of songs, plays them offline, and shows word-by-word synced
+> lyrics. No advertising, no tracking, no account required, no paid tier.
+
+Blazify is made by Rajendra Pandey in Kathmandu, Nepal, and licensed under
+GPL-3.0. Source: https://github.com/rajendra7169/blazify
+
+## What it is
+
+An alternative to Spotify Free and YouTube Music Free for people who do not
+want advertisements, do not want to pay, and do not want to be tracked. Unlike
+those free tiers it plays any song on demand rather than shuffling, allows
+offline downloads without a subscription, and continues playing with the screen
+off.
+
+## Features
+
+- Streams millions of songs; search or browse songs, albums, artists, playlists
+- Word-by-word synced lyrics, with translation and romanisation
+- Ten-band equalizer with 13 presets, bass boost and reverb
+- Offline downloads, and songs kept automatically as you play them
+- Background playback and gapless playback
+- Colour taken from the album artwork; Material You theming
+- Optional Google sign-in, syncing your YouTube Music library and playlists
+- Listen Together: play in sync with friends over a room code
+- Backup and restore your whole library to a single file
+- Android Auto, home-screen widgets, last.fm scrobbling
+
+## Privacy
+
+No advertising, no analytics and no tracking library of any kind is present in
+the source. Nothing is sent anywhere except to services the user switches on.
+Signing in is optional; everything except a personal YouTube Music library works
+signed out.
+
+## Availability
+
+- Android: https://github.com/rajendra7169/blazify/releases/latest
+- Windows and Linux: https://github.com/rajendra7169/blazify-desktop/releases/latest
+- Not on the Google Play Store, because apps that stream audio from YouTube are
+  removed from it. Installed by sideloading the APK.
+
+## Links
+
+- Website: https://rajendra7169.github.io/blazify/
+- Source: https://github.com/rajendra7169/blazify
+- Roadmap: https://github.com/rajendra7169/blazify/blob/main/ROADMAP.md
+- Licence: GPL-3.0

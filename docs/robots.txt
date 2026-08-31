@@ -1,0 +1,5 @@
+# Everything here is meant to be read, by people and by crawlers alike.
+User-agent: *
+Allow: /
+
+Sitemap: https://rajendra7169.github.io/blazify/sitemap.xml
