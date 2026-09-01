@@ -806,7 +806,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
           <a class="btn" href="#get">Download free <i>↓</i></a>
           <div class="proof">
             <span class="dots"><b><svg class="ic"><use href="#i-head"/></svg></b><b><svg class="ic"><use href="#i-flame"/></svg></b><b><svg class="ic"><use href="#i-note"/></svg></b></span>
-            <small><strong>450+</strong> downloads<br>and counting</small>
+            <small><strong id="dlCount">491</strong> downloads<br>and counting</small>
           </div>
           <div class="eq" aria-hidden="true"></div>
         </div>
@@ -1502,6 +1502,58 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
       <p class="guide-note">Not sure? Take the <b>.deb</b> if you are on Ubuntu or
       anything based on it, and the <b>AppImage</b> otherwise.</p>`;
     dlg.showModal();
+  });
+})();
+
+
+/* ── the download count, from GitHub rather than from memory ───────
+   A number typed into a page is out of date the day after it is typed.
+   This asks GitHub for the real one across all three projects and counts
+   up to it. If the request fails, or the rate limit is reached, the
+   number already in the markup stays: a slightly stale figure is better
+   than a blank space or a zero.
+
+   Sixty requests an hour is the unauthenticated limit, and it is counted
+   per visitor's own address rather than per site, so a page this size
+   will never approach it. The answer is kept for the session so moving
+   around the page does not re-ask. */
+(function () {
+  const el = document.getElementById('dlCount');
+  if (!el) return;
+
+  const REPOS = ['blazify', 'blazify-desktop', 'blazify-ios'];
+  const KEY = 'blazify-downloads';
+
+  const show = n => {
+    const from = parseInt(el.textContent.replace(/\D/g, ''), 10) || 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || n === from) {
+      el.textContent = n.toLocaleString();
+      return;
+    }
+    const start = performance.now(), span = 900;
+    const step = now => {
+      const t = Math.min(1, (now - start) / span);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (n - from) * eased).toLocaleString();
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  const cached = sessionStorage.getItem(KEY);
+  if (cached) { show(parseInt(cached, 10)); return; }
+
+  Promise.all(REPOS.map(r =>
+    fetch('https://api.github.com/repos/rajendra7169/' + r + '/releases')
+      .then(res => res.ok ? res.json() : [])
+      .catch(() => [])
+  )).then(sets => {
+    const total = sets.flat().reduce(
+      (sum, rel) => sum + (rel.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
+    if (total > 0) {
+      try { sessionStorage.setItem(KEY, String(total)); } catch (e) {}
+      show(total);
+    }
   });
 })();
 
