@@ -35,8 +35,10 @@ flow.
 ## Also wanted
 
 - **Windows installer** published alongside the Linux desktop builds
-- **iOS release** — the build pipeline is proven, the app itself is being built
-- **IzzyOnDroid listing** — [submitted](https://codeberg.org/IzzyOnDroid/repodata/issues/524), awaiting review
+- **iOS release.** The build pipeline is proven; the app itself is still being built
+- **F-Droid listing.** An IzzyOnDroid request was declined. F-Droid proper is the
+  next attempt, and the `izzy` build variant exists for it: no updater, and no
+  permission to install packages
 
 ---
 
