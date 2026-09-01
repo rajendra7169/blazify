@@ -203,6 +203,7 @@ svg.mark{
 }
 .card:hover svg.mark{transform:translateY(-3px) rotate(-4deg) scale(1.07)}
 .dl{
+  font-family:'Outfit',sans-serif;cursor:pointer;
   display:inline-flex;align-items:center;gap:9px;padding:12px 24px;border-radius:99px;
   background:var(--flame);color:#1A0E00;font-weight:600;font-size:15px;text-decoration:none;
   transition:transform .25s,box-shadow .25s;
@@ -421,6 +422,22 @@ dialog.guide::backdrop{background:rgba(6,5,4,.72);backdrop-filter:blur(4px)}
 @media (max-width:640px){
   .howto{top:14px;right:14px;padding:5px 10px;font-size:11.5px}
   .guide-body{padding:18px 20px 22px}
+}
+
+/* ── choosing a Linux package ─────────────────────────────────── */
+.pick{display:flex;flex-direction:column;gap:11px}
+.pick a{
+  display:flex;align-items:center;gap:15px;padding:15px 17px;border-radius:var(--r-sm);
+  background:rgba(255,167,38,.05);border:1px solid rgba(255,167,38,.12);
+  text-decoration:none;transition:border-color .25s,background .25s,transform .25s;
+}
+.pick a:hover{background:rgba(255,167,38,.1);border-color:rgba(255,167,38,.32);transform:translateY(-2px)}
+.pick b{display:block;font-family:'Outfit',sans-serif;font-weight:600;font-size:15.5px;color:var(--cream)}
+.pick span{display:block;color:var(--dim);font-size:13.5px;line-height:1.5;margin-top:3px}
+.pick em{
+  font-style:normal;flex:0 0 auto;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;
+  color:var(--amber);background:rgba(255,167,38,.1);border:1px solid rgba(255,167,38,.18);
+  border-radius:99px;padding:5px 11px;
 }
 
 /* ── the page as a track ──────────────────────────────────────────
@@ -871,7 +888,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <h3>Linux</h3>
         <div class="ver">Version 1.0.4 · deb · AppImage · tar.gz</div>
         <p>Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.</p>
-        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Download for Linux</a>
+        <button class="dl" type="button" data-pick="linux">Download for Linux</button>
       </article>
 
       <article class="card rise">
@@ -1406,8 +1423,8 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
       title: 'Install on Linux',
       steps: [
         'Pick the shape that suits your distribution.',
-        '<b>Debian, Ubuntu, Mint, Pop!_OS</b> use the .deb: <code>sudo apt install ./blazify_1.0.4_amd64.deb</code>',
-        '<b>Anywhere else</b> use the AppImage: <code>chmod +x Blazify-1.0.4-x86_64.AppImage</code> then run it. Nothing is installed.',
+        '<b>Debian, Ubuntu, Mint, Pop!_OS</b> use the .deb: <code>sudo apt install ./Blazify.deb</code>',
+        '<b>Anywhere else</b> use the AppImage: <code>chmod +x Blazify.AppImage</code> then run it. Nothing is installed.',
         'The .tar.gz is the same application as a plain folder, if you would rather unpack it yourself.',
       ],
       note: 'Use <b>apt</b> rather than <code>dpkg -i</code> for the .deb. Both install the package; only apt resolves what it depends on. The AppImage needs nothing at all, since its audio library travels inside it.',
@@ -1453,6 +1470,39 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   document.getElementById('guideClose').addEventListener('click', () => dlg.close());
   // clicking the dark area outside the panel closes it, which is what people try
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+})();
+
+
+/* Linux ships three packages and there is no sensible default, so the
+   button asks rather than guessing. Android, Windows and iPhone each have
+   one file and go straight to it. */
+(function () {
+  const dlg = document.getElementById('guide');
+  const btn = document.querySelector('[data-pick="linux"]');
+  if (!dlg || !btn) return;
+
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.card');
+    document.getElementById('guideTitle').textContent = 'Choose a package';
+    const src = card.querySelector('svg.mark');
+    let mk = document.getElementById('guideMark');
+    if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
+    document.getElementById('guideBody').innerHTML = `
+      <div class="pick">
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify.deb"><span style="flex:1"><b>.deb</b>
+          <span>Debian, Ubuntu, Mint, Pop!_OS. Install with
+          <code>sudo apt install ./Blazify.deb</code></span></span><em>most people</em></a>
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify.AppImage"><span style="flex:1"><b>.AppImage</b>
+          <span>Fedora, Arch, openSUSE, or anywhere else. One file, nothing
+          installed, and its audio library travels inside it</span></span><em>any distro</em></a>
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-linux.tar.gz"><span style="flex:1"><b>.tar.gz</b>
+          <span>The same application as a plain folder, if you would rather
+          unpack it yourself</span></span></a>
+      </div>
+      <p class="guide-note">Not sure? Take the <b>.deb</b> if you are on Ubuntu or
+      anything based on it, and the <b>AppImage</b> otherwise.</p>`;
+    dlg.showModal();
+  });
 })();
 
 // reveal on scroll
