@@ -3,3 +3,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://rajendra7169.github.io/blazify/sitemap.xml
+
+# IndexNow key lives at /640f0a86f95e540c9af5363343d1176b.txt
