@@ -1,15 +1,16 @@
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URL
 import java.util.Properties
 import javax.inject.Inject
 
@@ -51,8 +52,9 @@ plugins {
 }
 
 abstract class GenerateProtoTask : DefaultTask() {
-    @get:Input
-    abstract val protocUrl: Property<String>
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val protocArtifact: ConfigurableFileCollection
 
     @get:InputFile
     abstract val protoSourceFile: RegularFileProperty
@@ -74,23 +76,15 @@ abstract class GenerateProtoTask : DefaultTask() {
 
         outputDir.mkdirs()
 
-        if (!protocFile.exists() || protocFile.length() == 0L) {
-            val url = protocUrl.get()
-            logger.lifecycle("Downloading protoc ${url.substringAfterLast('/')} from $url")
+        // Comes from the protocTool configuration, already resolved. Gradle
+        // hands it over read-only from its cache, so it is copied out before
+        // being marked executable.
+        val resolved = protocArtifact.singleFile
+        if (!protocFile.exists() || protocFile.length() != resolved.length()) {
             protocFile.parentFile.mkdirs()
-            val connection = URL(url).openConnection() as java.net.HttpURLConnection
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-            val responseCode = connection.responseCode
-            if (responseCode !in 200..299) {
-                throw GradleException("Failed to download protoc: Server returned HTTP response code $responseCode for URL: $url")
-            }
-            connection.inputStream.use { input ->
-                protocFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            protocFile.setExecutable(true)
+            resolved.copyTo(protocFile, overwrite = true)
         }
+        protocFile.setExecutable(true)
 
         logger.lifecycle("Generating protobuf files in $outputDir")
         execOperations.exec {
@@ -294,7 +288,12 @@ android {
 
 val protocVersion = libs.versions.protobuf.get()
 
-fun getProtocUrl(): String {
+// protoc was fetched by hand over HTTP from inside the generate task, with a
+// browser User-Agent set on the request. It is the same artifact from the same
+// host either way, but declared as a dependency it resolves through the normal
+// path: it caches, it builds with the network down, and anyone reading this
+// file can see what the build is about to execute.
+val protocClassifier: String = run {
     val os = System.getProperty("os.name").lowercase()
     val arch = System.getProperty("os.arch").lowercase()
 
@@ -312,24 +311,31 @@ fun getProtocUrl(): String {
         else -> "x86_64"
     }
 
-    return "https://repo1.maven.org/maven2/com/google/protobuf/protoc/$protocVersion/protoc-$protocVersion-$osName-$archName.exe"
+    "$osName-$archName"
+}
+
+val protocTool by configurations.creating {
+    isTransitive = false
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+dependencies {
+    add("protocTool", "com.google.protobuf:protoc:$protocVersion:$protocClassifier@exe")
 }
 
 val protoDir = rootProject.file("proto")
 val protoFile = protoDir.resolve("listentogether.proto")
 
 val generateProto = if (protoFile.exists()) {
-    val protocUrl = getProtocUrl()
-    val protocFileName = URL(protocUrl).path.substringAfterLast('/')
-
     tasks.register<GenerateProtoTask>("generateProto") {
         group = "build"
         description = "Generate Kotlin protobuf files"
 
         protoSourceFile.set(protoFile)
         generatedSourcesDir.set(file("src/main/java"))
-        this.protocUrl.set(protocUrl)
-        protocExecutable.set(layout.buildDirectory.file("protoc/$protocFileName"))
+        protocArtifact.setFrom(protocTool)
+        protocExecutable.set(layout.buildDirectory.file("protoc/protoc-$protocVersion-$protocClassifier.exe"))
     }
 } else {
     logger.warn("Proto file not found at $protoFile. Skipping protobuf generation.")
