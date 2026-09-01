@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- This build has no updater: BuildConfig.UPDATER_AVAILABLE is false, so
+         nothing here ever downloads or installs an APK. The permission is
+         removed as well as the code path, because F-Droid's inclusion policy
+         judges what a build can do, not only what it does. -->
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
+
     <application>
         <!-- Remove Cast provider in Izzy build since GMS is not available -->
         <meta-data
