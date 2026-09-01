@@ -70,6 +70,9 @@ import java.util.Locale
 
 private const val WEBSITE_URL = "https://www.rajendrapandey.info.np/"
 private const val GITHUB_URL = "https://github.com/rajendra7169"
+// The project, not the profile. The social row above is about who made it;
+// this is about the thing itself.
+private const val PROJECT_URL = "https://github.com/rajendra7169/blazify"
 private const val INSTAGRAM_URL = "https://www.instagram.com/raja.indra7169"
 private const val GITHUB_AVATAR = "https://github.com/rajendra7169.png"
 
@@ -205,6 +208,32 @@ fun AboutScreen(
                 )
 
                 Spacer(Modifier.height(20.dp))
+
+                Button(
+                    onClick = { uriHandler.openUri(PROJECT_URL) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
+                ) {
+                    Icon(
+                        painterResource(R.drawable.star),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        stringResource(R.string.star_on_github),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 16.sp,
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
 
                 Button(
                     onClick = { showCoffeeDialog = true },
