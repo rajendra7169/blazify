@@ -1,0 +1,7 @@
+Nothing changes in how the app works. This release exists so the build offered to app repositories is one they can accept.
+
+The repository build no longer asks for permission to install packages. It has no updater, so it never had a use for it.
+
+The build no longer fetches its own tooling over the network partway through. It asks for it the same way it asks for every other dependency, which means it can be built with the network down and anyone reading the build file can see what it runs.
+
+The copy you download here still updates itself as before.

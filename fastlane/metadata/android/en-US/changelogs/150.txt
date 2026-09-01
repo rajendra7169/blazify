@@ -1,5 +1,5 @@
-Songs play again when you are signed in. Four separate faults could leave the app refusing every track with "Video unavailable" while signing out fixed it — an identity saved empty at sign-in, one that never renewed when it went stale, and two stream-address paths that had quietly stopped working. All four are fixed.
+Songs play again when you are signed in. Four separate faults could leave the app refusing every track with "Video unavailable" while signing out fixed it: an identity saved empty at sign-in, one that never renewed when it went stale, and two stream-address paths that had quietly stopped working. All four are fixed.
 
 Less waiting: the next song's address is fetched while the current one is still playing, so there is no pause between tracks. A stream the first source will not serve is now spotted in one request instead of a failed load.
 
-The app can also update itself now — it tells you when a new version is out, downloads it, and shows the release notes. Those notes travel inside the app, so they are there without a connection.
+The app can also update itself now. It tells you when a new version is out, downloads it, and shows the release notes. Those notes travel inside the app, so they are there without a connection.

@@ -1,5 +1,11 @@
 [
   {
+    "tagName": "v9.12.5",
+    "versionName": "9.12.5",
+    "releaseDate": "2026-09-01T00:00:00Z",
+    "description": "## Nothing changes in how the app works\n\nThis release exists so the build offered to app repositories is one they can accept. The copy you are running still updates itself as before.\n\n- **The repository build no longer asks for permission to install packages.** It has no updater in it, so it never had a use for that permission, but it was declaring it anyway. A store's scan reads what a build declares, not what it does.\n- **The build no longer fetches its own tooling over the network partway through.** It asks for it the way it asks for every other dependency, so it can be built with the network down, and anyone reading the build file can see what it is about to run."
+  },
+  {
     "tagName": "v9.12.4",
     "versionName": "9.12.4",
     "releaseDate": "2026-08-26T00:00:00Z",
