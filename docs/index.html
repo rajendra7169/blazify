@@ -372,6 +372,57 @@ svg.mark{
   .card,.f{transform:none!important}
 }
 
+/* ── how to install ───────────────────────────────────────────────
+   A card can say what something is; it cannot walk somebody through a
+   sideload. The steps sit behind a button on each card so the card stays
+   short, and so the iPhone instructions, which are the long ones, do not
+   set the height of the row. */
+.howto{
+  position:absolute;top:18px;right:18px;z-index:2;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:99px;cursor:pointer;
+  background:rgba(255,167,38,.07);border:1px solid rgba(255,167,38,.16);
+  color:var(--dim);font-family:'Outfit',sans-serif;font-size:12.5px;
+  transition:color .25s,border-color .25s,background .25s;
+}
+.howto:hover{color:var(--amber);border-color:rgba(255,167,38,.4);background:rgba(255,167,38,.12)}
+.howto:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.howto svg{width:14px;height:14px;stroke-width:1.9}
+
+dialog.guide{
+  width:min(560px,92vw);padding:0;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--coal);color:var(--cream);box-shadow:0 40px 90px rgba(0,0,0,.6);
+}
+dialog.guide::backdrop{background:rgba(6,5,4,.72);backdrop-filter:blur(4px)}
+.guide-head{
+  display:flex;align-items:center;gap:14px;padding:24px 26px 18px;
+  border-bottom:1px solid var(--line);
+}
+.guide-head svg.mark{width:34px;height:34px;margin:0}
+.guide-head h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;margin:0;flex:1}
+.guide-head button{
+  background:none;border:none;color:var(--dim);font-size:26px;line-height:1;cursor:pointer;padding:0 4px;
+}
+.guide-head button:hover{color:var(--amber)}
+.guide-body{padding:22px 26px 26px;max-height:66vh;overflow-y:auto}
+.guide-body ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:13px}
+.guide-body li{color:var(--dim);font-size:15px;line-height:1.6}
+.guide-body li b{color:var(--cream);font-weight:600}
+.guide-body code{
+  background:rgba(255,167,38,.09);border:1px solid rgba(255,167,38,.14);border-radius:6px;
+  padding:2px 7px;font-size:13.5px;color:var(--amber);
+}
+.guide-note{
+  margin:20px 0 0;padding:14px 16px;border-radius:var(--r-sm);
+  background:rgba(255,167,38,.06);border:1px solid rgba(255,167,38,.13);
+  color:var(--dim);font-size:14px;line-height:1.6;
+}
+.guide-note b{color:var(--amber)}
+@media (max-width:640px){
+  .howto{top:14px;right:14px;padding:5px 10px;font-size:11.5px}
+  .guide-body{padding:18px 20px 22px}
+}
+
 /* ── the page as a track ──────────────────────────────────────────
    Scroll position drawn as a seek bar, because that is what scrolling
    through a page about a music player ought to feel like. */
@@ -680,6 +731,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
 <symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
 <symbol id="i-devices" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="9.5" rx="1.4"/><path d="M6 18.2h6.2"/><path d="M9 14.5v3.7"/><rect x="16.5" y="9.5" width="5" height="9.5" rx="1.4"/><path d="M18.4 16.9h1.2"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.4-2.6 4"/><circle cx="12" cy="17.4" r=".9" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19.5V5.2"/><path d="M5.6 11.6L12 5.2l6.4 6.4"/></symbol>
 <symbol id="i-bgplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6l5.4 3.4-5.4 3.4z"/></symbol>
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
@@ -781,16 +833,18 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FE9B5"/><stop offset=".45" stop-color="#3DDC84"/><stop offset="1" stop-color="#1FA05C"/></linearGradient></defs>
 <path fill="url(#gflame)" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.14-.52.38.38 0 0 0-.52.14l-1.86 3.23a11.5 11.5 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.52-.14.38.38 0 0 0-.14.52L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+        <button class="howto" type="button" data-guide="android"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Android</h3>
         <div class="ver">Version 9.12.4 · 25 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
-        <a class="dl" href="https://github.com/rajendra7169/blazify/releases/latest">Download APK</a>
+        <a class="dl" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Download APK</a>
       </article>
 
       <article class="card rise">
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5FD0FF"/><stop offset=".5" stop-color="#0FA0EF"/><stop offset="1" stop-color="#0067B8"/></linearGradient></defs>
 <path fill="url(#gflame)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
+        <button class="howto" type="button" data-guide="windows"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Windows</h3>
         <div class="ver">Version 1.0.4 · installer</div>
         <p>The desktop player with its audio library bundled in. Installs without an administrator password.</p>
@@ -813,6 +867,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <ellipse cx="8.6" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(-13 8.6 20.9)"/>
 <ellipse cx="15.4" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(13 15.4 20.9)"/>
 </svg>
+        <button class="howto" type="button" data-guide="linux"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Linux</h3>
         <div class="ver">Version 1.0.4 · deb · AppImage · tar.gz</div>
         <p>Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.</p>
@@ -823,6 +878,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
 <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D8D8DE"/><stop offset="1" stop-color="#95959E"/></linearGradient></defs>
 <path fill="url(#gflame)" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <button class="howto" type="button" data-guide="ios"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>iOS</h3>
         <div class="ver">iPhone · sideload</div>
         <p>Search, library, playlists and synced lyrics, sideloaded with SideStore or AltStore. No App Store needed.</p>
@@ -996,6 +1052,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   <span class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span>
   <a class="go" href="#get">Get it free</a>
 </div>
+
+<dialog class="guide" id="guide">
+  <div class="guide-head">
+    <svg class="mark" id="guideMark" viewBox="0 0 24 24" aria-hidden="true"></svg>
+    <h3 id="guideTitle"></h3>
+    <button type="button" id="guideClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="guide-body" id="guideBody"></div>
+</dialog>
 
 <button class="totop" id="toTop" type="button" aria-label="Back to top"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg></button>
 
@@ -1305,6 +1370,90 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     el.addEventListener('pointerleave', () => { el.style.transform = ''; });
   });
 }
+
+
+/* ── install guides ────────────────────────────────────────────────
+   Written out per platform because the answers genuinely differ. The
+   iPhone one is four times the length of the Android one, which is the
+   whole reason these live behind a button rather than on the cards. */
+(function () {
+  const dlg = document.getElementById('guide');
+  if (!dlg) return;
+
+  const guides = {
+    android: {
+      title: 'Install on Android',
+      mark: '#ga-wrap',
+      steps: [
+        'Tap <b>Download APK</b>. The file saves to your Downloads folder.',
+        'Open the downloaded file.',
+        'Android warns you it came from outside the Play Store. That warning appears for <b>every</b> app installed this way, whoever made it.',
+        'Choose <b>Settings</b> in that prompt, turn on <b>Allow from this source</b>, then go back and tap <b>Install</b>.',
+      ],
+      note: 'You only do this once. From then on Blazify checks for new versions itself and installs them for you.',
+    },
+    windows: {
+      title: 'Install on Windows',
+      steps: [
+        'Download the installer from the releases page.',
+        'Run it. Windows may show a <b>SmartScreen</b> warning because the file is new and unsigned. Click <b>More info</b>, then <b>Run anyway</b>.',
+        'Choose a folder. No administrator password is needed.',
+        'It adds a Start menu entry and a desktop shortcut.',
+      ],
+      note: 'Everything it needs travels inside the package, including the audio library. Installing a newer version upgrades the old one rather than sitting beside it.',
+    },
+    linux: {
+      title: 'Install on Linux',
+      steps: [
+        'Pick the shape that suits your distribution.',
+        '<b>Debian, Ubuntu, Mint, Pop!_OS</b> use the .deb: <code>sudo apt install ./blazify_1.0.4_amd64.deb</code>',
+        '<b>Anywhere else</b> use the AppImage: <code>chmod +x Blazify-1.0.4-x86_64.AppImage</code> then run it. Nothing is installed.',
+        'The .tar.gz is the same application as a plain folder, if you would rather unpack it yourself.',
+      ],
+      note: 'Use <b>apt</b> rather than <code>dpkg -i</code> for the .deb. Both install the package; only apt resolves what it depends on. The AppImage needs nothing at all, since its audio library travels inside it.',
+    },
+    ios: {
+      title: 'Install on iPhone',
+      steps: [
+        'Blazify is not on the App Store and cannot be, so it is <b>sideloaded</b>. This takes longer than the other platforms, but it is a one-time setup.',
+        'Install <b>SideStore</b> (sidestore.io) or <b>AltStore</b> (altstore.io) and follow their own setup. You sign in with an Apple ID; a free one works.',
+        'Download the Blazify <b>.ipa</b> file.',
+        'Open the .ipa with SideStore or AltStore, and let it install.',
+        'On first launch, go to <b>Settings &rsaquo; General &rsaquo; VPN &amp; Device Management</b> and trust the developer profile.',
+      ],
+      note: 'An app signed with a <b>free</b> Apple ID stops working after <b>seven days</b> and has to be refreshed. SideStore and AltStore do that for you in the background, but only while they can reach your computer. A paid Apple Developer account raises that to a year.',
+    },
+  };
+
+  const body = document.getElementById('guideBody');
+  const title = document.getElementById('guideTitle');
+  let mark = document.getElementById('guideMark');
+
+  document.querySelectorAll('.howto').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = guides[btn.dataset.guide];
+      if (!g) return;
+      title.textContent = g.title;
+      // The platform marks are inline paths, not symbol references, so the
+      // real one is cloned across rather than pointed at.
+      const cardMark = btn.closest('.card').querySelector('svg.mark');
+      if (cardMark) {
+        const copy = cardMark.cloneNode(true);
+        copy.id = 'guideMark';
+        mark.replaceWith(copy);
+        mark = copy;
+      }
+      body.innerHTML =
+        '<ol>' + g.steps.map(x => '<li>' + x + '</li>').join('') + '</ol>' +
+        (g.note ? '<p class="guide-note">' + g.note + '</p>' : '');
+      dlg.showModal();
+    });
+  });
+
+  document.getElementById('guideClose').addEventListener('click', () => dlg.close());
+  // clicking the dark area outside the panel closes it, which is what people try
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+})();
 
 // reveal on scroll
 const io = new IntersectionObserver((entries) => {
