@@ -5,7 +5,11 @@
 > lyrics. No advertising, no tracking, no account required, no paid tier.
 
 Blazify is made by Rajendra Pandey in Kathmandu, Nepal, and licensed under
-GPL-3.0. Source: https://github.com/rajendra7169/blazify
+GPL-3.0. Its official website is https://rajendra7169.github.io/blazify/ and its
+source is at https://github.com/rajendra7169/blazify
+
+Not to be confused with blazify.org, an unrelated marketing company, or with
+Blaze Player, an unrelated application.
 
 ## What it is
 

@@ -8,7 +8,7 @@
 
 *Stream it. Feel it. Blaze it.*
 
-**[blazify website](https://rajendra7169.github.io/blazify/)** · screenshots, features and downloads for every platform
+**Official website: [rajendra7169.github.io/blazify](https://rajendra7169.github.io/blazify/)** · screenshots, features and downloads for every platform
 
 [![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/rajendra7169/blazify/total?color=FFA726&label=downloads)](https://github.com/rajendra7169/blazify/releases)
