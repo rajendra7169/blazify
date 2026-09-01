@@ -4,7 +4,7 @@
 
 # Blazify 🔥
 
-**A modern music streaming player for Android — Kotlin, Jetpack Compose, Material 3.**
+**A free, open-source music player. No ads, no tracking, no account needed.**
 
 *Stream it. Feel it. Blaze it.*
 
@@ -36,9 +36,18 @@
 
 ## Overview
 
-Blazify streams from a vast online catalogue, plays gapless with Media3/ExoPlayer,
-shows word-by-word synced lyrics, and lets you restyle almost every surface of the
-app — with a live preview while you do it. No ads, no tracking.
+**Blazify is a free, open-source music player with no advertisements, no tracking,
+and no account required.** It is an alternative to Spotify and YouTube Music that
+plays any song you choose rather than shuffling, downloads for offline listening
+without a subscription, and keeps playing with the screen off.
+
+It streams from a vast online catalogue, shows word-by-word synced lyrics, has a
+ten-band equalizer, and lets you restyle almost every surface of the app with a
+live preview while you do it. Signing in with Google is optional and brings your
+own YouTube Music library and playlists.
+
+Available for **Android, Windows, Linux and iPhone**. Built with Kotlin and
+Jetpack Compose, gapless through Media3/ExoPlayer.
 
 ---
 
@@ -72,7 +81,7 @@ app — with a live preview while you do it. No ads, no tracking.
 
 | Feature | What it does |
 |---|---|
-| **Live preview hub** | Five tabs — Theme, Player, Mini-player, Lyrics, Home — previewed in a phone frame |
+| **Live preview hub** | Five tabs (Theme, Player, Mini-player, Lyrics, Home) previewed in a phone frame |
 | **Dynamic theming** | Colours follow your album art, automatically |
 | **Custom colours** | Or pick your own: saturation/value field, hue rail, hex entry |
 | **Pure black** | True black dark mode for OLED panels |
@@ -99,7 +108,7 @@ app — with a live preview while you do it. No ads, no tracking.
 | **last.fm** | Scrobble what you play |
 | **Android Auto** | Full in-car playback |
 | **Widgets** | Home-screen controls |
-| **Backup & restore** | Your whole library in one file — songs, playlists, history, sign-in |
+| **Backup & restore** | Your whole library in one file: songs, playlists, history, sign-in |
 | **In-app updates** | Tells you when a new version is out, downloads it, and installs it |
 
 ---
@@ -114,7 +123,7 @@ What is planned, what has been asked for, and what is deliberately not being don
 
 Download the latest APK from **[Releases](https://github.com/rajendra7169/blazify/releases/latest)**.
 
-Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK — nothing else to do.
+Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK, nothing else to do.
 
 ### Automatic updates with Obtainium
 
@@ -130,13 +139,13 @@ Obtainium, tap **Add App**, and paste:
 https://github.com/rajendra7169/blazify
 ```
 
-Blazify also checks for its own updates and can install them itself — Obtainium
+Blazify also checks for its own updates and can install them itself. Obtainium
 is for people who prefer one app managing everything they sideload.
 
 ### ⚠️ Coming from 9.12.3 or earlier
 
 **9.12.4 is signed with a new key, so Android will not install it over an older
-build.** You have to uninstall first — and uninstalling erases your library
+build.** You have to uninstall first, and uninstalling erases your library
 unless you back it up. Two minutes, in this order:
 
 1. In your current version: **Settings → Backup and restore → Backup**, saved to **Downloads**.
@@ -204,7 +213,7 @@ If Blazify made your day a little better, you can buy me a coffee.
 
 ## License
 
-Released under the **[GNU General Public License v3.0](LICENSE)** — see [NOTICE](NOTICE).
+Released under the **[GNU General Public License v3.0](LICENSE)**. See [NOTICE](NOTICE).
 
 If you distribute this app or a build of it, GPL-3.0 asks you to pass on the
 same freedoms: keep the licence, keep the notices, and make the source available.
