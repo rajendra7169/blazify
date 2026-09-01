@@ -149,7 +149,7 @@ build.** You have to uninstall first, and uninstalling erases your library
 unless you back it up. Two minutes, in this order:
 
 1. In your current version: **Settings → Backup and restore → Backup**, saved to **Downloads**.
-2. Download `Blazify-9.12.4.apk` from Releases.
+2. Download `Blazify.apk` from Releases.
 3. Uninstall Blazify.
 4. Open Downloads and tap the APK.
 5. **Settings → Backup and restore → Restore**, and pick the file from step 1.
