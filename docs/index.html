@@ -91,6 +91,24 @@ nav{
   transition:transform .25s, box-shadow .25s;
 }
 .nav-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,140,50,.36)}
+/* Outlined on purpose: the amber pill next to it is the thing to press. */
+.nav-star{
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  padding:9px 15px;border-radius:99px;border:1px solid var(--line);
+  color:var(--cream);text-decoration:none;font-size:14px;font-weight:500;
+  transition:border-color .25s,color .25s,background .25s;
+}
+.nav-star:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,167,38,.07)}
+.nav-star .gh{width:17px;height:17px}
+.nav-star b{
+  font-weight:600;font-variant-numeric:tabular-nums;color:var(--amber);
+  padding-left:8px;border-left:1px solid var(--line);
+}
+.nav-star:hover b{border-left-color:rgba(255,167,38,.4)}
+@media (max-width:520px){
+  .nav-star .lbl{display:none}
+  .nav-star{padding:9px 12px;gap:7px}
+}
 
 /* ── hero ─────────────────────────────────────────────── */
 .hero{position:relative;z-index:1;padding:44px 0 0}
@@ -804,6 +822,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M5.9 5.9l12.2 12.2"/></symbol>
 <symbol id="i-noeye" viewBox="0 0 24 24"><path d="M3 12s3.6-6.2 9-6.2 9 6.2 9 6.2-3.6 6.2-9 6.2S3 12 3 12z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6"/></symbol>
+<symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" stroke="none" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
 <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.8 18.4L2.8 12l6-6.4M15.2 5.6l6 6.4-6 6.4M13.6 3.6l-3.2 16.8"/></symbol>
 <symbol id="i-account" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9.6" r="3"/><path d="M5.9 19.2c.6-3 3.1-4.6 6.1-4.6s5.5 1.6 6.1 4.6"/></symbol>
 <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 0 1-14.6 5.7"/><path d="M3.6 12a8.4 8.4 0 0 1 14.6-5.7"/><path d="M18.2 2.6v3.8h-3.8M5.8 21.4v-3.8h3.8"/></symbol>
@@ -839,6 +858,11 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#faq">FAQ</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
+    <a class="nav-star" href="https://github.com/rajendra7169/blazify" rel="noopener">
+      <svg class="ic gh" aria-hidden="true"><use href="#i-github"/></svg>
+      <span class="lbl">Star</span>
+      <b id="starCount" hidden></b>
+    </a>
     <a class="nav-cta" href="#get">Get Blazify</a>
   </div>
   <div class="seek"><i id="seekBar"></i></div>
@@ -1650,6 +1674,15 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   const newest = set => (set || []).find(r => !r.draft && !r.prerelease) || (set || [])[0];
   const asset = (rel, name) => ((rel && rel.assets) || []).find(a => a.name === name);
 
+  /* The count is the whole point of the button: "Star" alone is an ask,
+     "Star 16" is an ask with a number somebody can move. */
+  const applyStars = n => {
+    const el = document.getElementById('starCount');
+    if (!el || typeof n !== 'number' || n <= 0) return;
+    el.textContent = n.toLocaleString();
+    el.hidden = false;
+  };
+
   const applyVersions = v => {
     if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
     if (v.desktop) {
@@ -1680,22 +1713,34 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   if (cached && typeof cached.total === 'number' && cached.total > 0) {
     show(cached.total);
     applyVersions(cached.versions || {});
+    applyStars(cached.stars);
     return;
   }
 
-  Promise.all(REPOS.map(r =>
-    fetch('https://api.github.com/repos/rajendra7169/' + r + '/releases')
-      .then(res => res.ok ? res.json() : [])
-      .catch(() => [])
-  )).then(sets => {
+  Promise.all([
+    ...REPOS.map(r =>
+      fetch('https://api.github.com/repos/rajendra7169/' + r + '/releases')
+        .then(res => res.ok ? res.json() : [])
+        .catch(() => [])
+    ),
+    fetch('https://api.github.com/repos/rajendra7169/blazify')
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null),
+  ]).then(all => {
+    const repo = all.pop();
+    const sets = all;
+    const stars = repo && typeof repo.stargazers_count === 'number' ? repo.stargazers_count : null;
     const total = sets.flat().reduce(
       (sum, rel) => sum + (rel.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
     const versions = readVersions(sets);
     if (total > 0) {
-      try { sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions })); } catch (e) {}
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions, stars: stars }));
+      } catch (e) {}
       show(total);
     }
     applyVersions(versions);
+    applyStars(stars);
   });
 })();
 
