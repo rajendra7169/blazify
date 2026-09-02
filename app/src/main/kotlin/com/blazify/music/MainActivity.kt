@@ -19,6 +19,7 @@ import android.os.IBinder
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -209,6 +210,9 @@ import com.blazify.music.ui.utils.resetHeightOffset
 import com.blazify.music.utils.SearchRoutes
 import com.blazify.music.utils.SyncUtils
 import com.blazify.music.utils.ReleaseInfo
+import androidx.activity.result.contract.ActivityResultContracts
+import com.blazify.music.constants.AskedForLocalMusicKey
+import com.blazify.music.utils.LocalMusic
 import com.blazify.music.utils.Updater
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.safeDataStoreEdit
@@ -745,6 +749,41 @@ class MainActivity : ComponentActivity() {
                     val currentVersion = BuildConfig.VERSION_NAME
                     if (lastSeenVersion != currentVersion) {
                         showChangelog.value = true
+                    }
+                }
+
+                // Music already on the phone is invisible until Android is asked,
+                // and nobody goes looking in Settings for a feature they have not
+                // been told about. So ask once and never again whatever the
+                // answer, because a prompt that keeps returning is worse than a
+                // feature nobody found.
+                //
+                // Not before onboarding is finished, though: a system dialog
+                // landing on top of the language picker gets dismissed by
+                // whatever the person taps next, which is an answer to a
+                // question they never read.
+                val localScanScope = rememberCoroutineScope()
+                val localMusicPermission =
+                    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+                        // Recorded here rather than before the dialog, so a prompt
+                        // that never actually reached anyone can be asked again.
+                        localScanScope.launch {
+                            dataStore.edit { it[AskedForLocalMusicKey] = true }
+                            if (granted) {
+                                withContext(Dispatchers.IO) {
+                                    runCatching { LocalMusic(this@MainActivity, database).scan() }
+                                }
+                            }
+                        }
+                    }
+
+                val onboardingDone by rememberPreference(OnboardingCompletedKey, defaultValue = false)
+
+                LaunchedEffect(onboardingDone) {
+                    if (!onboardingDone) return@LaunchedEffect
+                    val asked = dataStore.data.first()[AskedForLocalMusicKey] ?: false
+                    if (!asked && !LocalMusic.hasPermission(this@MainActivity)) {
+                        localMusicPermission.launch(LocalMusic.permission)
                     }
                 }
 

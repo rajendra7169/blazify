@@ -55,6 +55,8 @@ fun BlazeLibraryHome(
     val likedThumbs by viewModel.likedThumbnails.collectAsStateWithLifecycle()
     val downloadedThumbs by viewModel.downloadedThumbnails.collectAsStateWithLifecycle()
     val uploadedThumbs by viewModel.uploadedThumbnails.collectAsStateWithLifecycle()
+    val localThumbs by viewModel.localThumbnails.collectAsStateWithLifecycle()
+    val localCount by viewModel.localSongCount.collectAsStateWithLifecycle()
     val topThumbs by viewModel.topThumbnails.collectAsStateWithLifecycle()
     val cachedThumbs by viewModel.cachedThumbnails.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
@@ -163,6 +165,21 @@ fun BlazeLibraryHome(
                     onClick = { navController.navigate("auto_playlist/downloaded") },
                     modifier = Modifier.weight(1f),
                 )
+            }
+        }
+        if (localCount > 0) {
+            item("local") {
+                LongPad {
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.local_music),
+                        subtitle = "$localCount $songsWord",
+                        thumbnails = localThumbs,
+                        seedColor = Color(0xFF2E7D32),
+                        aspectRatio = LONG_RATIO,
+                        iconRes = R.drawable.library_music,
+                        onClick = { navController.navigate("auto_playlist/local") },
+                    )
+                }
             }
         }
         item("uploaded") {

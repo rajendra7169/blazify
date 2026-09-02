@@ -67,6 +67,11 @@ class YoursViewModel @Inject constructor(
     val uploadedThumbnails = database.uploadedSongsByCreateDateAsc()
         .map { it.mapNotNull(Song::thumbnailUrl).take(4) }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val localThumbnails = database.localSongsByCreateDateAsc()
+        .map { it.mapNotNull(Song::thumbnailUrl).take(4) }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val localSongCount = database.localSongCount()
+        .stateIn(viewModelScope, SharingStarted.Lazily, 0)
     val topThumbnails = database
         .mostPlayedSongs(fromTimeStamp = java.time.LocalDateTime.of(1970, 1, 1, 0, 0), limit = 4)
         .map { it.mapNotNull(Song::thumbnailUrl).take(4) }

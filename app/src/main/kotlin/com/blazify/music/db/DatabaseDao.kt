@@ -729,6 +729,30 @@ interface DatabaseDao {
     @Query("SELECT COUNT(*) FROM song WHERE isLocal = 1")
     fun localSongCount(): Flow<Int>
 
+    @Transaction
+    @Query("SELECT * FROM song WHERE isLocal = 1 ORDER BY dateModified")
+    fun localSongsByCreateDateAsc(): Flow<List<Song>>
+
+    @Transaction
+    @Query("SELECT * FROM song WHERE isLocal = 1 ORDER BY title")
+    fun localSongsByNameAsc(): Flow<List<Song>>
+
+    fun localSongs(
+        sortType: SongSortType,
+        descending: Boolean,
+    ): Flow<List<Song>> =
+        when (sortType) {
+            SongSortType.CREATE_DATE -> localSongsByCreateDateAsc()
+            SongSortType.NAME, SongSortType.ARTIST ->
+                localSongsByNameAsc().map { songs ->
+                    val collator = Collator.getInstance(Locale.getDefault())
+                    collator.strength = Collator.PRIMARY
+                    songs.sortedWith(compareBy(collator) { it.song.title })
+                }
+
+            SongSortType.PLAY_TIME -> localSongsByCreateDateAsc()
+        }.map { it.reversed(descending) }
+
     @Query("DELETE FROM song WHERE id = :id AND isLocal = 1")
     fun deleteLocalSong(id: String)
 
