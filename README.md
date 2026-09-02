@@ -56,11 +56,11 @@ Jetpack Compose, gapless through Media3/ExoPlayer.
 The same player, built natively for each place you use it.
 
 | Platform | Download | Source |
-|---|---|---|
-| **Android** phones and tablets | [Blazify.apk](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk) | [rajendra7169/blazify](https://github.com/rajendra7169/blazify) **← you are here** |
-| **Windows** installer | [Blazify-setup.exe](https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-setup.exe) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
-| **Linux** | [deb, AppImage, tar.gz](https://github.com/rajendra7169/blazify-desktop/releases/latest) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
-| **iPhone** sideloaded | [Blazify.ipa](https://github.com/rajendra7169/blazify-ios/releases/latest/download/Blazify.ipa) | [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios) |
+|---|:---:|---|
+| **Android**<br><sub>phones and tablets</sub> | [![Blazify.apk](https://img.shields.io/badge/Blazify.apk-FFA726?style=for-the-badge&logoColor=1A0E00&logo=android)](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk) | [rajendra7169/blazify](https://github.com/rajendra7169/blazify) **← you are here** |
+| **Windows**<br><sub>installer</sub> | [![Blazify--setup.exe](https://img.shields.io/badge/Blazify--setup.exe-FFA726?style=for-the-badge&logoColor=1A0E00&logo=windows)](https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-setup.exe) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
+| **Linux**<br><sub>any distribution</sub> | [![deb_AppImage_tar.gz](https://img.shields.io/badge/deb_AppImage_tar.gz-FFA726?style=for-the-badge&logoColor=1A0E00&logo=linux)](https://github.com/rajendra7169/blazify-desktop/releases/latest) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
+| **iPhone**<br><sub>sideloaded</sub> | [![Blazify.ipa](https://img.shields.io/badge/Blazify.ipa-FFA726?style=for-the-badge&logoColor=1A0E00&logo=apple)](https://github.com/rajendra7169/blazify-ios/releases/latest/download/Blazify.ipa) | [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios) |
 
 Screenshots, install guides and everything else: **[blazify website](https://rajendra7169.github.io/blazify/)**
 
