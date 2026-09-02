@@ -1481,6 +1481,11 @@ fun ItemThumbnail(
                     .build(),
                 contentDescription = null,
                 contentScale = if (cropAlbumArt) ContentScale.Crop else ContentScale.Fit,
+                // A song with no picture used to leave a hole. Local files
+                // often have none, and neither do some streamed ones.
+                placeholder = painterResource(R.drawable.music_note),
+                fallback = painterResource(R.drawable.music_note),
+                error = painterResource(R.drawable.music_note),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape)

@@ -252,10 +252,13 @@ constructor(
                     val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaId)
                     val albumId = cursor.getLong(albumIdCol)
                     // The file's own picture frame first, then MediaStore's
-                    // album-art table, which is empty more often than not.
+                    // album-art table, which is empty more often than not. A
+                    // row is left with no picture at all rather than an address
+                    // that will not open, so the app draws its placeholder
+                    // instead of a black square.
                     val artwork =
                         embeddedArt(uri, SONG_PREFIX + mediaId)
-                            ?: ContentUris.withAppendedId(ALBUM_ART, albumId).toString()
+                            ?: albumArtIfReadable(albumId)
 
                     // A file with no title tag still has a name, and a name is
                     // more use than "<unknown>".
@@ -342,6 +345,19 @@ constructor(
                 out.parentFile?.mkdirs()
                 out.writeBytes(bytes)
                 out.toURI().toString()
+            }
+        }.getOrNull()
+    }
+
+    /**
+     * MediaStore hands out an album-art address for every album id whether or
+     * not there is a picture behind it, so the only way to know is to open it.
+     */
+    private fun albumArtIfReadable(albumId: Long): String? {
+        val uri = ContentUris.withAppendedId(ALBUM_ART, albumId)
+        return runCatching {
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                if (stream.read() == -1) null else uri.toString()
             }
         }.getOrNull()
     }
