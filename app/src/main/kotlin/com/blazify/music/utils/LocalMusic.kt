@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.SongItem
 import com.blazify.music.constants.LocalMusicArtworkOnlineKey
+import com.blazify.music.ui.utils.resize
 import com.blazify.music.db.MusicDatabase
 import com.blazify.music.db.entities.AlbumEntity
 import com.blazify.music.db.entities.ArtistEntity
@@ -157,13 +158,15 @@ constructor(
     suspend fun fetchMissingArtwork(): Int =
         withContext(Dispatchers.IO) {
             var filled = 0
-            // Only rows still pointing at MediaStore's album-art fallback. A
-            // file's own cover is a file: URL and a previous lookup left an
-            // http one, so neither is asked about twice.
+            // Rows still on MediaStore's album-art fallback, plus any picture
+            // fetched before this asked for a full-size one. A file's own cover
+            // is a file: URL and is never touched.
             val needing =
                 database.localSongsBlocking().filter {
                     val art = it.song.thumbnailUrl
-                    art == null || art.startsWith(ALBUM_ART.toString())
+                    art == null ||
+                        art.startsWith(ALBUM_ART.toString()) ||
+                        (art.contains("googleusercontent.com") && !art.contains("=w1080"))
                 }
 
             for (song in needing) {
@@ -186,7 +189,10 @@ constructor(
                             }
                     }.getOrNull() ?: continue
 
-                database.updateLocalArtwork(song.song.id, match.thumbnail)
+                // Search results carry a thumbnail sized for a search result,
+                // which is roughly 60px and looks it on a full player screen.
+                // Everything else in the app asks for 1080 the same way.
+                database.updateLocalArtwork(song.song.id, match.thumbnail.resize(1080, 1080))
                 filled++
             }
 
