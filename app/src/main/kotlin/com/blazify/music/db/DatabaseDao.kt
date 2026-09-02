@@ -726,6 +726,9 @@ interface DatabaseDao {
     @Query("SELECT id FROM song WHERE isLocal = 1")
     fun localSongIds(): List<String>
 
+    @Query("SELECT COUNT(*) FROM song WHERE isLocal = 1")
+    fun localSongCount(): Flow<Int>
+
     @Query("DELETE FROM song WHERE id = :id AND isLocal = 1")
     fun deleteLocalSong(id: String)
 

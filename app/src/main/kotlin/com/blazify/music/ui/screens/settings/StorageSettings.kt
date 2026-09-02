@@ -5,6 +5,10 @@
 
 package com.blazify.music.ui.screens.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.collectAsState
+import com.blazify.music.utils.LocalMusic
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -82,6 +86,26 @@ fun StorageSettings(
     val downloadCache = LocalPlayerConnection.current?.service?.downloadCache ?: return
 
     val coroutineScope = rememberCoroutineScope()
+
+    // The scanner needs nothing this screen does not already have, so it is
+    // built here rather than routed through a view model for one button.
+    val localMusic = remember(context, database) { LocalMusic(context, database) }
+    val localCount by database.localSongCount().collectAsState(initial = 0)
+    var scanning by remember { mutableStateOf(false) }
+
+    fun runScan() {
+        if (scanning) return
+        coroutineScope.launch {
+            scanning = true
+            localMusic.scan()
+            scanning = false
+        }
+    }
+
+    val audioPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) runScan()
+        }
     val songCacheString = stringResource(R.string.song_cache).lowercase()
     val imageCacheString = stringResource(R.string.image_cache).lowercase()
     val (maxImageCacheSize, onMaxImageCacheSizeChange) = rememberPreference(
@@ -296,6 +320,33 @@ fun StorageSettings(
                 ),
             ),
         )
+        Material3SettingsGroup(
+            title = stringResource(R.string.local_music),
+            items =
+                listOf(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.library_music),
+                        title = { Text(stringResource(R.string.local_music)) },
+                        description = {
+                            Text(
+                                when {
+                                    scanning -> stringResource(R.string.local_music_scanning)
+                                    localCount > 0 -> stringResource(R.string.local_music_found, localCount)
+                                    else -> stringResource(R.string.local_music_scan)
+                                },
+                            )
+                        },
+                        onClick = {
+                            if (LocalMusic.hasPermission(context)) {
+                                runScan()
+                            } else {
+                                audioPermission.launch(LocalMusic.permission)
+                            }
+                        },
+                    ),
+                ),
+        )
+
         Material3SettingsGroup(
             title = stringResource(R.string.storage),
             items =
