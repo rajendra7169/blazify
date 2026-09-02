@@ -730,6 +730,13 @@ interface DatabaseDao {
     fun localSongCount(): Flow<Int>
 
     @Transaction
+    @Query("SELECT * FROM song WHERE isLocal = 1")
+    fun localSongsBlocking(): List<Song>
+
+    @Query("UPDATE song SET thumbnailUrl = :thumbnailUrl WHERE id = :id AND isLocal = 1")
+    fun updateLocalArtwork(id: String, thumbnailUrl: String)
+
+    @Transaction
     @Query("SELECT * FROM song WHERE isLocal = 1 ORDER BY dateModified")
     fun localSongsByCreateDateAsc(): Flow<List<Song>>
 

@@ -13,6 +13,9 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
+import com.blazify.innertube.YouTube
+import com.blazify.innertube.models.SongItem
+import com.blazify.music.constants.LocalMusicArtworkOnlineKey
 import com.blazify.music.db.MusicDatabase
 import com.blazify.music.db.entities.AlbumEntity
 import com.blazify.music.db.entities.ArtistEntity
@@ -27,6 +30,7 @@ import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.math.abs
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,6 +60,9 @@ constructor(
         const val SONG_PREFIX = "local:"
         const val ARTIST_PREFIX = "local-artist:"
         const val ALBUM_PREFIX = "local-album:"
+
+        /** Loose enough for a re-encode, tight enough to reject a different song. */
+        private const val DURATION_TOLERANCE_SECONDS = 5
 
         /** Album art has lived at this address since long before MediaStore grew a thumbnail API. */
         private val ALBUM_ART = Uri.parse("content://media/external/audio/albumart")
@@ -99,32 +106,92 @@ constructor(
                     .onFailure { Timber.tag("LocalMusic").w(it, "could not remove $gone") }
             }
 
+            // Written straight through rather than through database.query{},
+            // which hands the work to a background executor and returns before
+            // any of it has happened. The artwork pass below reads these rows
+            // back, so it has to be able to see them.
             found.forEach { track ->
-                database.query {
-                    insert(track.song)
-                    // A rescan should pick up a retagged file, and insert alone
-                    // ignores conflicts, so the row is refreshed explicitly.
-                    updateLocalSong(
-                        id = track.song.id,
-                        title = track.song.title,
-                        duration = track.song.duration,
-                        thumbnailUrl = track.song.thumbnailUrl,
-                        albumName = track.song.albumName,
-                        localPath = track.song.localPath,
-                    )
-                    track.artist?.let {
-                        insert(it)
-                        insert(SongArtistMap(songId = track.song.id, artistId = it.id, position = 0))
-                    }
-                    track.album?.let {
-                        insert(it)
-                        insert(SongAlbumMap(songId = track.song.id, albumId = it.id, index = 0))
-                    }
+                database.insert(track.song)
+                // A rescan should pick up a retagged file, and insert alone
+                // ignores conflicts, so the row is refreshed explicitly.
+                database.updateLocalSong(
+                    id = track.song.id,
+                    title = track.song.title,
+                    duration = track.song.duration,
+                    thumbnailUrl = track.song.thumbnailUrl,
+                    albumName = track.song.albumName,
+                    localPath = track.song.localPath,
+                )
+                track.artist?.let {
+                    database.insert(it)
+                    database.insert(SongArtistMap(songId = track.song.id, artistId = it.id, position = 0))
+                }
+                track.album?.let {
+                    database.insert(it)
+                    database.insert(SongAlbumMap(songId = track.song.id, albumId = it.id, index = 0))
                 }
             }
 
             Timber.tag("LocalMusic").i("scan found ${found.size} tracks")
+
+            // Files that carried their own cover are already done. The rest are
+            // looked up unless that has been turned off, which is the only part
+            // of this that touches the network at all.
+            if (context.dataStore.get(LocalMusicArtworkOnlineKey, true)) {
+                runCatching { fetchMissingArtwork() }
+                    .onFailure { Timber.tag("LocalMusic").w(it, "artwork lookup failed") }
+            }
+
             found.size
+        }
+
+    /**
+     * Fills in artwork the file did not carry.
+     *
+     * Only tracks whose picture had to fall back to MediaStore's album-art
+     * table are looked up, so a file with its own cover never causes a request.
+     * A result is accepted only when the duration agrees to within five
+     * seconds: the titles here come from filenames, and a confident wrong
+     * cover is worse than an honest blank one.
+     */
+    suspend fun fetchMissingArtwork(): Int =
+        withContext(Dispatchers.IO) {
+            var filled = 0
+            // Only rows still pointing at MediaStore's album-art fallback. A
+            // file's own cover is a file: URL and a previous lookup left an
+            // http one, so neither is asked about twice.
+            val needing =
+                database.localSongsBlocking().filter {
+                    val art = it.song.thumbnailUrl
+                    art == null || art.startsWith(ALBUM_ART.toString())
+                }
+
+            for (song in needing) {
+                val query =
+                    listOfNotNull(song.song.title, song.artists.firstOrNull()?.name)
+                        .joinToString(" ")
+                        .trim()
+                if (query.isBlank()) continue
+
+                val match =
+                    runCatching {
+                        YouTube
+                            .search(query, YouTube.SearchFilter.FILTER_SONG)
+                            .getOrNull()
+                            ?.items
+                            ?.filterIsInstance<SongItem>()
+                            ?.firstOrNull { candidate ->
+                                val d = candidate.duration ?: return@firstOrNull false
+                                abs(d - song.song.duration) <= DURATION_TOLERANCE_SECONDS
+                            }
+                    }.getOrNull() ?: continue
+
+                database.updateLocalArtwork(song.song.id, match.thumbnail)
+                filled++
+            }
+
+            Timber.tag("LocalMusic").i("artwork filled for $filled of ${needing.size}")
+            filled
         }
 
     private data class Track(
@@ -178,14 +245,20 @@ constructor(
                     val mediaId = cursor.getLong(idCol)
                     val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaId)
                     val albumId = cursor.getLong(albumIdCol)
-                    val artwork = ContentUris.withAppendedId(ALBUM_ART, albumId).toString()
+                    // The file's own picture frame first, then MediaStore's
+                    // album-art table, which is empty more often than not.
+                    val artwork =
+                        embeddedArt(uri, SONG_PREFIX + mediaId)
+                            ?: ContentUris.withAppendedId(ALBUM_ART, albumId).toString()
 
                     // A file with no title tag still has a name, and a name is
                     // more use than "<unknown>".
                     val title =
-                        cursor.getString(titleCol)?.takeIf { it.isNotBlank() }
-                            ?: path?.let { File(it).nameWithoutExtension }
-                            ?: continue
+                        (
+                            cursor.getString(titleCol)?.takeIf { it.isNotBlank() }
+                                ?: path?.let { File(it).nameWithoutExtension }
+                                ?: continue
+                        ).let(::tidy)
 
                     val artistName = cursor.getString(artistCol)?.takeIf { it.isNotBlank() && it != "<unknown>" }
                     val albumName = cursor.getString(albumCol)?.takeIf { it.isNotBlank() && it != "<unknown>" }
@@ -231,6 +304,40 @@ constructor(
             }
 
         return tracks
+    }
+
+    /**
+     * Files downloaded from the web arrive named like
+     * `Sweety_Tera_Drama(128k).mp3`, and MediaStore takes that as the title.
+     * Lyrics and artwork are both matched on the title, so the underscores
+     * alone are enough to make every lookup miss.
+     */
+    private fun tidy(raw: String): String {
+        var t = raw.replace(Regex("(\\.(mp3|m4a|aac|flac|ogg|opus|wav|wma|vm))+$", RegexOption.IGNORE_CASE), "")
+        t = t.replace('_', ' ')
+        t = t.replace(Regex("\\s*[(\\[][^)\\]]*(?:kbps|k|bit|hq|hd|official|audio|video|lyrics?)[^)\\]]*[)\\]]", RegexOption.IGNORE_CASE), " ")
+        t = t.replace(Regex("\\s*\\b\\d{2,3}\\s?kbps\\b", RegexOption.IGNORE_CASE), " ")
+        t = t.replace(Regex("\\s{2,}"), " ").trim(' ', '-', '\u2013', '\u2014', '_')
+        return t.ifBlank { raw }
+    }
+
+    /**
+     * MediaStore's album-art table is often empty for files that were never
+     * part of a real album, but the file itself may still carry a picture
+     * frame. Reading it costs nothing and needs no network.
+     */
+    private fun embeddedArt(uri: Uri, songId: String): String? {
+        val out = File(context.filesDir, "localart/${songId.substringAfter(SONG_PREFIX)}.jpg")
+        if (out.exists() && out.length() > 0) return out.toURI().toString()
+        return runCatching {
+            android.media.MediaMetadataRetriever().use { r ->
+                r.setDataSource(context, uri)
+                val bytes = r.embeddedPicture ?: return null
+                out.parentFile?.mkdirs()
+                out.writeBytes(bytes)
+                out.toURI().toString()
+            }
+        }.getOrNull()
     }
 
     /** MediaStore counts in seconds; everything in the database is a LocalDateTime. */
