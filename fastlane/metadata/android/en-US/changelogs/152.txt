@@ -1,0 +1,3 @@
+The About page now has a button to star Blazify on GitHub. Stars are most of how a project like this gets found by the people looking for it, and until now there was no way to do that from inside the app.
+
+Underneath, the build no longer reaches for a package mirror that app repositories will not build against. The one library it was serving comes from Maven Central instead. It is the same library, and nothing about the app changes.

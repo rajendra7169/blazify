@@ -36,7 +36,7 @@ timber = "5.0.1"
 materialKolor = "4.1.1"
 kuromojiIpadic = "0.9.0"
 extractor = "v1.0.0"
-tinypinyin = "2.0.3"
+tinypinyin = "2.0.3.RELEASE"
 protobuf = "4.34.1"
 
 [libraries]
@@ -119,7 +119,10 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 extractor = { module = "com.github.rajendra7169:BlazifyExtractor", version.ref = "extractor" }
 
 kuromoji-ipadic = { module = "com.atilika.kuromoji:kuromoji-ipadic", version.ref = "kuromojiIpadic" }
-tinypinyin = { module = "com.github.promeG:tinypinyin", version.ref = "tinypinyin" }
+# Was com.github.promeG:tinypinyin, which only ever resolved from a mirror
+# F-Droid will not build against. This is the same library republished to
+# Maven Central, same com.github.promeg.pinyinhelper package.
+tinypinyin = { module = "io.github.biezhi:TinyPinyin", version.ref = "tinypinyin" }
 
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }

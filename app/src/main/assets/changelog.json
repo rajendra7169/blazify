@@ -1,5 +1,11 @@
 [
   {
+    "tagName": "v9.12.6",
+    "versionName": "9.12.6",
+    "releaseDate": "2026-09-02T00:00:00Z",
+    "description": "## Star the project from the About page\n\nStars are most of how something like this gets found by the people who are looking for it, and there was no way to leave one without going and finding the repository yourself. There is a button now, above the coffee one.\n\n## Underneath\n\n- **The build no longer reaches for a package mirror** that app repositories will not build against. The one library it was serving comes from Maven Central instead. Same library, same behaviour, nothing about the app changes."
+  },
+  {
     "tagName": "v9.12.5",
     "versionName": "9.12.5",
     "releaseDate": "2026-09-01T00:00:00Z",
