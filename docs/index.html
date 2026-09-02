@@ -655,7 +655,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       "applicationCategory": "MultimediaApplication",
       "applicationSubCategory": "Music Player",
       "operatingSystem": "Android 8.0+, Windows, Linux, iOS",
-      "softwareVersion": "9.12.4",
+      "softwareVersion": "9.12.6",
       "url": "https://rajendra7169.github.io/blazify/",
       "downloadUrl": "https://github.com/rajendra7169/blazify/releases/latest",
       "installUrl": "https://github.com/rajendra7169/blazify/releases/latest",
@@ -883,7 +883,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <path fill="url(#gflame)" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.14-.52.38.38 0 0 0-.52.14l-1.86 3.23a11.5 11.5 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.52-.14.38.38 0 0 0-.14.52L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
         <button class="howto" type="button" data-guide="android"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Android</h3>
-        <div class="ver">Version 9.12.4 · 25 MB · Android 8+</div>
+        <div class="ver" id="verAndroid">Version 9.12.6 · 25 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
         <a class="dl" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Download APK</a>
       </article>
@@ -894,7 +894,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <path fill="url(#gflame)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
         <button class="howto" type="button" data-guide="windows"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Windows</h3>
-        <div class="ver">Version 1.0.5 · 164 MB · installer</div>
+        <div class="ver" id="verWindows">Version 1.0.5 · 164 MB · installer</div>
         <p>The desktop player with its audio library bundled in. Installs without an administrator password.</p>
         <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-setup.exe">Download for Windows</a>
       </article>
@@ -917,7 +917,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 </svg>
         <button class="howto" type="button" data-guide="linux"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Linux</h3>
-        <div class="ver">Version 1.0.5 · deb · AppImage · tar.gz</div>
+        <div class="ver" id="verLinux">Version 1.0.5 · deb · AppImage · tar.gz</div>
         <p>Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.</p>
         <button class="dl" type="button" data-pick="linux">Download for Linux</button>
       </article>
@@ -1572,8 +1572,42 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     requestAnimationFrame(step);
   };
 
+  /* The version on each card used to be typed in by hand, so it was wrong
+     within a day of every release. It is in the same response the counter
+     already asks for, so reading it costs nothing extra. */
+  const setText = (id, text) => { const n = document.getElementById(id); if (n) n.textContent = text; };
+  const mb = bytes => bytes ? Math.round(bytes / 1048576) + ' MB' : null;
+  const newest = set => (set || []).find(r => !r.draft && !r.prerelease) || (set || [])[0];
+  const asset = (rel, name) => ((rel && rel.assets) || []).find(a => a.name === name);
+
+  const applyVersions = v => {
+    if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
+    if (v.desktop) {
+      setText('verWindows', 'Version ' + v.desktop + (v.winSize ? ' · ' + v.winSize : '') + ' · installer');
+      setText('verLinux', 'Version ' + v.desktop + ' · deb · AppImage · tar.gz');
+    }
+  };
+
+  const readVersions = sets => {
+    const a = newest(sets[0]), d = newest(sets[1]);
+    const apk = asset(a, 'Blazify.apk'), exe = asset(d, 'Blazify-setup.exe');
+    return {
+      android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
+      androidSize: mb(apk && apk.size),
+      desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
+      winSize: mb(exe && exe.size),
+    };
+  };
+
   const cached = sessionStorage.getItem(KEY);
-  if (cached) { show(parseInt(cached, 10)); return; }
+  if (cached) {
+    try {
+      const c = JSON.parse(cached);
+      show(c.total);
+      applyVersions(c.versions || {});
+      return;
+    } catch (e) { /* older cache shape, fall through and re-ask */ }
+  }
 
   Promise.all(REPOS.map(r =>
     fetch('https://api.github.com/repos/rajendra7169/' + r + '/releases')
@@ -1582,10 +1616,12 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   )).then(sets => {
     const total = sets.flat().reduce(
       (sum, rel) => sum + (rel.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
+    const versions = readVersions(sets);
     if (total > 0) {
-      try { sessionStorage.setItem(KEY, String(total)); } catch (e) {}
+      try { sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions })); } catch (e) {}
       show(total);
     }
+    applyVersions(versions);
   });
 })();
 
