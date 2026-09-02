@@ -1187,6 +1187,10 @@ fun HomeScreen(
                 // greeting card with overflowing hero image, and search bar
                 item(key = "blaze_header") {
                     BlazeHomeHeader(
+                        // Asked for by a user: greet the person, not "Music Lover",
+                        // once we actually know who they are.
+                        userName = accountName.trim().takeIf { it.isNotEmpty() && isLoggedIn }
+                            ?: stringResource(R.string.blaze_greeting_default_name),
                         // Profile: account sheet (logout / token / settings) when
                         // logged in, login page otherwise
                         onAccountClick = {
