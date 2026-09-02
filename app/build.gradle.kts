@@ -190,6 +190,15 @@ android {
 
     buildTypes {
         release {
+            // AGP stamps the git commit into META-INF/version-control-info.textproto,
+            // which makes the APK depend on how the source arrived rather than
+            // what is in it. A build from a worktree, a tarball or a zip writes
+            // an error stub there instead of the revision, and reproducible
+            // build verification fails on that one file while all 1004 others
+            // match. Nothing here reads it, so it is not written.
+            vcsInfo {
+                include = false
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             isCrunchPngs = false
