@@ -51,6 +51,21 @@ Jetpack Compose, gapless through Media3/ExoPlayer.
 
 ---
 
+## Blazify everywhere else
+
+The same player, built natively for each place you use it.
+
+| Platform | Download | Source |
+|---|---|---|
+| **Android** phones and tablets | [Blazify.apk](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk) | [rajendra7169/blazify](https://github.com/rajendra7169/blazify) **← you are here** |
+| **Windows** installer | [Blazify-setup.exe](https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-setup.exe) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
+| **Linux** | [deb, AppImage, tar.gz](https://github.com/rajendra7169/blazify-desktop/releases/latest) | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
+| **iPhone** sideloaded | [Blazify.ipa](https://github.com/rajendra7169/blazify-ios/releases/latest/download/Blazify.ipa) | [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios) |
+
+Screenshots, install guides and everything else: **[blazify website](https://rajendra7169.github.io/blazify/)**
+
+---
+
 ## Features
 
 ### 🎵 Playback
