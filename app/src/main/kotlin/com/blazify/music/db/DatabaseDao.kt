@@ -719,6 +719,36 @@ interface DatabaseDao {
     @Query("DELETE FROM lyrics")
     fun clearAllLyrics()
 
+    // ---- Music that lives on the phone ----------------------------------
+    // A scan has to know what it already knows about, refresh rows for files
+    // that were retagged, and drop rows for files that are gone.
+
+    @Query("SELECT id FROM song WHERE isLocal = 1")
+    fun localSongIds(): List<String>
+
+    @Query("DELETE FROM song WHERE id = :id AND isLocal = 1")
+    fun deleteLocalSong(id: String)
+
+    @Query(
+        """
+        UPDATE song
+        SET title = :title,
+            duration = :duration,
+            thumbnailUrl = :thumbnailUrl,
+            albumName = :albumName,
+            localPath = :localPath
+        WHERE id = :id AND isLocal = 1
+        """,
+    )
+    fun updateLocalSong(
+        id: String,
+        title: String,
+        duration: Int,
+        thumbnailUrl: String?,
+        albumName: String?,
+        localPath: String?,
+    )
+
     @Transaction
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Query("SELECT *, (SELECT COUNT(1) FROM song_artist_map JOIN song ON song_artist_map.songId = song.id WHERE artistId = artist.id AND song.inLibrary IS NOT NULL) AS songCount FROM artist WHERE songCount > 0 ORDER BY rowId")

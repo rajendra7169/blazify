@@ -217,6 +217,7 @@ import com.blazify.music.utils.ScrobbleManager
 import com.blazify.music.utils.SyncUtils
 import com.blazify.music.utils.getArtistSeparator
 import com.blazify.music.utils.joinToArtistString
+import com.blazify.music.utils.LocalMusic
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.cipher.CipherDeobfuscator
 import com.blazify.music.utils.dataStore
@@ -3814,6 +3815,22 @@ class MusicService :
     private fun createDataSourceFactory(): DataSource.Factory {
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
             val mediaId = dataSpec.key ?: error("No media id")
+
+            // A song that lives on the phone has nothing to resolve. Hand the
+            // player the file and skip the caches, the network and the whole
+            // stream lookup below.
+            if (LocalMusic.isLocal(mediaId)) {
+                val path =
+                    runBlocking(Dispatchers.IO) {
+                        database.getSongByIdBlocking(mediaId)?.song?.localPath
+                    }
+                        ?: throw PlaybackException(
+                            getString(R.string.error_unknown),
+                            null,
+                            PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+                        )
+                return@Factory dataSpec.withUri(path.toUri())
+            }
 
             val shouldBypassCache = bypassCacheForQualityChange.contains(mediaId)
 
