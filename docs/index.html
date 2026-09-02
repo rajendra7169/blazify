@@ -1623,9 +1623,10 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   if (!el) return;
 
   const REPOS = ['blazify', 'blazify-desktop', 'blazify-ios'];
-  const KEY = 'blazify-downloads';
+  const KEY = 'blazify-downloads-v2';
 
   const show = n => {
+    if (typeof n !== 'number' || !isFinite(n) || n <= 0) return;  // never paint NaN over a real fallback
     const from = parseInt(el.textContent.replace(/\D/g, ''), 10) || 0;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || n === from) {
       el.textContent = n.toLocaleString();
@@ -1671,14 +1672,15 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     };
   };
 
-  const cached = sessionStorage.getItem(KEY);
-  if (cached) {
-    try {
-      const c = JSON.parse(cached);
-      show(c.total);
-      applyVersions(c.versions || {});
-      return;
-    } catch (e) { /* older cache shape, fall through and re-ask */ }
+  /* Parsing is not validation: an earlier build cached the bare number, and
+     JSON.parse('504') returns 504 rather than throwing, so a shape check is
+     the only thing that catches it. */
+  let cached = null;
+  try { cached = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+  if (cached && typeof cached.total === 'number' && cached.total > 0) {
+    show(cached.total);
+    applyVersions(cached.versions || {});
+    return;
   }
 
   Promise.all(REPOS.map(r =>
