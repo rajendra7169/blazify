@@ -44,6 +44,10 @@ data class SongEntity(
     val dateDownload: LocalDateTime? = null,
     @ColumnInfo(name = "isLocal", defaultValue = false.toString())
     val isLocal: Boolean = false,
+    // Where the file actually lives. This column existed once and was dropped
+    // at schema 17 when local playback was removed upstream, which left
+    // isLocal able to say a song is local with nowhere to record where.
+    val localPath: String? = null,
     val libraryAddToken: String? = null,
     val libraryRemoveToken: String? = null,
     @ColumnInfo(defaultValue = "0")
