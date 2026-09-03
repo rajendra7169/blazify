@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import com.blazify.music.constants.LocalMusicFoldersKey
 import com.blazify.music.ui.component.ListDialog
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -363,7 +364,11 @@ fun StorageSettings(
                                 if (selectedFolders.isEmpty()) {
                                     stringResource(R.string.local_music_folders_all)
                                 } else {
-                                    stringResource(R.string.local_music_folders_some, selectedFolders.size)
+                                    pluralStringResource(
+                                        R.plurals.local_music_folders_some,
+                                        selectedFolders.size,
+                                        selectedFolders.size,
+                                    )
                                 },
                             )
                         },

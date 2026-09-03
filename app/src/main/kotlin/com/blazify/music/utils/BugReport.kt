@@ -71,8 +71,15 @@ object BugReport {
      * not have one. This asks for nothing but the mail app they already use.
      */
     fun email(context: Context): Boolean {
+        // Subject and body go in the URI, not in extras. With ACTION_SENDTO a
+        // mailto: client reads its query string and Gmail ignores EXTRA_SUBJECT
+        // and EXTRA_TEXT entirely, which opens a correctly addressed but
+        // completely empty message.
+        val subject = encode("Blazify ${BuildConfig.VERSION_NAME}: ")
+        val body = encode(plainBody())
         val intent =
-            Intent(Intent.ACTION_SENDTO, "mailto:$EMAIL".toUri()).apply {
+            Intent(Intent.ACTION_SENDTO, "mailto:$EMAIL?subject=$subject&body=$body".toUri()).apply {
+                // Kept as well, for the clients that prefer extras.
                 putExtra(Intent.EXTRA_SUBJECT, "Blazify ${BuildConfig.VERSION_NAME}: ")
                 putExtra(Intent.EXTRA_TEXT, plainBody())
             }
@@ -81,6 +88,9 @@ object BugReport {
             true
         }.getOrDefault(false)
     }
+
+    /** mailto: wants percent-encoding, and a literal + is a space to a mail client. */
+    private fun encode(s: String) = URLEncoder.encode(s, "UTF-8").replace("+", "%20")
 
     /** For anyone without a GitHub account, or without a connection right now. */
     fun copyDetails(context: Context) {

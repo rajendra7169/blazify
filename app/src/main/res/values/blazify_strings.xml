@@ -1153,7 +1153,6 @@
     <string name="local_music">Music on this device</string>
     <string name="local_music_folders">Where to look</string>
     <string name="local_music_folders_all">Everywhere on this phone</string>
-    <string name="local_music_folders_some">%1$d folders</string>
     <string name="local_music_folders_apply">Look again</string>
     <string name="local_music_scan">Look for music stored on this phone</string>
     <string name="local_music_scanning">Looking\u2026</string>
@@ -1249,4 +1248,8 @@
     <string name="show_top_playlist_desc">Show the Most-played auto-playlist in your library</string>
     <string name="show_cached_playlist_desc">Show the Cached auto-playlist in your library</string>
     <string name="show_uploaded_playlist_desc">Show your uploaded songs in your library</string>
+    <plurals name="local_music_folders_some">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
 </resources>
