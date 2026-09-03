@@ -5,6 +5,7 @@ Blazify is a music player for Android devices, built with Kotlin and Jetpack Com
 * Millions of songs, searched by name or found by browsing: songs, albums, artists, playlists and videos
 * Gapless playback through Media3/ExoPlayer, with the next track prepared while the current one is still playing
 * Download anything for offline listening, or let it keep songs as you play them
+* Play the music already on your phone, beside everything else, in the same queue and the same player
 * A queue that you can reorder by dragging, save as a playlist, or start a radio from
 * Sleep timer, with an end-of-track option so it never cuts off mid-song
 
@@ -43,6 +44,8 @@ Blazify is a music player for Android devices, built with Kotlin and Jetpack Com
 <b>Privacy</b>
 
 Blazify has no advertising, no analytics and no tracking libraries of any kind. Signing in is entirely optional. Everything except your personal YouTube Music library works signed out.
+
+One thing worth stating plainly, because it is the only time the app sends anything about your own files anywhere: when you scan the music on your phone, any track whose file carries no cover art has its title looked up online so a picture can be found. Files that already have artwork are never sent. It can be turned off, and turning it off only costs you the missing covers.
 
 <b>Free software</b>
 
