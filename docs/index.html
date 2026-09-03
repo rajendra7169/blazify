@@ -31,7 +31,15 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Loaded without blocking the page. The stylesheet lives on a third host,
+     so waiting for it means waiting on someone else's DNS and TLS before a
+     single word appears. media="print" makes the browser fetch it at low
+     priority and not block on it; onload promotes it once it arrives, and the
+     noscript copy covers the rest. display=swap means text is readable in a
+     fallback face the whole time. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap"></noscript>
 
 <style>
 :root{
@@ -158,7 +166,7 @@ nav{
 .btn:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(0,0,0,.34)}
 .btn i{
   width:34px;height:34px;border-radius:50%;background:var(--flame);color:#150D04;
-  display:grid;place-items:center;font-style:normal;font-size:17px;font-weight:700;
+  display:grid;place-items:center;font-style:normal;font-size:17px;font-weight:600;
 }
 .proof{
   margin-top:26px;display:inline-flex;align-items:center;gap:12px;
@@ -1708,8 +1716,13 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   /* Parsing is not validation: an earlier build cached the bare number, and
      JSON.parse('504') returns 504 rather than throwing, so a shape check is
      the only thing that catches it. */
+  /* Held for ten minutes rather than the whole session. Moving between pages
+     should not re-ask GitHub every time, but a tab left open all afternoon was
+     showing a number from hours ago. */
+  const MAX_AGE = 10 * 60 * 1000;
   let cached = null;
   try { cached = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+  if (cached && cached.at && Date.now() - cached.at > MAX_AGE) cached = null;
   if (cached && typeof cached.total === 'number' && cached.total > 0) {
     show(cached.total);
     applyVersions(cached.versions || {});
@@ -1735,7 +1748,7 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     const versions = readVersions(sets);
     if (total > 0) {
       try {
-        sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions, stars: stars }));
+        sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions, stars: stars, at: Date.now() }));
       } catch (e) {}
       show(total);
     }
