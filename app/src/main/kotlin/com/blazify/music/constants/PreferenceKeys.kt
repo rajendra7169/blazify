@@ -13,7 +13,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-val AskedForLocalMusicKey = booleanPreferencesKey("askedForLocalMusic")
 val LocalMusicArtworkOnlineKey = booleanPreferencesKey("localMusicArtworkOnline")
 val EnableHighRefreshRateKey = booleanPreferencesKey("enableHighRefreshRate")
 val EnableLandscapeScalingKey = booleanPreferencesKey("enableLandscapeScaling")

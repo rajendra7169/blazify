@@ -19,6 +19,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.blazify.music.LocalDatabase
+import com.blazify.music.utils.LocalMusic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -57,6 +68,20 @@ fun BlazeLibraryHome(
     val uploadedThumbs by viewModel.uploadedThumbnails.collectAsStateWithLifecycle()
     val localThumbs by viewModel.localThumbnails.collectAsStateWithLifecycle()
     val localCount by viewModel.localSongCount.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    val database = LocalDatabase.current
+    val scope = rememberCoroutineScope()
+    var localGranted by remember { mutableStateOf(LocalMusic.hasPermission(context)) }
+    val audioPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            localGranted = granted
+            if (granted) {
+                scope.launch(Dispatchers.IO) {
+                    runCatching { LocalMusic(context, database).scan() }
+                }
+            }
+        }
     val topThumbs by viewModel.topThumbnails.collectAsStateWithLifecycle()
     val cachedThumbs by viewModel.cachedThumbnails.collectAsStateWithLifecycle()
     val songsWord = stringResource(R.string.songs).lowercase()
@@ -167,6 +192,25 @@ fun BlazeLibraryHome(
                 )
             }
         }
+        // Asked here rather than at launch. Local music is not something the app
+        // needs to start, so the permission belongs at the moment somebody
+        // reaches for the feature, which is also where they will look for it.
+        if (localCount == 0 && !localGranted) {
+            item("local-invite") {
+                LongPad {
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.local_music),
+                        subtitle = stringResource(R.string.local_music_scan),
+                        thumbnails = emptyList(),
+                        seedColor = Color(0xFF2E7D32),
+                        aspectRatio = LONG_RATIO,
+                        iconRes = R.drawable.library_music,
+                        onClick = { audioPermission.launch(LocalMusic.permission) },
+                    )
+                }
+            }
+        }
+
         if (localCount > 0) {
             item("local") {
                 LongPad {
