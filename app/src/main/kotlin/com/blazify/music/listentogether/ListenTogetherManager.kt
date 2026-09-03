@@ -884,6 +884,18 @@ class ListenTogetherManager
                         player.playWhenReady &&
                         (trackId == null || player.currentMediaItem?.mediaId == trackId)
                     ) {
+                        // A stalled player has a frozen position, so the drift
+                        // measured against it is not drift at all, it is however
+                        // long the buffer has been empty. Correcting it seeks
+                        // into audio that has not arrived, which empties the
+                        // buffer again: the listener hears stop, start, stop.
+                        // Wait for the audio instead, and re-measure when it is
+                        // actually playing.
+                        if (player.playbackState != Player.STATE_READY) {
+                            delay(DRIFT_CHECK_INTERVAL_MS)
+                            continue
+                        }
+
                         val target = client.positionAtServerTime(position, effectiveAtServerTime, isPlaying = true)
                         val drift = target - player.currentPosition
                         val absoluteDrift = kotlin.math.abs(drift)
