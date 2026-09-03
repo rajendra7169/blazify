@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blazify | Free open source music player for Android, Windows, Linux and iPhone</title>
-<meta name="description" content="A free, open-source music player for Android and desktop. Millions of songs, word-by-word synced lyrics, a ten-band equalizer and offline downloads. No ads, no account, no tracking.">
+<title>Blazify | Open source music player for Android and desktop</title>
+<meta name="description" content="A free, open-source music player for Android, Windows, Linux and iPhone. Streams millions of songs, plays the music already on your phone, and follows the words as they are sung. No ads, no account, no tracking.">
 <meta name="keywords" content="open source music player android, youtube music alternative, spotify alternative android, ad free music player, free music player no ads, offline music player android, foss music player, synced lyrics app, innertune alternative, metrolist">
 <!-- 64px, not the 512px logo. A browser fetches the icon early and at high
      priority, so the old one spent 82KB of a slow connection on something
@@ -717,6 +717,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   .cmp th,.cmp td{padding:12px 14px;font-size:14px}
   .cmp tbody th{min-width:170px}
 }
+/* ── why it exists ────────────────────────────────────── */
+.prose{max-width:74ch;margin-top:26px;display:flex;flex-direction:column;gap:18px}
+.prose p{margin:0;color:var(--dim);font-size:16.5px;line-height:1.72}
+.prose p b{color:var(--cream);font-weight:600}
+.prose a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
+.prose a:hover{border-bottom-color:var(--amber)}
 </style>
 <!-- Tells a search engine this is a free Android music player rather than
      a page of text about one, and hands it the questions it already sees
@@ -1132,6 +1138,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 
     <div class="feat">
       <div class="f rise"><svg class="ic"><use href="#i-search"/></svg><h4>Millions of songs</h4><p>Search by name or browse songs, albums, artists and playlists.</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-devices"/></svg><h4>The music already on your phone</h4><p>Point it at a folder and your own files play beside everything else, in the same queue, with the same equalizer. Covers are found for tracks that have none.</p></div>
       <div class="f rise"><svg class="ic"><use href="#i-mic"/></svg><h4>Synced lyrics</h4><p>Word-by-word highlighting, with translation and romanisation.</p></div>
       <div class="f rise"><svg class="ic"><use href="#i-eq"/></svg><h4>Ten-band equalizer</h4><p>Thirteen presets, a live response curve, bass boost and reverb.</p></div>
       <div class="f rise"><svg class="ic"><use href="#i-down"/></svg><h4>Offline downloads</h4><p>Keep anything for later, or let it hold songs as you play them.</p></div>
@@ -1179,6 +1186,24 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
           <tr><th scope="row">Also on desktop and iPhone</th><td class="us"><span class="y">Yes</span></td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+
+<section id="why">
+  <div class="shell">
+    <h2 class="title rise">Why <em>another one</em></h2>
+    <p class="lede rise">There are a dozen open-source music players. Here is what is actually different about this one, including the part that is not flattering.</p>
+
+    <div class="prose rise">
+      <p>Blazify is a fork of <a href="https://github.com/mostafaalagamy/Metrolist" rel="noopener">Metrolist</a>, which came from <a href="https://github.com/z-huang/InnerTune" rel="noopener">InnerTune</a>. That whole family, <b>InnerTune, OuterTune, ViMusic and Metrolist</b>, shares one streaming core, and shares its worst failure with it: songs that stop partway through, or refuse to start at all, whenever YouTube changes something at their end. If you have used one of them and given up, that is almost certainly why.</p>
+
+      <p>Most of the work here has gone into that. The player was asking for audio streams it had no way to decode, which guaranteed a refusal on a step that reported no error at all. Two of the three fallback paths had been quietly returning nothing for every song, because the component they depend on was never handed anything to fetch with. Both are fixed. It is an arms race rather than a bug, so what matters is not that it works today but how quickly it gets repaired when it next breaks.</p>
+
+      <p>The other difference is reach. <b>ViMusic and InnerTune are Android only. Nuclear is desktop only.</b> Blazify is one project across Android, Windows, Linux and iPhone, written by one person in Kathmandu, where a dropped connection is ordinary and mobile data is not cheap. That is why the music already on your phone plays beside everything streamed, and why offline was never an afterthought.</p>
+
+      <p>It is <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" rel="noopener">GPL-3.0</a>, so you can read every line of it. Playback is <a href="https://developer.android.com/media/media3" rel="noopener">Media3</a>, lyrics come from <a href="https://lrclib.net" rel="noopener">LrcLib</a> among others, and it is submitted to <a href="https://f-droid.org" rel="noopener">F-Droid</a>, whose build servers compile it from source and check the result matches the file published here.</p>
     </div>
   </div>
 </section>
