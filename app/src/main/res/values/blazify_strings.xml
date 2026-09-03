@@ -1144,6 +1144,11 @@
     <string name="app_language_desc">Choose the app\'s display language in system settings</string>
     <string name="romanize_select_all">Select all</string>
     <string name="romanize_languages_title">Languages to romanize</string>
+    <string name="report_problem">Report a problem</string>
+    <string name="hint_report_problem">Something not working? Tell me about it</string>
+    <string name="report_problem_body">Describe what happened and it will be sent with the details below, so nobody has to ask you which version you are on.</string>
+    <string name="report_problem_open">Open the tracker</string>
+    <string name="report_problem_copy">Copy details</string>
     <string name="local_music">Music on this device</string>
     <string name="local_music_folders">Where to look</string>
     <string name="local_music_folders_all">Everywhere on this phone</string>

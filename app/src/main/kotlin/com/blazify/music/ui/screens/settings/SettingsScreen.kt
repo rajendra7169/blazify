@@ -51,6 +51,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import com.blazify.music.utils.BugReport
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -103,6 +106,7 @@ fun SettingsScreen(
         }
     }
     val showChangelog = LocalChangelogState.current
+    var showBugReport by remember { mutableStateOf(false) }
     // Newer, not merely different. An inequality also fires when this build is
     // ahead of the last published one — which is every development build, and
     // was every build at all while the version being compared was the release
@@ -174,6 +178,9 @@ fun SettingsScreen(
             })
             add(SettingRow(R.drawable.newspaper, stringResource(R.string.changelog), stringResource(R.string.hint_changelog)) {
                 showChangelog.value = true
+            })
+            add(SettingRow(R.drawable.bug_report, stringResource(R.string.report_problem), stringResource(R.string.hint_report_problem)) {
+                showBugReport = true
             })
             if (BuildConfig.UPDATER_AVAILABLE) {
                 add(SettingRow(R.drawable.update, stringResource(R.string.updater), stringResource(R.string.hint_updater)) {
@@ -264,6 +271,39 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(24.dp))
+    }
+
+    if (showBugReport) {
+        AlertDialog(
+            onDismissRequest = { showBugReport = false },
+            icon = { Icon(painterResource(R.drawable.bug_report), null) },
+            title = { Text(stringResource(R.string.report_problem)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.report_problem_body))
+                    Spacer(Modifier.height(12.dp))
+                    // Shown rather than merely attached. Nothing about someone's
+                    // device should leave without them having seen it first.
+                    Text(
+                        text = BugReport.details(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBugReport = false
+                    uriHandler.openUri(BugReport.issueUrl())
+                }) { Text(stringResource(R.string.report_problem_open)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showBugReport = false
+                    BugReport.copyDetails(context)
+                }) { Text(stringResource(R.string.report_problem_copy)) }
+            },
+        )
     }
 
     TopAppBar(
