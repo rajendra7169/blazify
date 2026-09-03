@@ -54,6 +54,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import com.blazify.music.utils.BugReport
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -281,7 +283,7 @@ fun SettingsScreen(
             text = {
                 Column {
                     Text(stringResource(R.string.report_problem_body))
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(14.dp))
                     // Shown rather than merely attached. Nothing about someone's
                     // device should leave without them having seen it first.
                     Text(
@@ -289,19 +291,28 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Spacer(Modifier.height(18.dp))
+                    // Email first: it is the only one of the three that asks
+                    // nothing of somebody who just wants to say it is broken.
+                    ReportChoice(stringResource(R.string.report_problem_email)) {
+                        showBugReport = false
+                        BugReport.email(context)
+                    }
+                    ReportChoice(stringResource(R.string.report_problem_open)) {
+                        showBugReport = false
+                        uriHandler.openUri(BugReport.issueUrl())
+                    }
+                    ReportChoice(stringResource(R.string.report_problem_copy)) {
+                        showBugReport = false
+                        BugReport.copyDetails(context)
+                    }
                 }
             },
-            confirmButton = {
-                TextButton(onClick = {
-                    showBugReport = false
-                    uriHandler.openUri(BugReport.issueUrl())
-                }) { Text(stringResource(R.string.report_problem_open)) }
-            },
+            confirmButton = {},
             dismissButton = {
-                TextButton(onClick = {
-                    showBugReport = false
-                    BugReport.copyDetails(context)
-                }) { Text(stringResource(R.string.report_problem_copy)) }
+                TextButton(onClick = { showBugReport = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             },
         )
     }
@@ -581,5 +592,20 @@ private fun openDefaultLinksSettings(context: Context) {
         context.startActivity(intent)
     } catch (e: Exception) {
         Toast.makeText(context, R.string.open_app_settings_error, Toast.LENGTH_LONG).show()
+    }
+}
+
+
+@Composable
+private fun ReportChoice(
+    label: String,
+    onClick: () -> Unit,
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 10.dp),
+    ) {
+        Text(label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
     }
 }
