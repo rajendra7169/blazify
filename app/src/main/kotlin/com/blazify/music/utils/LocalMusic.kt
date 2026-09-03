@@ -200,6 +200,44 @@ constructor(
             filled
         }
 
+    /** A directory that actually contains music, and how much. */
+    data class Folder(
+        val path: String,
+        val name: String,
+        val count: Int,
+    )
+
+    /**
+     * The folders music was found in, commonest first.
+     *
+     * Offered instead of the system folder picker on purpose. That returns a
+     * document tree rather than a path, which is not what the scan filters on,
+     * and it would happily let someone pick a folder with nothing in it. This
+     * only ever offers places that already hold music, and can say how much.
+     */
+    suspend fun folders(): List<Folder> =
+        withContext(Dispatchers.IO) {
+            if (!hasPermission(context)) return@withContext emptyList()
+            val counts = linkedMapOf<String, Int>()
+            context.contentResolver
+                .query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    arrayOf(MediaStore.Audio.Media.DATA),
+                    "${MediaStore.Audio.Media.IS_MUSIC} != 0",
+                    null,
+                    null,
+                )?.use { cursor ->
+                    val col = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                    while (cursor.moveToNext()) {
+                        val dir = cursor.getString(col)?.substringBeforeLast('/', "").orEmpty()
+                        if (dir.isNotEmpty()) counts[dir] = (counts[dir] ?: 0) + 1
+                    }
+                }
+            counts.entries
+                .sortedWith(compareByDescending<Map.Entry<String, Int>> { it.value }.thenBy { it.key })
+                .map { Folder(it.key, it.key.substringAfterLast('/'), it.value) }
+        }
+
     private data class Track(
         val song: SongEntity,
         val artist: ArtistEntity?,

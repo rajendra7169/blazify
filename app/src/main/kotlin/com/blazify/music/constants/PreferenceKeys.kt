@@ -6,6 +6,7 @@
 package com.blazify.music.constants
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -14,6 +15,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 val LocalMusicArtworkOnlineKey = booleanPreferencesKey("localMusicArtworkOnline")
+// Empty means every folder, which is what someone means before they have said otherwise.
+val LocalMusicFoldersKey = stringSetPreferencesKey("localMusicFolders")
 val EnableHighRefreshRateKey = booleanPreferencesKey("enableHighRefreshRate")
 val EnableLandscapeScalingKey = booleanPreferencesKey("enableLandscapeScaling")
 val DynamicThemeKey = booleanPreferencesKey("dynamicTheme")

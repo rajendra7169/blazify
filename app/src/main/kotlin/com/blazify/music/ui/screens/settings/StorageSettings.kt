@@ -9,6 +9,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import com.blazify.music.utils.LocalMusic
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Checkbox
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextOverflow
+import com.blazify.music.constants.LocalMusicFoldersKey
+import com.blazify.music.ui.component.ListDialog
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -92,12 +100,15 @@ fun StorageSettings(
     val localMusic = remember(context, database) { LocalMusic(context, database) }
     val localCount by database.localSongCount().collectAsState(initial = 0)
     var scanning by remember { mutableStateOf(false) }
+    var selectedFolders by rememberPreference(LocalMusicFoldersKey, emptySet())
+    var showFolders by remember { mutableStateOf(false) }
+    var folders by remember { mutableStateOf<List<LocalMusic.Folder>>(emptyList()) }
 
     fun runScan() {
         if (scanning) return
         coroutineScope.launch {
             scanning = true
-            localMusic.scan()
+            localMusic.scan(selectedFolders)
             scanning = false
         }
     }
@@ -344,8 +355,71 @@ fun StorageSettings(
                             }
                         },
                     ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.list),
+                        title = { Text(stringResource(R.string.local_music_folders)) },
+                        description = {
+                            Text(
+                                if (selectedFolders.isEmpty()) {
+                                    stringResource(R.string.local_music_folders_all)
+                                } else {
+                                    stringResource(R.string.local_music_folders_some, selectedFolders.size)
+                                },
+                            )
+                        },
+                        onClick = {
+                            if (LocalMusic.hasPermission(context)) {
+                                coroutineScope.launch {
+                                    folders = localMusic.folders()
+                                    showFolders = true
+                                }
+                            } else {
+                                audioPermission.launch(LocalMusic.permission)
+                            }
+                        },
+                    ),
                 ),
         )
+
+        if (showFolders) {
+            ListDialog(onDismiss = { showFolders = false }) {
+                item {
+                    // Empty means everywhere, which is what someone means before
+                    // they have chosen, so it is a real option rather than a
+                    // state you can only leave.
+                    FolderRow(
+                        name = stringResource(R.string.local_music_folders_all),
+                        detail = null,
+                        checked = selectedFolders.isEmpty(),
+                        onClick = { selectedFolders = emptySet() },
+                    )
+                }
+                items(folders, key = { it.path }) { folder ->
+                    FolderRow(
+                        name = folder.name,
+                        detail = "${folder.count} · ${folder.path}",
+                        checked = folder.path in selectedFolders,
+                        onClick = {
+                            selectedFolders =
+                                if (folder.path in selectedFolders) {
+                                    selectedFolders - folder.path
+                                } else {
+                                    selectedFolders + folder.path
+                                }
+                        },
+                    )
+                }
+                item {
+                    TextButton(
+                        onClick = {
+                            showFolders = false
+                            runScan()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(stringResource(R.string.local_music_folders_apply)) }
+                }
+            }
+        }
 
         Material3SettingsGroup(
             title = stringResource(R.string.storage),
@@ -540,4 +614,37 @@ fun StorageSettings(
             }
         },
     )
+}
+
+
+@Composable
+private fun FolderRow(
+    name: String,
+    detail: String?,
+    checked: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+    ) {
+        Checkbox(checked = checked, onCheckedChange = { onClick() })
+        Spacer(Modifier.size(8.dp))
+        Column(Modifier.weight(1f)) {
+            Text(name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (detail != null) {
+                Text(
+                    detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
 }

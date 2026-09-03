@@ -1145,6 +1145,10 @@
     <string name="romanize_select_all">Select all</string>
     <string name="romanize_languages_title">Languages to romanize</string>
     <string name="local_music">Music on this device</string>
+    <string name="local_music_folders">Where to look</string>
+    <string name="local_music_folders_all">Everywhere on this phone</string>
+    <string name="local_music_folders_some">%1$d folders</string>
+    <string name="local_music_folders_apply">Look again</string>
     <string name="local_music_scan">Look for music stored on this phone</string>
     <string name="local_music_scanning">Looking\u2026</string>
     <string name="local_music_found">%1$d on this device. Tap to look again</string>
