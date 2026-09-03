@@ -76,12 +76,20 @@ a{color:inherit}
 .shell{width:var(--shell);margin-inline:auto}
 
 /* ── ambient glow ─────────────────────────────────────── */
+/* Painted as gradients rather than blurred circles. A 120px blur on a fixed
+   640px element has to be re-composited over the whole page as it scrolls,
+   which a desktop GPU absorbs and a phone does not. A radial gradient is the
+   same picture for free. */
 .glow{position:fixed;inset:0;pointer-events:none;z-index:0}
-.glow::before,.glow::after{
-  content:'';position:absolute;border-radius:50%;filter:blur(120px);opacity:.20
+.glow::before,.glow::after{content:'';position:absolute;border-radius:50%}
+.glow::before{
+  width:880px;height:880px;top:-380px;left:-300px;
+  background:radial-gradient(circle closest-side,rgba(255,167,38,.20),rgba(255,167,38,0));
 }
-.glow::before{width:640px;height:640px;background:#FFA726;top:-260px;left:-180px}
-.glow::after{width:520px;height:520px;background:#FF7043;top:32%;right:-220px;opacity:.14}
+.glow::after{
+  width:760px;height:760px;top:26%;right:-340px;
+  background:radial-gradient(circle closest-side,rgba(255,112,67,.14),rgba(255,112,67,0));
+}
 
 /* ── nav ──────────────────────────────────────────────── */
 nav{
@@ -455,6 +463,12 @@ dialog.guide::backdrop{background:rgba(6,5,4,.72);backdrop-filter:blur(4px)}
   color:var(--dim);font-size:14px;line-height:1.6;
 }
 .guide-note b{color:var(--amber)}
+@media (max-width:900px){
+  /* Frosted glass is a desktop luxury. Both of these are fixed, so a phone
+     re-blurs the page behind them on every frame it scrolls. */
+  nav{backdrop-filter:none;background:rgba(11,10,9,.94)}
+  .mp{backdrop-filter:none;background:rgba(24,20,17,.97)}
+}
 @media (max-width:640px){
   .howto{top:14px;right:14px;padding:5px 10px;font-size:11.5px}
   .guide-body{padding:18px 20px 22px}
