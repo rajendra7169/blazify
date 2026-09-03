@@ -52,6 +52,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -175,6 +176,8 @@ import com.blazify.music.playback.MusicService
 import com.blazify.music.playback.MusicService.MusicBinder
 import com.blazify.music.playback.PlayerConnection
 import com.blazify.music.playback.queues.YouTubeQueue
+import androidx.compose.ui.platform.LocalUriHandler
+import com.blazify.music.utils.StarPrompt
 import com.blazify.music.constants.OnboardingCompletedKey
 import com.blazify.music.ui.component.BlazeSplash
 import com.blazify.music.ui.screens.OnboardingScreen
@@ -748,6 +751,47 @@ class MainActivity : ComponentActivity() {
                     if (lastSeenVersion != currentVersion) {
                         showChangelog.value = true
                     }
+                }
+
+                // Asked at most three times over about six weeks and then never
+                // again. Not while anything is playing: interrupting music to
+                // ask a favour is worse than not asking.
+                var showStarPrompt by remember { mutableStateOf(false) }
+                val starUriHandler = LocalUriHandler.current
+                val starScope = rememberCoroutineScope()
+                LaunchedEffect(Unit) {
+                    val playing = playerConnectionSnapshot?.player?.isPlaying == true
+                    if (!playing && StarPrompt.onOpened(this@MainActivity)) {
+                        StarPrompt.onShown(this@MainActivity)
+                        showStarPrompt = true
+                    }
+                }
+
+                if (showStarPrompt) {
+                    AlertDialog(
+                        onDismissRequest = { showStarPrompt = false },
+                        icon = { Icon(painterResource(R.drawable.star), null) },
+                        title = { Text(stringResource(R.string.star_prompt_title)) },
+                        text = { Text(stringResource(R.string.star_prompt_body)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showStarPrompt = false
+                                starScope.launch { StarPrompt.stop(this@MainActivity) }
+                                starUriHandler.openUri(StarPrompt.REPO)
+                            }) { Text(stringResource(R.string.star_prompt_yes)) }
+                        },
+                        dismissButton = {
+                            Row {
+                                TextButton(onClick = {
+                                    showStarPrompt = false
+                                    starScope.launch { StarPrompt.stop(this@MainActivity) }
+                                }) { Text(stringResource(R.string.star_prompt_never)) }
+                                TextButton(onClick = { showStarPrompt = false }) {
+                                    Text(stringResource(R.string.star_prompt_later))
+                                }
+                            }
+                        },
+                    )
                 }
 
                 val homeViewModel: HomeViewModel = hiltViewModel()

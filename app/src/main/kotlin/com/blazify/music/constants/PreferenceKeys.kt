@@ -15,6 +15,14 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 val LocalMusicArtworkOnlineKey = booleanPreferencesKey("localMusicArtworkOnline")
+
+// Asking for a star. Days are counted by opening the app, not by the calendar
+// since install, so somebody who installed it and forgot is never asked.
+val StarPromptDaysUsedKey = intPreferencesKey("starPromptDaysUsed")
+val StarPromptLastDayKey = stringPreferencesKey("starPromptLastDay")
+val StarPromptNextAtKey = longPreferencesKey("starPromptNextAt")
+val StarPromptAsksKey = intPreferencesKey("starPromptAsks")
+val StarPromptDoneKey = booleanPreferencesKey("starPromptDone")
 // Empty means every folder, which is what someone means before they have said otherwise.
 val LocalMusicFoldersKey = stringSetPreferencesKey("localMusicFolders")
 val EnableHighRefreshRateKey = booleanPreferencesKey("enableHighRefreshRate")

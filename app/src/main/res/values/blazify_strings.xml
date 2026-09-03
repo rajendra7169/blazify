@@ -1162,6 +1162,11 @@
     <string name="local_music_permission">Blazify needs permission to read audio files</string>
     <string name="blaze_greeting_default_name">Music Lover</string>
     <string name="star_on_github">Star Blazify on GitHub</string>
+    <string name="star_prompt_title">Getting on with Blazify?</string>
+    <string name="star_prompt_body">It is made by one person and given away, with no ads and nothing tracked. A star on GitHub is most of how anyone else finds it.</string>
+    <string name="star_prompt_yes">Star it</string>
+    <string name="star_prompt_later">Later</string>
+    <string name="star_prompt_never">No thanks</string>
     <string name="social_website">Website</string>
     <string name="social_github">GitHub</string>
     <string name="social_instagram">Instagram</string>
