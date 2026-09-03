@@ -6,7 +6,11 @@
 <title>Blazify | Free open source music player for Android, Windows, Linux and iPhone</title>
 <meta name="description" content="A free, open-source music player for Android and desktop. Millions of songs, word-by-word synced lyrics, a ten-band equalizer and offline downloads. No ads, no account, no tracking.">
 <meta name="keywords" content="open source music player android, youtube music alternative, spotify alternative android, ad free music player, free music player no ads, offline music player android, foss music player, synced lyrics app, innertune alternative, metrolist">
-<link rel="icon" href="assets/logo-512.png">
+<!-- 64px, not the 512px logo. A browser fetches the icon early and at high
+     priority, so the old one spent 82KB of a slow connection on something
+     drawn at sixteen pixels. -->
+<link rel="icon" href="assets/favicon-64.png" sizes="64x64">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <!-- The same page answers at /blazify/, /blazify/index.html and any address
      with a query string on the end. Without this they compete with each other
      and split whatever the page earns between them. -->
