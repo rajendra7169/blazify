@@ -17,6 +17,7 @@ import com.blazify.innertube.models.WatchEndpoint
 import com.blazify.innertube.models.YTItem
 import com.blazify.innertube.models.filterExplicit
 import com.blazify.innertube.models.filterVideoSongs
+import com.blazify.innertube.pages.MoodAndGenres
 import com.blazify.innertube.utils.YouTubeUrlParser
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
@@ -46,7 +47,23 @@ class OnlineSearchSuggestionViewModel
         private val _viewState = MutableStateFlow(SearchSuggestionViewState())
         val viewState = _viewState.asStateFlow()
 
+        /**
+         * Moods and genres for the idle screen, so an empty search box offers
+         * something to browse rather than a blank page. Fetched once — the
+         * list barely changes and a failure just leaves the section out.
+         */
+        val moods = MutableStateFlow<List<MoodAndGenres.Item>>(emptyList())
+
         init {
+            viewModelScope.launch {
+                YouTube.moodAndGenres().onSuccess { sections ->
+                    // The same mood appears under more than one section — "Commute"
+                    // sits in both moods and activities — and a grid with it in
+                    // twice looks like a bug.
+                    moods.value = sections.flatMap { it.items }.distinctBy { it.title }
+                }
+            }
+
             viewModelScope.launch {
                 query
                     .flatMapLatest { query ->

@@ -30,6 +30,13 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -118,6 +125,7 @@ fun OnlineSearchScreen(
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val moods by viewModel.moods.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
 
@@ -414,8 +422,64 @@ fun OnlineSearchScreen(
                                 delete(history)
                             }
                         },
+                        onClear = {
+                            database.query {
+                                viewState.history.forEach { delete(it) }
+                            }
+                        },
                         modifier = Modifier.animateItem(),
                     )
+                }
+            }
+
+            // An empty search box used to be an empty screen. This gives it
+            // somewhere to go: the same moods and genres Explore lists, two to
+            // a row, each in its own colour.
+            if (moods.isNotEmpty()) {
+                item(key = "browse_heading") {
+                    Text(
+                        text = stringResource(R.string.browse),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier =
+                            Modifier
+                                .animateItem()
+                                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
+                    )
+                }
+                items(
+                    items = moods.take(12).chunked(2),
+                    key = { row -> "browse_${row.first().title}" },
+                ) { row ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier =
+                            Modifier
+                                .animateItem()
+                                .fillMaxWidth()
+                                // Both tiles take the height of the taller one,
+                                // so a two-line title does not leave a ragged row.
+                                .height(IntrinsicSize.Min)
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                    ) {
+                        row.forEach { mood ->
+                            BrowseTile(
+                                title = mood.title,
+                                stripeColor = mood.stripeColor,
+                                onClick = {
+                                    onDismiss()
+                                    navController.navigate(
+                                        "youtube_browse/${mood.endpoint.browseId}?params=${mood.endpoint.params}",
+                                    )
+                                },
+                                modifier = Modifier.weight(1f).fillMaxHeight(),
+                            )
+                        }
+                        // A last odd tile keeps its own column rather than
+                        // stretching across the row.
+                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                    }
                 }
             }
         } else {
@@ -686,15 +750,19 @@ fun OnlineSearchScreen(
 }
 
 /**
- * Blazify: horizontal "Recent Searches" rail shown when the search box is empty.
- * Ported from the Flutter reference app — recent queries render as amber Blaze
- * chips; tapping a chip runs the search, the ✕ removes it from history.
+ * Blazify: the "Recent Searches" block shown when the search box is empty.
+ *
+ * The chips wrap rather than scroll sideways. A rail hid everything past the
+ * third entry off the right edge, where nobody drags to look, so most of the
+ * history may as well not have been kept.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecentSearchesRail(
     history: List<SearchHistory>,
     onSearch: (String) -> Unit,
     onDelete: (SearchHistory) -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -703,20 +771,42 @@ fun RecentSearchesRail(
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
     ) {
-        Text(
-            text = stringResource(R.string.recent_searches),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
-        )
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            modifier = Modifier.fillMaxWidth(),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
-            items(history.take(10), key = { "recent_chip_${it.query}" }) { entry ->
+            Text(
+                text = stringResource(R.string.recent_searches),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = stringResource(R.string.clear_all),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(percent = 50))
+                        .clickable(onClick = onClear)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+        ) {
+            history.take(12).forEach { entry ->
                 RecentSearchChip(
                     query = entry.query,
                     onClick = { onSearch(entry.query) },
@@ -725,9 +815,58 @@ fun RecentSearchesRail(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(18.dp))
     }
 }
+
+/**
+ * One tile of the Browse grid, coloured by the stripe YouTube ships with each
+ * mood — the same colour its own apps use, so the grid is recognisable rather
+ * than twelve identical grey rectangles.
+ */
+@Composable
+private fun BrowseTile(
+    title: String,
+    stripeColor: Long,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val seed = Color(stripeColor or 0xFF000000L)
+    // Light tiles need dark type on them; the rest take white.
+    val onSeed = if (seed.luminance() > 0.5f) Color.Black else Color.White
+    Box(
+        contentAlignment = Alignment.BottomStart,
+        modifier =
+            modifier
+                .heightIn(min = 84.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(seed.copy(alpha = 1f).lighten(0.24f), seed),
+                    ),
+                )
+                .clickable(onClick = onClick)
+                .padding(14.dp),
+    ) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = onSeed,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** Mixes a colour towards white, as the iPhone's browse tiles do. */
+private fun Color.lighten(amount: Float) =
+    Color(
+        red = red + (1f - red) * amount,
+        green = green + (1f - green) * amount,
+        blue = blue + (1f - blue) * amount,
+        alpha = alpha,
+    )
 
 @Composable
 private fun RecentSearchChip(

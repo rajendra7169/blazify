@@ -1253,6 +1253,10 @@
         <item quantity="other">%1$d folders</item>
     </plurals>
 
+    <!-- Search -->
+    <string name="browse">Browse</string>
+    <string name="clear_all">Clear</string>
+
     <!-- Player bottom row -->
     <string name="cast">Cast</string>
 </resources>
