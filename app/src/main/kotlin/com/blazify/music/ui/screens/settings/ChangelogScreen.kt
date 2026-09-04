@@ -214,14 +214,43 @@ fun ReleaseItem(release: ReleaseInfo) {
     }
 }
 
+
+/**
+ * Release notes, with the parts this cannot draw taken out.
+ *
+ * Notes are written for the releases page first, where GitHub renders HTML,
+ * image badges and tables. None of that means anything to the few lines below,
+ * which knew only headings, bullets and links — so a download button arrived
+ * here as the literal text of its markdown, and a `<div>` as the word "div".
+ * Better to show the words and drop the scaffolding than to print the
+ * scaffolding at somebody.
+ */
+private fun readable(text: String): List<String> {
+    val html = Regex("<[^>]+>")
+    val badge = Regex("""\[!\[[^\]]*]\([^)]*\)]\([^)]*\)""")
+    val image = Regex("""!\[[^\]]*]\([^)]*\)""")
+    return text
+        .split("\n")
+        .map { line ->
+            line.trim()
+                // A linked badge is a button, and a button is not text.
+                .replace(badge, "")
+                .replace(image, "")
+                .replace(html, "")
+                .trim()
+        }
+        // Rules and table borders draw as rows of punctuation and say nothing.
+        .filterNot { it.isBlank() || it.all { c -> c == '-' || c == '=' || c == '|' || c == ':' || c == ' ' } }
+}
+
 @Suppress("DEPRECATION")
 @Composable
 fun MarkdownText(text: String) {
-    val lines = text.split("\n")
+    val lines = readable(text)
     val uriHandler = LocalUriHandler.current
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        lines.filter { it.isNotBlank() }.forEach { line ->
+        lines.forEach { line ->
             val trimmedLine = line.trim()
 
             if (trimmedLine.startsWith("#")) {
