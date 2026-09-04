@@ -1,0 +1,14 @@
+Blazify now plays the music already on your phone. Point it at the folders your
+music lives in — it asks for the folders, not for the whole phone — and local
+songs sit in the library beside everything else and play the same way.
+
+Settings, About, Report a problem writes the version, the phone and the Android
+release for you, and opens your mail app or the issue tracker. Nothing is sent
+anywhere without you seeing it first.
+
+Search opens on moods and genres to browse instead of an empty page under a
+keyboard, and your recent searches now wrap so you can see all of them.
+
+The player's bottom row shows what is on: queue, sleep timer and lyrics light up
+while they are running. The pure black theme is properly black everywhere,
+including cards and sheets, which used to keep a colour of their own.
