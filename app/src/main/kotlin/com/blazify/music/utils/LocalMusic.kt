@@ -289,6 +289,13 @@ constructor(
                     val mediaId = cursor.getLong(idCol)
                     val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaId)
                     val albumId = cursor.getLong(albumIdCol)
+                    // Addresses are built with Uri.fromFile, not File.toURI.
+                    // The two look alike and are not: File.toURI writes
+                    // "file:/path" with one slash, which the image loader does
+                    // not open, so a cover pulled out of a file's own tags was
+                    // saved correctly and then never drawn — a blank square in
+                    // the list and four blank squares on the library card.
+                    //
                     // The file's own picture frame first, then MediaStore's
                     // album-art table, which is empty more often than not. A
                     // row is left with no picture at all rather than an address
@@ -307,7 +314,14 @@ constructor(
                                 ?: continue
                         ).let(::tidy)
 
-                    val artistName = cursor.getString(artistCol)?.takeIf { it.isNotBlank() && it != "<unknown>" }
+                    // A file with no artist tag usually still says who it is,
+                    // in the one place people have always written it: the file
+                    // name, as "Somebody - The Song". Without this the row has
+                    // a title and a blank line under it, which reads as the app
+                    // having failed rather than the file being untagged.
+                    val taggedArtist =
+                        cursor.getString(artistCol)?.takeIf { it.isNotBlank() && it != "<unknown>" }
+                    val artistName = taggedArtist ?: artistFromFileName(path)
                     val albumName = cursor.getString(albumCol)?.takeIf { it.isNotBlank() && it != "<unknown>" }
 
                     tracks +=
@@ -329,7 +343,19 @@ constructor(
                             artist =
                                 artistName?.let {
                                     ArtistEntity(
-                                        id = ARTIST_PREFIX + cursor.getLong(artistIdCol),
+                                        // A name read off the file name has no
+                                        // MediaStore id behind it, so it is
+                                        // keyed by the name itself — otherwise
+                                        // every such song would be filed under
+                                        // whatever artist id the untagged file
+                                        // happened to be given, which is one
+                                        // shared id for all of them.
+                                        id =
+                                            if (taggedArtist != null) {
+                                                ARTIST_PREFIX + cursor.getLong(artistIdCol)
+                                            } else {
+                                                ARTIST_PREFIX + "name-" + it.lowercase().hashCode()
+                                            },
                                         name = it,
                                         isLocal = true,
                                     )
@@ -359,6 +385,23 @@ constructor(
      * Lyrics and artwork are both matched on the title, so the underscores
      * alone are enough to make every lookup miss.
      */
+    /**
+     * The artist a file name is claiming, or nothing.
+     *
+     * "Artist - Title.mp3" is the one convention almost every downloaded file
+     * follows. Only the first dash is a separator, and only when both halves
+     * look like words rather than a track number or a stray hyphen in a title.
+     */
+    private fun artistFromFileName(path: String?): String? {
+        val name = path?.let { File(it).nameWithoutExtension } ?: return null
+        val at = name.indexOf(" - ").takeIf { it > 0 } ?: return null
+        val candidate = tidy(name.take(at))
+        // "01 - Song" is a track number, not a person.
+        if (candidate.isBlank() || candidate.all { it.isDigit() }) return null
+        if (candidate.length > 60) return null
+        return candidate
+    }
+
     private fun tidy(raw: String): String {
         var t = raw.replace(Regex("(\\.(mp3|m4a|aac|flac|ogg|opus|wav|wma|vm))+$", RegexOption.IGNORE_CASE), "")
         t = t.replace('_', ' ')
@@ -375,14 +418,14 @@ constructor(
      */
     private fun embeddedArt(uri: Uri, songId: String): String? {
         val out = File(context.filesDir, "localart/${songId.substringAfter(SONG_PREFIX)}.jpg")
-        if (out.exists() && out.length() > 0) return out.toURI().toString()
+        if (out.exists() && out.length() > 0) return Uri.fromFile(out).toString()
         return runCatching {
             android.media.MediaMetadataRetriever().use { r ->
                 r.setDataSource(context, uri)
                 val bytes = r.embeddedPicture ?: return null
                 out.parentFile?.mkdirs()
                 out.writeBytes(bytes)
-                out.toURI().toString()
+                Uri.fromFile(out).toString()
             }
         }.getOrNull()
     }
