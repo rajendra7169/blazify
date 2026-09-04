@@ -1252,4 +1252,7 @@
         <item quantity="one">%1$d folder</item>
         <item quantity="other">%1$d folders</item>
     </plurals>
+
+    <!-- Player bottom row -->
+    <string name="cast">Cast</string>
 </resources>

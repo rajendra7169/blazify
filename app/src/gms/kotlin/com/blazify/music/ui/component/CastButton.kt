@@ -48,6 +48,10 @@ import timber.log.Timber
 fun CastButton(
     modifier: Modifier = Modifier,
     tintColor: Color = MaterialTheme.colorScheme.onSurface,
+    // Set to draw the player's bottom-row shape instead of the floating button
+    // over the artwork: the icon above its name, in a column of equal width.
+    label: String? = null,
+    activeTint: Color = MaterialTheme.colorScheme.primary,
 ) {
     val context = LocalContext.current
     val playerConnection = LocalPlayerConnection.current
@@ -128,76 +132,95 @@ fun CastButton(
     }
 
     // Show the button if Cast is enabled and SDK is available
-    if (enableGoogleCast && castAvailable) {
-        Box(
-            modifier = modifier
-        ) {
-            // Shadow background for cast button
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .align(Alignment.Center)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.4f),
-                                Color.Transparent
-                            )
-                        )
-                    )
-            )
-            
-            // Cast button
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.Center)
-                    .clip(RoundedCornerShape(20.dp))
-                    .clickable {
-                    if (currentMetadata == null && !isCasting) {
-                        Toast.makeText(context, "Play a song first to cast", Toast.LENGTH_SHORT).show()
-                        return@clickable
+    if (!enableGoogleCast || !castAvailable) return
+
+    val onCastClick = {
+        if (currentMetadata == null && !isCasting) {
+            Toast.makeText(context, "Play a song first to cast", Toast.LENGTH_SHORT).show()
+        } else {
+            // Get current connected route if casting
+            val currentRoute =
+                if (isCasting) {
+                    mediaRouter?.routes?.find { route ->
+                        routeSelector?.let { selector ->
+                            route.matchesSelector(selector) && route.isSelected
+                        } == true
                     }
-                    
-                    // Get current connected route if casting
-                    val currentRoute = if (isCasting) {
-                        mediaRouter?.routes?.find { route ->
-                            routeSelector?.let { selector -> 
-                                route.matchesSelector(selector) && route.isSelected
-                            } == true
-                        }
-                    } else null
-                    
-                    // Show bottom sheet with cast picker
-                    menuState.show {
-                        CastPickerSheet(
-                            routes = availableRoutes,
-                            isConnecting = isConnecting,
-                            currentlyConnectedRoute = currentRoute,
-                            onRouteSelected = { route ->
-                                castHandler?.connectToRoute(route)
-                                menuState.dismiss()
-                            },
-                            onDisconnect = {
-                                castHandler?.disconnect()
-                                menuState.dismiss()
-                            }
-                        )
-                    }
+                } else {
+                    null
                 }
-            ) {
-                Image(
-                    painter = painterResource(
-                        if (isCasting) R.drawable.cast_connected else R.drawable.cast
-                    ),
-                    contentDescription = if (isCasting) "Stop casting" else "Cast",
-                    colorFilter = ColorFilter.tint(
-                        if (isCasting) MaterialTheme.colorScheme.primary else tintColor
-                    ),
-                    modifier = Modifier.size(24.dp)
+
+            // Show bottom sheet with cast picker
+            menuState.show {
+                CastPickerSheet(
+                    routes = availableRoutes,
+                    isConnecting = isConnecting,
+                    currentlyConnectedRoute = currentRoute,
+                    onRouteSelected = { route ->
+                        castHandler?.connectToRoute(route)
+                        menuState.dismiss()
+                    },
+                    onDisconnect = {
+                        castHandler?.disconnect()
+                        menuState.dismiss()
+                    },
                 )
             }
+        }
+    }
+
+    val icon = if (isCasting) R.drawable.cast_connected else R.drawable.cast
+    val description = if (isCasting) "Stop casting" else "Cast"
+
+    if (label != null) {
+        PlayerBottomButton(
+            icon = icon,
+            label = label,
+            active = isCasting,
+            tint = tintColor,
+            activeTint = activeTint,
+            contentDescription = description,
+            modifier = modifier,
+            onClick = onCastClick,
+        )
+        return
+    }
+
+    Box(
+        modifier = modifier,
+    ) {
+        // Shadow background for cast button
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .align(Alignment.Center)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.4f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
+        // Cast button
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.Center)
+                .clip(RoundedCornerShape(20.dp))
+                .clickable(onClick = onCastClick)
+        ) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = description,
+                colorFilter = ColorFilter.tint(
+                    if (isCasting) MaterialTheme.colorScheme.primary else tintColor
+                ),
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

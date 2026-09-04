@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 fun CastButton(
     modifier: Modifier = Modifier,
     tintColor: Color = MaterialTheme.colorScheme.onSurface,
+    label: String? = null,
+    activeTint: Color = MaterialTheme.colorScheme.primary,
 ) {
     // No-op: Cast not available in Izzy build
 }

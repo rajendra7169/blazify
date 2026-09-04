@@ -114,14 +114,17 @@ import com.blazify.music.listentogether.RoomRole
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.component.ActionPromptDialog
 import com.blazify.music.ui.component.BlazeSleepTimerDialog
+import com.blazify.music.ui.component.CastButton
 import com.blazify.music.ui.component.BottomSheet
 import com.blazify.music.ui.component.BottomSheetState
 import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
+import com.blazify.music.ui.component.PlayerBottomButton
 import com.blazify.music.ui.component.MediaMetadataListItem
 import com.blazify.music.ui.menu.PlayerMenu
 import com.blazify.music.ui.menu.QueueMenu
 import com.blazify.music.ui.menu.SelectionMediaMetadataMenu
+import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.ui.utils.ShowMediaInfo
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.makeTimeString
@@ -417,123 +420,67 @@ fun Queue(
                     }
                 }
             } else {
-                // Old design
+                // Old design: four equal columns, the icon above its name, each
+                // one lit amber while what it controls is on. Without that a
+                // tap on Lyrics gave no sign of anything having happened.
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 30.dp, vertical = 12.dp)
+                            .padding(horizontal = 20.dp, vertical = 4.dp)
                             .windowInsetsPadding(
                                 WindowInsets.systemBars
                                     .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                             ),
                 ) {
-                    TextButton(
+                    PlayerBottomButton(
+                        icon = R.drawable.queue_music,
+                        label = stringResource(R.string.queue),
+                        active = false,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
+                        modifier = Modifier.weight(1f),
                         onClick = { state.expandSoft() },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.queue_music),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = stringResource(id = R.string.queue),
-                                color = TextBackgroundColor,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.basicMarquee(),
-                            )
-                        }
-                    }
+                    )
 
-                    TextButton(
+                    // Nothing is drawn where Cast is unavailable, so the row is
+                    // three columns on builds without Play Services rather than
+                    // four with a dead one.
+                    CastButton(
+                        modifier = Modifier.weight(1f),
+                        tintColor = TextBackgroundColor,
+                        label = stringResource(R.string.cast),
+                        activeTint = BlazeThemeColor,
+                    )
+
+                    PlayerBottomButton(
+                        icon = R.drawable.bedtime,
+                        label =
+                            if (sleepTimerEnabled) {
+                                makeTimeString(sleepTimerTimeLeft)
+                            } else {
+                                stringResource(R.string.sleep_timer)
+                            },
+                        active = sleepTimerEnabled,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
                         enabled = !isListenTogetherGuest,
-                        onClick = {
-                            if (!isListenTogetherGuest) {
-                                // Always open the dialog; a running timer shows countdown + END/RESET
-                                showSleepTimerDialog = true
-                            }
-                        },
-                        modifier = Modifier.weight(1.2f),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.bedtime),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            AnimatedContent(
-                                label = "sleepTimer",
-                                targetState = sleepTimerEnabled,
-                            ) { enabled ->
-                                if (enabled) {
-                                    Text(
-                                        text = makeTimeString(sleepTimerTimeLeft),
-                                        color = TextBackgroundColor,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.basicMarquee(),
-                                    )
-                                } else {
-                                    Text(
-                                        text = stringResource(id = R.string.sleep_timer),
-                                        color = TextBackgroundColor,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.basicMarquee(),
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    TextButton(
-                        onClick = {
-                            onToggleLyrics()
-                        },
                         modifier = Modifier.weight(1f),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.lyrics),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = stringResource(R.string.lyrics),
-                                color = TextBackgroundColor,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.basicMarquee(),
-                            )
-                        }
-                    }
+                        // Always open the dialog; a running timer shows countdown + END/RESET
+                        onClick = { showSleepTimerDialog = true },
+                    )
+
+                    PlayerBottomButton(
+                        icon = R.drawable.lyrics,
+                        label = stringResource(R.string.lyrics),
+                        active = showInlineLyrics,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onToggleLyrics() },
+                    )
                 }
             }
 
