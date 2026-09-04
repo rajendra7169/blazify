@@ -32,11 +32,21 @@ val DefaultThemeColor = Color(0xFFED5564)
 val BlazeThemeColor = Color(0xFFFFA726)
 val BlazeGradientEnd = Color(0xFFFF7043)
 
-/** Cards and sheets in pure-black dark, as on the iPhone. */
-val BlazeBlackSurface = Color(0xFF0A0A0A)
+/**
+ * Cards and sheets in pure-black dark.
+ *
+ * The iPhone uses #0A0A0A here, but it reaches that colour from a #000000 page
+ * only when someone has deliberately turned pure black on — its own dark mode
+ * is a tonal one that starts the page at 4% and the card at 9%, so the card is
+ * more than twice the brightness of what it sits on. Copying the iPhone's
+ * pure-black number onto a page that is genuinely #000000 left a 4% card that
+ * did not read as a card at all. These keep the true-black page and restore
+ * the step up to it.
+ */
+val BlazeBlackSurface = Color(0xFF141414)
 
 /** A step above a card: search fields, chips, anything resting on one. */
-val BlazeBlackSurfaceHigh = Color(0xFF121212)
+val BlazeBlackSurfaceHigh = Color(0xFF1F1F1F)
 
 @Composable
 fun BlazifyTheme(
