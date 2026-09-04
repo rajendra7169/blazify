@@ -32,6 +32,12 @@ val DefaultThemeColor = Color(0xFFED5564)
 val BlazeThemeColor = Color(0xFFFFA726)
 val BlazeGradientEnd = Color(0xFFFF7043)
 
+/** Cards and sheets in pure-black dark, as on the iPhone. */
+val BlazeBlackSurface = Color(0xFF0A0A0A)
+
+/** A step above a card: search fields, chips, anything resting on one. */
+val BlazeBlackSurfaceHigh = Color(0xFF121212)
+
 @Composable
 fun BlazifyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -100,10 +106,31 @@ fun Bitmap.extractGradientColors(): List<Color> {
         listOf(Color(0xFF595959), Color(0xFF0D0D0D))
 }
 
+/**
+ * The pure-black dark scheme, matched to the iPhone build.
+ *
+ * Material generates every surface tone from the seed colour, so with an amber
+ * seed a "black" theme still drew its cards in a warm brown-grey, and album-art
+ * theming moved them about as the artwork changed. Blacking out `surface` and
+ * `background` alone left every container role behind, which is most of what a
+ * settings page is made of.
+ *
+ * These are the three steps the iPhone uses — black page, #0A0A0A card,
+ * #121212 for anything sitting on a card — applied across the whole ramp so a
+ * card is the same colour whatever is playing.
+ */
 fun ColorScheme.pureBlack(apply: Boolean) =
     if (apply) copy(
+        background = Color.Black,
         surface = Color.Black,
-        background = Color.Black
+        surfaceDim = Color.Black,
+        surfaceContainerLowest = Color.Black,
+        surfaceContainerLow = BlazeBlackSurface,
+        surfaceContainer = BlazeBlackSurface,
+        surfaceContainerHigh = BlazeBlackSurfaceHigh,
+        surfaceContainerHighest = BlazeBlackSurfaceHigh,
+        surfaceBright = BlazeBlackSurfaceHigh,
+        surfaceVariant = BlazeBlackSurfaceHigh,
     ) else this
 
 val ColorSaver = object : Saver<Color, Int> {

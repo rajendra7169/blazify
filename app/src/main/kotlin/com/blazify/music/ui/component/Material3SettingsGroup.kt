@@ -77,9 +77,12 @@ fun Material3SettingsGroup(
                         .fillMaxWidth()
                         .animateContentSize(),
                     shape = shape,
+                    // Opaque, so a card is one colour rather than a third of
+                    // one composited over whatever is behind it — which made
+                    // its contrast depend on the seed and shift with the art.
                     colors = CardDefaults.cardColors(
                         containerColor = if (!useLowContrast) {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            MaterialTheme.colorScheme.surfaceContainer
                         } else {
                             MaterialTheme.colorScheme.surfaceContainerLow
                         }
