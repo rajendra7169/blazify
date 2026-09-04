@@ -52,3 +52,6 @@ One thing worth stating plainly, because it is the only time the app sends anyth
 Blazify is licensed under the GNU General Public License v3.0. Its streaming core builds on the work of the InnerTune, OuterTune and Metrolist projects, all GPL-3.0; the interface, theming, branding and feature work are original. See the NOTICE file in the source repository.
 
 Blazify is not affiliated with, funded, authorised or endorsed by YouTube, Google LLC, or any of their affiliates.
+
+Source code, releases and issue tracker: https://github.com/rajendra7169/blazify
+Website: https://rajendra7169.github.io/blazify/
