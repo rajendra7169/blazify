@@ -100,6 +100,11 @@ object Updater {
             if (!name.endsWith(".apk", ignoreCase = true)) continue
 
             val lower = name.lowercase()
+            // The F-Droid build is on the release too, and it is the one build
+            // that must never be offered here: it ships with the updater off,
+            // so anybody who took it by mistake would never be told about a
+            // release again.
+            if ("-izzy" in lower) continue
             val variant = when {
                 "google-cast" in lower || "-gms" in lower -> "gms"
                 else -> "foss"

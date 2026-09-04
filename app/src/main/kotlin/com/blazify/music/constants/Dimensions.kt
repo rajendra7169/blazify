@@ -22,7 +22,9 @@ val SlimNavBarHeight = 64.dp
 val MiniPlayerHeight = 64.dp
 val MinMiniPlayerHeight = 16.dp
 val MiniPlayerBottomSpacing = 8.dp // Space between MiniPlayer and NavigationBar
-val QueuePeekHeight = 64.dp
+// Tall enough for the bottom row's icon above its label. At 64 the labels
+// were cut in half by the edge of the sheet.
+val QueuePeekHeight = 78.dp
 val AppBarHeight = 64.dp
 
 val ListItemHeight = 64.dp
