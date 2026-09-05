@@ -35,6 +35,7 @@ object CipherDeobfuscator {
         // Cosmetic "cipher support added" dates for the song-details sheet — pulled purely from a
         // remote file and decoupled from the decipher path (any failure just yields an unknown date).
         PlayerDatesStore.initialize(appContext)
+        restoreUndecipherableVerdict()
         Timber.tag(TAG).d("CipherDeobfuscator initialized")
     }
 
@@ -62,6 +63,53 @@ object CipherDeobfuscator {
      */
     @Volatile
     private var undecipherablePlayerHash: String? = null
+
+    /**
+     * Where that verdict is kept between runs.
+     *
+     * The reader learns a player is beyond it by trying: fetching three
+     * megabytes of script, parsing it, and finding no shape it recognises. That
+     * costs well over a second, and until the site changes its player again the
+     * answer is the same every time — so a phone that has paid it once should
+     * not pay it again on the next launch, which is where the first song of the
+     * day was going.
+     *
+     * The verdict is filed against the table that produced it. Any refresh that
+     * teaches the table a player it did not know before makes the old answer
+     * untrustworthy, and it is dropped rather than trusted.
+     */
+    private const val VERDICT_PREFS = "cipher_verdicts"
+    private const val VERDICT_HASH_KEY = "undecipherable_player_hash"
+    private const val VERDICT_TABLE_KEY = "undecipherable_config_fingerprint"
+
+    private fun verdicts() =
+        appContext.getSharedPreferences(VERDICT_PREFS, Context.MODE_PRIVATE)
+
+    private fun restoreUndecipherableVerdict() {
+        val prefs = verdicts()
+        val stored = prefs.getString(VERDICT_HASH_KEY, null) ?: return
+        val storedTable = prefs.getString(VERDICT_TABLE_KEY, null)
+        if (storedTable == PlayerConfigStore.tableFingerprint()) {
+            undecipherablePlayerHash = stored
+            Timber.tag(TAG).d("Player $stored was already found undecipherable here — not parsing it again")
+        } else {
+            Timber.tag(TAG).d("Config table has changed since $stored was ruled out — giving it another try")
+            prefs.edit().remove(VERDICT_HASH_KEY).remove(VERDICT_TABLE_KEY).apply()
+        }
+    }
+
+    private fun rememberUndecipherable(hash: String) {
+        undecipherablePlayerHash = hash
+        verdicts().edit()
+            .putString(VERDICT_HASH_KEY, hash)
+            .putString(VERDICT_TABLE_KEY, PlayerConfigStore.tableFingerprint())
+            .apply()
+    }
+
+    private fun forgetUndecipherable() {
+        undecipherablePlayerHash = null
+        verdicts().edit().remove(VERDICT_HASH_KEY).remove(VERDICT_TABLE_KEY).apply()
+    }
 
     /**
      * The player_ias hash last used to decipher a web stream (sig/n), or null if none yet.
@@ -364,6 +412,16 @@ object CipherDeobfuscator {
         val (playerJs, hash) = result
         Timber.tag(TAG).d("Got player JS: hash=$hash, length=${playerJs.length}")
 
+        // A player already found to be beyond this reader stays beyond it until the
+        // config table changes, and proving it again costs over a second of parsing
+        // per song — on the first song, on top of everything else a cold start pays.
+        // The verdict now survives restarts, so this falls straight through to the
+        // clients that need no signature at all.
+        if (hash == undecipherablePlayerHash) {
+            Timber.tag(TAG).d("Player $hash cannot be deciphered here — skipping the parse")
+            return null
+        }
+
         // Run full analysis for logging - pass the known hash from PlayerJsFetcher
         Timber.tag(TAG).d("Analyzing player JS for cipher functions (knownHash=$hash)...")
         var analysis = FunctionNameExtractor.analyzePlayerJs(playerJs, knownHash = hash)
@@ -394,7 +452,7 @@ object CipherDeobfuscator {
             Timber.tag(TAG).e("Could not extract signature function info from player JS")
             // Remembered, so the STS this player would be asked for is not
             // quoted by something that cannot follow through on it.
-            undecipherablePlayerHash = hash
+            rememberUndecipherable(hash)
             return null
         }
 
@@ -425,7 +483,7 @@ object CipherDeobfuscator {
         // A config refresh can teach it a shape it failed on earlier, so the
         // verdict is lifted the moment the build succeeds rather than standing
         // for the life of the process.
-        if (undecipherablePlayerHash == hash) undecipherablePlayerHash = null
+        if (undecipherablePlayerHash == hash) forgetUndecipherable()
         return webView
     }
 

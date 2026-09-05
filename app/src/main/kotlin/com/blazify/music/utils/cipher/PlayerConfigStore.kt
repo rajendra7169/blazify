@@ -175,6 +175,18 @@ object PlayerConfigStore {
 
     fun knownHashes(): Set<String> = mergedConfigs.keys
 
+    /**
+     * A cheap summary of which players this table can teach.
+     *
+     * Used to date a verdict recorded against a player: the verdict is only
+     * worth keeping while the table that produced it is the same table. Any
+     * refresh that adds or drops an entry changes this, and the verdict with it.
+     */
+    fun tableFingerprint(): String {
+        val keys = mergedConfigs.keys
+        return "${keys.size}:${keys.sorted().joinToString(",").hashCode()}"
+    }
+
     /** Test-only: swaps the in-memory table without touching disk, context, or network. */
     internal fun setTableForTest(configs: Map<String, FunctionNameExtractor.HardcodedPlayerConfig>) {
         mergedConfigs = configs
