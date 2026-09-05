@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.blazify.music.ui.theme.BlazeGradientEnd
+import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.utils.parseCookieString
 import com.blazify.music.BuildConfig
@@ -132,11 +135,21 @@ fun AccountSettings(
         ) {
             Text(
                 text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    brush = Brush.horizontalGradient(
+                        listOf(BlazeThemeColor, BlazeGradientEnd),
+                    ),
+                ),
                 modifier = Modifier.padding(start = 4.dp)
             )
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = onClose) {
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            ) {
                 Icon(painterResource(R.drawable.close), contentDescription = null)
             }
         }
@@ -388,7 +401,7 @@ fun AccountSettings(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
             PreferenceEntry(
                 title = { Text(stringResource(R.string.together)) },
@@ -399,7 +412,7 @@ fun AccountSettings(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             )
 
             Spacer(Modifier.height(4.dp))
@@ -413,7 +426,7 @@ fun AccountSettings(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             )
 
             Spacer(Modifier.height(4.dp))
@@ -438,7 +451,7 @@ fun AccountSettings(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -481,7 +494,7 @@ fun AccountSettings(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .clickable { showDeveloperDialog = true }
                 .padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
@@ -506,7 +519,7 @@ fun AccountSettings(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = stringResource(R.string.developer_role),
+                    text = stringResource(R.string.developer_role_short),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

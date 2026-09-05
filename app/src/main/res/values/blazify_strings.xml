@@ -294,6 +294,7 @@
     <string name="developer_heading">Know about the developer</string>
     <string name="developer_name" translatable="false">Rajendra Pandey</string>
     <string name="developer_role">Builds Blazify, from Kathmandu</string>
+    <string name="developer_role_short">Developer, Kathmandu</string>
     <string name="developer_star">Star</string>
     <string name="developer_bio">I build Blazify on my own, in the open. It began because I wanted a music player that looked the way I thought one should, and people kept asking me for a copy. What goes into each version is mostly what people tell me is broken or missing.</string>
     <string name="developer_website">Website</string>
@@ -675,7 +676,7 @@
     <!-- Decryption Library Settings -->
 
     <!-- Listen Together -->
-    <string name="together">Together</string>
+    <string name="together">Blaze Together</string>
     <string name="blaze_together">Blaze Together</string>
     <string name="listen_together">Listen Together</string>
     <string name="listen_together_server_url">Server URL</string>
