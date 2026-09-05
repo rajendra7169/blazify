@@ -110,7 +110,9 @@ class App :
             // Warm the PoToken/BotGuard generator (the ~2-5s cold cost) once a session (visitorData) is
             // available; gate only this half on it. Best-effort and delayed so it never competes with startup.
             launch(Dispatchers.IO) {
-                delay(2500)
+                // Short: on a cold start the first tap can land inside a second, and a
+                // warm-up that begins after it has already lost the race it exists to win.
+                delay(800)
                 var waitedMs = 0
                 while (YouTube.visitorData == null && waitedMs < 12_000) {
                     delay(500)

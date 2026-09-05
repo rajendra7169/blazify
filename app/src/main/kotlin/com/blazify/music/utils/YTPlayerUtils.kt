@@ -67,6 +67,18 @@ object YTPlayerUtils {
     private val poTokenGenerator = PoTokenGenerator()
 
     /**
+     * Whether a song has already asked for a token.
+     *
+     * The warm-up exists to pay the generator's cold cost before a song needs
+     * it. Once a song has asked, that cost is already being paid on the path
+     * that matters, and starting a second run for a throwaway video only takes
+     * the processor away from it — which on a slow phone is the difference
+     * between four seconds and eight.
+     */
+    @Volatile
+    private var poTokenAskedForSong = false
+
+    /**
      * When the main client last refused a stream.
      *
      * Kept in memory only. It is a hint to save a doomed round trip, not a
@@ -193,6 +205,10 @@ object YTPlayerUtils {
     suspend fun prewarmPoToken() {
         val sessionId = YouTube.visitorData ?: return
         if (!MAIN_CLIENT.useWebPoTokens) return
+        if (poTokenAskedForSong) {
+            Timber.tag(TAG).d("PoToken prewarm skipped — a song already asked for one")
+            return
+        }
         runCatching {
             withContext(Dispatchers.IO) {
                 poTokenGenerator.getWebClientPoToken(POTOKEN_WARMUP_VIDEO_ID, sessionId)
@@ -265,6 +281,7 @@ object YTPlayerUtils {
         val sessionId = YouTube.visitorData
         if (MAIN_CLIENT.useWebPoTokens && sessionId != null) {
             Timber.tag(logTag).d("Generating PoToken for WEB_REMIX with sessionId")
+            poTokenAskedForSong = true
             try {
                 poToken = poTokenGenerator.getWebClientPoToken(videoId, sessionId)
                 if (poToken != null) {
