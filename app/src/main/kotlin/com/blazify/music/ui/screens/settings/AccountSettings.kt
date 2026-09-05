@@ -417,19 +417,24 @@ fun AccountSettings(
 
             Spacer(Modifier.height(4.dp))
 
-            PreferenceEntry(
-                title = { Text(stringResource(R.string.integrations)) },
-                icon = { Icon(painterResource(R.drawable.integration), null) },
-                onClick = {
-                    onClose()
-                    navController.navigate("settings/integrations")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            )
+            // Integrations lives in settings and is set up once; checking for a
+            // new version is the thing people come back to. The izzy build has
+            // no updater at all, so there it simply is not offered.
+            if (BuildConfig.UPDATER_AVAILABLE) {
+                PreferenceEntry(
+                    title = { Text(stringResource(R.string.check_for_updates_title)) },
+                    icon = { Icon(painterResource(R.drawable.update), null) },
+                    onClick = {
+                        onClose()
+                        navController.navigate("settings/updater")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                )
 
-            Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(4.dp))
+            }
 
             if (showSettings) {
                 PreferenceEntry(
