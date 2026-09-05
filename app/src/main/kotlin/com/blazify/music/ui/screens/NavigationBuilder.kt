@@ -36,6 +36,7 @@ import com.blazify.music.ui.screens.library.LibraryAlbumsScreen
 import com.blazify.music.ui.screens.library.LibraryArtistsScreen
 import com.blazify.music.ui.screens.library.LibraryScreen
 import com.blazify.music.ui.screens.library.LibrarySongsScreen
+import com.blazify.music.ui.screens.library.LocalFoldersScreen
 import com.blazify.music.ui.screens.playlist.AutoPlaylistScreen
 import com.blazify.music.ui.screens.playlist.CachePlaylistScreen
 import com.blazify.music.ui.screens.playlist.LocalPlaylistScreen
@@ -325,15 +326,24 @@ fun NavGraphBuilder.navigationBuilder(
     }
 
     composable(
-        route = "auto_playlist/{playlist}",
+        route = "auto_playlist/{playlist}?folder={folder}",
         arguments =
             listOf(
                 navArgument("playlist") {
                     type = NavType.StringType
                 },
+                navArgument("folder") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
             ),
     ) {
         AutoPlaylistScreen(navController)
+    }
+
+    composable("local_folders") {
+        LocalFoldersScreen(navController)
     }
 
     composable(

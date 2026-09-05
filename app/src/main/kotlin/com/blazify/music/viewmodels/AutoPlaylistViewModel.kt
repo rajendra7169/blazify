@@ -45,6 +45,9 @@ constructor(
 ) : ViewModel() {
     val playlist = savedStateHandle.get<String>("playlist")!!
 
+    /** Set when the list was opened from the folder view: show only that folder. */
+    val folder: String? = savedStateHandle.get<String>("folder")
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
@@ -66,7 +69,17 @@ constructor(
                     "liked" -> database.likedSongs(sortType, descending)
                         .map { it.filterExplicit(hideExplicit).filterVideoSongs(hideVideoSongs) }
 
-                    "local" -> database.localSongs(sortType, descending)
+                    "local" ->
+                        database.localSongs(sortType, descending).map { songs ->
+                            if (folder == null) {
+                                songs
+                            } else {
+                                songs.filter {
+                                    it.song.localPath
+                                        ?.let { path -> java.io.File(path).parent } == folder
+                                }
+                            }
+                        }
                     "downloaded" -> database.downloadedSongs(sortType, descending)
                         .map { it.filterExplicit(hideExplicit).filterVideoSongs(hideVideoSongs) }
 

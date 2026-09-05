@@ -1171,6 +1171,7 @@
     <string name="local_music_scanning">Looking\u2026</string>
     <string name="local_music_found">%1$d on this device. Tap to look again</string>
     <string name="local_music_none_found">Nothing found on this device</string>
+    <string name="local_folders">Folders</string>
     <string name="local_music_permission">Blazify needs permission to read audio files</string>
     <string name="blaze_greeting_default_name">Music Lover</string>
     <string name="star_on_github">Star Blazify on GitHub</string>

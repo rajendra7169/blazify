@@ -148,12 +148,16 @@ fun AutoPlaylistScreen(
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsStateWithLifecycle()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val playlist =
-        when (viewModel.playlist) {
-            "liked" -> stringResource(R.string.liked)
-            "uploaded" -> stringResource(R.string.uploaded_playlist)
-            "local" -> stringResource(R.string.local_music)
-            else -> stringResource(R.string.offline)
-        }
+        // A folder shows under its own name. It is the name the person chose
+        // when they put the files there, and repeating "Music on this device"
+        // over every one of them would say nothing about which is open.
+        viewModel.folder?.let { java.io.File(it).name.ifBlank { it } }
+            ?: when (viewModel.playlist) {
+                "liked" -> stringResource(R.string.liked)
+                "uploaded" -> stringResource(R.string.uploaded_playlist)
+                "local" -> stringResource(R.string.local_music)
+                else -> stringResource(R.string.offline)
+            }
 
     val songs by viewModel.likedSongs.collectAsStateWithLifecycle(null)
     val mutableSongs =
@@ -853,6 +857,17 @@ fun AutoPlaylistScreen(
                         )
                     }
                 } else if (!isSearching) {
+                    if (viewModel.playlist == "local" && viewModel.folder == null) {
+                        IconButton(
+                            onClick = { navController.navigate("local_folders") },
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.folder),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+
                     IconButton(
                         onClick = { isSearching = true },
                     ) {
