@@ -82,6 +82,9 @@ import kotlinx.coroutines.launch
 import okio.ByteString.Companion.encodeUtf8
 import java.io.File
 import kotlin.math.roundToInt
+import com.blazify.music.constants.LocalMusicMinSizeKey
+import com.blazify.music.constants.LocalMusicMinDurationKey
+import com.blazify.music.utils.safeDataStoreEdit
 
 @OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class, DelicateCoilApi::class)
 @Composable
@@ -102,6 +105,29 @@ fun StorageSettings(
     val localCount by database.localSongCount().collectAsState(initial = 0)
     var scanning by remember { mutableStateOf(false) }
     var selectedFolders by rememberPreference(LocalMusicFoldersKey, emptySet())
+    val minDuration by rememberPreference(LocalMusicMinDurationKey, 0)
+    val minSize by rememberPreference(LocalMusicMinSizeKey, 0)
+    var showMinLength by remember { mutableStateOf(false) }
+    var showMinSize by remember { mutableStateOf(false) }
+
+    val noLimit = stringResource(R.string.local_music_no_limit)
+    fun lengthLabel(seconds: Int) =
+        when {
+            seconds <= 0 -> noLimit
+            seconds >= 60 ->
+                context.resources.getQuantityString(
+                    R.plurals.local_music_minutes,
+                    seconds / 60,
+                    seconds / 60,
+                )
+            else -> context.getString(R.string.local_music_seconds, seconds)
+        }
+    fun sizeLabel(kb: Int) =
+        when {
+            kb <= 0 -> noLimit
+            kb >= 1024 -> context.getString(R.string.local_music_mb, kb / 1024)
+            else -> context.getString(R.string.local_music_kb, kb)
+        }
     var showFolders by remember { mutableStateOf(false) }
     var folders by remember { mutableStateOf<List<LocalMusic.Folder>>(emptyList()) }
 
@@ -383,8 +409,61 @@ fun StorageSettings(
                             }
                         },
                     ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.timer),
+                        title = { Text(stringResource(R.string.local_music_min_length)) },
+                        description = { Text(lengthLabel(minDuration)) },
+                        onClick = { showMinLength = true },
+                    ),
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.storage),
+                        title = { Text(stringResource(R.string.local_music_min_size)) },
+                        description = { Text(sizeLabel(minSize)) },
+                        onClick = { showMinSize = true },
+                    ),
                 ),
         )
+
+        // A phone's music folder collects voice notes, alarm tones and message
+        // sounds, and MediaStore honestly calls all of it music. Both limits
+        // start at no limit: raising one hides files somebody already has.
+        if (showMinLength) {
+            ListDialog(onDismiss = { showMinLength = false }) {
+                items(listOf(0, 15, 30, 45, 60, 120)) { seconds ->
+                    FolderRow(
+                        name = lengthLabel(seconds),
+                        detail = null,
+                        checked = minDuration == seconds,
+                        onClick = {
+                            showMinLength = false
+                            coroutineScope.launch {
+                                context.safeDataStoreEdit { it[LocalMusicMinDurationKey] = seconds }
+                                if (LocalMusic.hasPermission(context)) runScan()
+                            }
+                        },
+                    )
+                }
+            }
+        }
+
+        if (showMinSize) {
+            ListDialog(onDismiss = { showMinSize = false }) {
+                items(listOf(0, 100, 250, 500, 1024, 2048)) { kb ->
+                    FolderRow(
+                        name = sizeLabel(kb),
+                        detail = null,
+                        checked = minSize == kb,
+                        onClick = {
+                            showMinSize = false
+                            coroutineScope.launch {
+                                context.safeDataStoreEdit { it[LocalMusicMinSizeKey] = kb }
+                                if (LocalMusic.hasPermission(context)) runScan()
+                            }
+                        },
+                    )
+                }
+            }
+        }
 
         if (showFolders) {
             ListDialog(onDismiss = { showFolders = false }) {

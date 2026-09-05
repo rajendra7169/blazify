@@ -25,6 +25,11 @@ val StarPromptAsksKey = intPreferencesKey("starPromptAsks")
 val StarPromptDoneKey = booleanPreferencesKey("starPromptDone")
 // Empty means every folder, which is what someone means before they have said otherwise.
 val LocalMusicFoldersKey = stringSetPreferencesKey("localMusicFolders")
+
+// Both off by default: raising either hides files somebody already has in
+// their library, which is not a thing to do to them without being asked.
+val LocalMusicMinDurationKey = intPreferencesKey("localMusicMinDurationSeconds")
+val LocalMusicMinSizeKey = intPreferencesKey("localMusicMinSizeKb")
 val EnableHighRefreshRateKey = booleanPreferencesKey("enableHighRefreshRate")
 val EnableLandscapeScalingKey = booleanPreferencesKey("enableLandscapeScaling")
 val DynamicThemeKey = booleanPreferencesKey("dynamicTheme")

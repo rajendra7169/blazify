@@ -1172,6 +1172,16 @@
     <string name="local_music_found">%1$d on this device. Tap to look again</string>
     <string name="local_music_none_found">Nothing found on this device</string>
     <string name="local_folders">Folders</string>
+    <string name="local_music_min_length">Shortest to include</string>
+    <string name="local_music_min_size">Smallest to include</string>
+    <string name="local_music_no_limit">No limit</string>
+    <string name="local_music_seconds">%1$d seconds</string>
+    <plurals name="local_music_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <string name="local_music_kb">%1$d KB</string>
+    <string name="local_music_mb">%1$d MB</string>
     <string name="edit_tags">Edit details</string>
     <string name="edit_tags_desc">Change the title, artist or album shown in Blazify</string>
     <string name="edit_tags_title">Title</string>
