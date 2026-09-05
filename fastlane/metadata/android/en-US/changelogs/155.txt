@@ -1,16 +1,18 @@
 The first song now starts in about three seconds. It was taking ten or
-more, and often never started at all: every launch worked out from
-scratch that the site's current player cannot be read here, which costs
-megabytes of parsing, and the token the first request needs was being
-warmed too late to be any help.
+more and often never started at all, because every launch worked out from
+scratch that the site's current player cannot be read here, and the token
+the first request needs was warmed too late to help.
 
 Music on your phone plays now. The player had only the two formats the
-online catalogue uses, so MP3, FLAC, Ogg, Opus and WAV files had nothing
-to read them with. Formats it cannot open are no longer listed at all.
+online catalogue uses, so MP3, FLAC, Ogg, Opus and WAV had nothing to
+read them with. Covers show up where they were blank, a song with no
+artist tag is given one, and a file that describes itself badly can be
+told what it is. Formats the player cannot open are no longer listed.
 
-Covers show up where they were blank, and a song with no artist tag takes
-its name from the file.
+Local music can be browsed by folder, and the shortest and smallest files
+can be left out, so a voice note from a chat stops sitting next to the
+albums.
 
-Home no longer leaves a gap under a short shelf, the last row sits clear
-of the mini player, and a refresh brings different songs rather than the
-same ones rearranged.
+Room invites go somewhere that exists. Menus no longer offer a local file
+things it cannot do. Home leaves no gap under a short shelf, the last row
+sits clear of the mini player, and a refresh brings different songs.
