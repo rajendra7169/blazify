@@ -289,6 +289,18 @@
     <string name="github_releases_url">https://github.com/rajendra7169/blazify/releases</string>
     <string name="list_bullet">•</string>
     <string name="view_on_github">View on GitHub</string>
+
+    <!-- Know about the developer, in the account sheet -->
+    <string name="developer_heading">Know about the developer</string>
+    <string name="developer_name" translatable="false">Rajendra Pandey</string>
+    <string name="developer_role">Builds Blazify, from Kathmandu</string>
+    <string name="developer_star">Star</string>
+    <string name="developer_bio">I build Blazify on my own, in the open. It began because I wanted a music player that looked the way I thought one should, and people kept asking me for a copy. What goes into each version is mostly what people tell me is broken or missing.</string>
+    <string name="developer_website">Website</string>
+    <string name="developer_github">GitHub</string>
+    <string name="developer_website_url" translatable="false">https://rajendrapandey.info.np</string>
+    <string name="developer_github_url" translatable="false">https://github.com/rajendra7169</string>
+    <string name="blazify_repo_url" translatable="false">https://github.com/rajendra7169/blazify</string>
     <string name="current_version">Current version</string>
     <string name="version_format">Version: %s</string>
     <string name="update_settings">Update settings</string>
