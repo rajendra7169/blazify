@@ -930,12 +930,23 @@ class MainActivity : ComponentActivity() {
                         playerBottomSheetState.isDismissed,
                         showRail,
                         isHomeRoute,
+                        navPadding,
+                        useNewMiniPlayerDesign,
                     ) {
+                        // Has to match the player sheet's collapsedBound exactly,
+                        // or the last row of every list ends up under the mini
+                        // player. It was short by the spacing the new design
+                        // leaves beneath itself, and used the full navigation
+                        // bar height where the sheet uses the slim one — so the
+                        // two disagreed in both directions at once.
                         var bottom = bottomInset
                         if (shouldShowNavigationBar && !showRail) {
-                            bottom += NavigationBarHeight
+                            bottom += navPadding
                         }
-                        if (!playerBottomSheetState.isDismissed) bottom += MiniPlayerHeight
+                        if (!playerBottomSheetState.isDismissed) {
+                            bottom += MiniPlayerHeight
+                            if (useNewMiniPlayerDesign) bottom += MiniPlayerBottomSpacing
+                        }
                         windowsInsets
                             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
                             .add(WindowInsets(top = if (isHomeRoute) 0.dp else AppBarHeight, bottom = bottom))
