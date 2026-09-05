@@ -563,6 +563,7 @@ fun AutoPlaylistScreen(
                                 downloadState = downloadState,
                                 onShowRemoveDownloadDialog = { showRemoveDownloadDialog = true },
                                 menuState = menuState,
+                                canDownload = viewModel.playlist != "local",
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -902,6 +903,7 @@ private fun AutoPlaylistHeader(
     downloadState: Int,
     onShowRemoveDownloadDialog: () -> Unit,
     menuState: com.blazify.music.ui.component.MenuState,
+    canDownload: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -1067,6 +1069,7 @@ private fun AutoPlaylistHeader(
                 onClick = {
                     menuState.show {
                         AutoPlaylistMenu(
+                            canDownload = canDownload,
                             downloadState = downloadState,
                             onQueue = {
                                 playerConnection.addToQueue(
