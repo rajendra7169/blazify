@@ -103,6 +103,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDateTime
+import androidx.compose.runtime.LaunchedEffect
+import com.blazify.music.ui.component.EditLocalTagsDialog
+import com.blazify.music.db.entities.LocalTagOverride
+import com.blazify.music.utils.LocalMusic
 
 @Composable
 fun SongMenu(
@@ -183,7 +187,48 @@ fun SongMenu(
         )
     }
 
-    if (showEditDialog) {
+    // A local file's tags are read back off the file on every rescan, so the
+    // editor below would write a correction that quietly disappeared. Local
+    // songs get the one that records the correction separately, and can also
+    // set an album and undo itself.
+    if (showEditDialog && song.song.isLocal) {
+        val localMusic = remember { LocalMusic(context, database) }
+        var override by remember(song.id) { mutableStateOf<LocalTagOverride?>(null) }
+        var loaded by remember(song.id) { mutableStateOf(false) }
+
+        LaunchedEffect(song.id) {
+            override = withContext(Dispatchers.IO) { localMusic.tagOverride(song.id) }
+            loaded = true
+        }
+
+        if (loaded) {
+            EditLocalTagsDialog(
+                initialTitle = song.song.title,
+                initialArtist = song.artists.firstOrNull()?.name.orEmpty(),
+                initialAlbum = song.song.albumName.orEmpty(),
+                hasOverride = override != null,
+                onDismiss = { showEditDialog = false },
+                onSave = { newTitle, newArtist, newAlbum ->
+                    coroutineScope.launch {
+                        localMusic.saveTagOverride(
+                            songId = song.id,
+                            title = newTitle,
+                            artistName = newArtist,
+                            albumName = newAlbum,
+                        )
+                        onDismiss()
+                    }
+                },
+                onReset = {
+                    coroutineScope.launch {
+                        localMusic.clearTagOverride(song.id)
+                        localMusic.scan()
+                        onDismiss()
+                    }
+                },
+            )
+        }
+    } else if (showEditDialog) {
         TextFieldDialog(
             icon = {
                 Icon(

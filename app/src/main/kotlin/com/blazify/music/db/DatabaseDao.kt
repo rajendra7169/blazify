@@ -35,6 +35,7 @@ import com.blazify.music.db.entities.ArtistEntity
 import com.blazify.music.db.entities.Event
 import com.blazify.music.db.entities.EventWithSong
 import com.blazify.music.db.entities.FormatEntity
+import com.blazify.music.db.entities.LocalTagOverride
 import com.blazify.music.db.entities.LyricsEntity
 import com.blazify.music.db.entities.PlayCountEntity
 import com.blazify.music.db.entities.Playlist
@@ -759,6 +760,31 @@ interface DatabaseDao {
 
             SongSortType.PLAY_TIME -> localSongsByCreateDateAsc()
         }.map { it.reversed(descending) }
+
+    @Query(
+        """
+        UPDATE song
+        SET title = COALESCE(:title, title),
+            albumName = COALESCE(:albumName, albumName)
+        WHERE id = :id AND isLocal = 1
+        """,
+    )
+    fun applyLocalTagOverride(id: String, title: String?, albumName: String?)
+
+    @Query("DELETE FROM song_artist_map WHERE songId = :songId")
+    fun clearSongArtists(songId: String)
+
+    @Query("SELECT * FROM local_tag_override WHERE songId = :songId")
+    fun localTagOverride(songId: String): LocalTagOverride?
+
+    @Query("SELECT * FROM local_tag_override")
+    fun localTagOverrides(): List<LocalTagOverride>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsertLocalTagOverride(override: LocalTagOverride)
+
+    @Query("DELETE FROM local_tag_override WHERE songId = :songId")
+    fun deleteLocalTagOverride(songId: String)
 
     @Query("DELETE FROM song WHERE id = :id AND isLocal = 1")
     fun deleteLocalSong(id: String)

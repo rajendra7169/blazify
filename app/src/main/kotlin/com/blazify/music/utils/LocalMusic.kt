@@ -21,6 +21,7 @@ import com.blazify.music.db.MusicDatabase
 import com.blazify.music.db.entities.AlbumEntity
 import com.blazify.music.db.entities.ArtistEntity
 import com.blazify.music.db.entities.SongAlbumMap
+import com.blazify.music.db.entities.LocalTagOverride
 import com.blazify.music.db.entities.SongArtistMap
 import com.blazify.music.db.entities.SongEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -92,6 +93,71 @@ constructor(
      *
      * Returns how many tracks are now on file, or null if permission is missing.
      */
+    /**
+     * Reapply the corrections people made to files that describe themselves
+     * badly, over the top of what the scan just read back off those files.
+     */
+    private fun applyOverrides() {
+        database.localTagOverrides().forEach { override ->
+            runCatching {
+                database.applyLocalTagOverride(
+                    id = override.songId,
+                    title = override.title?.takeIf { it.isNotBlank() },
+                    albumName = override.albumName?.takeIf { it.isNotBlank() },
+                )
+
+                override.artistName?.takeIf { it.isNotBlank() }?.let { name ->
+                    val artist =
+                        ArtistEntity(
+                            id = ARTIST_PREFIX + "name-" + name.lowercase().hashCode(),
+                            name = name,
+                            isLocal = true,
+                        )
+                    database.insert(artist)
+                    database.clearSongArtists(override.songId)
+                    database.insert(
+                        SongArtistMap(songId = override.songId, artistId = artist.id, position = 0),
+                    )
+                }
+            }.onFailure {
+                Timber.tag("LocalMusic").w(it, "could not reapply tags for ${override.songId}")
+            }
+        }
+    }
+
+    /**
+     * Record a correction and show it straight away, rather than making
+     * someone rescan to see the name they just typed.
+     */
+    suspend fun saveTagOverride(
+        songId: String,
+        title: String?,
+        artistName: String?,
+        albumName: String?,
+    ) = withContext(Dispatchers.IO) {
+        val nothingLeft = listOf(title, artistName, albumName).all { it.isNullOrBlank() }
+        if (nothingLeft) {
+            database.deleteLocalTagOverride(songId)
+        } else {
+            database.upsertLocalTagOverride(
+                LocalTagOverride(
+                    songId = songId,
+                    title = title?.takeIf { it.isNotBlank() },
+                    artistName = artistName?.takeIf { it.isNotBlank() },
+                    albumName = albumName?.takeIf { it.isNotBlank() },
+                ),
+            )
+        }
+        applyOverrides()
+    }
+
+    /** Forget a correction. The next scan restores whatever the file itself says. */
+    suspend fun clearTagOverride(songId: String) = withContext(Dispatchers.IO) {
+        database.deleteLocalTagOverride(songId)
+    }
+
+    fun tagOverride(songId: String): LocalTagOverride? = database.localTagOverride(songId)
+
     suspend fun scan(folders: Set<String> = emptySet()): Int? =
         withContext(Dispatchers.IO) {
             if (!hasPermission(context)) return@withContext null
@@ -132,6 +198,11 @@ constructor(
                     database.insert(SongAlbumMap(songId = track.song.id, albumId = it.id, index = 0))
                 }
             }
+
+            // The loop above rewrote every row from what the file says, which
+            // is the whole point of a rescan and also how a correction someone
+            // made by hand would quietly disappear. Put those back.
+            applyOverrides()
 
             Timber.tag("LocalMusic").i("scan found ${found.size} tracks")
 
