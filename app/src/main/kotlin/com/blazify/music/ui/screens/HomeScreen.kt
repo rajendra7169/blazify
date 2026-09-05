@@ -1199,11 +1199,12 @@ fun HomeScreen(
                         // once we actually know who they are.
                         userName = accountName.trim().takeIf { it.isNotEmpty() && isLoggedIn }
                             ?: stringResource(R.string.blaze_greeting_default_name),
-                        // Profile: account sheet (logout / token / settings) when
-                        // logged in, login page otherwise
-                        onAccountClick = {
-                            if (isLoggedIn) showAccountDialog = true else navController.navigate("login")
-                        },
+                        // Profile: the account sheet either way. Signed out, it
+                        // is not an empty screen — it offers signing in, but also
+                        // the token route, Blaze Together, integrations and
+                        // settings, and jumping straight to the login page put
+                        // all of that behind a step nobody asked for.
+                        onAccountClick = { showAccountDialog = true },
                         onSettingsClick = { navController.navigate("settings") },
                         onSearchClick = { navController.navigate(Screens.Search.route) },
                         onMicClick = { navController.navigate("recognition") },
