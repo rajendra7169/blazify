@@ -78,10 +78,7 @@ import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
-import androidx.media3.extractor.ExtractorsFactory
-import androidx.media3.extractor.mkv.MatroskaExtractor
-import androidx.media3.extractor.mp4.FragmentedMp4Extractor
-import androidx.media3.extractor.mp4.Mp4Extractor
+import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaController
@@ -3981,12 +3978,27 @@ class MusicService :
         }
     }
 
+    /**
+     * Every extractor, not only the two containers a stream arrives in.
+     *
+     * This used to hand the player Matroska and MP4 and nothing else, which is
+     * exactly right for the catalogue: it serves WebM and MP4 and never
+     * anything else, and a short list is a fast one. It is also why not one
+     * file on somebody's phone would play. MP3, FLAC, Ogg, Opus, WAV and AAC
+     * all need extractors that were not there, so the library filled up and
+     * every song stopped the moment it was asked to start.
+     *
+     * The default set covers the streams as well, so there is nothing to
+     * choose between: the cost is a few sniffs on a local file that the
+     * shorter list turned into a song that could not be played at all.
+     */
     private fun createMediaSourceFactory() =
         DefaultMediaSourceFactory(
             createDataSourceFactory(),
-            ExtractorsFactory {
-                arrayOf(MatroskaExtractor(), FragmentedMp4Extractor(), Mp4Extractor())
-            },
+            DefaultExtractorsFactory()
+                // A stream whose container says nothing is still a stream: keep
+                // trying rather than refusing at the first unrecognised byte.
+                .setConstantBitrateSeekingEnabled(true),
         )
 
     private fun createRenderersFactory(

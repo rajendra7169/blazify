@@ -195,7 +195,14 @@ fun BlazeLibraryHome(
         // Asked here rather than at launch. Local music is not something the app
         // needs to start, so the permission belongs at the moment somebody
         // reaches for the feature, which is also where they will look for it.
-        if (localCount == 0 && !localGranted) {
+        // Shown whenever there is nothing scanned yet, whether or not the
+        // permission has already been given. Keying it on the permission left a
+        // state with no way out: granted but never scanned meant this card was
+        // hidden for having permission and the one below was hidden for having
+        // no songs, so local music could not be reached at all. That is where
+        // anybody lands who granted it in the system settings, or cleared the
+        // app's data, or ran a scan that found nothing.
+        if (localCount == 0) {
             item("local-invite") {
                 LongPad {
                     BlazePlaylistCard(
@@ -205,7 +212,15 @@ fun BlazeLibraryHome(
                         seedColor = Color(0xFF2E7D32),
                         aspectRatio = LONG_RATIO,
                         iconRes = R.drawable.library_music,
-                        onClick = { audioPermission.launch(LocalMusic.permission) },
+                        onClick = {
+                            if (localGranted) {
+                                scope.launch(Dispatchers.IO) {
+                                    runCatching { LocalMusic(context, database).scan() }
+                                }
+                            } else {
+                                audioPermission.launch(LocalMusic.permission)
+                            }
+                        },
                     )
                 }
             }
