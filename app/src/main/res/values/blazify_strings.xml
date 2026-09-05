@@ -1253,6 +1253,8 @@
         <item quantity="other">%1$d folders</item>
     </plurals>
 
+    <string name="local_music_cannot_play">This file could not be played. Its format may not be supported.</string>
+
     <!-- Search -->
     <string name="browse">Browse</string>
     <string name="clear_all">Clear</string>

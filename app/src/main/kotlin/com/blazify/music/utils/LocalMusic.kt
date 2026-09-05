@@ -257,9 +257,11 @@ constructor(
                 MediaStore.Audio.Media.YEAR,
                 MediaStore.Audio.Media.DATE_MODIFIED,
                 MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.MIME_TYPE,
             )
 
         val tracks = mutableListOf<Track>()
+        var skipped = 0
 
         context.contentResolver
             .query(
@@ -267,10 +269,16 @@ constructor(
                 projection,
                 // Ringtones, notification sounds and voice memos are audio but
                 // nobody wants them turning up next to their albums.
+                //
+                // Format is checked as each row is read, below: the player has
+                // a fixed set of decoders and a file it cannot open is worse
+                // than a file it never listed. A library that appears in full
+                // and plays nothing reads as a broken app.
                 "${MediaStore.Audio.Media.IS_MUSIC} != 0",
                 null,
                 "${MediaStore.Audio.Media.TITLE} COLLATE NOCASE ASC",
             )?.use { cursor ->
+                val mimeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
                 val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                 val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
@@ -285,6 +293,16 @@ constructor(
                 while (cursor.moveToNext()) {
                     val path = cursor.getString(pathCol)
                     if (folders.isNotEmpty() && folders.none { path != null && path.startsWith(it) }) continue
+
+                    // Skipped rather than listed and then refused at the tap of
+                    // play. Windows Media, Monkey's Audio and the DSD formats
+                    // are the common ones here: MediaStore calls them music
+                    // because they are, and the player has no decoder for them.
+                    val mime = cursor.getString(mimeCol)?.lowercase()
+                    if (mime != null && !playable(mime, path)) {
+                        skipped += 1
+                        continue
+                    }
 
                     val mediaId = cursor.getLong(idCol)
                     val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaId)
@@ -376,6 +394,9 @@ constructor(
                 }
             }
 
+        if (skipped > 0) {
+            Timber.tag("LocalMusic").i("skipped $skipped files the player has no decoder for")
+        }
         return tracks
     }
 
@@ -400,6 +421,29 @@ constructor(
         if (candidate.isBlank() || candidate.all { it.isDigit() }) return null
         if (candidate.length > 60) return null
         return candidate
+    }
+
+
+    /**
+     * Whether the player has a decoder for this file.
+     *
+     * Media3 ships a fixed set: MP3, AAC and the MP4 family, FLAC, Vorbis,
+     * Opus, WAV, Matroska, AMR, ALAC. It has none for Windows Media, Monkey's
+     * Audio, DSD or Real Audio, and no amount of trying will play them.
+     *
+     * MediaStore's own mime type is trusted first. Some devices leave it
+     * blank or wrong, so the file name is the fallback rather than a guess in
+     * either direction: unknown is allowed through, since refusing to list a
+     * file that would have played is the worse mistake.
+     */
+    private fun playable(mime: String, path: String?): Boolean {
+        val refused = listOf(
+            "x-ms-wma", "wma", "monkeys-audio", "ape", "dsd", "dsf", "dff",
+            "vnd.rn-realaudio", "realaudio", "x-tta", "x-musepack", "musepack",
+        )
+        if (refused.any { mime.contains(it) }) return false
+        val extension = path?.substringAfterLast('.', "")?.lowercase().orEmpty()
+        return extension !in setOf("wma", "ape", "dsf", "dff", "dsd", "ra", "rm", "tta", "mpc")
     }
 
     private fun tidy(raw: String): String {

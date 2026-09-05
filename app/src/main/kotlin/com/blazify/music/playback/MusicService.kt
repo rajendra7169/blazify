@@ -3035,6 +3035,28 @@ class MusicService :
             .w(error, "Player error occurred for $mediaId: errorCode=${error.errorCode}, message=${error.message}")
         reportException(error)
 
+        // A file on the phone has nothing to recover.
+        //
+        // Everything below this point is written for streams: clear the cache,
+        // fetch a fresh link, retry, and only then give up. None of it can help
+        // a local file, and running it all is what turned an unplayable file
+        // into a play button that bounced straight back to stop with nothing
+        // said. Say what happened, and move on rather than fighting it.
+        if (mediaId != null && LocalMusic.isLocal(mediaId)) {
+            Timber.tag(TAG).w("Local file would not play ($mediaId): ${error.errorCodeName}")
+            scope.launch {
+                Toast
+                    .makeText(
+                        this@MusicService,
+                        getString(R.string.local_music_cannot_play),
+                        Toast.LENGTH_LONG,
+                    ).show()
+            }
+            markSongAsFailed(mediaId)
+            handleFinalFailure()
+            return
+        }
+
         if (mediaId != null && hasExceededRetryLimit(mediaId)) {
             Timber.tag(TAG).w("Song $mediaId has exceeded retry limit, skipping")
             markSongAsFailed(mediaId)
