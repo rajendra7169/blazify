@@ -778,7 +778,7 @@ private fun RoomStatusCard(
                 Spacer(modifier = Modifier.height(16.dp))
                 val inviteLink =
                     remember(roomCode) {
-                        "https://blazify.cc/listen?code=$roomCode"
+                        "https://rajendra7169.github.io/blazify/listen?code=$roomCode"
                     }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

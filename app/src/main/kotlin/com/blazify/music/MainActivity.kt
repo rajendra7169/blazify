@@ -1617,7 +1617,12 @@ class MainActivity : ComponentActivity() {
             uri.getQueryParameter("code")
                 ?: uri.getQueryParameter("room")
                 ?: uri.pathSegments.getOrNull(1)
-        val isListenLink = uri.pathSegments.firstOrNull() == "listen" || uri.host?.equals("listen", ignoreCase = true) == true
+        // "listen" anywhere in the path, not only at the front: the invite page
+        // is served from a project site, so the link reads /blazify/listen and
+        // the segment it used to look for is second.
+        val isListenLink =
+            uri.pathSegments.any { it.equals("listen", ignoreCase = true) } ||
+                uri.host?.equals("listen", ignoreCase = true) == true
         if (!listenCode.isNullOrBlank() && isListenLink) {
             val username = dataStore.get(ListenTogetherUsernameKey, "").ifBlank { "Guest" }
             listenTogetherManager.joinRoom(listenCode, username)

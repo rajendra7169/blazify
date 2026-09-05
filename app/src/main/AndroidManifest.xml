@@ -96,16 +96,30 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
-            <!-- Listen Together invite link -->
-            <intent-filter android:autoVerify="true">
+            <!-- Listen Together invite link. The web address is the project
+                 site, which cannot serve an assetlinks.json at its own root, so
+                 this is deliberately not autoVerify: the page it lands on hands
+                 over to the scheme filter below, which needs no domain at all. -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="https" />
-                <data android:host="blazify.cc" />
-                <data android:pathPrefix="/listen" />
+                <data android:host="rajendra7169.github.io" />
+                <data android:pathPrefix="/blazify/listen" />
+            </intent-filter>
+
+            <!-- What the invite page actually opens. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="blazify" />
+                <data android:host="listen" />
             </intent-filter>
 
             <!-- Youtube filter -->

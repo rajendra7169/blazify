@@ -1513,7 +1513,7 @@ fun ListenTogetherDialog(
                                 Spacer(modifier = Modifier.height(12.dp))
                                 val inviteLink =
                                     remember(room.roomCode) {
-                                        "https://blazify.cc/listen?code=${room.roomCode}"
+                                        "https://rajendra7169.github.io/blazify/listen?code=${room.roomCode}"
                                     }
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
