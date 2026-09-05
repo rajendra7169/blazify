@@ -1482,6 +1482,19 @@ fun HomeScreen(
                                     val itemsPerPage = columns * rows
                                     val itemWidth = availableWidth / columns
 
+                                    // As tall as the rows actually used, not as
+                                    // tall as the rows on offer. A shelf that
+                                    // came back with one item still reserved
+                                    // the full three rows, so the screen showed
+                                    // a single circle sitting above a hand's
+                                    // depth of nothing.
+                                    val filledRows =
+                                        if (items.size >= itemsPerPage) {
+                                            rows
+                                        } else {
+                                            ((items.size + columns - 1) / columns).coerceIn(1, rows)
+                                        }
+
                                     val pagerState = rememberPagerState(pageCount = { (items.size + itemsPerPage - 1) / itemsPerPage })
 
                                     Column(
@@ -1496,7 +1509,7 @@ fun HomeScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .height(itemWidth * rows),
+                                                    .height(itemWidth * filledRows),
                                         ) { page ->
                                             val pageStartIndex = page * itemsPerPage
                                             val pageItems = items.drop(pageStartIndex).take(itemsPerPage)
