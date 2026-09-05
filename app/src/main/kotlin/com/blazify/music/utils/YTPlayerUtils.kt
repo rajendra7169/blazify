@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.OkHttpClient
 import timber.log.Timber
 
@@ -81,6 +82,26 @@ object YTPlayerUtils {
         mainClientRefusedAt = System.currentTimeMillis()
         Timber.tag(logTag).d("Main client refused a stream — resting it for five minutes")
     }
+
+    /**
+     * When working out the signature last failed.
+     *
+     * The same answer for every song: YouTube's player changed shape and the
+     * app cannot read it, which it discovers again from scratch each time at a
+     * cost of two and a half seconds. NewPipe's own deobfuscation is what
+     * actually produces the address, so once this has failed it is left alone
+     * and that route is taken directly.
+     */
+    @Volatile
+    private var cipherFailedAt: Long = 0
+
+    private fun noteCipherFailed() {
+        cipherFailedAt = System.currentTimeMillis()
+    }
+
+    private fun cipherResting(): Boolean =
+        cipherFailedAt > 0 &&
+            System.currentTimeMillis() - cipherFailedAt < MAIN_CLIENT_REST_MS
 
     private fun mainClientRefusing(): Boolean =
         mainClientRefusedAt > 0 &&
@@ -869,7 +890,26 @@ object YTPlayerUtils {
         val signatureCipher = format.signatureCipher ?: format.cipher
         if (!signatureCipher.isNullOrEmpty()) {
             Timber.tag(logTag).d("Format has signatureCipher, using custom deobfuscation")
-            val customDeobfuscatedUrl = CipherDeobfuscator.deobfuscateStreamUrl(signatureCipher, videoId)
+            // Bounded, because it is allowed to fail and something else here
+            // will work. Working out YouTube's signature means running its own
+            // JavaScript in a WebView, and when the player changes shape the
+            // attempt does not fail so much as never finish: measured at
+            // thirteen seconds on a real phone, spent on the first song of
+            // every session, before falling back to a client that needs no
+            // signature at all and starts in one. Two and a half seconds is
+            // longer than a working answer has ever taken.
+            val customDeobfuscatedUrl =
+                if (cipherResting()) {
+                    null
+                } else {
+                    withTimeoutOrNull(2500) {
+                        CipherDeobfuscator.deobfuscateStreamUrl(signatureCipher, videoId)
+                    } ?: run {
+                        Timber.tag(logTag).d("Cipher deobfuscation gave up — falling through")
+                        noteCipherFailed()
+                        null
+                    }
+                }
             if (customDeobfuscatedUrl != null) {
                 Timber.tag(logTag).d("Stream URL obtained via custom cipher deobfuscation")
                 return customDeobfuscatedUrl
