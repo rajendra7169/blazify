@@ -80,6 +80,7 @@ import com.blazify.music.ui.component.NewActionGrid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import com.blazify.music.utils.LocalMusic
 
 @Composable
 fun QueueMenu(
@@ -89,6 +90,10 @@ fun QueueMenu(
     onDismiss: () -> Unit,
 ) {
     mediaMetadata ?: return
+
+    // A file only this phone has: no radio to start from it, no address to
+    // share, nothing to download, re-fetch or look up.
+    val isLocal = LocalMusic.isLocal(mediaMetadata.id)
     val navController = LocalNavController.current
     val context = LocalContext.current
     val database = LocalDatabase.current
@@ -271,8 +276,8 @@ fun QueueMenu(
         // Quick actions grid
         item {
             NewActionGrid(
-                actions = listOf(
-                    NewAction(
+                actions = listOfNotNull(
+                    if (isLocal) null else NewAction(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.radio),
@@ -308,7 +313,7 @@ fun QueueMenu(
                         text = stringResource(R.string.add_to_playlist),
                         onClick = { showChoosePlaylistDialog = true }
                     ),
-                    NewAction(
+                    if (isLocal) null else NewAction(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.share),
@@ -383,7 +388,7 @@ fun QueueMenu(
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
         // Download section
-        item {
+        if (!isLocal) item {
             Material3MenuGroup(
                 items = listOf(
                     when (download?.state) {
@@ -471,7 +476,7 @@ fun QueueMenu(
         item {
             Material3MenuGroup(
                 items = buildList {
-                    if (artists.isNotEmpty()) {
+                    if (artists.isNotEmpty() && !isLocal) {
                         add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.view_artist)) },
@@ -501,7 +506,7 @@ fun QueueMenu(
                             )
                         )
                     }
-                    if (mediaMetadata.album != null) {
+                    if (mediaMetadata.album != null && !isLocal) {
                         add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.view_album)) },
@@ -537,7 +542,7 @@ fun QueueMenu(
         item {
             Material3MenuGroup(
                 items = buildList {
-                    add(
+                    if (!isLocal) add(
                         Material3MenuItemData(
                             title = { Text(text = stringResource(R.string.refetch)) },
                             description = { Text(text = stringResource(R.string.refetch_desc)) },
@@ -563,7 +568,7 @@ fun QueueMenu(
                             }
                         )
                     )
-                    add(
+                    if (!isLocal) add(
                         Material3MenuItemData(
                             title = { Text(text = stringResource(R.string.details)) },
                             description = { Text(text = stringResource(R.string.details_desc)) },

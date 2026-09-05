@@ -109,6 +109,8 @@ import kotlinx.coroutines.withContext
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.math.round
+import com.blazify.music.utils.LocalMusic
+import com.blazify.music.extensions.toMediaItem
 
 @Composable
 fun PlayerMenu(
@@ -119,6 +121,11 @@ fun PlayerMenu(
     onDismiss: () -> Unit,
 ) {
     mediaMetadata ?: return
+
+    // Same reasoning as the song menu: a file only this phone has cannot be
+    // downloaded, put on a radio, looked up, or opened on a page that does not
+    // exist. Offered and then failing is what reads as the app being broken.
+    val isLocal = LocalMusic.isLocal(mediaMetadata.id)
     val navController = LocalNavController.current
     val context = LocalContext.current
     val database = LocalDatabase.current
@@ -366,7 +373,7 @@ fun PlayerMenu(
             NewActionGrid(
                 actions =
                     listOfNotNull(
-                        if (!isListenTogetherGuest) {
+                        if (!isListenTogetherGuest && !isLocal) {
                             NewAction(
                                 icon = {
                                     Icon(
@@ -398,7 +405,24 @@ fun PlayerMenu(
                             text = stringResource(R.string.add_to_playlist),
                             onClick = { showChoosePlaylistDialog = true },
                         ),
-                        NewAction(
+                        // Copying an address for a file only this phone has copies
+                        // nothing anyone can open, so its place goes to something
+                        // a local file can actually do.
+                        if (isLocal) NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.queue_music),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_queue),
+                            onClick = {
+                                onDismiss()
+                                playerConnection.addToQueue(mediaMetadata.toMediaItem())
+                            },
+                        ) else NewAction(
                             icon = {
                                 Icon(
                                     painter = painterResource(R.drawable.link),
@@ -439,7 +463,7 @@ fun PlayerMenu(
                 items =
                     buildList {
                         // Don't show "View Artist" for podcasts - only show "View Podcast"
-                        if (artists.isNotEmpty() && !isPodcast) {
+                        if (artists.isNotEmpty() && !isPodcast && !isLocal) {
                             add(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(R.string.view_artist)) },
@@ -469,7 +493,7 @@ fun PlayerMenu(
                                 ),
                             )
                         }
-                        if (mediaMetadata.album != null) {
+                        if (mediaMetadata.album != null && !isLocal) {
                             add(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(if (isPodcast) R.string.view_podcast else R.string.view_album)) },
@@ -567,7 +591,7 @@ fun PlayerMenu(
 
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
-        item {
+        if (!isLocal) item {
             Material3MenuGroup(
                 items =
                     listOf(
@@ -657,7 +681,7 @@ fun PlayerMenu(
             Material3MenuGroup(
                 items =
                     buildList {
-                        add(
+                        if (!isLocal) add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.listen_together)) },
                                 icon = {
@@ -718,7 +742,7 @@ fun PlayerMenu(
             Material3MenuGroup(
                 items =
                     buildList {
-                        add(
+                        if (!isLocal) add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.details)) },
                                 description = { Text(text = stringResource(R.string.details_desc)) },
