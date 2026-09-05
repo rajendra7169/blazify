@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
@@ -865,6 +867,18 @@ fun AutoPlaylistScreen(
     }
 }
 
+
+/** One square of the header's artwork, however many there turned out to be. */
+@Composable
+private fun CoverCell(url: String, modifier: Modifier) {
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+        modifier = modifier,
+    )
+}
+
 @Composable
 private fun AutoPlaylistHeader(
     name: String,
@@ -900,12 +914,45 @@ private fun AutoPlaylistHeader(
                         ),
                 shape = RoundedCornerShape(3.dp),
             ) {
-                AsyncImage(
-                    model = songs[0].song.thumbnailUrl,
-                    contentDescription = null,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                // The first song's cover, if the first song happens to have
+                // one — which for a folder of untagged files it often does
+                // not, and the whole square then drew as a black hole while
+                // four other songs in the list had artwork. Take the first
+                // four that exist, the way the library card does, and fall
+                // back to the icon rather than to nothing.
+                val covers = remember(songs) {
+                    songs.mapNotNull { it.song.thumbnailUrl?.takeIf(String::isNotBlank) }.take(4)
+                }
+                when {
+                    covers.size >= 4 ->
+                        Column(Modifier.fillMaxSize()) {
+                            Row(Modifier.weight(1f).fillMaxWidth()) {
+                                CoverCell(covers[0], Modifier.weight(1f).fillMaxHeight())
+                                CoverCell(covers[1], Modifier.weight(1f).fillMaxHeight())
+                            }
+                            Row(Modifier.weight(1f).fillMaxWidth()) {
+                                CoverCell(covers[2], Modifier.weight(1f).fillMaxHeight())
+                                CoverCell(covers[3], Modifier.weight(1f).fillMaxHeight())
+                            }
+                        }
+
+                    covers.isNotEmpty() -> CoverCell(covers[0], Modifier.fillMaxSize())
+
+                    else ->
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surfaceContainer),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.music_note),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(72.dp),
+                            )
+                        }
+                }
             }
         }
 
