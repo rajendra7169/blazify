@@ -296,6 +296,11 @@
     <string name="developer_role">Builds Blazify, from Kathmandu</string>
     <string name="developer_role_short">Developer, Kathmandu</string>
     <string name="developer_star">Star</string>
+    <string name="update_check_idle">Tap to check</string>
+    <string name="update_check_running">Checking\u2026</string>
+    <string name="update_check_latest">You have the newest version</string>
+    <string name="update_check_available">%1$s is out. Tap to get it</string>
+    <string name="update_check_failed">Could not check. Tap to try again</string>
     <string name="developer_bio">I build Blazify on my own, in the open. It began because I wanted a music player that looked the way I thought one should, and people kept asking me for a copy. What goes into each version is mostly what people tell me is broken or missing.</string>
     <string name="developer_website">Website</string>
     <string name="developer_github">GitHub</string>

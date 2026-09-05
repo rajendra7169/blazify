@@ -93,6 +93,7 @@ fun AccountSettings(
 ) {
     val context = LocalContext.current
     var showDeveloperDialog by remember { mutableStateOf(false) }
+    var updateState by remember { mutableStateOf<UpdateCheck>(UpdateCheck.Idle) }
     val repoUrl = stringResource(R.string.blazify_repo_url)
     val websiteUrl = stringResource(R.string.developer_website_url)
     val devGithubUrl = stringResource(R.string.developer_github_url)
@@ -421,12 +422,50 @@ fun AccountSettings(
             // new version is the thing people come back to. The izzy build has
             // no updater at all, so there it simply is not offered.
             if (BuildConfig.UPDATER_AVAILABLE) {
+                // Asked and answered in place. Sending someone to a screen whose
+                // only content is the same question, to press it again, is two
+                // taps and a page for one line of text.
                 PreferenceEntry(
                     title = { Text(stringResource(R.string.check_for_updates_title)) },
-                    icon = { Icon(painterResource(R.drawable.update), null) },
+                    description =
+                        when (val state = updateState) {
+                            UpdateCheck.Running -> stringResource(R.string.update_check_running)
+                            UpdateCheck.Latest -> stringResource(R.string.update_check_latest)
+                            UpdateCheck.Failed -> stringResource(R.string.update_check_failed)
+                            is UpdateCheck.Available ->
+                                stringResource(R.string.update_check_available, state.version)
+                            UpdateCheck.Idle -> stringResource(R.string.update_check_idle)
+                        },
+                    icon = {
+                        BadgedBox(
+                            badge = { if (updateState is UpdateCheck.Available) Badge() },
+                        ) {
+                            Icon(painterResource(R.drawable.update), null)
+                        }
+                    },
                     onClick = {
-                        onClose()
-                        navController.navigate("settings/updater")
+                        val ready = updateState as? UpdateCheck.Available
+                        if (ready != null) {
+                            uriHandler.openUri(ready.downloadUrl)
+                            return@PreferenceEntry
+                        }
+                        if (updateState == UpdateCheck.Running) return@PreferenceEntry
+                        updateState = UpdateCheck.Running
+                        scope.launch {
+                            val result = Updater.checkForUpdate(forceRefresh = true)
+                            updateState =
+                                result.fold(
+                                    onSuccess = { (release, isNewer) ->
+                                        val url = release?.let(Updater::getDownloadUrlForCurrentVariant)
+                                        if (isNewer && release != null && url != null) {
+                                            UpdateCheck.Available(release.versionName, url)
+                                        } else {
+                                            UpdateCheck.Latest
+                                        }
+                                    },
+                                    onFailure = { UpdateCheck.Failed },
+                                )
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -613,4 +652,17 @@ fun AccountSettings(
             Spacer(Modifier.height(8.dp))
         }
     }
+}
+
+/** What the update row has to say, without leaving the sheet to say it. */
+private sealed interface UpdateCheck {
+    data object Idle : UpdateCheck
+
+    data object Running : UpdateCheck
+
+    data object Latest : UpdateCheck
+
+    data object Failed : UpdateCheck
+
+    data class Available(val version: String, val downloadUrl: String) : UpdateCheck
 }
