@@ -546,6 +546,12 @@ fun SongMenu(
 
     val isGuest = listenTogetherManager?.isInRoom == true && !listenTogetherManager.isHost
 
+    // A file on this phone has no page on the catalogue, no address anyone else
+    // could open and nothing to re-fetch. The actions that only make sense for
+    // a song the catalogue knows are left out rather than offered and then
+    // failing: a blank sheet or an error reads as the app being broken.
+    val isLocal = song.song.isLocal
+
     LazyColumn(
         contentPadding =
             PaddingValues(
@@ -558,7 +564,7 @@ fun SongMenu(
         item {
             NewActionGrid(
                 actions =
-                    listOf(
+                    listOfNotNull(
                         NewAction(
                             icon = {
                                 Icon(
@@ -583,7 +589,7 @@ fun SongMenu(
                             text = stringResource(R.string.add_to_playlist),
                             onClick = { showChoosePlaylistDialog = true },
                         ),
-                        NewAction(
+                        if (isLocal) null else NewAction(
                             icon = {
                                 Icon(
                                     painter = painterResource(R.drawable.share),
@@ -640,7 +646,7 @@ fun SongMenu(
                         } else {
                             null
                         },
-                        if (!isGuest) {
+                        if (!isGuest && !isLocal) {
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.start_radio)) },
                                 description = { Text(text = stringResource(R.string.start_radio_desc)) },
@@ -938,7 +944,7 @@ fun SongMenu(
 
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
-        item {
+        if (!isLocal) item {
             Material3MenuGroup(
                 items =
                     listOf(
@@ -1047,7 +1053,7 @@ fun SongMenu(
                                 ),
                             )
                         }
-                        if (song.song.albumId != null) {
+                        if (song.song.albumId != null && !isLocal) {
                             // Show "View Podcast" for episodes, "View Album" for songs
                             val isPodcast = song.song.isEpisode
                             add(
@@ -1149,7 +1155,7 @@ fun SongMenu(
                                 ),
                             )
                         }
-                        add(
+                        if (!isLocal) add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.refetch)) },
                                 description = { Text(text = stringResource(R.string.refetch_desc)) },
@@ -1175,7 +1181,7 @@ fun SongMenu(
                                 },
                             ),
                         )
-                        add(
+                        if (!isLocal) add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.details)) },
                                 description = { Text(text = stringResource(R.string.details_desc)) },
