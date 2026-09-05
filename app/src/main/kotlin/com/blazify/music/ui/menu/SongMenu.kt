@@ -589,7 +589,24 @@ fun SongMenu(
                             text = stringResource(R.string.add_to_playlist),
                             onClick = { showChoosePlaylistDialog = true },
                         ),
-                        if (isLocal) null else NewAction(
+                        // Sharing a file only this phone has is not a thing that
+                        // can work, so the third place goes to something that does
+                        // rather than being left as a hole in the row.
+                        if (isLocal) NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.queue_music),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(28.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_queue),
+                            onClick = {
+                                onDismiss()
+                                playerConnection.addToQueue(song.toMediaItem())
+                            },
+                        ) else NewAction(
                             icon = {
                                 Icon(
                                     painter = painterResource(R.drawable.share),
@@ -1031,7 +1048,11 @@ fun SongMenu(
                 items =
                     buildList {
                         // Don't show "View Artist" for podcast episodes
-                        if (!song.song.isEpisode) {
+                        // The artist page for a local one draws a name, a
+                        // Subscribe button that means nothing here, and no songs
+                        // at all. It has a local branch, but not one that fills
+                        // the page, so it is not offered.
+                        if (!song.song.isEpisode && !isLocal) {
                             add(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(R.string.view_artist)) },
