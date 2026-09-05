@@ -46,11 +46,45 @@ object YTPlayerUtils {
     private const val logTag = "YTPlayerUtils"
     private const val TAG = "YTPlayerUtils"
 
+    /**
+     * Deliberately impatient.
+     *
+     * This asks for two bytes to find out whether an address will serve a song
+     * at all. With no timeouts set it inherited OkHttp's defaults and a client
+     * that was never going to work took sixteen seconds to say so — measured on
+     * a real phone, on every single track, because the first client tried needs
+     * a cipher the app cannot currently extract and is refused every time.
+     * Four seconds is longer than a working address has ever needed.
+     */
     private val httpClient = OkHttpClient.Builder()
         .proxy(YouTube.proxy)
+        .connectTimeout(4, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(4, java.util.concurrent.TimeUnit.SECONDS)
+        .callTimeout(6, java.util.concurrent.TimeUnit.SECONDS)
         .build()
 
     private val poTokenGenerator = PoTokenGenerator()
+
+    /**
+     * When the main client last refused a stream.
+     *
+     * Kept in memory only. It is a hint to save a doomed round trip, not a
+     * decision worth remembering across restarts: YouTube changes its player
+     * often, and a client refusing us this afternoon may well work tomorrow.
+     */
+    @Volatile
+    private var mainClientRefusedAt: Long = 0
+
+    private const val MAIN_CLIENT_REST_MS = 5 * 60 * 1000L
+
+    private fun noteMainClientRefused() {
+        mainClientRefusedAt = System.currentTimeMillis()
+        Timber.tag(logTag).d("Main client refused a stream — resting it for five minutes")
+    }
+
+    private fun mainClientRefusing(): Boolean =
+        mainClientRefusedAt > 0 &&
+            System.currentTimeMillis() - mainClientRefusedAt < MAIN_CLIENT_REST_MS
 
     // Fire-and-forget scope for the cipher config self-heal triggered when a cipher client fails
     // stream validation during resolution. Only WEB_REMIX skips HEAD validation (so its bad URL
@@ -280,9 +314,18 @@ object YTPlayerUtils {
         }
 
         // For age-restricted: skip main client, start with fallbacks
-        // For normal content: standard order
+        // For normal content: standard order, unless the main client has just
+        // been refusing us.
+        //
+        // The main client needs a cipher, and when the app cannot extract one
+        // from the current player JS every request it makes is refused. Trying
+        // it anyway costs a whole round trip per song for no possible gain, and
+        // that round trip was measured at sixteen seconds on a real phone.
+        // After it fails, it is left out for a few minutes and the fallbacks —
+        // which need no cipher — are asked instead.
         val startIndex = when {
             isAgeRestricted -> 0
+            mainClientRefusing() -> 0
             else -> -1
         }
 
@@ -526,6 +569,7 @@ object YTPlayerUtils {
                     break
                 } else {
                     Timber.tag(logTag).d("Stream validation failed for client: ${currentClient.clientName}")
+                    if (currentClient.clientName == MAIN_CLIENT.clientName) noteMainClientRefused()
                     // A cipher client failing validation can mean a wrong-but-non-throwing signature
                     // from a stale/wrong player config — caught here at resolution, so it never
                     // reaches ExoPlayer and MusicService's 403 handler never fires. Ask the cipher to
