@@ -35,6 +35,10 @@ import java.time.ZoneId
 import kotlin.math.abs
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.first
+import com.blazify.music.constants.LocalMusicMinSizeKey
+import com.blazify.music.constants.LocalMusicMinDurationKey
+import com.blazify.music.db.entities.Song
 
 /**
  * The music already on the phone.
@@ -98,7 +102,13 @@ constructor(
      * badly, over the top of what the scan just read back off those files.
      */
     private fun applyOverrides() {
+        val present = database.localSongIds().toSet()
         database.localTagOverrides().forEach { override ->
+            // A file that a length or size limit has just taken out of the
+            // library, or that has left the phone, has nothing to apply to.
+            // The correction is kept rather than deleted, so it is still there
+            // if the file comes back.
+            if (override.songId !in present) return@forEach
             runCatching {
                 database.applyLocalTagOverride(
                     id = override.songId,
@@ -149,6 +159,7 @@ constructor(
             )
         }
         applyOverrides()
+        runCatching { refreshDetails(songId) }
     }
 
     /** Forget a correction. The next scan restores whatever the file itself says. */
@@ -162,7 +173,13 @@ constructor(
         withContext(Dispatchers.IO) {
             if (!hasPermission(context)) return@withContext null
 
-            val found = read(folders)
+            val prefs = context.dataStore.data.first()
+            val found =
+                read(
+                    folders = folders,
+                    minDurationSeconds = prefs[LocalMusicMinDurationKey] ?: 0,
+                    minSizeKb = prefs[LocalMusicMinSizeKey] ?: 0,
+                )
             val seen = found.map { it.song.id }.toSet()
 
             // Anything that was here last time and is not here now has been
@@ -235,7 +252,9 @@ constructor(
             val needing =
                 database.localSongsBlocking().filter {
                     val art = it.song.thumbnailUrl
-                    art == null ||
+                    val artless = it.artists.isEmpty()
+                    artless ||
+                        art == null ||
                         art.startsWith(ALBUM_ART.toString()) ||
                         (art.contains("googleusercontent.com") && !art.contains("=w1080"))
                 }
@@ -264,11 +283,74 @@ constructor(
                 // which is roughly 60px and looks it on a full player screen.
                 // Everything else in the app asks for 1080 the same way.
                 database.updateLocalArtwork(song.song.id, match.thumbnail.resize(1080, 1080))
+                attachArtistIfMissing(song, match)
                 filled++
             }
 
             Timber.tag("LocalMusic").i("artwork filled for $filled of ${needing.size}")
             filled
+        }
+
+    /**
+     * Give a song an artist when the file never said who it was.
+     *
+     * A file with no artist tag and no "Somebody - Song" in its name leaves a
+     * blank line under the title, which reads as the app having failed rather
+     * than the file being bare. The search that already found the cover knows
+     * the answer, so it is taken from there.
+     *
+     * Never over anything already known, and never over a name somebody typed
+     * in themselves: a guess is only better than nothing.
+     */
+    private fun attachArtistIfMissing(song: Song, match: SongItem) {
+        if (song.artists.isNotEmpty()) return
+        if (database.localTagOverride(song.id)?.artistName?.isNotBlank() == true) return
+        val name = match.artists.firstOrNull()?.name?.takeIf { it.isNotBlank() } ?: return
+        runCatching {
+            val artist =
+                ArtistEntity(
+                    id = ARTIST_PREFIX + "name-" + name.lowercase().hashCode(),
+                    name = name,
+                    isLocal = true,
+                )
+            database.insert(artist)
+            database.insert(SongArtistMap(songId = song.id, artistId = artist.id, position = 0))
+        }.onFailure { Timber.tag("LocalMusic").w(it, "could not attach artist for ${song.id}") }
+    }
+
+    /**
+     * Look this one song up again, now that somebody has said what it is.
+     *
+     * Correcting a name is usually the only way a search could ever have found
+     * the track, so the cover worth having only becomes reachable at the moment
+     * the correction is made. Waiting for the next scan to notice would be a
+     * strange thing to make somebody do.
+     */
+    suspend fun refreshDetails(songId: String) =
+        withContext(Dispatchers.IO) {
+            if (!context.dataStore.get(LocalMusicArtworkOnlineKey, true)) return@withContext
+            val song = database.localSongsBlocking().firstOrNull { it.id == songId } ?: return@withContext
+            val query =
+                listOfNotNull(song.song.title, song.artists.firstOrNull()?.name)
+                    .joinToString(" ")
+                    .trim()
+            if (query.isBlank()) return@withContext
+
+            val match =
+                runCatching {
+                    YouTube
+                        .search(query, YouTube.SearchFilter.FILTER_SONG)
+                        .getOrNull()
+                        ?.items
+                        ?.filterIsInstance<SongItem>()
+                        ?.firstOrNull { candidate ->
+                            val d = candidate.duration ?: return@firstOrNull false
+                            abs(d - song.song.duration) <= DURATION_TOLERANCE_SECONDS
+                        }
+                }.getOrNull() ?: return@withContext
+
+            database.updateLocalArtwork(songId, match.thumbnail.resize(1080, 1080))
+            attachArtistIfMissing(song, match)
         }
 
     /** A directory that actually contains music, and how much. */
@@ -315,7 +397,11 @@ constructor(
         val album: AlbumEntity?,
     )
 
-    private fun read(folders: Set<String>): List<Track> {
+    private fun read(
+        folders: Set<String>,
+        minDurationSeconds: Int,
+        minSizeKb: Int,
+    ): List<Track> {
         val projection =
             arrayOf(
                 MediaStore.Audio.Media._ID,
@@ -329,6 +415,7 @@ constructor(
                 MediaStore.Audio.Media.DATE_MODIFIED,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.MIME_TYPE,
+                MediaStore.Audio.Media.SIZE,
             )
 
         val tracks = mutableListOf<Track>()
@@ -360,10 +447,27 @@ constructor(
                 val yearCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
                 val modifiedCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
                 val pathCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
 
                 while (cursor.moveToNext()) {
                     val path = cursor.getString(pathCol)
                     if (folders.isNotEmpty() && folders.none { path != null && path.startsWith(it) }) continue
+
+                    // A phone's music folder is also where voice notes, alarm
+                    // tones and half-second message sounds end up, and
+                    // MediaStore calls all of it music. Neither limit does
+                    // anything until somebody sets it.
+                    if (minDurationSeconds > 0) {
+                        val seconds = cursor.getLong(durationCol) / 1000
+                        if (seconds in 1 until minDurationSeconds.toLong()) {
+                            skipped += 1
+                            continue
+                        }
+                    }
+                    if (minSizeKb > 0 && cursor.getLong(sizeCol) in 1 until minSizeKb.toLong() * 1024) {
+                        skipped += 1
+                        continue
+                    }
 
                     // Skipped rather than listed and then refused at the tap of
                     // play. Windows Media, Monkey's Audio and the DSD formats
