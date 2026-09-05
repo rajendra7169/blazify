@@ -1082,7 +1082,15 @@ fun HomeScreen(
 
                             // Middle tier starts equal
 
-                            else -> 100 // Bottom tier
+                            // What the catalogue sent, and songs like the ones
+                            // already played. These are the only shelves whose
+                            // contents actually change, so they are the reason
+                            // anybody pulls to refresh — and they used to be
+                            // capped below the history shelves and could never
+                            // reach the top of the screen however often you
+                            // asked. Same tier as the rest now, and they take
+                            // their chances with everything else.
+                            else -> 500
                         }
 
                     val modifier =
@@ -1103,8 +1111,8 @@ fun HomeScreen(
                             HomeSection.FromTheCommunity,
                             -> sectionRandom.nextInt(-100, 400)
 
-                            // Bottom tier: Standard variance
-                            else -> sectionRandom.nextInt(-50, 50)
+                            // Enough spread to land anywhere, top included.
+                            else -> sectionRandom.nextInt(-250, 400)
                         }
                     base + modifier
                 }
