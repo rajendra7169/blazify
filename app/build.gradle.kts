@@ -108,8 +108,8 @@ android {
         applicationId = applicationIdOverride ?: baseApplicationId
         minSdk = 26
         targetSdk = 36
-        versionCode = 153
-        versionName = "9.13.0"
+        versionCode = 154
+        versionName = "9.13.1"
         resValue("string", "app_name", appNameOverride ?: "Blazify")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

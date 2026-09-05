@@ -1,0 +1,13 @@
+Music on your phone plays now. It did not before: the player was only
+given the two formats the online catalogue uses, so MP3, FLAC, Ogg, Opus
+and WAV files had nothing to read them with and every one of them stopped
+the moment it was asked to start.
+
+Files in formats the player cannot open, such as Windows Media, are no
+longer listed at all rather than listed and then refused.
+
+Covers show up where they were blank, both beside each song and on the
+library card, and a song with no artist tag now takes the name from the
+file instead of leaving the line empty.
+
+The last row of a list no longer sits flush against the mini player.
