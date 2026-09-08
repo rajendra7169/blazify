@@ -82,10 +82,24 @@ object CipherDeobfuscator {
     private const val VERDICT_HASH_KEY = "undecipherable_player_hash"
     private const val VERDICT_TABLE_KEY = "undecipherable_config_fingerprint"
 
+    /**
+     * Where the verdict is kept, on storage that is readable before unlocking.
+     *
+     * The app can be started while the phone is still locked — at boot, by a
+     * widget, by the system offering to resume what was playing — and ordinary
+     * preferences are not readable until the user has unlocked. Reading them
+     * there threw, in the middle of Application.onCreate, and the app could not
+     * start at all.
+     *
+     * This is a hint about one player's shape, not anything private, so it lives
+     * on device-protected storage where it can always be read.
+     */
     private fun verdicts() =
-        appContext.getSharedPreferences(VERDICT_PREFS, Context.MODE_PRIVATE)
+        appContext
+            .createDeviceProtectedStorageContext()
+            .getSharedPreferences(VERDICT_PREFS, Context.MODE_PRIVATE)
 
-    private fun restoreUndecipherableVerdict() {
+    private fun restoreUndecipherableVerdict() = runCatching {
         val prefs = verdicts()
         val stored = prefs.getString(VERDICT_HASH_KEY, null) ?: return
         val storedTable = prefs.getString(VERDICT_TABLE_KEY, null)
@@ -96,19 +110,25 @@ object CipherDeobfuscator {
             Timber.tag(TAG).d("Config table has changed since $stored was ruled out — giving it another try")
             prefs.edit().remove(VERDICT_HASH_KEY).remove(VERDICT_TABLE_KEY).apply()
         }
-    }
+    }.onFailure {
+        // Worst case the player is parsed once more. Never worth a crash, and
+        // certainly not one that stops the app from starting at all.
+        Timber.tag(TAG).w(it, "could not read the stored verdict")
+    }.let { }
 
     private fun rememberUndecipherable(hash: String) {
         undecipherablePlayerHash = hash
-        verdicts().edit()
-            .putString(VERDICT_HASH_KEY, hash)
-            .putString(VERDICT_TABLE_KEY, PlayerConfigStore.tableFingerprint())
-            .apply()
+        runCatching {
+            verdicts().edit()
+                .putString(VERDICT_HASH_KEY, hash)
+                .putString(VERDICT_TABLE_KEY, PlayerConfigStore.tableFingerprint())
+                .apply()
+        }
     }
 
     private fun forgetUndecipherable() {
         undecipherablePlayerHash = null
-        verdicts().edit().remove(VERDICT_HASH_KEY).remove(VERDICT_TABLE_KEY).apply()
+        runCatching { verdicts().edit().remove(VERDICT_HASH_KEY).remove(VERDICT_TABLE_KEY).apply() }
     }
 
     /**
