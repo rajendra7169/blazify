@@ -38,6 +38,13 @@ import com.blazify.music.utils.BundledChangelog
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 import androidx.compose.ui.unit.sp
+import com.blazify.music.ui.theme.BlazeGradientEnd
+import com.blazify.music.ui.theme.BlazeThemeColor
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.Image
 
 // Links, mentions, and the two emphases release notes are actually written in.
 // Emphasis used to be missing here, which did not leave it unstyled — it left the
@@ -115,21 +122,47 @@ fun ChangelogScreen(
                 }
 
                 item {
-                    val density = LocalDensity.current
-                    val stroke = remember(density) {
-                        Stroke(width = with(density) { 3.dp.toPx() }, cap = StrokeCap.Round)
-                    }
-                    LinearWavyProgressIndicator(
-                        progress = { 1f },
+                    // A rule either side of the mark, in the app's own amber and
+                    // orange, each fading out towards the edge it runs to.
+                    val dark = isSystemInDarkTheme()
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 32.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = Color.Transparent,
-                        stroke = stroke,
-                        trackStroke = stroke,
-                        amplitude = { 1f }
-                    )
+                            .padding(horizontal = 32.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(2.dp)
+                                .clip(RoundedCornerShape(1.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(Color.Transparent, BlazeThemeColor),
+                                    ),
+                                ),
+                        )
+                        Image(
+                            painter = painterResource(
+                                if (dark) R.drawable.blaze_logo_white else R.drawable.blaze_logo,
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(horizontal = 14.dp)
+                                .size(26.dp),
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(2.dp)
+                                .clip(RoundedCornerShape(1.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(BlazeGradientEnd, Color.Transparent),
+                                    ),
+                                ),
+                        )
+                    }
                 }
 
                 if (isLoading) {
