@@ -6,5 +6,8 @@ insisted that it had. That happened on a background thread where nothing was
 watching, so the app went down instead of losing one song's volume-levelling
 figures.
 
-Failures in that part of the app can no longer close it. If a detail cannot be
-saved, it is written to the log and playing carries on.
+Sixty-four pieces of background work ran with nothing to catch a failure. None
+of them can close the app now.
+
+Release notes inside the app read as sentences instead of arriving with their
+own pipes and backticks.
