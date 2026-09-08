@@ -53,6 +53,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Date
 import java.util.Locale
+import com.blazify.music.utils.reportException
 
 class MusicDatabase(
     private val delegate: InternalDatabase,
@@ -63,21 +64,37 @@ class MusicDatabase(
     val openHelper: SupportSQLiteOpenHelper
         get() = delegate.openHelper
 
+    /**
+     * Both of these hand the work to another thread and return at once, which
+     * means the caller's own try/catch is already finished by the time the work
+     * runs and cannot protect it. Nothing else was protecting it either, so any
+     * mistake inside any of the roughly forty of these blocks in the app took
+     * the whole app down from a background thread, with the crash pointing at
+     * the database rather than at whatever was wrong.
+     *
+     * A failed write is worth reporting and surviving, not dying for. It is
+     * logged and reported here instead so the next one is diagnosable.
+     */
     fun query(block: MusicDatabase.() -> Unit) =
         with(delegate) {
             queryExecutor.execute {
-                block(this@MusicDatabase)
+                runCatching { block(this@MusicDatabase) }
+                    .onFailure { onBackgroundWorkFailed("query", it) }
             }
         }
 
     fun transaction(block: MusicDatabase.() -> Unit) =
         with(delegate) {
             transactionExecutor.execute {
-                runInTransaction {
-                    block(this@MusicDatabase)
-                }
+                runCatching { runInTransaction { block(this@MusicDatabase) } }
+                    .onFailure { onBackgroundWorkFailed("transaction", it) }
             }
         }
+
+    private fun onBackgroundWorkFailed(what: String, error: Throwable) {
+        Timber.tag("MusicDatabase").e(error, "database %s failed", what)
+        runCatching { reportException(Exception("database $what failed", error)) }
+    }
 
     suspend fun withTransaction(block: suspend MusicDatabase.() -> Unit) =
         with(delegate) {
