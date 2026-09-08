@@ -3941,21 +3941,31 @@ class MusicService :
                     Timber.tag(TAG).w("No loudness data available from YouTube for video: $mediaId")
                 }
 
-                database.query {
-                    upsert(
-                        FormatEntity(
-                            id = mediaId,
-                            itag = format.itag,
-                            mimeType = format.mimeType.split(";")[0],
-                            codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
-                            bitrate = format.bitrate,
-                            sampleRate = format.audioSampleRate,
-                            contentLength = format.contentLength!!,
-                            loudnessDb = loudnessDb,
-                            perceptualLoudnessDb = perceptualLoudnessDb,
-                            playbackUrl = nonNullPlayback.playbackTracking?.videostatsPlaybackUrl?.baseUrl,
-                        ),
-                    )
+                // The catalogue does not always say how long the file is, and the
+                // row has nowhere to record that it does not know. This used to
+                // assert the value was there, which killed the app on the database
+                // thread rather than losing one song's loudness figures — and it
+                // did so on the very first song, straight from the home screen.
+                val contentLength = format.contentLength
+                if (contentLength == null) {
+                    Timber.tag(TAG).w("No contentLength for $mediaId - not storing its format")
+                } else {
+                    database.query {
+                        upsert(
+                            FormatEntity(
+                                id = mediaId,
+                                itag = format.itag,
+                                mimeType = format.mimeType.split(";")[0],
+                                codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
+                                bitrate = format.bitrate,
+                                sampleRate = format.audioSampleRate,
+                                contentLength = contentLength,
+                                loudnessDb = loudnessDb,
+                                perceptualLoudnessDb = perceptualLoudnessDb,
+                                playbackUrl = nonNullPlayback.playbackTracking?.videostatsPlaybackUrl?.baseUrl,
+                            ),
+                        )
+                    }
                 }
                 recoverSongDeduped(mediaId, nonNullPlayback)
 
