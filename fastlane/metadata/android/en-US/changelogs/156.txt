@@ -1,0 +1,10 @@
+Fixes a crash. On some phones 9.13.2 closed itself as it opened, before you
+could touch anything, and it could close again while a song was starting.
+
+The cause: the catalogue does not always say how long a file is, and the app
+insisted that it had. That happened on a background thread where nothing was
+watching, so the app went down instead of losing one song's volume-levelling
+figures.
+
+Failures in that part of the app can no longer close it. If a detail cannot be
+saved, it is written to the log and playing carries on.
