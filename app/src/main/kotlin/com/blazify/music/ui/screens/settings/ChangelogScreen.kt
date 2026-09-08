@@ -241,6 +241,24 @@ private fun readable(text: String): List<String> {
         }
         // Rules and table borders draw as rows of punctuation and say nothing.
         .filterNot { it.isBlank() || it.all { c -> c == '-' || c == '=' || c == '|' || c == ':' || c == ' ' } }
+        .map { line ->
+            // A table row has no columns here, so its pipes arrive as pipes and
+            // the row reads as punctuation. Its cells are sentences, so they are
+            // joined into one instead of being thrown away.
+            if (line.startsWith("|") && line.endsWith("|")) {
+                line.trim('|')
+                    .split('|')
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .joinToString(" — ")
+            } else {
+                line
+            }
+        }
+        // Backticks mark code on a page that draws code. Here they are just
+        // punctuation around a file name.
+        .map { it.replace("`", "") }
+        .filterNot { it.isBlank() }
 }
 
 @Suppress("DEPRECATION")
