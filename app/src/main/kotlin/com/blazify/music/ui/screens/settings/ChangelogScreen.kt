@@ -37,6 +37,7 @@ import com.blazify.music.BuildConfig
 import com.blazify.music.utils.BundledChangelog
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
+import androidx.compose.ui.unit.sp
 
 // Links, mentions, and the two emphases release notes are actually written in.
 // Emphasis used to be missing here, which did not leave it unstyled — it left the
@@ -225,141 +226,179 @@ fun ReleaseItem(release: ReleaseInfo) {
  * Better to show the words and drop the scaffolding than to print the
  * scaffolding at somebody.
  */
-private fun readable(text: String): List<String> {
+/** One piece of a release note, once its page scaffolding is gone. */
+private sealed interface Note {
+    data class Heading(val level: Int, val text: String) : Note
+
+    data class Paragraph(val text: String) : Note
+
+    data class Bullet(val text: String) : Note
+}
+
+/**
+ * Turn a release note into something worth reading on a phone.
+ *
+ * Notes are written for the releases page, so they arrive wrapped at about
+ * eighty columns, wearing HTML, image badges and tables. Drawing each of those
+ * lines on its own broke sentences wherever the author happened to press
+ * return, which is the single thing that made these hard to read.
+ *
+ * Lines are cleaned, then folded back into paragraphs the way the writer meant
+ * them: a blank line ends one, a heading or a bullet stands alone.
+ */
+private fun notes(text: String): List<Note> {
     val html = Regex("<[^>]+>")
     val badge = Regex("""\[!\[[^\]]*]\([^)]*\)]\([^)]*\)""")
     val image = Regex("""!\[[^\]]*]\([^)]*\)""")
-    return text
-        .split("\n")
-        .map { line ->
-            line.trim()
-                // A linked badge is a button, and a button is not text.
+
+    val cleaned =
+        text.split("\n").map { line ->
+            var l = line.trim()
+                // A linked badge is a button, and a button is not a sentence.
                 .replace(badge, "")
                 .replace(image, "")
                 .replace(html, "")
+                .replace("`", "")
                 .trim()
-        }
-        // Rules and table borders draw as rows of punctuation and say nothing.
-        .filterNot { it.isBlank() || it.all { c -> c == '-' || c == '=' || c == '|' || c == ':' || c == ' ' } }
-        .map { line ->
-            // A table row has no columns here, so its pipes arrive as pipes and
-            // the row reads as punctuation. Its cells are sentences, so they are
-            // joined into one instead of being thrown away.
-            if (line.startsWith("|") && line.endsWith("|")) {
-                line.trim('|')
-                    .split('|')
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
+            // Rules and the dashes under a table heading say nothing, and have to
+            // go before the next step, which would otherwise turn them into text.
+            if (l.isNotEmpty() && l.all { it == '-' || it == '=' || it == '|' || it == ':' || it == ' ' }) {
+                l = ""
+            }
+            // A table row has no columns here; its cells are sentences, so they
+            // are joined rather than thrown away.
+            if (l.length > 1 && l.startsWith("|") && l.endsWith("|")) {
+                l = l.trim('|').split('|').map { it.trim() }.filter { it.isNotEmpty() }
                     .joinToString(" — ")
-            } else {
-                line
+            }
+            l
+        }
+
+    val out = mutableListOf<Note>()
+    val para = StringBuilder()
+    fun flush() {
+        if (para.isNotBlank()) out += Note.Paragraph(para.toString().trim())
+        para.clear()
+    }
+    cleaned.forEach { line ->
+        when {
+            line.isBlank() -> flush()
+            line.startsWith("#") -> {
+                flush()
+                val level = line.takeWhile { it == '#' }.length
+                val body = line.drop(level).trim()
+                if (body.isNotEmpty()) out += Note.Heading(level.coerceIn(1, 3), body)
+            }
+            line.startsWith("- ") || line.startsWith("* ") -> {
+                flush()
+                out += Note.Bullet(line.drop(2).trim())
+            }
+            // A wrapped sentence continues the paragraph it belongs to.
+            else -> {
+                if (para.isNotEmpty()) para.append(' ')
+                para.append(line)
             }
         }
-        // Backticks mark code on a page that draws code. Here they are just
-        // punctuation around a file name.
-        .map { it.replace("`", "") }
-        .filterNot { it.isBlank() }
+    }
+    flush()
+    return out
 }
 
 @Suppress("DEPRECATION")
 @Composable
 fun MarkdownText(text: String) {
-    val lines = readable(text)
     val uriHandler = LocalUriHandler.current
+    val linkColour = MaterialTheme.colorScheme.primary
+    val bodyColour = MaterialTheme.colorScheme.onSurface
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        lines.forEach { line ->
-            val trimmedLine = line.trim()
+    // Inline marks are the same wherever a piece of text appears, so the work
+    // of reading them is done once here.
+    @Composable
+    fun inline(raw: String) = buildAnnotatedString {
+        var lastIndex = 0
+        markdownInlineRegex.findAll(raw).forEach { result ->
+            append(raw.substring(lastIndex, result.range.first))
+            val match = result.value
+            when {
+                match.startsWith("**") && match.endsWith("**") ->
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(match.removeSurrounding("**"))
+                    }
 
-            if (trimmedLine.startsWith("#")) {
-                val level = trimmedLine.takeWhile { it == '#' }.length
-                val headerText = trimmedLine.substring(level).trim()
-                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+                match.startsWith("*") && match.endsWith("*") ->
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append(match.removeSurrounding("*"))
+                    }
+
+                else -> {
+                    val isMention = match.startsWith("@")
+                    val link = if (isMention) "https://github.com/${match.substring(1)}" else match
+                    pushStringAnnotation(tag = "URL", annotation = link)
+                    withStyle(
+                        SpanStyle(
+                            color = linkColour,
+                            fontWeight = if (isMention) FontWeight.Bold else FontWeight.Normal,
+                            textDecoration = if (isMention) TextDecoration.None else TextDecoration.Underline,
+                        ),
+                    ) {
+                        append(match)
+                    }
+                    pop()
+                }
+            }
+            lastIndex = result.range.last + 1
+        }
+        append(raw.substring(lastIndex))
+    }
+
+    @Composable
+    fun body(annotated: androidx.compose.ui.text.AnnotatedString, modifier: Modifier = Modifier) {
+        ClickableText(
+            text = annotated,
+            modifier = modifier,
+            style = MaterialTheme.typography.bodyLarge.copy(color = bodyColour, lineHeight = 26.sp),
+            onClick = { offset ->
+                annotated.getStringAnnotations("URL", offset, offset)
+                    .firstOrNull()?.let { uriHandler.openUri(it.item) }
+            },
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        notes(text).forEachIndexed { index, note ->
+            when (note) {
+                is Note.Heading -> {
+                    // Space above a heading, not below: it belongs to what follows.
+                    Spacer(Modifier.height(if (index == 0) 0.dp else 22.dp))
                     Text(
-                        text = headerText,
-                        style = when (level) {
-                            1 -> MaterialTheme.typography.headlineMedium
-                            2 -> MaterialTheme.typography.headlineSmall
+                        text = note.text,
+                        style = when (note.level) {
+                            1 -> MaterialTheme.typography.headlineSmall
+                            2 -> MaterialTheme.typography.titleLarge
                             else -> MaterialTheme.typography.titleMedium
                         },
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        color = bodyColour,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                     )
                 }
-            } else {
-                val isListItem = trimmedLine.startsWith("- ") || trimmedLine.startsWith("* ")
-                val contentText = if (isListItem) {
-                    trimmedLine.substring(2).trim()
-                } else {
-                    trimmedLine
+
+                is Note.Paragraph -> {
+                    body(inline(note.text), Modifier.fillMaxWidth().padding(bottom = 12.dp))
                 }
 
-                val linkColour = MaterialTheme.colorScheme.primary
-                val annotatedString = buildAnnotatedString {
-                    var lastIndex = 0
-                    markdownInlineRegex.findAll(contentText).forEach { result ->
-                        append(contentText.substring(lastIndex, result.range.first))
-
-                        val match = result.value
-                        when {
-                            match.startsWith("**") && match.endsWith("**") ->
-                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append(match.removeSurrounding("**"))
-                                }
-
-                            match.startsWith("*") && match.endsWith("*") ->
-                                withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                                    append(match.removeSurrounding("*"))
-                                }
-
-                            else -> {
-                                val isMention = match.startsWith("@")
-                                val link = if (isMention) "https://github.com/${match.substring(1)}" else match
-                                pushStringAnnotation(tag = "URL", annotation = link)
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = linkColour,
-                                        fontWeight = if (isMention) FontWeight.Bold else FontWeight.Normal,
-                                        textDecoration = if (isMention) TextDecoration.None else TextDecoration.Underline,
-                                    ),
-                                ) {
-                                    append(match)
-                                }
-                                pop()
-                            }
-                        }
-                        lastIndex = result.range.last + 1
-                    }
-                    append(contentText.substring(lastIndex))
-                }
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        if (isListItem) {
-                            Text(
-                                text = stringResource(R.string.list_bullet),
-                                modifier = Modifier.padding(end = 8.dp),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                        ClickableText(
-                            text = annotatedString,
-                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                            onClick = { offset ->
-                                annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                                    .firstOrNull()?.let { annotation ->
-                                        uriHandler.openUri(annotation.item)
-                                    }
-                            }
+                is Note.Bullet -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.list_bullet),
+                            style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 26.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 10.dp),
                         )
-                    }
-                    
-                    if (isListItem) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HorizontalDivider(
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                        )
+                        body(inline(note.text), Modifier.weight(1f))
                     }
                 }
             }
