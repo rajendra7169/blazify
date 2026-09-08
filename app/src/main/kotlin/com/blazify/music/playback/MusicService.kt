@@ -261,6 +261,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.random.Random
 import java.util.Collections
+import kotlinx.coroutines.CoroutineExceptionHandler
 
 private const val INSTANT_SILENCE_SKIP_STEP_MS = 15_000L
 private const val INSTANT_SILENCE_SKIP_SETTLE_MS = 350L
@@ -323,7 +324,20 @@ class MusicService :
             }
         }
 
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    // A SupervisorJob keeps one failed child from taking its siblings down, but
+    // an uncaught exception in any of them still reaches the default handler and
+    // closes the app. Sixty-odd pieces of background work run on this scope, and
+    // none of them is worth closing a music player for: a scrobble that fails, a
+    // cover that will not load, a queue that cannot be saved. They are recorded
+    // here instead so they can be found, and playing carries on.
+    private val scope =
+        CoroutineScope(
+            Dispatchers.Main + SupervisorJob() +
+                CoroutineExceptionHandler { _, error ->
+                    Timber.tag(TAG).e(error, "background work failed")
+                    runCatching { reportException(Exception("service scope failed", error)) }
+                },
+        )
 
     private val binder = MusicBinder()
 

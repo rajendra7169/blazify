@@ -1804,6 +1804,11 @@ class SyncUtils @Inject constructor(
                     }
 
                     removeFromPlaylistAndAwaitSync(browseId, songId, setVideoId, playlistId)
+                } catch (error: Throwable) {
+                    // A bare thread with no catch takes the app down with it, and
+                    // failing to remove one song from one playlist is not worth
+                    // that. Recorded, and the modifying flag is still cleared.
+                    Timber.w(error, "scheduleRemoveFromPlaylist failed for songId=%s", songId)
                 } finally {
                     unmarkPlaylistModifying(playlistId)
                 }
