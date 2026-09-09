@@ -171,6 +171,9 @@ steps here: **[MIGRATION.md](MIGRATION.md)**.
 
 ## Libraries & Integrations
 
+<details>
+<summary><b>Projects Blazify builds on</b></summary>
+
 | Project | Contribution |
 |---|---|
 | **Better Lyrics** | Time-synced lyrics with word-by-word highlighting & YouTube Music integration |
@@ -179,6 +182,8 @@ steps here: **[MIGRATION.md](MIGRATION.md)**.
 | **MusicRecognizer** | Music recognition feature & Shazam API integration |
 | **BlazifyExtractor** | YouTube cipher deobfuscation and PoToken generation |
 | **last.fm** | Scrobbling and listening history |
+
+</details>
 
 ## Tech
 
