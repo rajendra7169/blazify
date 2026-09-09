@@ -1,8 +1,8 @@
-<div align="center">
+<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/85f863c1-b0d0-4238-bcf3-f6c364ca2718" /><div align="center">
 
 <img src="docs/assets/banner.png" alt="Blazify — a free, open-source music player for Android, Windows, Linux and iPhone. No ads, offline downloads, synced lyrics, imported playlists." width="900" />
 
-# Blazify 🔥
+# Blazify 🎶🎧
 
 **A free, open-source music player. No ads, no tracking, no account needed.**
 
