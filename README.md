@@ -63,16 +63,12 @@ Jetpack Compose, gapless through Media3/ExoPlayer.
 
 ## Blazify everywhere else
 
-The same player, built natively for each place you use it. The buttons at
-the top of this page download any of them directly — these are the repos, if
-you want the source.
+The same player, built natively for each platform. The buttons at the top of
+this page download any of them — these are the repos.
 
-| Platform | Source |
-|---|---|
-| **Android**<br><sub>phones and tablets</sub> | [rajendra7169/blazify](https://github.com/rajendra7169/blazify) **← you are here** |
-| **Windows**<br><sub>installer</sub> | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
-| **Linux**<br><sub>deb, AppImage or tar.gz</sub> | [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop) |
-| **iPhone**<br><sub>sideloaded</sub> | [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios) |
+**Android** — [rajendra7169/blazify](https://github.com/rajendra7169/blazify) *(you are here)*<br>
+**Windows & Linux** — [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop)<br>
+**iPhone** — [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios)
 
 Screenshots, install guides and everything else: **[blazify website](https://rajendra7169.github.io/blazify/)**
 
@@ -155,36 +151,21 @@ Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK, noth
 ### Automatic updates with Obtainium
 
 [Obtainium](https://github.com/ImranR98/Obtainium) watches this repository and
-installs each new release for you, so you never have to come back here.
+installs each new release for you.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.blazify.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Frajendra7169%2Fblazify%22%2C%22author%22%3A%22rajendra7169%22%2C%22name%22%3A%22Blazify%22%7D"><img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png?raw=true" alt="Get it on Obtainium" height="48"></a>
 
-Tap that on your phone with Obtainium installed and Blazify is added. Or open
-Obtainium, tap **Add App**, and paste:
+Tap that on your phone, or add `https://github.com/rajendra7169/blazify` in
+Obtainium by hand. Blazify updates itself too — this is for people who prefer
+one app managing everything they sideload.
 
-```
-https://github.com/rajendra7169/blazify
-```
+---
 
-Blazify also checks for its own updates and can install them itself. Obtainium
-is for people who prefer one app managing everything they sideload.
+### Coming from 9.12.3 or earlier
 
-### ⚠️ Coming from 9.12.3 or earlier
-
-**9.12.4 is signed with a new key, so Android will not install it over an older
-build.** You have to uninstall first, and uninstalling erases your library
-unless you back it up. Two minutes, in this order:
-
-1. In your current version: **Settings → Backup and restore → Backup**, saved to **Downloads**.
-2. Download `Blazify.apk` from Releases.
-3. Uninstall Blazify.
-4. Open Downloads and tap the APK.
-5. **Settings → Backup and restore → Restore**, and pick the file from step 1.
-
-Liked songs, playlists, history and your sign-in all come back.
-
-This is a one-time break. From 9.12.4 onward the app checks for new versions
-itself, downloads them, and installs them over the top without any of this.
+9.12.4 is signed with a new key, so Android will not install it over an
+older build — you have to back up, uninstall, then reinstall. Two minutes,
+steps here: **[MIGRATION.md](MIGRATION.md)**.
 
 ---
 
@@ -201,6 +182,9 @@ itself, downloads them, and installs them over the top without any of this.
 
 ## Tech
 
+<details>
+<summary><b>Built with</b></summary>
+
 | | |
 |---|---|
 | Language | Kotlin |
@@ -210,6 +194,8 @@ itself, downloads them, and installs them over the top without any of this.
 | Database | Room |
 | Images | Coil |
 | Async | Coroutines + Flow |
+
+</details>
 
 ---
 
