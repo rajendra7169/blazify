@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logo.png" alt="Blazify" width="120" />
+<img src="docs/assets/share-card.png" alt="Blazify — a free, open-source music player for Android, Windows, Linux and iPhone" width="820" />
 
 # Blazify 🔥
 
@@ -35,9 +35,9 @@
 
 | | | |
 |:---:|:---:|:---:|
-| <img src="docs/assets/splash.png" width="230" alt="Blazify splash screen" /> | <img src="docs/assets/home.png" width="230" alt="Blazify home screen showing recently played music" /> | <img src="docs/assets/player.png" width="230" alt="Blazify now-playing screen with album art" /> |
+| <img src="docs/assets/frame-splash.png" width="230" alt="Blazify splash screen" /> | <img src="docs/assets/frame-home.png" width="230" alt="Blazify home screen showing recently played music" /> | <img src="docs/assets/frame-player.png" width="230" alt="Blazify now-playing screen with album art" /> |
 | **Splash** | **Home** | **Player** |
-| <img src="docs/assets/lyrics.png" width="230" alt="Word-by-word synced lyrics in Blazify" /> | <img src="docs/assets/equalizer.png" width="230" alt="Blazify ten-band equalizer with live frequency-response curve" /> | <img src="docs/assets/look-and-feel.png" width="230" alt="Blazify Look and Feel hub with live theme preview" /> |
+| <img src="docs/assets/frame-lyrics.png" width="230" alt="Word-by-word synced lyrics in Blazify" /> | <img src="docs/assets/frame-equalizer.png" width="230" alt="Blazify ten-band equalizer with live frequency-response curve" /> | <img src="docs/assets/frame-look-and-feel.png" width="230" alt="Blazify Look and Feel hub with live theme preview" /> |
 | **Synced lyrics** | **Equalizer** | **Look & Feel** |
 
 </div>
