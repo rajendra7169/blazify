@@ -242,6 +242,9 @@ this project belong to their respective owners.
 
 ## Support ☕
 
+<details>
+<summary><b>Buy me a coffee</b></summary>
+
 If Blazify made your day a little better, you can buy me a coffee.
 
 <div align="center">
@@ -251,6 +254,8 @@ If Blazify made your day a little better, you can buy me a coffee.
 **Scan to support Blazify**
 
 </div>
+
+</details>
 
 ---
 
