@@ -8,7 +8,7 @@
 
 *Stream it. Feel it. Blaze it.*
 
-**Download it now** — one click, straight from the newest release.
+**Download it now** --> one click, straight from the newest release.
 
 [![android](https://img.shields.io/badge/Download_for_Android-FFA726?style=for-the-badge&logoColor=1A0E00&logo=android)](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk) [![windows](https://img.shields.io/badge/Download_for_Windows-FFA726?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzFBMEUwMCIgZD0iTTEuNSAzLjkgMTAuMiAyLjd2OC42SDEuNXpNMTEuNCAyLjU1IDIyLjUgMXYxMC4zSDExLjR6TTEuNSAxMi43aDguN3Y4LjZMMS41IDIwLjF6TTExLjQgMTIuN0gyMi41VjIzbC0xMS4xLTEuNTV6Ii8+PC9zdmc+)](https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify-setup.exe) [![linux](https://img.shields.io/badge/Download_for_Linux-FFA726?style=for-the-badge&logoColor=1A0E00&logo=linux)](https://github.com/rajendra7169/blazify-desktop/releases/latest/download/Blazify.deb) [![iphone](https://img.shields.io/badge/Download_for_iPhone-FFA726?style=for-the-badge&logoColor=1A0E00&logo=apple)](https://github.com/rajendra7169/blazify-ios/releases/latest/download/Blazify.ipa)
 
