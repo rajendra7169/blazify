@@ -17,6 +17,8 @@
 [![Release](https://img.shields.io/github/v/release/rajendra7169/blazify?color=FFA726&label=release)](https://github.com/rajendra7169/blazify/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/rajendra7169/blazify/total?color=FFA726&label=downloads)](https://github.com/rajendra7169/blazify/releases)
 [![Website](https://img.shields.io/badge/website-blazify-FFA726)](https://rajendra7169.github.io/blazify/)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-channel-FFA726?logo=whatsapp&logoColor=1A0E00)](https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y)
+[![Discussions](https://img.shields.io/badge/discussions-ask%20anything-FFA726?logo=github&logoColor=1A0E00)](https://github.com/rajendra7169/blazify/discussions)
 [![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
