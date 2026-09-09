@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/share-card.png" alt="Blazify — a free, open-source music player for Android, Windows, Linux and iPhone" width="820" />
+<img src="docs/assets/banner.png" alt="Blazify — a free, open-source music player for Android, Windows, Linux and iPhone. No ads, offline downloads, synced lyrics, imported playlists." width="900" />
 
 # Blazify 🔥
 
