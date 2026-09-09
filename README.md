@@ -2,7 +2,7 @@
 
 <img src="docs/assets/banner.png" alt="Blazify — a free, open-source music player for Android, Windows, Linux and iPhone. No ads, offline downloads, synced lyrics, imported playlists." width="900" />
 
-# Blazify 🎶🎧
+# Blazify 🎧🔥
 
 **A free, open-source music player. No ads, no tracking, no account needed.**
 
