@@ -138,7 +138,7 @@ Screenshots, install guides and everything else: **[blazify website](https://raj
 
 ## Roadmap
 
-What is planned, what has been asked for, and what is deliberately not being done: **[ROADMAP.md](ROADMAP.md)**. Local music support on Android is next.
+What is planned, what has been asked for, and what is deliberately not being done: **[ROADMAP.md](ROADMAP.md)**. Local music on Android shipped in 9.13.2.
 
 ---
 

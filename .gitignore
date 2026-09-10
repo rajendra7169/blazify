@@ -124,3 +124,6 @@ CLAUDE.md
 
 # Local technical docs (do not publish)
 docs/*.pdf
+
+# browser-automation leftovers
+.playwright-mcp/
