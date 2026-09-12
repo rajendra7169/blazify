@@ -281,6 +281,11 @@ interface DatabaseDao {
         previewSize: Int = 3,
     ): Flow<List<Song>>
 
+    // Quick picks start from what someone listens to most, measured in time
+    // listened. A single three-hour podcast outweighs a week of songs by that
+    // measure, so episodes and anything over half an hour were steering the
+    // music suggestions towards talk. They still play; they no longer seed
+    // or fill this list.
     @Transaction
     @Query(
         """
@@ -289,23 +294,33 @@ interface DatabaseDao {
               FROM related_song_map
               GROUP BY relatedSongId) map
                  JOIN song ON song.id = map.relatedSongId
-        WHERE songId IN (SELECT songId
-                         FROM (SELECT songId
+        WHERE (song.isEpisode = 0 OR song.isEpisode IS NULL)
+          AND song.duration < 1800
+          AND songId IN (SELECT songId
+                         FROM (SELECT event.songId
                                FROM event
-                               ORDER BY ROWID DESC
+                                        JOIN song ON song.id = event.songId
+                               WHERE (song.isEpisode = 0 OR song.isEpisode IS NULL)
+                                 AND song.duration < 1800
+                               ORDER BY event.rowid DESC
                                LIMIT 5)
                          UNION
                          SELECT songId
-                         FROM (SELECT songId
+                         FROM (SELECT event.songId
                                FROM event
-                               WHERE timestamp > :now - 86400000 * 7
-                               GROUP BY songId
-                               ORDER BY SUM(playTime) DESC
+                                        JOIN song ON song.id = event.songId
+                               WHERE event.timestamp > :now - 86400000 * 7
+                                 AND (song.isEpisode = 0 OR song.isEpisode IS NULL)
+                                 AND song.duration < 1800
+                               GROUP BY event.songId
+                               ORDER BY SUM(event.playTime) DESC
                                LIMIT 5)
                          UNION
                          SELECT id
                          FROM (SELECT id
                                FROM song
+                               WHERE (isEpisode = 0 OR isEpisode IS NULL)
+                                 AND duration < 1800
                                ORDER BY totalPlayTime DESC
                                LIMIT 10))
         ORDER BY referredCount DESC
@@ -618,6 +633,7 @@ interface DatabaseDao {
               ORDER BY oldPlayTime) AS t
                  JOIN song on song.id = t.eid
         WHERE 0.2 * t.oldPlayTime > t.newPlayTime
+          AND (song.isEpisode = 0 OR song.isEpisode IS NULL) AND song.duration < 1800
         LIMIT 100
     """
     )

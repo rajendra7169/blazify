@@ -291,6 +291,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun getDailyDiscover() {
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
+        val hideExplicit = context.dataStore.get(HideExplicitKey, false)
         val likedSongs = database.likedSongsByCreateDateAsc().first()
         if (likedSongs.isEmpty()) return
 
@@ -308,7 +309,10 @@ class HomeViewModel @Inject constructor(
                             val recommendations = page.songs
                                 .filter { item ->
                                     if (hideVideoSongs && item.isVideoSong) return@filter false
-                                    if (item.explicit) return@filter false
+                                    // Only when the listener asked for it. This used to drop every
+                                    // explicit song whatever the setting said, which quietly emptied
+                                    // Daily Discover for anyone whose taste runs to hip-hop or rap.
+                                    if (hideExplicit && item.explicit) return@filter false
                                     true
                                 }
                                 .shuffled()
