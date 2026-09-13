@@ -1904,8 +1904,18 @@ class MusicService :
         scope.launch(SilentHandler) {
             val initialStatus =
                 withContext(Dispatchers.IO) {
-                    queue
-                        .getInitialStatus()
+                    runCatching { queue.getInitialStatus() }
+                        .getOrElse { error ->
+                            if (error is kotlin.coroutines.cancellation.CancellationException) throw error
+                            // The song that was tapped is already playing; this only fills in
+                            // what comes after it. When that request failed, the error went
+                            // nowhere and the song played alone, stopping at its end with
+                            // nothing said. Record it, and fill the queue from songs already
+                            // known to belong with it, so playback carries on.
+                            Timber.tag(TAG).w(error, "Queue failed to load for ${queue.preloadItem?.id}")
+                            reportException(error)
+                            fallbackQueueStatus(queue.preloadItem) ?: throw error
+                        }
                         .filterExplicit(dataStore.get(HideExplicitKey, false))
                         .filterVideoSongs(dataStore.get(HideVideoSongsKey, false))
                 }
@@ -1948,6 +1958,31 @@ class MusicService :
                 applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
             }
         }
+    }
+
+    /**
+     * Something to play after [preload] when its own queue could not be fetched.
+     *
+     * A song from the phone goes on among the other songs on the phone. Anything
+     * else goes on to the songs recorded as related to it, which need no network
+     * to find. Null when there is nothing to offer, so the original failure stands.
+     */
+    private suspend fun fallbackQueueStatus(preload: com.blazify.music.models.MediaMetadata?): Queue.Status? {
+        val id = preload?.id ?: return null
+        val first = preload.toMediaItem()
+        if (LocalMusic.isLocal(id)) {
+            val local = database.localSongsBlocking()
+            val index = local.indexOfFirst { it.id == id }
+            if (local.size <= 1) return null
+            return if (index >= 0) {
+                Queue.Status(title = null, items = local.map { it.toMediaItem() }, mediaItemIndex = index)
+            } else {
+                Queue.Status(title = null, items = listOf(first) + local.map { it.toMediaItem() }, mediaItemIndex = 0)
+            }
+        }
+        val related = database.getRelatedSongs(id).first().filter { it.id != id }
+        if (related.isEmpty()) return null
+        return Queue.Status(title = null, items = listOf(first) + related.map { it.toMediaItem() }, mediaItemIndex = 0)
     }
 
     fun startRadioSeamlessly() {
