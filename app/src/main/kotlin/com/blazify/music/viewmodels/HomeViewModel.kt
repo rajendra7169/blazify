@@ -14,6 +14,8 @@ import com.blazify.innertube.models.Artist
 import com.blazify.innertube.models.ArtistItem
 import com.blazify.innertube.models.PlaylistItem
 import com.blazify.innertube.models.SongItem
+import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.utils.mixQuickPicks
 import kotlinx.coroutines.flow.combine
 import com.blazify.innertube.models.WatchEndpoint
 import com.blazify.innertube.models.BrowseEndpoint
@@ -346,35 +348,43 @@ class HomeViewModel @Inject constructor(
         when (quickPicksEnum.first()) {
             QuickPicks.QUICK_PICKS -> {
                 val relatedSongs = database.quickPicks().first().filterVideoSongs(hideVideoSongs)
-                val forgotten = database.forgottenFavorites().first().filterVideoSongs(hideVideoSongs).take(8)
+                val forgotten = database.forgottenFavorites().first().filterVideoSongs(hideVideoSongs)
 
-                // Get similar songs from YouTube based on recent listening
-                val recentSong = database.events().first().firstOrNull()?.song
+                // Songs YouTube finds similar to the last song played — a song,
+                // not a podcast, or the suggestions follow the talk instead.
+                //
+                // These used to be kept only when they were already in the
+                // local database, so the one source that can bring someone music
+                // they have not heard yet could only ever repeat what they had.
+                // They are saved first now, the way the player saves every
+                // related song it looks up.
+                val recentSong = database.events().first()
+                    .firstOrNull { !it.song.song.isEpisode && it.song.song.duration < 1800 }
+                    ?.song
                 val ytSimilarSongs = mutableListOf<Song>()
 
                 if (recentSong != null) {
                     val endpoint = YouTube.next(WatchEndpoint(videoId = recentSong.id)).getOrNull()?.relatedEndpoint
                     if (endpoint != null) {
                         YouTube.related(endpoint).onSuccess { page ->
-                            // Convert YouTube songs to local Song format if they exist in database
-                            page.songs.take(10).forEach { ytSong ->
-                                database.song(ytSong.id).first()?.let { localSong ->
-                                    if (!hideVideoSongs || !localSong.song.isVideo) {
-                                        ytSimilarSongs.add(localSong)
-                                    }
+                            page.songs
+                                .filter { !it.isEpisode && (it.duration ?: 0) < 1800 }
+                                .filter { !hideVideoSongs || !it.isVideoSong }
+                                .take(10)
+                                .forEach { ytSong ->
+                                    database.insert(ytSong.toMediaMetadata())
+                                    database.song(ytSong.id).first()?.let(ytSimilarSongs::add)
                                 }
-                            }
                         }
                     }
                 }
 
-                // Combine all sources and remove duplicates
-                val combined = (relatedSongs + forgotten + ytSimilarSongs)
-                    .distinctBy { it.id }
-                    .shuffled()
-                    .take(20)
-
-                quickPicks.value = combined.ifEmpty { relatedSongs.shuffled().take(20) }
+                quickPicks.value = mixQuickPicks(
+                    related = relatedSongs,
+                    similar = ytSimilarSongs,
+                    forgotten = forgotten,
+                    id = { it.id },
+                )
             }
             QuickPicks.LAST_LISTEN -> {
                 val song = database.events().first().firstOrNull()?.song
