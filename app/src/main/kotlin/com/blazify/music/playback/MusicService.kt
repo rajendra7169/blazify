@@ -1890,6 +1890,8 @@ class MusicService :
 
         currentQueue = queue
         queueTitle = null
+        // A new queue replaces everything, including songs waiting from Play next.
+        pendingPlayNextIds.clear()
         val persistShuffleAcrossQueues = dataStore.get(PersistentShuffleAcrossQueuesKey, false)
         val previousShuffleEnabled = player.shuffleModeEnabled
         if (!persistShuffleAcrossQueues) {
@@ -2182,9 +2184,15 @@ class MusicService :
         automixItems.value = emptyList()
     }
 
+    // Songs added with Play next that haven't started yet, oldest pick first.
+    // A new pick goes in behind these instead of jumping in front of them, so
+    // picking 5, 9 and 11 plays 5, 9, 11 rather than 11, 9, 5.
+    private val pendingPlayNextIds = mutableListOf<String>()
+
     fun playNext(items: List<MediaItem>) {
         // If queue is empty or player is idle, play immediately instead
         if (player.mediaItemCount == 0 || player.playbackState == STATE_IDLE) {
+            pendingPlayNextIds.clear()
             player.setMediaItems(items)
             player.prepare()
             if (castConnectionHandler?.isCasting?.value != true) {
@@ -2210,12 +2218,20 @@ class MusicService :
             }
         }
 
-        val insertIndex = player.currentMediaItemIndex + 1
+        // Step past earlier picks that are still waiting right after the current song.
+        var insertIndex = player.currentMediaItemIndex + 1
+        while (insertIndex < player.mediaItemCount &&
+            player.getMediaItemAt(insertIndex).mediaId in pendingPlayNextIds
+        ) {
+            insertIndex++
+        }
+        val earlierPicks = (player.currentMediaItemIndex + 1 until insertIndex).toSet()
         val shuffleEnabled = player.shuffleModeEnabled
 
-        // Insert items immediately after the current item in the window/index space
+        // Insert after the current item and any earlier picks, in the window/index space
         player.addMediaItems(insertIndex, items)
         player.prepare()
+        pendingPlayNextIds.addAll(items.map { it.mediaId })
 
         if (shuffleEnabled) {
             // Rebuild shuffle order so that newly inserted items are played next
@@ -2247,17 +2263,18 @@ class MusicService :
 
                 val existingOrder = (prevList + orderAfter).filter { it != currentIndex && it !in newIndices }
 
-                // Build new shuffle order: current -> newly inserted (in insertion order) -> rest
+                // Build new shuffle order: current -> earlier picks -> newly inserted (in insertion order) -> rest
                 val nextBlock = (insertIndex until (insertIndex + items.size)).toList()
                 val finalOrder = IntArray(size)
                 var pos = 0
                 prevList
-                    .filter { it !in newIndices }
+                    .filter { it !in newIndices && it !in earlierPicks }
                     .forEach { if (it in 0 until size) finalOrder[pos++] = it }
                 finalOrder[pos++] = currentIndex
+                earlierPicks.sorted().forEach { if (it in 0 until size) finalOrder[pos++] = it }
                 nextBlock.forEach { if (it in 0 until size) finalOrder[pos++] = it }
                 orderAfter
-                    .filter { it !in newIndices }
+                    .filter { it !in newIndices && it !in earlierPicks }
                     .forEach { if (pos < size) finalOrder[pos++] = it }
 
                 // Fill any missing indices (safety) to ensure a full permutation
@@ -2637,6 +2654,8 @@ class MusicService :
             }
         }
         lastTransitionedMediaId = mediaItem?.mediaId
+        // A Play next pick that has started playing is no longer waiting.
+        mediaItem?.mediaId?.let { pendingPlayNextIds.remove(it) }
 
         previousEpisodeId?.let { episodeId ->
             if (previousEpisodePosition > 0) {
