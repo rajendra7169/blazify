@@ -75,6 +75,7 @@ import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.InnerTubeCookieKey
 import com.blazify.music.constants.PureBlackKey
+import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.ReleaseNotesCard
 import com.blazify.music.utils.Updater
@@ -123,7 +124,14 @@ fun SettingsScreen(
     val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in innerTubeCookie }
     val (darkMode, onDarkModeChange) = rememberEnumPreference(DarkModeKey, DarkMode.AUTO)
     val (dynamicTheme, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, true)
-    val (pureBlack, onPureBlackChange) = rememberPreference(PureBlackKey, true)
+    val (pureBlack, setPureBlack) = rememberPreference(PureBlackKey, true)
+    val (_, setPureBlackMiniPlayer) = rememberPreference(PureBlackMiniPlayerKey, false)
+    // Look & Feel turns pure black on for the mini player as well. The chip used to
+    // skip that, which left a grey mini player under an otherwise black app.
+    val onPureBlackChange: (Boolean) -> Unit = { enabled ->
+        setPureBlack(enabled)
+        setPureBlackMiniPlayer(enabled)
+    }
 
     val groups: List<Pair<String, List<SettingRow>>> = listOf(
         stringResource(R.string.settings_group_personalize) to listOf(
