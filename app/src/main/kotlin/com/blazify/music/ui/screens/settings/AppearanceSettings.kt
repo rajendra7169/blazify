@@ -87,7 +87,6 @@ import com.blazify.music.constants.SwipeSensitivityKey
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.SwipeToRemoveSongKey
 import com.blazify.music.constants.SwipeToSongKey
-import com.blazify.music.constants.UseNewPlayerDesignKey
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.EnumDialog
 import com.blazify.music.ui.component.IconButton
@@ -140,11 +139,6 @@ fun AppearanceSettings(
     // Check if user has selected a custom color (not the default/dynamic color)
     val isUsingCustomColor = selectedThemeColorInt != DefaultThemeColor.toArgb()
 
-    val (useNewPlayerDesign, onUseNewPlayerDesignChange) =
-        rememberPreference(
-            UseNewPlayerDesignKey,
-            defaultValue = false,
-        )
     // Mini-player design and background, slider style, default tab, grid size and
     // slim navbar are set in Look & Feel, which has a live preview for them.
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
@@ -500,28 +494,6 @@ fun AppearanceSettings(
             title = stringResource(R.string.player),
             items =
                 listOf(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.palette),
-                        title = { Text(stringResource(R.string.new_player_design)) },
-                        description = { Text(stringResource(R.string.new_player_design_desc)) },
-                        trailingContent = {
-                            Switch(
-                                checked = useNewPlayerDesign,
-                                onCheckedChange = onUseNewPlayerDesignChange,
-                                thumbContent = {
-                                    Icon(
-                                        painter =
-                                            painterResource(
-                                                id = if (useNewPlayerDesign) R.drawable.check else R.drawable.close,
-                                            ),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    )
-                                },
-                            )
-                        },
-                        onClick = { onUseNewPlayerDesignChange(!useNewPlayerDesign) },
-                    ),
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.gradient),
                         title = { Text(stringResource(R.string.player_background_style)) },
