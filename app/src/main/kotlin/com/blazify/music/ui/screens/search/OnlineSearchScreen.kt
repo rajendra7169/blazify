@@ -433,21 +433,52 @@ fun OnlineSearchScreen(
             }
 
             // An empty search box used to be an empty screen. This gives it
-            // somewhere to go: the same moods and genres Explore lists, two to
-            // a row, each in its own colour.
-            if (moods.isNotEmpty()) {
-                item(key = "browse_heading") {
-                    Text(
-                        text = stringResource(R.string.browse),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier =
-                            Modifier
-                                .animateItem()
-                                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
+            // somewhere to go: Charts and New releases, which nothing else in the
+            // app opened, then the moods and genres Explore lists, two to a row,
+            // each in its own colour.
+            item(key = "browse_heading") {
+                Text(
+                    text = stringResource(R.string.browse),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier =
+                        Modifier
+                            .animateItem()
+                            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
+                )
+            }
+            item(key = "browse_explore") {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier =
+                        Modifier
+                            .animateItem()
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min)
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                ) {
+                    BrowseTile(
+                        title = stringResource(R.string.charts),
+                        stripeColor = 0xFFFFA726,
+                        onClick = {
+                            onDismiss()
+                            navController.navigate("charts_screen")
+                        },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    BrowseTile(
+                        title = stringResource(R.string.new_release_albums),
+                        stripeColor = 0xFFFF7043,
+                        onClick = {
+                            onDismiss()
+                            navController.navigate("new_release")
+                        },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                 }
+            }
+            if (moods.isNotEmpty()) {
                 items(
                     items = moods.take(12).chunked(2),
                     key = { row -> "browse_${row.first().title}" },
