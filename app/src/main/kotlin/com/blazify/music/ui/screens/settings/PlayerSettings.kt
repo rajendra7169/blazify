@@ -43,6 +43,8 @@ import com.blazify.music.constants.AudioTrackPlaybackParamsKey
 import com.blazify.music.constants.AudioQuality
 import com.blazify.music.constants.AudioQualityKey
 import com.blazify.music.constants.AutoDownloadOnLikeKey
+import com.blazify.music.constants.DownloadOnWifiOnlyKey
+import com.blazify.music.constants.SaveDataOnMobileKey
 import com.blazify.music.constants.CrossfadeDurationKey
 import com.blazify.music.constants.CrossfadeEnabledKey
 import com.blazify.music.constants.CrossfadeGaplessKey
@@ -101,6 +103,7 @@ fun PlayerSettings(
         AudioQualityKey,
         defaultValue = AudioQuality.AUTO
     )
+    val (saveDataOnMobile, onSaveDataOnMobileChange) = rememberPreference(SaveDataOnMobileKey, defaultValue = true)
     val (crossfadeEnabled, onCrossfadeEnabledChange) = rememberPreference(
         CrossfadeEnabledKey,
         defaultValue = false
@@ -181,6 +184,7 @@ fun PlayerSettings(
         AutoDownloadOnLikeKey,
         defaultValue = false
     )
+    val (downloadOnWifiOnly, onDownloadOnWifiOnlyChange) = rememberPreference(DownloadOnWifiOnlyKey, defaultValue = false)
     val (similarContentEnabled, similarContentEnabledChange) = rememberPreference(
         key = SimilarContent,
         defaultValue = true
@@ -321,6 +325,29 @@ fun PlayerSettings(
                     },
                     onClick = { showAudioQualityDialog = true }
                 ))
+                add(
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.speed),
+                    title = { Text(stringResource(R.string.save_data_on_mobile)) },
+                    description = { Text(stringResource(R.string.save_data_on_mobile_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = saveDataOnMobile,
+                            onCheckedChange = onSaveDataOnMobileChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (saveDataOnMobile) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onSaveDataOnMobileChange(!saveDataOnMobile) }
+                )
+                )
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.linear_scale),
                     title = { Text(stringResource(R.string.crossfade)) },
@@ -892,6 +919,27 @@ fun PlayerSettings(
                         )
                     },
                     onClick = { onAutoDownloadOnLikeChange(!autoDownloadOnLike) }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.download),
+                    title = { Text(stringResource(R.string.download_wifi_only)) },
+                    description = { Text(stringResource(R.string.download_wifi_only_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = downloadOnWifiOnly,
+                            onCheckedChange = onDownloadOnWifiOnlyChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (downloadOnWifiOnly) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onDownloadOnWifiOnlyChange(!downloadOnWifiOnly) }
                 ),
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.similar),

@@ -43,6 +43,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.distinctUntilChanged
+import com.blazify.music.utils.dataStore
+import com.blazify.music.constants.DownloadOnWifiOnlyKey
+import androidx.media3.exoplayer.scheduler.Requirements
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import timber.log.Timber
@@ -246,6 +251,18 @@ constructor(
         }
 
     init {
+        // With Download only on Wi-Fi on, downloads wait for an unmetered network and
+        // pick up again by themselves when the phone connects to one.
+        scope.launch {
+            context.dataStore.data.map { it[DownloadOnWifiOnlyKey] ?: false }
+                .distinctUntilChanged()
+                .collect { wifiOnly ->
+                    val requirements =
+                        Requirements(if (wifiOnly) Requirements.NETWORK_UNMETERED else Requirements.NETWORK)
+                    withContext(Dispatchers.Main) { downloadManager.requirements = requirements }
+                }
+        }
+
         val result = mutableMapOf<String, Download>()
         val cursor = downloadManager.downloadIndex.getDownloads()
         while (cursor.moveToNext()) {

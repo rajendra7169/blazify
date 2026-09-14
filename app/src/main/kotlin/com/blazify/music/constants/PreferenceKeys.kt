@@ -137,6 +137,11 @@ enum class AudioQuality {
     HIGH,
 }
 
+// On mobile data, Auto quality streams at 128 kbps unless this is turned off.
+val SaveDataOnMobileKey = booleanPreferencesKey("saveDataOnMobile")
+// Downloads wait for Wi-Fi (an unmetered network) when this is on.
+val DownloadOnWifiOnlyKey = booleanPreferencesKey("downloadOnWifiOnly")
+
 val AudioOffload = booleanPreferencesKey("enableOffload")
 val AudioTrackPlaybackParamsKey = booleanPreferencesKey("audioTrackPlaybackParams")
 

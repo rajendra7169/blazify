@@ -292,6 +292,13 @@
             </intent-filter>
         </service>
 
+        <!-- Restarts downloads that were waiting for Wi-Fi once it is available, even
+             when the app is not open. -->
+        <service
+            android:name="androidx.media3.exoplayer.scheduler.PlatformScheduler$PlatformSchedulerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <!-- Receiver for Listen Together notification actions (Approve/Reject) -->
         <receiver
             android:name=".listentogether.ListenTogetherActionReceiver"

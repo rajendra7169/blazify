@@ -132,6 +132,7 @@ import com.blazify.music.constants.EnableSongCacheKey
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HiddenSongIdsKey
+import com.blazify.music.constants.SaveDataOnMobileKey
 import com.blazify.music.constants.HistoryDuration
 import com.blazify.music.constants.LastFMUseNowPlaying
 import com.blazify.music.constants.MediaSessionConstants
@@ -1275,6 +1276,9 @@ class MusicService :
         }
         scope.launch {
             dataStore.data.map { it[HiddenSongIdsKey] ?: emptySet() }.distinctUntilChanged().collect { cachedHiddenSongIds = it }
+        }
+        scope.launch {
+            dataStore.data.map { it[SaveDataOnMobileKey] ?: true }.distinctUntilChanged().collect { YTPlayerUtils.saveDataOnMobile = it }
         }
         scope.launch {
             dataStore.data.map { it[ShufflePlaylistFirstKey] ?: false }.distinctUntilChanged().collect { cachedShufflePlaylistFirst = it }

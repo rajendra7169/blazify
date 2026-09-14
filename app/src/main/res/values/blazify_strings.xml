@@ -959,6 +959,10 @@
     <string name="hidden_songs_desc">Songs you asked not to be played for you</string>
     <string name="hidden_songs_empty">No hidden songs. Choose Don\'t play this song in a song\'s menu to hide one.</string>
     <string name="unhide">Unhide</string>
+    <string name="save_data_on_mobile">Save data on mobile networks</string>
+    <string name="save_data_on_mobile_desc">With Audio quality on Auto, stream at 128 kbps on mobile data. Turn off for full quality everywhere</string>
+    <string name="download_wifi_only">Download only on Wi-Fi</string>
+    <string name="download_wifi_only_desc">Downloads wait for Wi-Fi and carry on by themselves once you connect</string>
     <string name="pin">Pin</string>
     <string name="unpin">Unpin</string>
     <string name="randomize_home_order">Randomize home screen order</string>

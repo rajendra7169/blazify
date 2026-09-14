@@ -152,6 +152,10 @@ object YTPlayerUtils {
     @Volatile
     var disabledStreamClients: Set<String> = emptySet()
 
+    // Settings → Player → Save data on mobile networks. Only changes Auto quality.
+    @Volatile
+    var saveDataOnMobile: Boolean = true
+
     /**
      * Told when the session identity has to be replaced, so it can be kept.
      *
@@ -764,7 +768,8 @@ object YTPlayerUtils {
             }
 
             AudioQuality.AUTO -> {
-                val targetBitrate = if (connectivityManager.isActiveNetworkMetered) 128000.0 else maxBitrate.toDouble()
+                val targetBitrate =
+                    if (saveDataOnMobile && connectivityManager.isActiveNetworkMetered) 128000.0 else maxBitrate.toDouble()
                 val cappedFormats = audioCapableFormats.filter { it.bitrate <= targetBitrate }
                 val autoFormat = cappedFormats
                     .filter { it.isOriginal }
