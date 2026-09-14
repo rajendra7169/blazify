@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.blazify.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
 import com.blazify.music.lyrics.LyricsEntry
 import com.blazify.music.lyrics.LyricsUtils
+import com.blazify.music.lyrics.lyricsTextLooksSynced
 import com.blazify.music.ui.component.LyricsListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class LyricsViewModel @Inject constructor() : ViewModel() {
                 if (lyrics == null || lyrics == LYRICS_NOT_FOUND) {
                     emptyList()
                 } else {
-                    val isLrc = timestampRegex.containsMatchIn(lyrics)
+                    val isLrc = lyricsTextLooksSynced(lyrics)
                     val parsedLines = if (isLrc) LyricsUtils.parseLyrics(lyrics) else emptyList()
                     
                     if (parsedLines.isNotEmpty()) {

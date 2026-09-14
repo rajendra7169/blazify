@@ -114,7 +114,7 @@ import com.blazify.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
 import com.blazify.music.lyrics.LyricsResyncHelper
 import com.blazify.music.lyrics.LyricsTranslationHelper
 import com.blazify.music.lyrics.LyricsUtils.findActiveLineIndices
-import com.blazify.music.lyrics.lyricsTextLooksSynced
+import com.blazify.music.lyrics.LyricsEntry
 import com.blazify.music.ui.component.shimmer.ShimmerHost
 import com.blazify.music.ui.component.shimmer.TextPlaceholder
 import com.blazify.music.ui.screens.settings.LyricsPosition
@@ -234,7 +234,10 @@ fun ExperimentalLyrics(
         lyricsViewModel.processLyrics(lyrics, enabledLanguages, romanizeCyrillicByLine, showIntervalIndicator, songDurationSec)
     }
 
-    val isSynced = remember(lyrics) { lyricsTextLooksSynced(lyrics) }
+    // Synced means the lines really came with times, not that the text looked like it might:
+    // the view model only puts the head entry in front when timestamps were parsed. Anything
+    // else gets the scroll that follows playback progress instead of waiting for a line time.
+    val isSynced = remember(lines) { lines.firstOrNull() === LyricsEntry.HEAD_LYRICS_ENTRY }
     val hasWordTimings = remember(lines) { lines.any { it.words?.isNotEmpty() == true } }
 
     // For PLAIN (un-timestamped) lyrics we drive the scroll from playback progress.

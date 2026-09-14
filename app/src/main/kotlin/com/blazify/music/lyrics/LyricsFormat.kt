@@ -5,15 +5,17 @@
 
 package com.blazify.music.lyrics
 
-private val LRC_TIMESTAMP_HINT = Regex("""\[\d{1,2}:\d{2}""")
+private val LRC_TIMESTAMP_HINT = Regex("""\[\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?\]""")
 
 /**
- * Whether raw lyrics text appears to be time-synced (LRC-style), including when a BOM or
- * leading blank lines precede the first `[mm:ss.xx]` tag.
+ * Whether raw lyrics text is time-synced (LRC-style): it carries at least one `[mm:ss.xx]`
+ * tag, wherever that first tag sits — after a BOM, blank lines or `[ar:]` / `[ti:]` tags.
+ *
+ * Starting with `[` is not enough. Plain lyrics often open with a section header such as
+ * `[Verse 1]`, and treating those as synced left every line without a time, so nothing ever
+ * lit up and the scroll for plain lyrics never ran either.
  */
 fun lyricsTextLooksSynced(lyrics: String?): Boolean {
     if (lyrics.isNullOrBlank()) return false
-    val t = lyrics.trim().removePrefix("\uFEFF").trimStart()
-    if (t.startsWith('[')) return true
-    return LRC_TIMESTAMP_HINT.containsMatchIn(t.take(4096))
+    return LRC_TIMESTAMP_HINT.containsMatchIn(lyrics.take(4096))
 }
