@@ -2216,14 +2216,21 @@ class MusicService :
             indicesToRemove.sortedDescending().forEach { index ->
                 player.removeMediaItem(index)
             }
+            // A pick that was just taken out of the queue is no longer waiting.
+            pendingPlayNextIds.removeAll(itemIds)
         }
 
-        // Step past earlier picks that are still waiting right after the current song.
+        // Step past earlier picks still waiting right after the current song. They are
+        // matched one by one in pick order, so the same song sitting next in the list
+        // isn't mistaken for a pick (that put the third pick behind the list's copy).
         var insertIndex = player.currentMediaItemIndex + 1
+        var matched = 0
         while (insertIndex < player.mediaItemCount &&
-            player.getMediaItemAt(insertIndex).mediaId in pendingPlayNextIds
+            matched < pendingPlayNextIds.size &&
+            player.getMediaItemAt(insertIndex).mediaId == pendingPlayNextIds[matched]
         ) {
             insertIndex++
+            matched++
         }
         val earlierPicks = (player.currentMediaItemIndex + 1 until insertIndex).toSet()
         val shuffleEnabled = player.shuffleModeEnabled
