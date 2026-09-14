@@ -146,9 +146,6 @@ fun SettingsScreen(
             SettingRow(R.drawable.play, stringResource(R.string.player_and_audio), stringResource(R.string.hint_player)) {
                 navController.navigate("settings/player")
             },
-            SettingRow(R.drawable.radio, stringResource(R.string.stream_sources), stringResource(R.string.hint_stream)) {
-                navController.navigate("settings/stream_sources")
-            },
         ),
         stringResource(R.string.settings_group_content) to buildList {
             add(SettingRow(R.drawable.language, stringResource(R.string.content), stringResource(R.string.hint_content)) {

@@ -61,7 +61,6 @@ import com.blazify.music.ui.screens.settings.PrivacySettings
 import com.blazify.music.ui.screens.settings.RomanizationSettings
 import com.blazify.music.ui.screens.settings.SettingsScreen
 import com.blazify.music.ui.screens.settings.StorageSettings
-import com.blazify.music.ui.screens.settings.StreamSourcesSettings
 import com.blazify.music.ui.screens.settings.PlayerDesignScreen
 import com.blazify.music.ui.screens.settings.ThemeScreen
 import com.blazify.music.ui.screens.settings.UpdaterScreen
@@ -425,10 +424,6 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/player") {
         PlayerSettings(navController)
-    }
-
-    composable("settings/stream_sources") {
-        StreamSourcesSettings(navController)
     }
 
     composable("settings/storage") {

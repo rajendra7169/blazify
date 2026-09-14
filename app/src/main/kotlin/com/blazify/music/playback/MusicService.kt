@@ -103,13 +103,6 @@ import com.blazify.music.constants.AudioTrackPlaybackParamsKey
 import com.blazify.music.constants.AutoDownloadOnLikeKey
 import com.blazify.music.constants.AutoLoadMoreKey
 import com.blazify.music.constants.AutoSkipNextOnErrorKey
-import com.blazify.music.constants.StreamSourceAndroidCreatorKey
-import com.blazify.music.constants.StreamSourceAndroidVRKey
-import com.blazify.music.constants.StreamSourceIOSKey
-import com.blazify.music.constants.StreamSourceTVHTML5Key
-import com.blazify.music.constants.StreamSourceVisionOSKey
-import com.blazify.music.constants.StreamSourceWebCreatorKey
-import com.blazify.music.constants.StreamSourceWebRemixKey
 import com.blazify.music.constants.AutoplayKey
 import com.blazify.music.constants.CrossfadeDurationKey
 import com.blazify.music.constants.CrossfadeEnabledKey
@@ -1282,28 +1275,11 @@ class MusicService :
         scope.launch {
             dataStore.data.map { it[AutoLoadMoreKey] ?: true }.distinctUntilChanged().collect { cachedAutoLoadMore = it }
         }
-        // Keep YTPlayerUtils in sync with the stream source toggles (Settings → Stream sources).
-        // Map to the derived set + distinctUntilChanged so an unrelated preference write doesn't
-        // rebuild the set and rewrite the @Volatile field on every DataStore emission.
-        scope.launch {
-            dataStore.data
-                .map { prefs ->
-                    buildSet {
-                        if (prefs[StreamSourceWebRemixKey] == false) add("WEB_REMIX")
-                        if (prefs[StreamSourceTVHTML5Key] == false) add("TVHTML5")
-                        if (prefs[StreamSourceAndroidVRKey] == false) add("ANDROID_VR")
-                        // The IOS toggle covers both the iOS and iPadOS clients (they share clientName
-                        // "IOS"); ANDROID_CREATOR needs DroidGuard — these default OFF (`!= true`: unset
-                        // or false both disable; only an explicit toggle enables them).
-                        if (prefs[StreamSourceIOSKey] != true) add("IOS")
-                        if (prefs[StreamSourceVisionOSKey] == false) add("VISIONOS")
-                        if (prefs[StreamSourceWebCreatorKey] == false) add("WEB_CREATOR")
-                        if (prefs[StreamSourceAndroidCreatorKey] != true) add("ANDROID_CREATOR")
-                    }
-                }
-                .distinctUntilChanged()
-                .collect { YTPlayerUtils.disabledStreamClients = it }
-        }
+        // The Stream sources screen is gone, so every install uses the same clients: all on
+        // except iOS/iPadOS (they share clientName "IOS") and ANDROID_CREATOR, which needs
+        // DroidGuard. Anything saved on the old screen is ignored on purpose, so a client
+        // someone switched off there can't keep their playback broken.
+        YTPlayerUtils.disabledStreamClients = setOf("IOS", "ANDROID_CREATOR")
 
         if (startupPrefs!![PersistentQueueKey] ?: true) {
             val queueFile = filesDir.resolve(PERSISTENT_QUEUE_FILE)
