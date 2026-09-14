@@ -32,6 +32,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.datastore.preferences.core.Preferences
@@ -1319,7 +1320,13 @@ class MusicService :
         // someone switched off there can't keep their playback broken.
         YTPlayerUtils.disabledStreamClients = setOf("IOS", "ANDROID_CREATOR")
 
-        if (startupPrefs!![PersistentQueueKey] ?: true) {
+        // Opened by a link that plays something: the saved queue would only be loaded, start
+        // buffering and be thrown away a moment later, and when the player came up after the
+        // link was handled it even replaced the song that was asked for. Nothing is written over
+        // the saved queue until something is playing, so if the link fails the next start still
+        // brings it back.
+        val openedForLink = consumeOpenedForLink()
+        if ((startupPrefs!![PersistentQueueKey] ?: true) && !openedForLink) {
             val queueFile = filesDir.resolve(PERSISTENT_QUEUE_FILE)
             if (queueFile.exists()) {
                 runCatching {
@@ -5253,6 +5260,22 @@ class MusicService :
             private set
             
         @Volatile
+        // Set by MainActivity when the app is opened by a link that plays something, and read
+        // once by the next service start. A time rather than a flag, so one left behind by a
+        // start that found the service already running can't skip a later, ordinary restore.
+        @Volatile
+        private var openedForLinkAt = 0L
+
+        fun markOpenedForLink() {
+            openedForLinkAt = SystemClock.elapsedRealtime()
+        }
+
+        private fun consumeOpenedForLink(): Boolean {
+            val markedAt = openedForLinkAt
+            openedForLinkAt = 0L
+            return markedAt != 0L && SystemClock.elapsedRealtime() - markedAt < 10_000L
+        }
+
         var shutdownDeferred = kotlinx.coroutines.CompletableDeferred<Unit>().apply { complete(Unit) }
     }
 }

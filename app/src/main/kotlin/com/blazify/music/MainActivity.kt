@@ -403,6 +403,11 @@ class MainActivity : ComponentActivity() {
         // to the normal theme now that we're about to draw the real UI.
         setTheme(R.style.Theme_Blazify)
         super.onCreate(savedInstanceState)
+        // Tell the service before onStart starts it, so it doesn't load the old queue for a link
+        // that is about to replace it.
+        if (savedInstanceState == null && isPlayLink(intent)) {
+            MusicService.markOpenedForLink()
+        }
         window.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -1619,6 +1624,23 @@ class MainActivity : ComponentActivity() {
         } ?: return
 
         navController.navigate(targetRoute.route)
+    }
+
+    /**
+     * Whether this intent is a link that starts something playing straight away: a song, or a
+     * playlist opened from a watch link. Mirrors the branches of [handleDeepLinkIntent] that
+     * call playQueue, so the service can skip loading the old queue for it.
+     */
+    private fun isPlayLink(intent: Intent?): Boolean {
+        val uri = intent?.data ?: intent?.extras?.getString(Intent.EXTRA_TEXT)?.toUri() ?: return false
+        val path = uri.pathSegments.firstOrNull()
+        return when {
+            uri.pathSegments.any { it.equals("listen", ignoreCase = true) } -> false
+            path in setOf("playlist", "browse", "channel", "c", "search") -> false
+            path == "watch" -> uri.getQueryParameter("v") != null || uri.getQueryParameter("list") != null
+            uri.host == "youtu.be" -> path != null
+            else -> uri.getQueryParameter("list") != null
+        }
     }
 
     private fun handleDeepLinkIntent(
