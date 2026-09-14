@@ -12,8 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-val LINE_REGEX = "((\\[\\d\\d:\\d\\d\\.\\d{2,3}\\] ?)+)(.*)".toRegex()
-val TIME_REGEX = "\\[(\\d\\d):(\\d\\d)\\.(\\d{2,3})\\]".toRegex()
+// One timestamp: minutes, seconds and an optional fraction. Almost everything writes
+// [00:12.34], but [0:12.34], [00:12], [00:12.3] and [00:12:34] all turn up too, and a line
+// whose stamp didn't match was dropped, so those songs never followed along.
+val LINE_REGEX = "((\\[\\d{1,3}:\\d{1,2}(?:[.:]\\d{1,3})?\\] ?)+)(.*)".toRegex()
+val TIME_REGEX = "\\[(\\d{1,3}):(\\d{1,2})(?:[.:](\\d{1,3}))?\\]".toRegex()
+
+// [offset:+500] on a line of its own: milliseconds, positive meaning lyrics come earlier.
+private val OFFSET_TAG_REGEX = "(?m)^\\s*\\[offset:\\s*([+-]?\\d+)\\s*\\]".toRegex()
 
 // Regex for rich sync format: [MM:SS.mm]<MM:SS.mm> word <MM:SS.mm> word ...
 private val RICH_SYNC_LINE_REGEX = "\\[(\\d{1,2}):(\\d{2})\\.(\\d{2,3})\\](.*)".toRegex()
@@ -467,10 +473,27 @@ object LyricsUtils {
             RICH_SYNC_WORD_REGEX.containsMatchIn(line)
         }
 
-        return if (isRichSync) {
+        val entries = if (isRichSync) {
             parseRichSyncLyrics(lines)
         } else {
             parseStandardLyrics(lines)
+        }
+
+        // An [offset:] tag shifts the whole file, and a positive value brings every line
+        // earlier. It used to be thrown away, leaving those songs early or late by that much.
+        val offsetMs = OFFSET_TAG_REGEX.find(decodedLyrics)?.groupValues?.get(1)?.toLongOrNull() ?: 0L
+        if (offsetMs == 0L) return entries
+        val offsetSec = offsetMs / 1000.0
+        return entries.map { entry ->
+            entry.copy(
+                time = (entry.time - offsetMs).coerceAtLeast(0L),
+                words = entry.words?.map { word ->
+                    word.copy(
+                        startTime = (word.startTime - offsetSec).coerceAtLeast(0.0),
+                        endTime = (word.endTime - offsetSec).coerceAtLeast(0.0),
+                    )
+                },
+            )
         }
     }
 
@@ -792,10 +815,13 @@ object LyricsUtils {
             .map { timeMatchResult ->
                 val min = timeMatchResult.groupValues[1].toLong()
                 val sec = timeMatchResult.groupValues[2].toLong()
-                val milString = timeMatchResult.groupValues[3]
-                var mil = milString.toLong()
-                if (milString.length == 2) {
-                    mil *= 10
+                // Tenths, hundredths or thousandths of a second, or no fraction at all.
+                val fraction = timeMatchResult.groupValues[3]
+                val mil = when (fraction.length) {
+                    0 -> 0L
+                    1 -> fraction.toLong() * 100
+                    2 -> fraction.toLong() * 10
+                    else -> fraction.toLong()
                 }
                 val time = min * DateUtils.MINUTE_IN_MILLIS + sec * DateUtils.SECOND_IN_MILLIS + mil
                 LyricsEntry(time, text, words, agent = agent, isBackground = isBackground)
