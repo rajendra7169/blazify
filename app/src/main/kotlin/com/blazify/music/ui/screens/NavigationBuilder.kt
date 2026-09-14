@@ -62,7 +62,6 @@ import com.blazify.music.ui.screens.settings.RomanizationSettings
 import com.blazify.music.ui.screens.settings.SettingsScreen
 import com.blazify.music.ui.screens.settings.StorageSettings
 import com.blazify.music.ui.screens.settings.PlayerDesignScreen
-import com.blazify.music.ui.screens.settings.ThemeScreen
 import com.blazify.music.ui.screens.settings.UpdaterScreen
 import com.blazify.music.ui.screens.settings.integrations.DiscordSettings
 import com.blazify.music.ui.screens.settings.integrations.IntegrationScreen
@@ -392,10 +391,6 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/appearance") {
         AppearanceSettings(navController, activity, snackbarHostState)
-    }
-
-    composable("settings/appearance/theme") {
-        ThemeScreen(navController)
     }
 
     composable("settings/appearance/look_and_feel") {

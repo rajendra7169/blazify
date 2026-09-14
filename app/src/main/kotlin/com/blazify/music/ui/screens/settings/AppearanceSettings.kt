@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.blazify.music.ui.player.MiniPlayerDesign
-import com.blazify.music.constants.MiniPlayerDesignKey
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.sp
@@ -85,7 +84,6 @@ import androidx.navigation.NavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
 import com.blazify.music.constants.CropAlbumArtKey
-import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.DensityScale
 import com.blazify.music.constants.DensityScaleKey
 import com.blazify.music.constants.DynamicThemeKey
@@ -93,8 +91,6 @@ import com.blazify.music.constants.EnableDynamicIconKey
 import com.blazify.music.constants.EnableHighRefreshRateKey
 import com.blazify.music.constants.EnableLandscapeScalingKey
 import com.blazify.music.constants.ExperimentalLyricsKey
-import com.blazify.music.constants.GridItemSize
-import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
 import com.blazify.music.constants.ListenTogetherInTopBarKey
@@ -112,7 +108,6 @@ import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.constants.PlayerButtonsStyle
 import com.blazify.music.constants.PlayerButtonsStyleKey
-import com.blazify.music.constants.PureBlackMiniPlayerKey
 import com.blazify.music.constants.RespectAgentPositioningKey
 import com.blazify.music.constants.SelectedThemeColorKey
 import com.blazify.music.constants.ShowCachedPlaylistKey
@@ -120,15 +115,10 @@ import com.blazify.music.constants.ShowDownloadedPlaylistKey
 import com.blazify.music.constants.ShowLikedPlaylistKey
 import com.blazify.music.constants.ShowTopPlaylistKey
 import com.blazify.music.constants.ShowUploadedPlaylistKey
-import com.blazify.music.constants.SliderStyle
-import com.blazify.music.constants.SliderStyleKey
-import com.blazify.music.constants.SlimNavBarKey
-import com.blazify.music.constants.SquigglySliderKey
 import com.blazify.music.constants.SwipeSensitivityKey
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.SwipeToRemoveSongKey
 import com.blazify.music.constants.SwipeToSongKey
-import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.constants.UseNewPlayerDesignKey
 import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.DefaultDialog
@@ -194,36 +184,8 @@ fun AppearanceSettings(
             UseNewPlayerDesignKey,
             defaultValue = false,
         )
-    val (miniPlayerBackground, onMiniPlayerBackgroundChange) =
-        rememberEnumPreference(
-            MiniPlayerBackgroundStyleKey,
-            defaultValue = MiniPlayerBackgroundStyle.GRADIENT,
-        )
-
-    val availableMiniPlayerBackgroundStyles =
-        MiniPlayerBackgroundStyle.entries.filter {
-            it != MiniPlayerBackgroundStyle.BLUR || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        }
-
-    var showMiniPlayerBackgroundDialog by rememberSaveable { mutableStateOf(false) }
-
-    val (useNewMiniPlayerDesign, onUseNewMiniPlayerDesignChange) =
-        rememberPreference(
-            UseNewMiniPlayerDesignKey,
-            defaultValue = true,
-        )
-    val (miniPlayerDesignId, onMiniPlayerDesignChange) =
-        rememberPreference(MiniPlayerDesignKey, defaultValue = "")
-    val selectedMiniPlayerDesign =
-        remember(miniPlayerDesignId, useNewMiniPlayerDesign) {
-            if (miniPlayerDesignId.isBlank()) {
-                if (useNewMiniPlayerDesign) MiniPlayerDesign.MODERN else MiniPlayerDesign.FLAT
-            } else {
-                MiniPlayerDesign.fromId(miniPlayerDesignId)
-            }
-        }
-    // The album-art background style only applies to the non-flat designs.
-    val miniPlayerUsesArtBackground = selectedMiniPlayerDesign != MiniPlayerDesign.FLAT
+    // Mini-player design and background, slider style, default tab, grid size and
+    // slim navbar are set in Look & Feel, which has a live preview for them.
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
         rememberPreference(
             HidePlayerThumbnailKey,
@@ -240,11 +202,6 @@ fun AppearanceSettings(
             defaultValue = PlayerBackgroundStyle.GRADIENT,
         )
 
-    val (defaultOpenTab, onDefaultOpenTabChange) =
-        rememberEnumPreference(
-            DefaultOpenTabKey,
-            defaultValue = NavigationTab.HOME,
-        )
     val (playerButtonsStyle, onPlayerButtonsStyleChange) =
         rememberEnumPreference(
             PlayerButtonsStyleKey,
@@ -252,16 +209,6 @@ fun AppearanceSettings(
         )
     // Lyrics settings moved to the dedicated Lyrics screen (settings/lyrics).
 
-    val (sliderStyle, onSliderStyleChange) =
-        rememberEnumPreference(
-            SliderStyleKey,
-            defaultValue = SliderStyle.SLIM,
-        )
-    val (squigglySlider, onSquigglySliderChange) =
-        rememberPreference(
-            SquigglySliderKey,
-            defaultValue = false,
-        )
     val (swipeThumbnail, onSwipeThumbnailChange) =
         rememberPreference(
             SwipeThumbnailKey,
@@ -271,17 +218,6 @@ fun AppearanceSettings(
         rememberPreference(
             SwipeSensitivityKey,
             defaultValue = 0.73f,
-        )
-    val (gridItemSize, onGridItemSizeChange) =
-        rememberEnumPreference(
-            GridItemsSizeKey,
-            defaultValue = GridItemSize.SMALL,
-        )
-
-    val (slimNav, onSlimNavChange) =
-        rememberPreference(
-            SlimNavBarKey,
-            defaultValue = false,
         )
 
     // Density scale preferences
@@ -353,10 +289,6 @@ fun AppearanceSettings(
             it != PlayerBackgroundStyle.BLUR || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
-    var showSliderOptionDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     var showPlayerBackgroundDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -402,75 +334,6 @@ fun AppearanceSettings(
                     PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
                     PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
                     PlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
-                }
-            },
-        )
-    }
-
-    if (showMiniPlayerBackgroundDialog) {
-        EnumDialog(
-            onDismiss = { showMiniPlayerBackgroundDialog = false },
-            onSelect = {
-                onMiniPlayerBackgroundChange(it)
-                showMiniPlayerBackgroundDialog = false
-            },
-            title = stringResource(R.string.mini_player_background_style),
-            current = miniPlayerBackground,
-            values = availableMiniPlayerBackgroundStyles,
-            valueText = {
-                when (it) {
-                    MiniPlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
-                    MiniPlayerBackgroundStyle.TRANSPARENT -> stringResource(R.string.transparent)
-                    MiniPlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
-                    MiniPlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
-                    MiniPlayerBackgroundStyle.PURE_BLACK -> stringResource(R.string.pure_black)
-                }
-            },
-        )
-    }
-
-    var showDefaultOpenTabDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    if (showDefaultOpenTabDialog) {
-        EnumDialog(
-            onDismiss = { showDefaultOpenTabDialog = false },
-            onSelect = {
-                onDefaultOpenTabChange(it)
-                showDefaultOpenTabDialog = false
-            },
-            title = stringResource(R.string.default_open_tab),
-            current = defaultOpenTab,
-            values = NavigationTab.values().toList(),
-            valueText = {
-                when (it) {
-                    NavigationTab.HOME -> stringResource(R.string.home)
-                    NavigationTab.SEARCH -> stringResource(R.string.search)
-                    NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
-                }
-            },
-        )
-    }
-
-    var showGridSizeDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    if (showGridSizeDialog) {
-        EnumDialog(
-            onDismiss = { showGridSizeDialog = false },
-            onSelect = {
-                onGridItemSizeChange(it)
-                showGridSizeDialog = false
-            },
-            title = stringResource(R.string.grid_cell_size),
-            current = gridItemSize,
-            values = GridItemSize.values().toList(),
-            valueText = {
-                when (it) {
-                    GridItemSize.BIG -> stringResource(R.string.big)
-                    GridItemSize.SMALL -> stringResource(R.string.small)
                 }
             },
         )
@@ -554,18 +417,6 @@ fun AppearanceSettings(
         }
     }
 
-    if (showSliderOptionDialog) {
-        SliderStyleDialog(
-            current = sliderStyle,
-            squiggly = squigglySlider,
-            onSelect = { style, squig ->
-                onSliderStyleChange(style)
-                onSquigglySliderChange(squig)
-                showSliderOptionDialog = false
-            },
-            onDismiss = { showSliderOptionDialog = false },
-        )
-    }
 
     Column(
         Modifier
@@ -677,75 +528,6 @@ fun AppearanceSettings(
                             onClick = { onEnableDynamicIconChange(!enableDynamicIcon) },
                         ),
                     )
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.palette),
-                            title = { Text(stringResource(R.string.theme)) },
-                            description = { Text(stringResource(R.string.theme_desc)) },
-                            onClick = { navController.navigate("settings/appearance/theme") },
-                        ),
-                    )
-                },
-        )
-
-        Spacer(modifier = Modifier.height(27.dp))
-
-        val (pureBlackMiniPlayer, onPureBlackMiniPlayerChange) =
-            rememberPreference(
-                PureBlackMiniPlayerKey,
-                defaultValue = false,
-            )
-
-        MiniPlayerDesignPicker(
-            selected = selectedMiniPlayerDesign,
-            onSelect = { onMiniPlayerDesignChange(it.id) },
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Material3SettingsGroup(
-            title = stringResource(id = R.string.mini_player),
-            items =
-                buildList {
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.gradient),
-                            title = {
-                                Text(
-                                    text = stringResource(R.string.mini_player_background_style),
-                                    color =
-                                        if (!miniPlayerUsesArtBackground) {
-                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurface
-                                        },
-                                )
-                            },
-                            description = {
-                                Text(
-                                    text =
-                                        if (!miniPlayerUsesArtBackground) {
-                                            stringResource(R.string.mini_player_background_not_available)
-                                        } else {
-                                            when (miniPlayerBackground) {
-                                                MiniPlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
-                                                MiniPlayerBackgroundStyle.TRANSPARENT -> stringResource(R.string.transparent)
-                                                MiniPlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
-                                                MiniPlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
-                                                MiniPlayerBackgroundStyle.PURE_BLACK -> stringResource(R.string.pure_black)
-                                            }
-                                        },
-                                    color =
-                                        if (!miniPlayerUsesArtBackground) {
-                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                        },
-                                )
-                            },
-                            onClick = { if (miniPlayerUsesArtBackground) showMiniPlayerBackgroundDialog = true },
-                        ),
-                    )
                 },
         )
 
@@ -850,34 +632,6 @@ fun AppearanceSettings(
                             )
                         },
                         onClick = { showPlayerButtonsStyleDialog = true },
-                    ),
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.sliders),
-                        title = { Text(stringResource(R.string.player_slider_style)) },
-                        description = {
-                            Text(
-                                when (sliderStyle) {
-                                    SliderStyle.DEFAULT -> {
-                                        stringResource(R.string.slider_style_capsule)
-                                    }
-
-                                    SliderStyle.WAVY -> {
-                                        if (squigglySlider) {
-                                            stringResource(R.string.squiggly)
-                                        } else {
-                                            stringResource(
-                                                R.string.wavy,
-                                            )
-                                        }
-                                    }
-
-                                    SliderStyle.SLIM -> {
-                                        stringResource(R.string.slim)
-                                    }
-                                },
-                            )
-                        },
-                        onClick = { showSliderOptionDialog = true },
                     ),
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
@@ -998,20 +752,6 @@ fun AppearanceSettings(
             items =
                 listOf(
                     Material3SettingsItem(
-                        icon = painterResource(R.drawable.nav_bar),
-                        title = { Text(stringResource(R.string.default_open_tab)) },
-                        description = {
-                            Text(
-                                when (defaultOpenTab) {
-                                    NavigationTab.HOME -> stringResource(R.string.home)
-                                    NavigationTab.SEARCH -> stringResource(R.string.search)
-                                    NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
-                                },
-                            )
-                        },
-                        onClick = { showDefaultOpenTabDialog = true },
-                    ),
-                    Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
                         title = { Text(stringResource(R.string.swipe_song_to_add)) },
                         description = { Text(stringResource(R.string.swipe_song_to_add_desc)) },
@@ -1056,28 +796,6 @@ fun AppearanceSettings(
                         onClick = { onSwipeToRemoveSongChange(!swipeToRemoveSong) },
                     ),
                     Material3SettingsItem(
-                        icon = painterResource(R.drawable.nav_bar),
-                        title = { Text(stringResource(R.string.slim_navbar)) },
-                        description = { Text(stringResource(R.string.slim_navbar_desc)) },
-                        trailingContent = {
-                            Switch(
-                                checked = slimNav,
-                                onCheckedChange = onSlimNavChange,
-                                thumbContent = {
-                                    Icon(
-                                        painter =
-                                            painterResource(
-                                                id = if (slimNav) R.drawable.check else R.drawable.close,
-                                            ),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    )
-                                },
-                            )
-                        },
-                        onClick = { onSlimNavChange(!slimNav) },
-                    ),
-                    Material3SettingsItem(
                         icon = painterResource(R.drawable.group_outlined),
                         title = { Text(stringResource(R.string.listen_together_in_top_bar)) },
                         description = { Text(stringResource(R.string.listen_together_in_top_bar_desc)) },
@@ -1098,19 +816,6 @@ fun AppearanceSettings(
                             )
                         },
                         onClick = { onListenTogetherInTopBarChange(!listenTogetherInTopBar) },
-                    ),
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.grid_view),
-                        title = { Text(stringResource(R.string.grid_cell_size)) },
-                        description = {
-                            Text(
-                                when (gridItemSize) {
-                                    GridItemSize.BIG -> stringResource(R.string.big)
-                                    GridItemSize.SMALL -> stringResource(R.string.small)
-                                },
-                            )
-                        },
-                        onClick = { showGridSizeDialog = true },
                     ),
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.grid_view),

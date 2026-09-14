@@ -1,6 +1,5 @@
 package com.blazify.music.ui.screens.settings
 
-import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -12,7 +11,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,22 +24,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.layout.windowInsetsPadding
-import com.blazify.music.LocalPlayerAwareWindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -53,15 +42,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.ripple
@@ -87,7 +72,6 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -97,7 +81,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import coil3.compose.AsyncImage
@@ -106,7 +89,6 @@ import com.blazify.music.R
 import com.blazify.music.ui.component.ColorPickerDialog
 import com.blazify.music.models.MediaMetadata
 import kotlinx.coroutines.flow.MutableStateFlow
-import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
@@ -120,10 +102,6 @@ import com.blazify.music.constants.ShowHomeSearchBarKey
 import com.blazify.music.constants.SlimNavBarKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.ui.player.MiniPlayerDesign
-import com.blazify.music.constants.DynamicThemeKey
-import com.blazify.music.constants.PureBlackKey
-import com.blazify.music.constants.PureBlackMiniPlayerKey
-import com.blazify.music.constants.SelectedThemeColorKey
 import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.ui.theme.DefaultThemeColor
 import com.blazify.music.ui.theme.BlazifyTheme
@@ -158,185 +136,6 @@ val PaletteColors = listOf(
     ThemePalette(R.string.palette_grey, Color(0xFF757575)),
     ThemePalette(R.string.palette_blue_grey, Color(0xFF546E7A)),
 )
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ThemeScreen(
-    navController: NavController,
-) {
-    val (darkMode, onDarkModeChange) = rememberEnumPreference(DarkModeKey, DarkMode.AUTO)
-    val (pureBlack, onPureBlackChangeRaw) = rememberPreference(PureBlackKey, defaultValue = true)
-    val (_, onPureBlackMiniPlayerChange) = rememberPreference(
-        PureBlackMiniPlayerKey,
-        defaultValue = true
-    )
-
-    val onPureBlackChange: (Boolean) -> Unit = { enabled ->
-        onPureBlackChangeRaw(enabled)
-        onPureBlackMiniPlayerChange(enabled)
-    }
-    val (selectedThemeColorInt, onSelectedThemeColorChange) = rememberPreference(
-        SelectedThemeColorKey,
-        BlazeThemeColor.toArgb()
-    )
-    val (_, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, defaultValue = true)
-
-    val selectedThemeColor = Color(selectedThemeColorInt)
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    // Helper function to handle color selection with dynamic theme toggle
-    val handleColorSelection: (Color) -> Unit = { color ->
-        onSelectedThemeColorChange(color.toArgb())
-        // Enable dynamic theme only when selecting the default/dynamic color
-        // Disable it when selecting any other color
-        val isDynamicColor = color == DefaultThemeColor
-        onDynamicThemeChange(isDynamicColor)
-    }
-
-    if (isLandscape) {
-        LandscapeThemeLayout(
-            innerPadding = PaddingValues(0.dp),
-            darkMode = darkMode,
-            onDarkModeChange = onDarkModeChange,
-            pureBlack = pureBlack,
-            onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = handleColorSelection
-        )
-    } else {
-        PortraitThemeLayout(
-            innerPadding = PaddingValues(0.dp),
-            darkMode = darkMode,
-            onDarkModeChange = onDarkModeChange,
-            pureBlack = pureBlack,
-            onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = handleColorSelection
-        )
-    }
-
-    TopAppBar(
-        title = { Text(stringResource(R.string.theme_colors)) },
-        navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_back),
-                    contentDescription = stringResource(R.string.cd_back)
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun PortraitThemeLayout(
-    innerPadding: PaddingValues,
-    darkMode: DarkMode,
-    onDarkModeChange: (DarkMode) -> Unit,
-    pureBlack: Boolean,
-    onPureBlackChange: (Boolean) -> Unit,
-    selectedThemeColor: Color,
-    onSelectedThemeColorChange: (Color) -> Unit
-) {
-    // Frame height scales with the screen (responsive on small phones), ~5%
-    // bigger than before. Scrollable so nothing is ever trapped off-screen.
-    val screenHeightDp = LocalConfiguration.current.screenHeightDp.toFloat()
-    val frameHeight = (screenHeightDp * 0.5f).coerceIn(260f, 520f).dp
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .padding(top = 56.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(12.dp))
-        // Live theme preview inside a phone frame with a drop shadow.
-        ThemePhoneFrame(modifier = Modifier.height(frameHeight)) {
-            ThemePhonePreview(
-                darkMode = darkMode,
-                pureBlack = pureBlack,
-                themeColor = selectedThemeColor
-            )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        ThemeControls(
-            darkMode = darkMode,
-            onDarkModeChange = onDarkModeChange,
-            pureBlack = pureBlack,
-            onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = onSelectedThemeColorChange
-        )
-
-        // Clear the now-playing mini-player + navigation bar so the controls
-        // card is never hidden behind them.
-        Spacer(modifier = Modifier.windowInsetsBottomHeight(LocalPlayerAwareWindowInsets.current))
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
-@Composable
-fun LandscapeThemeLayout(
-    innerPadding: PaddingValues,
-    darkMode: DarkMode,
-    onDarkModeChange: (DarkMode) -> Unit,
-    pureBlack: Boolean,
-    onPureBlackChange: (Boolean) -> Unit,
-    selectedThemeColor: Color,
-    onSelectedThemeColorChange: (Color) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(0.4f)
-                .fillMaxHeight()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight(0.9f),
-                contentAlignment = Alignment.Center
-            ) {
-                ThemePhoneFrame(modifier = Modifier.fillMaxHeight()) {
-                    ThemePhonePreview(
-                        darkMode = darkMode,
-                        pureBlack = pureBlack,
-                        themeColor = selectedThemeColor
-                    )
-                }
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .weight(0.6f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
-        ) {
-            ThemeControls(
-                darkMode = darkMode,
-                onDarkModeChange = onDarkModeChange,
-                pureBlack = pureBlack,
-                onPureBlackChange = onPureBlackChange,
-                selectedThemeColor = selectedThemeColor,
-                onSelectedThemeColorChange = onSelectedThemeColorChange
-            )
-
-            Spacer(modifier = Modifier.height(80.dp))
-        }
-    }
-}
 
 @Composable
 fun ThemeControls(
@@ -1130,227 +929,6 @@ internal fun ThemePhonePreview(
                             Box(Modifier.width(12.dp).height(2.5.dp).clip(RoundedCornerShape(2.dp)).background(tint.copy(alpha = if (active) 1f else 0.5f)))
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ThemeMockup(
-    darkMode: DarkMode,
-    pureBlack: Boolean,
-    themeColor: Color
-) {
-    val isSystemDark = isSystemInDarkTheme()
-    val useDark = when (darkMode) {
-        DarkMode.AUTO -> isSystemDark
-        DarkMode.ON -> true
-        DarkMode.OFF -> false
-    }
-
-    BlazifyTheme(
-        darkTheme = useDark,
-        pureBlack = pureBlack,
-        themeColor = themeColor
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .aspectRatio(9f / 18f),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(10.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .background(MaterialTheme.colorScheme.secondary, CircleShape)
-                        )
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(32.dp)
-                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
-                    )
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp)
-                                .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(6.dp))
-                        )
-                        
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp)
-                                .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(6.dp))
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ThemeMockupPortrait(
-    darkMode: DarkMode,
-    pureBlack: Boolean,
-    themeColor: Color
-) {
-    val isSystemDark = isSystemInDarkTheme()
-    val useDark = when (darkMode) {
-        DarkMode.AUTO -> isSystemDark
-        DarkMode.ON -> true
-        DarkMode.OFF -> false
-    }
-
-    BlazifyTheme(
-        darkTheme = useDark,
-        pureBlack = pureBlack,
-        themeColor = themeColor
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxSize(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Header (20% of height)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.2f)
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(6.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(MaterialTheme.colorScheme.secondary, CircleShape)
-                        )
-                    }
-                }
-
-                // Main Content (60% of height)
-                Column(
-                    modifier = Modifier
-                        .weight(0.6f)
-                        .padding(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                    )
-                    
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1.2f),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
-                        )
-                        
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(4.dp))
-                        )
-                    }
-                }
-
-                // FAB Area (20% of height)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.2f)
-                        .padding(6.dp),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                    )
                 }
             }
         }
