@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -333,7 +334,6 @@ fun YoursScreen(
                 )
             }
             item("artist_rail") {
-                val songsWord = stringResource(R.string.songs)
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -341,7 +341,12 @@ fun YoursScreen(
                     items(favoriteArtists, key = { "artist_${it.id}" }) { artist ->
                         BlazeMusicCard(
                             title = artist.title,
-                            subtitle = "${artist.songCount} ${songsWord.lowercase()}",
+                            // Nothing played or liked yet: show just the name, not "0 songs".
+                            subtitle = if (artist.songCount > 0) {
+                                pluralStringResource(R.plurals.n_song, artist.songCount, artist.songCount)
+                            } else {
+                                ""
+                            },
                             thumbnailUrl = artist.thumbnailUrl,
                             isCircular = true,
                             fallbackIcon = R.drawable.artist,
