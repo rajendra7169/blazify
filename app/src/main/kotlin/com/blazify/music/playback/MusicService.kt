@@ -133,6 +133,7 @@ import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.constants.PodcastSpeedsKey
+import com.blazify.music.constants.VarispeedKey
 import com.blazify.music.constants.SaveDataOnMobileKey
 import com.blazify.music.constants.HistoryDuration
 import com.blazify.music.constants.LastFMUseNowPlaying
@@ -515,6 +516,8 @@ class MusicService :
     private var lastPodcastSpeed: Float? = null
     // What songs were playing at before episodes started; put back when songs resume.
     private var speedBeforeEpisodes: Float? = null
+    @Volatile
+    private var cachedVarispeed = false
     @Volatile
     private var cachedShufflePlaylistFirst = false
     @Volatile
@@ -1292,6 +1295,9 @@ class MusicService :
         }
         scope.launch {
             dataStore.data.map { it[PodcastSpeedsKey].orEmpty() }.distinctUntilChanged().collect { podcastSpeeds = decodePodcastSpeeds(it) }
+        }
+        scope.launch {
+            dataStore.data.map { it[VarispeedKey] ?: false }.distinctUntilChanged().collect { cachedVarispeed = it }
         }
         scope.launch {
             dataStore.data.map { it[ShufflePlaylistFirstKey] ?: false }.distinctUntilChanged().collect { cachedShufflePlaylistFirst = it }
@@ -2659,8 +2665,8 @@ class MusicService :
             }
         if (target == current.speed) return
         lastPodcastSpeed = target
-        // The plain speed dialog keeps pitch equal to speed; tempo and pitch mode keeps its own pitch.
-        val pitch = if (current.pitch == current.speed) target else current.pitch
+        // Varispeed moves pitch along with speed; the default tempo and pitch mode leaves pitch alone.
+        val pitch = if (cachedVarispeed) target else current.pitch
         player.playbackParameters = PlaybackParameters(target, pitch)
     }
 
