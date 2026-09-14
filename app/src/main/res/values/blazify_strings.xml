@@ -87,7 +87,10 @@
     <string name="seek_forward_dynamic">+%1$d seconds forward</string>
     <string name="seek_backward_dynamic">-%1$d seconds backward</string>
     <string name="seek_seconds_addup">Progressive seek</string>
-    <string name="seek_seconds_addup_description">When enabled, adds 5 extra seconds incrementally with each seek</string>
+    <string name="seek_amount">Seek amount</string>
+    <string name="seek_amount_description">How far a double-tap on the artwork jumps: %1$d seconds</string>
+    <string name="seek_amount_seconds">%1$d seconds</string>
+    <string name="seek_seconds_addup_description">Double-tap again quickly to jump further each time</string>
 
     <string name="similar_content">Similar content</string>
 

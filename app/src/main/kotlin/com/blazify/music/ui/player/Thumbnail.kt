@@ -78,6 +78,7 @@ import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.constants.PlayerHorizontalPadding
+import com.blazify.music.constants.SeekAmountSecondsKey
 import com.blazify.music.constants.SeekExtraSeconds
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.ThumbnailCornerRadius
@@ -505,6 +506,7 @@ private fun ThumbnailItem(
     modifier: Modifier = Modifier,
 ) {
     val incrementalSeekSkipEnabled by rememberPreference(SeekExtraSeconds, defaultValue = false)
+    val seekAmountSeconds by rememberPreference(SeekAmountSecondsKey, defaultValue = 10)
     var skipMultiplier by remember { mutableIntStateOf(1) }
     var lastTapTime by remember { mutableLongStateOf(0L) }
 
@@ -540,7 +542,7 @@ private fun ThumbnailItem(
                         }
                         lastTapTime = now
 
-                        val skipAmount = 5000 * skipMultiplier
+                        val skipAmount = seekAmountSeconds * 1000 * skipMultiplier
 
                         val isLeftSide = (layoutDirection == LayoutDirection.Ltr && offset.x < size.width / 2) ||
                                 (layoutDirection == LayoutDirection.Rtl && offset.x > size.width / 2)

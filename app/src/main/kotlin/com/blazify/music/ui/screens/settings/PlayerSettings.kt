@@ -62,6 +62,7 @@ import com.blazify.music.constants.PersistentShuffleAcrossQueuesKey
 import com.blazify.music.constants.PreventDuplicateTracksInQueueKey
 import com.blazify.music.constants.RememberShuffleAndRepeatKey
 import com.blazify.music.constants.ResumeOnBluetoothConnectKey
+import com.blazify.music.constants.SeekAmountSecondsKey
 import com.blazify.music.constants.SeekExtraSeconds
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
@@ -158,6 +159,11 @@ fun PlayerSettings(
         SeekExtraSeconds,
         defaultValue = false
     )
+    val (seekAmountSeconds, onSeekAmountSecondsChange) = rememberPreference(
+        SeekAmountSecondsKey,
+        defaultValue = 10
+    )
+    var showSeekAmountDialog by remember { mutableStateOf(false) }
 
     val (autoLoadMore, onAutoLoadMoreChange) = rememberPreference(
         AutoLoadMoreKey,
@@ -230,6 +236,20 @@ fun PlayerSettings(
 
     var showLoudnessLevelDialog by remember {
         mutableStateOf(false)
+    }
+
+    if (showSeekAmountDialog) {
+        EnumDialog(
+            onDismiss = { showSeekAmountDialog = false },
+            onSelect = {
+                onSeekAmountSecondsChange(it)
+                showSeekAmountDialog = false
+            },
+            title = stringResource(R.string.seek_amount),
+            current = seekAmountSeconds,
+            values = listOf(5, 10, 15, 30),
+            valueText = { stringResource(R.string.seek_amount_seconds, it) },
+        )
     }
 
     if (showAudioQualityDialog) {
@@ -547,6 +567,12 @@ fun PlayerSettings(
                         onClick = { onEnableGoogleCastChange(!enableGoogleCast) }
                     ))
                 }
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.fast_forward),
+                    title = { Text(stringResource(R.string.seek_amount)) },
+                    description = { Text(stringResource(R.string.seek_amount_description, seekAmountSeconds)) },
+                    onClick = { showSeekAmountDialog = true }
+                ))
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.arrow_forward),
                     title = { Text(stringResource(R.string.seek_seconds_addup)) },
