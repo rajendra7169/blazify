@@ -135,6 +135,8 @@ class PlaylistWidgetReceiver : AppWidgetProvider() {
         const val EXTRA_TARGET_TYPE = "playlist_widget_target_type"
         const val EXTRA_TARGET_ID = "playlist_widget_target_id"
         const val EXTRA_TARGET_TITLE = "playlist_widget_target_title"
+        // Set by the Shuffle launcher shortcut so the queue is shuffled before it plays.
+        const val EXTRA_SHUFFLE = "playlist_widget_shuffle"
 
         const val TARGET_TYPE_LOCAL = "local"
         const val TARGET_TYPE_ONLINE = "online"

@@ -243,6 +243,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val ACTION_SEARCH = "com.blazify.music.action.SEARCH"
         private const val ACTION_LIBRARY = "com.blazify.music.action.LIBRARY"
+        private const val ACTION_SHUFFLE_LIKED = "com.blazify.music.action.SHUFFLE_LIKED"
         const val ACTION_RECOGNITION = "com.blazify.music.action.RECOGNITION"
         const val ACTION_OPEN_WIDGET_TARGET = "com.blazify.music.action.OPEN_WIDGET_TARGET"
         const val EXTRA_AUTO_START_RECOGNITION = "auto_start_recognition"
@@ -387,6 +388,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (::navController.isInitialized) {
+            handleShuffleShortcutIntent(intent)
             handleWidgetTargetIntent(intent, navController)
             handleDeepLinkIntent(intent, navController)
         } else {
@@ -1063,11 +1065,13 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     if (pendingIntent != null) {
+                        handleShuffleShortcutIntent(pendingIntent!!)
                         handleWidgetTargetIntent(pendingIntent!!, navController)
                         handleRecognitionIntent(pendingIntent!!, navController)
                         handleDeepLinkIntent(pendingIntent!!, navController)
                         pendingIntent = null
                     } else {
+                        handleShuffleShortcutIntent(intent)
                         handleWidgetTargetIntent(intent, navController)
                         handleRecognitionIntent(intent, navController)
                         handleDeepLinkIntent(intent, navController)
@@ -1077,6 +1081,7 @@ class MainActivity : ComponentActivity() {
                 DisposableEffect(Unit) {
                     val listener =
                         Consumer<Intent> { intent ->
+                            handleShuffleShortcutIntent(intent)
                             handleWidgetTargetIntent(intent, navController)
                             handleRecognitionIntent(intent, navController)
                             handleDeepLinkIntent(intent, navController)
@@ -1565,6 +1570,19 @@ class MainActivity : ComponentActivity() {
         data object LikedSongs : WidgetTargetRoute("auto_playlist/liked")
         data object DownloadedSongs : WidgetTargetRoute("auto_playlist/downloaded")
         data class TopSongs(val limit: String) : WidgetTargetRoute("top_playlist/$limit")
+    }
+
+    // Launcher shortcut "Shuffle": plays Liked songs shuffled straight away, the same
+    // way the playlist widget starts a playlist.
+    private fun handleShuffleShortcutIntent(intent: Intent) {
+        if (intent.action != ACTION_SHUFFLE_LIKED) return
+        intent.action = null
+        val serviceIntent = Intent(this, MusicService::class.java).apply {
+            action = PlaylistWidgetReceiver.ACTION_PLAY_TARGET
+            putExtra(PlaylistWidgetReceiver.EXTRA_TARGET_TYPE, PlaylistWidgetReceiver.TARGET_TYPE_LIKED)
+            putExtra(PlaylistWidgetReceiver.EXTRA_SHUFFLE, true)
+        }
+        runCatching { startService(serviceIntent) }
     }
 
     private fun handleWidgetTargetIntent(

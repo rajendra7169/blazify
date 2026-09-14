@@ -20,4 +20,45 @@
             android:targetClass="com.blazify.music.MainActivity"
             android:targetPackage="com.blazify.music" />
     </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shortcut_liked"
+        android:shortcutId="liked"
+        android:shortcutShortLabel="@string/liked"
+        android:shortcutLongLabel="@string/liked_songs">
+        <intent
+            android:action="com.blazify.music.action.OPEN_WIDGET_TARGET"
+            android:targetClass="com.blazify.music.MainActivity"
+            android:targetPackage="com.blazify.music">
+            <extra
+                android:name="widget_target_type"
+                android:value="liked" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shortcut_downloads"
+        android:shortcutId="downloaded"
+        android:shortcutShortLabel="@string/offline"
+        android:shortcutLongLabel="@string/downloaded_songs">
+        <intent
+            android:action="com.blazify.music.action.OPEN_WIDGET_TARGET"
+            android:targetClass="com.blazify.music.MainActivity"
+            android:targetPackage="com.blazify.music">
+            <extra
+                android:name="widget_target_type"
+                android:value="downloaded" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shortcut_shuffle"
+        android:shortcutId="shuffle_liked"
+        android:shortcutShortLabel="@string/shortcut_shuffle"
+        android:shortcutLongLabel="@string/shortcut_shuffle_long">
+        <intent
+            android:action="com.blazify.music.action.SHUFFLE_LIKED"
+            android:targetClass="com.blazify.music.MainActivity"
+            android:targetPackage="com.blazify.music" />
+    </shortcut>
 </shortcuts>

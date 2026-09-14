@@ -963,6 +963,10 @@
     <string name="save_data_on_mobile_desc">With Audio quality on Auto, stream at 128 kbps on mobile data. Turn off for full quality everywhere</string>
     <string name="download_wifi_only">Download only on Wi-Fi</string>
     <string name="download_wifi_only_desc">Downloads wait for Wi-Fi and carry on by themselves once you connect</string>
+    <string name="qs_tile_playback">Play or pause</string>
+    <string name="qs_tile_nothing_playing">Nothing playing</string>
+    <string name="shortcut_shuffle">Shuffle</string>
+    <string name="shortcut_shuffle_long">Shuffle liked songs</string>
     <string name="pin">Pin</string>
     <string name="unpin">Unpin</string>
     <string name="randomize_home_order">Randomize home screen order</string>

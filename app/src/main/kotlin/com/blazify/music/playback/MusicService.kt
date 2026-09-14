@@ -4598,9 +4598,10 @@ class MusicService :
             PlaylistWidgetReceiver.TARGET_TYPE_LIKED -> {
                 val songs = database.likedSongsByCreateDateAsc().first()
                 if (songs.isEmpty()) return null
+                val shuffled = intent.getBooleanExtra(PlaylistWidgetReceiver.EXTRA_SHUFFLE, false)
                 ListQueue(
                     title = getString(R.string.liked_songs),
-                    items = songs.map { it.toMediaItem() },
+                    items = (if (shuffled) songs.shuffled() else songs).map { it.toMediaItem() },
                 )
             }
 
