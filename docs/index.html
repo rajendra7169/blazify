@@ -344,6 +344,37 @@ svg.mark{
 .band h2{font-family:'Anton',sans-serif;font-size:clamp(30px,4.4vw,58px);margin:0 0 14px;line-height:1}
 .band p{margin:0 auto;max-width:58ch;font-size:17.5px;color:rgba(42,20,0,.8);font-weight:400}
 
+/* ── roadmap: three lanes, the last two link to their vote posts ── */
+.rm-lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;align-items:start}
+.rm-lane{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:24px 22px 10px}
+.rm-lane.next{background:linear-gradient(160deg,rgba(255,167,38,.13),rgba(255,112,67,.03) 55%,var(--coal));border-color:rgba(255,167,38,.34)}
+.rm-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream)}
+.rm-h small{margin-left:auto;color:var(--dim);font-size:12.5px;font-weight:500;letter-spacing:.04em;text-transform:none;font-variant-numeric:tabular-nums}
+.rm-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.next .rm-dot{background:var(--amber);animation:rmPulse 2.2s infinite}
+.planned .rm-dot{border:2px solid var(--cream)}
+.considering .rm-dot{border:2px dashed var(--dim)}
+.rm-lane>p{color:var(--dim);font-size:13.5px;margin:0 0 12px;line-height:1.5}
+.rm-lane ul{list-style:none;margin:0;padding:0}
+.rm-lane li{border-top:1px solid var(--line)}
+.rm-row{display:flex;align-items:center;gap:14px;padding:13px 0;color:inherit;text-decoration:none}
+.rm-row b{display:block;font-weight:500;font-size:15.5px;color:var(--cream);line-height:1.35;transition:color .25s}
+.rm-row small{display:block;color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:2px}
+.rm-vote{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:6px 12px 6px 9px;border-radius:99px;
+  border:1px solid var(--line);color:var(--dim);font-size:13px;font-weight:500;transition:border-color .25s,color .25s,transform .25s}
+.rm-vote .ic{width:14px;height:14px;stroke-width:2.2}
+a.rm-row:hover b,a.rm-row:focus-visible b{color:var(--amber)}
+a.rm-row:hover .rm-vote,a.rm-row:focus-visible .rm-vote{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.rm-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.rm-cta a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:99px;border:1px solid var(--line);
+  color:var(--cream);text-decoration:none;font-size:15px;font-weight:500;transition:border-color .25s,color .25s,transform .25s,box-shadow .25s}
+.rm-cta a:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.rm-cta .ic{width:17px;height:17px;stroke-width:2.2}
+.rm-cta a.rm-primary{background:var(--flame);border-color:transparent;color:#2A1400}
+.rm-cta a.rm-primary:hover{color:#2A1400;box-shadow:0 14px 30px rgba(255,112,67,.26)}
+@keyframes rmPulse{0%{box-shadow:0 0 0 0 rgba(255,167,38,.55)}70%{box-shadow:0 0 0 9px rgba(255,167,38,0)}100%{box-shadow:0 0 0 0 rgba(255,167,38,0)}}
+@media (prefers-reduced-motion:reduce){.next .rm-dot{animation:none}}
+
 
 /* ── the lyrics demo: the one feature worth showing in motion ── */
 .stage{
@@ -888,6 +919,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#look">Screenshots</a>
       <a href="#features">Features</a>
       <a href="#faq">FAQ</a>
+      <a href="#roadmap">Roadmap</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
     <a class="nav-star" href="https://github.com/rajendra7169/blazify" rel="noopener">
@@ -1204,6 +1236,58 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <p>The other difference is reach. <b>Nearly all of them run on one platform.</b> Blazify is one project across Android, Windows, Linux and iPhone, written by one person in Kathmandu, where a dropped connection is ordinary and mobile data is not cheap. That is why the music already on your phone plays beside everything streamed, and why offline was never an afterthought.</p>
 
       <p>It is <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" rel="noopener">GPL-3.0</a>, so you can read every line of it. Playback is <a href="https://developer.android.com/media/media3" rel="noopener">Media3</a>, lyrics come from <a href="https://lrclib.net" rel="noopener">LrcLib</a> among others, and it is submitted to <a href="https://f-droid.org" rel="noopener">F-Droid</a>, whose build servers compile it from source and check the result matches the file published here.</p>
+    </div>
+  </div>
+</section>
+<section id="roadmap">
+  <div class="shell">
+    <h2 class="title rise">What's <em>coming next</em></h2>
+    <p class="lede rise">Blazify is built in the open, and the people using it decide what comes next. Every idea below has its own post. Upvote the ones you want, and the most wanted get built first.</p>
+
+    <div class="rm-lanes">
+      <div class="rm-lane next rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>Next release<small>In testing</small></h3>
+        <p>Already built, and being tested on real phones.</p>
+        <ul>
+          <li><div class="rm-row"><span><b>Faster, steadier playback</b><small>Songs start sooner and recover when a stream expires</small></span></div></li>
+          <li><div class="rm-row"><span><b>Tighter lyrics sync</b><small>Plus text size, spacing, glow and animation settings</small></span></div></li>
+          <li><div class="rm-row"><span><b>Don't play this song</b><small>Hidden songs stay out of queues and recommendations</small></span></div></li>
+          <li><div class="rm-row"><span><b>Double-tap to seek</b><small>On every player design, as far as you choose</small></span></div></li>
+          <li><div class="rm-row"><span><b>Charts and New releases</b><small>Straight from the Search tab</small></span></div></li>
+          <li><div class="rm-row"><span><b>Podcasts keep their speed</b><small>Each one remembers how fast you listen</small></span></div></li>
+          <li><div class="rm-row"><span><b>Pick up where you left off</b><small>Your place and shuffle survive closing the app</small></span></div></li>
+        </ul>
+      </div>
+
+      <div class="rm-lane planned rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>Planned<small>7 ideas</small></h3>
+        <p>Decided, and waiting their turn. Votes set the order.</p>
+        <ul>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/13" rel="noopener"><span><b>Import from Spotify</b><small>Bring your playlists over</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/14" rel="noopener"><span><b>Search inside lyrics</b><small>Find a line and jump to it</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/9" rel="noopener"><span><b>New release alerts</b><small>From artists you follow</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/12" rel="noopener"><span><b>Skip the talking</b><small>SponsorBlock for music videos</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/11" rel="noopener"><span><b>More than one account</b><small>Switch without signing out</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/10" rel="noopener"><span><b>ListenBrainz</b><small>An open alternative to Last.fm</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/15" rel="noopener"><span><b>Intel and AMD devices</b><small>Waydroid, emulators, x86 tablets</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+        </ul>
+      </div>
+
+      <div class="rm-lane considering rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>Considering<small>3 ideas</small></h3>
+        <p>Not decided yet. Enough votes move an idea up to Planned.</p>
+        <ul>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/8" rel="noopener"><span><b>Animated art and video</b><small>Moving covers, and the music video</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/7" rel="noopener"><span><b>Android TV</b><small>Big-screen, remote-friendly</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/6" rel="noopener"><span><b>Your own music server</b><small>Jellyfin, Navidrome, Subsonic</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rm-cta rise">
+      <a class="rm-primary" href="https://github.com/rajendra7169/blazify/discussions/categories/ideas" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote on ideas</a>
+      <a href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml" rel="noopener">Suggest a feature</a>
+      <a href="https://github.com/rajendra7169/blazify/blob/main/ROADMAP.md" rel="noopener">Full roadmap</a>
     </div>
   </div>
 </section>
