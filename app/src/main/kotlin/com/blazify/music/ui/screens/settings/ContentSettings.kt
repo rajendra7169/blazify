@@ -55,6 +55,7 @@ import androidx.navigation.NavController
 import com.blazify.music.LocalDatabase
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
+import com.blazify.music.constants.AddToPlaylistAtTopKey
 import com.blazify.music.constants.AppLanguageKey
 import com.blazify.music.constants.ContentCountryKey
 import com.blazify.music.constants.ContentLanguageKey
@@ -122,6 +123,7 @@ fun ContentSettings(
     val (lengthTop, onLengthTopChange) = rememberPreference(key = TopSize, defaultValue = "50")
     val (quickPicks, onQuickPicksChange) = rememberEnumPreference(key = QuickPicksKey, defaultValue = QuickPicks.QUICK_PICKS)
     val (showWrappedCard, onShowWrappedCardChange) = rememberPreference(key = ShowWrappedCardKey, defaultValue = false)
+    val (addToPlaylistAtTop, onAddToPlaylistAtTopChange) = rememberPreference(key = AddToPlaylistAtTopKey, defaultValue = true)
     val (showMostStatsPlaylists, onShowMostStatsPlaylistsChange) =
         rememberPreference(key = ShowMostStatsPlaylistsKey, defaultValue = true)
     val (randomizeHomeOrder, onRandomizeHomeOrderChange) = rememberPreference(
@@ -494,6 +496,27 @@ fun ContentSettings(
                     title = { Text(stringResource(R.string.hidden_songs)) },
                     description = { Text(stringResource(R.string.hidden_songs_desc)) },
                     onClick = { navController.navigate("settings/content/hidden_songs") }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.playlist_add),
+                    title = { Text(stringResource(R.string.add_to_playlist_top)) },
+                    description = { Text(stringResource(R.string.add_to_playlist_top_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = addToPlaylistAtTop,
+                            onCheckedChange = onAddToPlaylistAtTopChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (addToPlaylistAtTop) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onAddToPlaylistAtTopChange(!addToPlaylistAtTop) }
                 )
             )
         )

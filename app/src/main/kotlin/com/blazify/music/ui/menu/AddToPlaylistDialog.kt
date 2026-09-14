@@ -34,6 +34,7 @@ import com.blazify.innertube.YouTube
 import com.blazify.innertube.utils.parseCookieString
 import com.blazify.music.LocalDatabase
 import com.blazify.music.R
+import com.blazify.music.constants.AddToPlaylistAtTopKey
 import com.blazify.music.constants.AddToPlaylistSortDescendingKey
 import com.blazify.music.constants.AddToPlaylistSortTypeKey
 import com.blazify.music.constants.InnerTubeCookieKey
@@ -87,6 +88,7 @@ fun AddToPlaylistDialog(
     viewModel: PlaylistsViewModel = hiltViewModel()
 ) {
     val database = LocalDatabase.current
+    val (addToPlaylistAtTop) = rememberPreference(AddToPlaylistAtTopKey, defaultValue = true)
     val syncUtils = LocalSyncUtils.current
     val coroutineScope = rememberCoroutineScope()
     val (sortType, onSortTypeChange) = rememberEnumPreference(
@@ -123,7 +125,7 @@ fun AddToPlaylistDialog(
     }
 
     suspend fun addSongsAndSync(targetPlaylist: Playlist, ids: List<String>) {
-        database.addSongsToPlaylist(targetPlaylist, ids.map { it to null }, prepend = true)
+        database.addSongsToPlaylist(targetPlaylist, ids.map { it to null }, prepend = addToPlaylistAtTop)
         targetPlaylist.playlist.browseId?.let { plist ->
             ids.forEach { songId ->
                 syncUtils.registerPendingAdd(plist, songId)

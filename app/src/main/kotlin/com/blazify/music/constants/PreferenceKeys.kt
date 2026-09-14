@@ -251,6 +251,8 @@ val PlaylistSortTypeKey = stringPreferencesKey("playlistSortType")
 val PlaylistSortDescendingKey = booleanPreferencesKey("playlistSortDescending")
 val AddToPlaylistSortTypeKey = stringPreferencesKey("addToPlaylistSortType")
 val AddToPlaylistSortDescendingKey = booleanPreferencesKey("addToPlaylistSortDescending")
+// Where songs added to a playlist go: the top (as it always was) or the end.
+val AddToPlaylistAtTopKey = booleanPreferencesKey("addToPlaylistAtTop")
 val ArtistSongSortTypeKey = stringPreferencesKey("artistSongSortType")
 val ArtistSongSortDescendingKey = booleanPreferencesKey("artistSongSortDescending")
 val MixSortTypeKey = stringPreferencesKey("mixSortType")

@@ -38,6 +38,7 @@ import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.SongItem
 import com.blazify.music.LocalDatabase
 import com.blazify.music.R
+import com.blazify.music.constants.AddToPlaylistAtTopKey
 import com.blazify.music.constants.AddToPlaylistSortDescendingKey
 import com.blazify.music.constants.AddToPlaylistSortTypeKey
 import com.blazify.music.constants.ListThumbnailSize
@@ -101,6 +102,7 @@ fun AddToPlaylistDialogOnline(
     viewModel: PlaylistsViewModel = hiltViewModel()
 ) {
     val database = LocalDatabase.current
+    val (addToPlaylistAtTop) = rememberPreference(AddToPlaylistAtTopKey, defaultValue = true)
     val coroutineScope = rememberCoroutineScope()
     val viewStateMap = remember { mutableStateMapOf<String, ItemsPage?>() }
     val (sortType, onSortTypeChange) = rememberEnumPreference(
@@ -459,7 +461,7 @@ fun AddToPlaylistDialogOnline(
                                 songIds!!.filter {
                                     !duplicates.contains(it)
                                 }.map { it to null },
-                                prepend = true,
+                                prepend = addToPlaylistAtTop,
                             )
                         }
                     }
@@ -472,7 +474,7 @@ fun AddToPlaylistDialogOnline(
                         showDuplicateDialog = false
                         onDismiss()
                          database.transaction {
-                            addSongsToPlaylist(selectedPlaylist!!, songIds!!.map { it to null }, prepend = true)
+                            addSongsToPlaylist(selectedPlaylist!!, songIds!!.map { it to null }, prepend = addToPlaylistAtTop)
                         }
                     }
                 ) {

@@ -24,6 +24,7 @@ import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
+import com.blazify.music.constants.AddToPlaylistAtTopKey
 import com.blazify.music.playback.audio.VolumeNormalizationAudioProcessor
 import com.blazify.music.utils.safeDataStoreEdit
 import android.net.ConnectivityManager
@@ -2433,7 +2434,11 @@ class MusicService :
 
             val targetPlaylist = database.playlist(targetPlaylistId).first()
             if (targetPlaylist != null) {
-                database.addSongsToPlaylist(targetPlaylist, listOf(currentSong.id to null), prepend = true)
+                database.addSongsToPlaylist(
+                    targetPlaylist,
+                    listOf(currentSong.id to null),
+                    prepend = dataStore.get(AddToPlaylistAtTopKey, true),
+                )
             }
         }
     }
