@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlin.math.PI
 import kotlin.math.atan2
+import kotlin.math.hypot
 
 /** Convert a touch point (relative to a square's box) into a 0..1 fraction, 0 = top, clockwise. */
 private fun angleFraction(x: Float, y: Float, width: Int, height: Int): Float {
@@ -56,8 +58,15 @@ fun SeekableAlbumRing(
     artPaddingDp: Float = 16f,
     fallbackBrush: Brush? = null,
     thumbColor: Color? = null,
+    // Double-tap the artwork inside the ring to jump back or forward.
+    onDoubleTapArt: ((forward: Boolean) -> Unit)? = null,
+    rtl: Boolean = false,
 ) {
     var dragFraction by remember { mutableStateOf<Float?>(null) }
+    // The touch handlers below are set up once, so they read the latest callbacks
+    // here instead of keeping the ones from the first song they saw.
+    val latestOnSeek by rememberUpdatedState(onSeek)
+    val latestOnDoubleTapArt by rememberUpdatedState(onDoubleTapArt)
     val shown = (dragFraction ?: progress).coerceIn(0f, 1f)
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
@@ -95,14 +104,31 @@ fun SeekableAlbumRing(
                             onDrag = { change, _ ->
                                 dragFraction = angleFraction(change.position.x, change.position.y, size.width, size.height)
                             },
-                            onDragEnd = { dragFraction?.let(onSeek); dragFraction = null },
+                            onDragEnd = { dragFraction?.let(latestOnSeek); dragFraction = null },
                             onDragCancel = { dragFraction = null },
                         )
                     }
-                    .pointerInput(Unit) {
-                        detectTapGestures { pos ->
-                            onSeek(angleFraction(pos.x, pos.y, size.width, size.height))
-                        }
+                    .pointerInput(onDoubleTapArt != null, rtl) {
+                        // A tap on the ring jumps to that point. When double-tap seeking is
+                        // on, taps on the artwork inside the ring are left for that instead.
+                        val artRadius = minOf(size.width, size.height) / 2f - artPaddingDp.dp.toPx()
+                        fun onArt(pos: Offset) =
+                            hypot(pos.x - size.width / 2f, pos.y - size.height / 2f) < artRadius
+                        val artSeeks = onDoubleTapArt != null
+                        detectTapGestures(
+                            onTap = { pos ->
+                                if (!artSeeks || !onArt(pos)) {
+                                    latestOnSeek(angleFraction(pos.x, pos.y, size.width, size.height))
+                                }
+                            },
+                            onDoubleTap = if (!artSeeks) null else { pos ->
+                                if (onArt(pos)) {
+                                    latestOnDoubleTapArt?.invoke((pos.x < size.width / 2f) == rtl)
+                                } else {
+                                    latestOnSeek(angleFraction(pos.x, pos.y, size.width, size.height))
+                                }
+                            },
+                        )
                     },
         ) {
             val stroke = ringStrokeDp.dp.toPx()

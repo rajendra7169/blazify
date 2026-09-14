@@ -2002,6 +2002,8 @@ fun BottomSheetPlayer(
                         onToggleShuffle = {
                             playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
                         },
+                        seeker = if (isListenTogetherGuest) null else playerSeeker,
+                        rtl = isRtlLayout,
                         modifier =
                             Modifier
                                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
@@ -2575,6 +2577,8 @@ private fun RingPlayerLayout(
     onCollapse: () -> Unit,
     onOpenTheme: () -> Unit,
     onToggleShuffle: () -> Unit,
+    seeker: PlayerSeeker? = null,
+    rtl: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
@@ -2635,7 +2639,10 @@ private fun RingPlayerLayout(
                     ringStrokeDp = 7f,
                     artPaddingDp = 18f,
                     thumbColor = MaterialTheme.colorScheme.primary,
+                    onDoubleTapArt = seeker?.let { s -> { forward: Boolean -> s.seek(forward) } },
+                    rtl = rtl,
                 )
+                if (seeker != null) SeekMessage(seeker)
             }
         }
 
