@@ -3141,7 +3141,13 @@ private fun RowScope.RetroSegment(bg: Color, iconRes: Int, tint: Color, onClick:
     }
 }
 
-/** Retro segmented bottom row: lyrics (accent) · queue · sleep timer · theme · more. */
+/**
+ * Retro segmented bottom row: lyrics · queue · sleep timer · theme · more.
+ *
+ * All five are plain dark keys. This row only shows while lyrics are closed, and accent
+ * on this player means "on" (play, shuffle, repeat), so an accent lyrics key read as
+ * already selected.
+ */
 @Composable
 private fun RetroBottomRow(
     accent: Color,
@@ -3160,7 +3166,7 @@ private fun RetroBottomRow(
             .shadow(8.dp, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp)),
     ) {
-        RetroSegment(bg = accent, iconRes = R.drawable.lyrics, tint = Color.White, onClick = onLyrics)
+        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.lyrics, tint = RetroCream, onClick = onLyrics)
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.queue_music, tint = RetroCream, onClick = onQueue)
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.bedtime, tint = RetroCream, onClick = onSleep)
         RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.palette, tint = RetroCream) {
