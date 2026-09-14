@@ -1420,11 +1420,16 @@ class MusicService :
             }
         }
 
+        // Where you are in the song goes to its own small file every few seconds, so a force
+        // stop or a crash loses at most that much. The whole queue is heavier: it goes every nine
+        // seconds, and right away after items were added, removed or moved, so the saved position
+        // always points into the queue that is on disk.
         scope.launch {
+            var tick = 0
             while (isActive) {
-                delay(10.seconds)
+                delay(3.seconds)
                 if (cachedPersistentQueue && player.isPlaying) {
-                    saveQueueToDisk()
+                    if (queueChangedSinceSave || ++tick % 3 == 0) saveQueueToDisk() else savePlayerStateToDisk()
                 }
             }
         }
@@ -3057,6 +3062,19 @@ class MusicService :
         }
     }
 
+    // Set when items are added, removed or moved, so the next periodic save writes the whole
+    // queue and not only the position, which would otherwise point into the old one.
+    private var queueChangedSinceSave = false
+
+    override fun onTimelineChanged(
+        timeline: Timeline,
+        reason: Int,
+    ) {
+        if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
+            queueChangedSinceSave = true
+        }
+    }
+
     override fun onRepeatModeChanged(repeatMode: Int) {
         updateNotification()
         scope.launch {
@@ -4354,6 +4372,7 @@ class MusicService :
             return
         }
 
+        queueChangedSinceSave = false
         try {
             val persistQueue =
                 currentQueue.toPersistQueue(
@@ -4369,17 +4388,6 @@ class MusicService :
                     items = automixItems.value.mapNotNull { it.metadata },
                     mediaItemIndex = 0,
                     position = 0,
-                )
-
-            val persistPlayerState =
-                PersistPlayerState(
-                    playWhenReady = player.playWhenReady,
-                    repeatMode = player.repeatMode,
-                    shuffleModeEnabled = player.shuffleModeEnabled,
-                    volume = playerVolume.value,
-                    currentPosition = player.currentPosition,
-                    currentMediaItemIndex = player.currentMediaItemIndex,
-                    playbackState = player.playbackState,
                 )
 
             runCatching {
@@ -4406,20 +4414,46 @@ class MusicService :
                 reportException(it)
             }
 
-            runCatching {
-                filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE).outputStream().use { fos ->
-                    ObjectOutputStream(fos).use { oos ->
-                        oos.writeObject(persistPlayerState)
-                    }
-                }
-                Timber.tag(TAG).d("Player state saved successfully")
-            }.onFailure {
-                Timber.tag(TAG).e(it, "Failed to save player state")
-                reportException(it)
-            }
+            savePlayerStateToDisk()
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error during queue save operation")
             reportException(e)
+        }
+    }
+
+    /**
+     * Where playback is: the item, the position in it and a few player settings. It is tiny, so
+     * it is written every few seconds while playing, through a temporary file so a kill in the
+     * middle of a write can't leave half a file that makes the next start throw the queue away.
+     */
+    private fun savePlayerStateToDisk() {
+        if (player.mediaItemCount == 0) return
+        runCatching {
+            val state =
+                PersistPlayerState(
+                    playWhenReady = player.playWhenReady,
+                    repeatMode = player.repeatMode,
+                    shuffleModeEnabled = player.shuffleModeEnabled,
+                    volume = playerVolume.value,
+                    currentPosition = player.currentPosition,
+                    currentMediaItemIndex = player.currentMediaItemIndex,
+                    playbackState = player.playbackState,
+                )
+            val file = filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE)
+            val tmp = filesDir.resolve("$PERSISTENT_PLAYER_STATE_FILE.tmp")
+            tmp.outputStream().use { fos ->
+                ObjectOutputStream(fos).use { oos ->
+                    oos.writeObject(state)
+                }
+            }
+            if (!tmp.renameTo(file)) {
+                file.delete()
+                tmp.renameTo(file)
+            }
+            Timber.tag(TAG).d("Player state saved successfully")
+        }.onFailure {
+            Timber.tag(TAG).e(it, "Failed to save player state")
+            reportException(it)
         }
     }
 
@@ -5226,6 +5260,22 @@ class MusicService :
     }
 
     companion object {
+        // Set by MainActivity when the app is opened by a link that plays something, and read
+        // once by the next service start. A time rather than a flag, so one left behind by a
+        // start that found the service already running can't skip a later, ordinary restore.
+        @Volatile
+        private var openedForLinkAt = 0L
+
+        fun markOpenedForLink() {
+            openedForLinkAt = SystemClock.elapsedRealtime()
+        }
+
+        private fun consumeOpenedForLink(): Boolean {
+            val markedAt = openedForLinkAt
+            openedForLinkAt = 0L
+            return markedAt != 0L && SystemClock.elapsedRealtime() - markedAt < 10_000L
+        }
+
         const val ACTION_ALARM_TRIGGER = "com.blazify.music.action.ALARM_TRIGGER"
         const val EXTRA_ALARM_ID = "extra_alarm_id"
         const val EXTRA_ALARM_PLAYLIST_ID = "extra_alarm_playlist_id"
@@ -5260,22 +5310,6 @@ class MusicService :
             private set
             
         @Volatile
-        // Set by MainActivity when the app is opened by a link that plays something, and read
-        // once by the next service start. A time rather than a flag, so one left behind by a
-        // start that found the service already running can't skip a later, ordinary restore.
-        @Volatile
-        private var openedForLinkAt = 0L
-
-        fun markOpenedForLink() {
-            openedForLinkAt = SystemClock.elapsedRealtime()
-        }
-
-        private fun consumeOpenedForLink(): Boolean {
-            val markedAt = openedForLinkAt
-            openedForLinkAt = 0L
-            return markedAt != 0L && SystemClock.elapsedRealtime() - markedAt < 10_000L
-        }
-
         var shutdownDeferred = kotlinx.coroutines.CompletableDeferred<Unit>().apply { complete(Unit) }
     }
 }
