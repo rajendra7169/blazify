@@ -75,6 +75,8 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.LocalSyncUtils
 import com.blazify.music.R
 import com.blazify.music.constants.ListItemHeight
+import com.blazify.music.constants.LocalMusicFoldersKey
+import com.blazify.music.utils.rememberPreference
 import com.blazify.music.constants.ListThumbnailSize
 import com.blazify.music.db.entities.ArtistEntity
 import com.blazify.music.db.entities.Event
@@ -193,6 +195,8 @@ fun SongMenu(
     // set an album and undo itself.
     if (showEditDialog && song.song.isLocal) {
         val localMusic = remember { LocalMusic(context, database) }
+        // Rescans here honour the folders picked in Storage settings, like the scan there does.
+        val (localMusicFolders) = rememberPreference(LocalMusicFoldersKey, emptySet())
         var override by remember(song.id) { mutableStateOf<LocalTagOverride?>(null) }
         var loaded by remember(song.id) { mutableStateOf(false) }
 
@@ -222,7 +226,7 @@ fun SongMenu(
                 onReset = {
                     coroutineScope.launch {
                         localMusic.clearTagOverride(song.id)
-                        localMusic.scan()
+                        localMusic.scan(localMusicFolders)
                         onDismiss()
                     }
                 },

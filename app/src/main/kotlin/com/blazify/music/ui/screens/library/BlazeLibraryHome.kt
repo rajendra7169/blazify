@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.blazify.music.LocalDatabase
 import com.blazify.music.utils.LocalMusic
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.constants.LocalMusicFoldersKey
 import com.blazify.music.constants.ShowCachedPlaylistKey
 import com.blazify.music.constants.ShowDownloadedPlaylistKey
 import com.blazify.music.constants.ShowLikedPlaylistKey
@@ -78,13 +79,15 @@ fun BlazeLibraryHome(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val scope = rememberCoroutineScope()
+    // Scans started from here honour the folders picked in Storage settings.
+    val (localMusicFolders) = rememberPreference(LocalMusicFoldersKey, emptySet())
     var localGranted by remember { mutableStateOf(LocalMusic.hasPermission(context)) }
     val audioPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             localGranted = granted
             if (granted) {
                 scope.launch(Dispatchers.IO) {
-                    runCatching { LocalMusic(context, database).scan() }
+                    runCatching { LocalMusic(context, database).scan(localMusicFolders) }
                 }
             }
         }
@@ -259,7 +262,7 @@ fun BlazeLibraryHome(
                         onClick = {
                             if (localGranted) {
                                 scope.launch(Dispatchers.IO) {
-                                    runCatching { LocalMusic(context, database).scan() }
+                                    runCatching { LocalMusic(context, database).scan(localMusicFolders) }
                                 }
                             } else {
                                 audioPermission.launch(LocalMusic.permission)
