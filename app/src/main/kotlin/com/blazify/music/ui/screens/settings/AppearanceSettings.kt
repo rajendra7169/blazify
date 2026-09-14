@@ -315,7 +315,7 @@ fun AppearanceSettings(
     val (swipeToSong, onSwipeToSongChange) =
         rememberPreference(
             SwipeToSongKey,
-            defaultValue = false,
+            defaultValue = true,
         )
 
     val (swipeToRemoveSong, onSwipeToRemoveSongChange) =
