@@ -111,6 +111,9 @@ val EnablePaxsenixKey = booleanPreferencesKey("enablePaxsenix")
 val EnableLyricsPlus = booleanPreferencesKey("enableLyricsPlus")
 val HideExplicitKey = booleanPreferencesKey("hideExplicit")
 val HideVideoSongsKey = booleanPreferencesKey("hideVideoSongs")
+
+// Songs the listener asked never to be played for them again (Don't play this song).
+val HiddenSongIdsKey = stringSetPreferencesKey("hiddenSongIds")
 val HideYoutubeShortsKey = booleanPreferencesKey("hideYoutubeShorts")
 val ShowArtistDescriptionKey = booleanPreferencesKey("showArtistDescription")
 val ShowArtistSubscriberCountKey = booleanPreferencesKey("showArtistSubscriberCount")

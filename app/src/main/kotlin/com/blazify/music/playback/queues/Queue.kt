@@ -41,8 +41,29 @@ interface Queue {
             } else {
                 this
             }
+
+        /**
+         * Leaves out songs the listener hid with "Don't play this song". The song at
+         * [mediaItemIndex] stays even if it is hidden, because that is the one they
+         * chose to play, and the index is moved so it still points at it.
+         */
+        fun filterHidden(hiddenIds: Set<String>): Status {
+            if (hiddenIds.isEmpty() || items.isEmpty()) return this
+            val start = mediaItemIndex.coerceIn(0, items.lastIndex)
+            val kept = ArrayList<MediaItem>(items.size)
+            var newIndex = 0
+            items.forEachIndexed { i, item ->
+                if (i == start) newIndex = kept.size
+                if (i == start || item.mediaId !in hiddenIds) kept.add(item)
+            }
+            return copy(items = kept, mediaItemIndex = newIndex)
+        }
     }
 }
+
+/** Leaves out songs hidden with "Don't play this song", for batches nobody picked by hand. */
+fun List<MediaItem>.filterHidden(hiddenIds: Set<String>) =
+    if (hiddenIds.isEmpty()) this else filterNot { it.mediaId in hiddenIds }
 
 fun List<MediaItem>.filterExplicit(enabled: Boolean = true) =
     if (enabled) {
