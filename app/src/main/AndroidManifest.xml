@@ -427,6 +427,17 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".quicksettings.PlaybackTileService"
+            android:label="@string/qs_tile_playback"
+            android:icon="@drawable/play"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
