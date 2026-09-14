@@ -50,6 +50,7 @@ import com.blazify.music.constants.EnableLrcLibKey
 import com.blazify.music.constants.EnableLyricsPlus
 import com.blazify.music.constants.EnablePaxsenixKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
+import com.blazify.music.constants.LyricsGlowEffectKey
 import com.blazify.music.constants.LyricsLineSpacingKey
 import com.blazify.music.constants.LyricsProviderOrderKey
 import com.blazify.music.constants.LyricsClickKey
@@ -84,6 +85,7 @@ fun LyricsSettings(navController: NavController) {
         rememberPreference(RespectAgentPositioningKey, defaultValue = true)
     val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 36f)
     val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.3f)
+    val (lyricsGlow, onLyricsGlowChange) = rememberPreference(LyricsGlowEffectKey, defaultValue = true)
 
     // Sources (moved from Content).
     val (enableKugou, onEnableKugouChange) = rememberPreference(EnableKugouKey, defaultValue = true)
@@ -202,6 +204,16 @@ fun LyricsSettings(navController: NavController) {
                                 )
                             }
                         },
+                    ),
+                )
+                add(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.lyrics),
+                        title = { Text(stringResource(R.string.lyrics_glow_effect)) },
+                        trailingContent = {
+                            Switch(checked = lyricsGlow, onCheckedChange = onLyricsGlowChange, thumbContent = switchIcon(lyricsGlow))
+                        },
+                        onClick = { onLyricsGlowChange(!lyricsGlow) },
                     ),
                 )
                 add(

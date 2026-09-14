@@ -153,6 +153,7 @@ internal fun LyricsLine(
     lyricsTextSize: Float,
     lyricsLineSpacing: Float,
     expressiveAccent: Color,
+    glowEnabled: Boolean = true,
     lyricsTextPosition: LyricsPosition,
     respectAgentPositioning: Boolean,
     isAutoScrollEnabled: Boolean,
@@ -304,6 +305,7 @@ internal fun LyricsLine(
                         focusedAlpha = focusedAlpha,
                         alignment = agentTextAlign,
                         useWholeLinePath = isComplexText,
+                        glowEnabled = glowEnabled,
                     )
                 } else {
                     Text(
@@ -369,6 +371,7 @@ private fun WordLevelLyrics(
     focusedAlpha: Float,
     alignment: TextAlign,
     useWholeLinePath: Boolean = false,
+    glowEnabled: Boolean = true,
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -733,7 +736,7 @@ private fun WordLevelLyrics(
                         ((wProg - cInW / wLen) * wLen).coerceIn(0.0, 1.0).toFloat()
                     } else 0f
 
-                    val shouldGlow = wordItem != null && !isWordSung && sungFactor > 0.001f
+                    val shouldGlow = glowEnabled && wordItem != null && !isWordSung && sungFactor > 0.001f
 
                     var crescendoDeltaX = 0f
                     var crescendoDeltaY = 0f
