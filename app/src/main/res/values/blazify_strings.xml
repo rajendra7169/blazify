@@ -1277,7 +1277,7 @@
     <string name="mini_player_design_floating">Floating</string>
 
     <!-- Toggle descriptions (what each does) -->
-    <string name="enable_dynamic_theme_desc">Match the app colours to your wallpaper (Android 12+)</string>
+    <string name="enable_dynamic_theme_desc">Colour the app from the album art of the song that\'s playing</string>
     <string name="new_player_design_desc">Use the redesigned full-screen player</string>
     <string name="enable_swipe_thumbnail_desc">Swipe the mini-player artwork to change songs</string>
     <string name="slim_navbar_desc">Use a thinner bottom navigation bar</string>
