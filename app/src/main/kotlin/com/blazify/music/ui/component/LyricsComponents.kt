@@ -91,6 +91,7 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import com.blazify.music.R
 import com.blazify.music.lyrics.LyricsTranslationHelper
+import com.blazify.music.lyrics.lyricsTextLooksSynced
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.screens.settings.LyricsPosition
 import com.blazify.music.utils.ComposeToImage
@@ -360,7 +361,7 @@ internal fun LyricsSourceLanguageDialog(
                                                 .padding(horizontal = 6.dp, vertical = 1.dp),
                                         )
                                     }
-                                    if (result.lyrics.startsWith("[")) {
+                                    if (lyricsTextLooksSynced(result.lyrics)) {
                                         Icon(
                                             painter = painterResource(R.drawable.sync),
                                             contentDescription = null,

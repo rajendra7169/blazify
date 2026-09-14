@@ -70,6 +70,7 @@ import com.blazify.music.db.entities.LyricsEntity
 import com.blazify.music.db.entities.SongEntity
 import com.blazify.music.lyrics.LyricsTranslationHelper
 import com.blazify.music.lyrics.LyricsUtils
+import com.blazify.music.lyrics.lyricsTextLooksSynced
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.ListDialog
@@ -328,7 +329,7 @@ fun LyricsMenu(
                                         .padding(horizontal = 6.dp, vertical = 1.dp),
                                 )
                             }
-                            if (result.lyrics.startsWith("[")) {
+                            if (lyricsTextLooksSynced(result.lyrics)) {
                                 Icon(
                                     painter = painterResource(R.drawable.sync),
                                     contentDescription = null,
@@ -468,13 +469,14 @@ fun LyricsMenu(
                             text = stringResource(R.string.copy),
                             onClick = {
                                 lyricsProvider()?.lyrics?.let { lyrics ->
+                                    // Synced lyrics are copied without their timestamps. Anything the
+                                    // parser can't read, like plain lyrics that open with [Verse 1],
+                                    // is copied as it is instead of as an empty clipboard.
                                     val plainLyrics =
-                                        if (lyrics.startsWith("[")) {
-                                            LyricsUtils.parseLyrics(lyrics)
-                                                .joinToString("\n") { it.text }
-                                        } else {
-                                            lyrics
-                                        }
+                                        LyricsUtils.parseLyrics(lyrics)
+                                            .takeIf { lyricsTextLooksSynced(lyrics) && it.isNotEmpty() }
+                                            ?.joinToString("\n") { it.text }
+                                            ?: lyrics
 
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                     val clip = ClipData.newPlainText("Lyrics", plainLyrics)
