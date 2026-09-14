@@ -5,7 +5,6 @@
 
 package com.blazify.music.ui.player
 
-import android.content.Context
 import android.os.SystemClock
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -27,12 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.blazify.music.R
 import com.blazify.music.constants.SeekAmountSecondsKey
 import com.blazify.music.constants.SeekExtraSeconds
 import com.blazify.music.playback.PlayerConnection
@@ -49,14 +46,17 @@ import kotlinx.coroutines.delay
 @Stable
 class PlayerSeeker internal constructor(
     private val playerConnection: PlayerConnection,
-    private val context: Context,
 ) {
     internal var stepSeconds = 10
     internal var progressive = false
     private var steps = 1
     private var lastSeekAt = 0L
 
-    /** "+10 seconds forward" and the like, or null when there is nothing to show. */
+    /**
+     * "+10" or "-10", or null when there is nothing to show. Just the signed number: it sits
+     * right where the person double-tapped, so the side already says which way it went, and
+     * a number reads the same in every language.
+     */
     var message by mutableStateOf<String?>(null)
         private set
 
@@ -80,10 +80,7 @@ class PlayerSeeker internal constructor(
             }
         player.seekTo(target)
 
-        message = context.getString(
-            if (forward) R.string.seek_forward_dynamic else R.string.seek_backward_dynamic,
-            stepSeconds * steps,
-        )
+        message = (if (forward) "+" else "-") + stepSeconds * steps
         messageId++
     }
 
@@ -94,10 +91,9 @@ class PlayerSeeker internal constructor(
 
 @Composable
 fun rememberPlayerSeeker(playerConnection: PlayerConnection): PlayerSeeker {
-    val context = LocalContext.current
     val stepSeconds by rememberPreference(SeekAmountSecondsKey, defaultValue = 10)
     val progressive by rememberPreference(SeekExtraSeconds, defaultValue = false)
-    val seeker = remember(playerConnection) { PlayerSeeker(playerConnection, context.applicationContext) }
+    val seeker = remember(playerConnection) { PlayerSeeker(playerConnection) }
     SideEffect {
         seeker.stepSeconds = stepSeconds
         seeker.progressive = progressive
@@ -120,7 +116,7 @@ fun Modifier.doubleTapToSeek(seeker: PlayerSeeker, rtl: Boolean, enabled: Boolea
         }
     }
 
-/** The small "+10 seconds forward" note, gone a second after the last seek. */
+/** The small "+10" note, gone a second after the last seek. */
 @Composable
 fun SeekMessage(seeker: PlayerSeeker, modifier: Modifier = Modifier) {
     val message = seeker.message
