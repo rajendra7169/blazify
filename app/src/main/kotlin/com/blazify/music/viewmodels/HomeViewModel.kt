@@ -15,6 +15,7 @@ import com.blazify.innertube.models.ArtistItem
 import com.blazify.innertube.models.PlaylistItem
 import com.blazify.innertube.models.SongItem
 import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.ui.screens.wrapped.WrappedConstants
 import com.blazify.music.utils.mixQuickPicks
 import kotlinx.coroutines.flow.combine
 import com.blazify.innertube.models.WatchEndpoint
@@ -34,7 +35,7 @@ import com.blazify.music.constants.InnerTubeCookieKey
 import com.blazify.music.constants.QuickPicks
 import com.blazify.music.constants.QuickPicksKey
 import com.blazify.music.constants.ShowWrappedCardKey
-import com.blazify.music.constants.WrappedSeenKey
+import com.blazify.music.constants.WrappedSeenYearKey
 import com.blazify.music.db.MusicDatabase
 import com.blazify.music.db.entities.Album
 import com.blazify.music.db.entities.LocalItem
@@ -256,16 +257,16 @@ class HomeViewModel @Inject constructor(
     val accountName = MutableStateFlow("Guest")
     val accountImageUrl = MutableStateFlow<String?>(null)
 
-	val showWrappedCard: StateFlow<Boolean> = context.dataStore.data.map { prefs ->
+    // Offered in December and January for the year Wrapped looks back on. Seen is kept per
+    // year, so having opened last year's Wrapped doesn't hide this year's.
+    val showWrappedCard: StateFlow<Boolean> = context.dataStore.data.map { prefs ->
         val showWrappedPref = prefs[ShowWrappedCardKey] ?: false
-        val seen = prefs[WrappedSeenKey] ?: false
-        val isBeforeDate = LocalDate.now().isBefore(LocalDate.of(2026, 2, 1))
-
-        isBeforeDate && (!seen || showWrappedPref)
+        val seen = prefs[WrappedSeenYearKey] == WrappedConstants.year()
+        WrappedConstants.isSeason() && (!seen || showWrappedPref)
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val wrappedSeen: StateFlow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[WrappedSeenKey] ?: false
+        prefs[WrappedSeenYearKey] == WrappedConstants.year()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     fun togglePin(item: YTItem) {
@@ -283,7 +284,7 @@ class HomeViewModel @Inject constructor(
     fun markWrappedAsSeen() {
         viewModelScope.launch(Dispatchers.IO) {
             context.safeDataStoreEdit {
-                it[WrappedSeenKey] = true
+                it[WrappedSeenYearKey] = WrappedConstants.year()
             }
         }
     }

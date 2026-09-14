@@ -301,7 +301,8 @@ val LyricsProviderOrderKey = stringPreferencesKey("lyricsProviderOrder")
 val SimpMusicMigrationDoneKey = booleanPreferencesKey("simpMusicMigrationDone")
 val QueueEditLockKey = booleanPreferencesKey("queueEditLock")
 val ShowWrappedCardKey = booleanPreferencesKey("show_wrapped_card")
-val WrappedSeenKey = booleanPreferencesKey("wrapped_seen")
+// The Wrapped year that has been opened, so each new Wrapped gets its own card.
+val WrappedSeenYearKey = intPreferencesKey("wrapped_seen_year")
 val LastSeenVersionKey = stringPreferencesKey("lastSeenVersion")
 
 /**
