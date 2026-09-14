@@ -1146,9 +1146,9 @@
     <string name="settings_group_privacy_data">Privacy &amp; data</string>
     <string name="settings_group_about">About</string>
     <string name="search_settings">Search settings</string>
-    <string name="hint_appearance">Theme, colors, dark mode, layout</string>
+    <string name="hint_appearance">Player look, gestures, display, Library cards</string>
     <string name="look_and_feel">Look &amp; Feel</string>
-    <string name="look_and_feel_desc">Preview and style theme and mini-player in one place</string>
+    <string name="look_and_feel_desc">Theme, player, mini-player, lyrics and Home, with a live preview</string>
     <string name="stop_music_on_task_clear_desc">Stop playback when you swipe the app away from Recents</string>
     <string name="pause_on_mute_desc">Pause automatically when media volume is muted</string>
     <string name="resume_on_bluetooth_desc">Continue playing when a Bluetooth device connects</string>
