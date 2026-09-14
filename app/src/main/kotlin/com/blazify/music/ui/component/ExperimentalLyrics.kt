@@ -98,7 +98,9 @@ import com.blazify.music.constants.LyricsClickKey
 import com.blazify.music.constants.LyricsRomanizeAsMainKey
 import com.blazify.music.constants.LyricsRomanizeCyrillicByLineKey
 import com.blazify.music.constants.LyricsRomanizeList
+import com.blazify.music.constants.LyricsLineSpacingKey
 import com.blazify.music.constants.LyricsTextPositionKey
+import com.blazify.music.constants.LyricsTextSizeKey
 import com.blazify.music.constants.OpenRouterApiKey
 import com.blazify.music.constants.OpenRouterBaseUrlKey
 import com.blazify.music.constants.OpenRouterDefaultBaseUrl
@@ -172,6 +174,8 @@ fun ExperimentalLyrics(
     val romanizeAsMain by rememberPreference(LyricsRomanizeAsMainKey, false)
     val romanizeCyrillicByLine by rememberPreference(LyricsRomanizeCyrillicByLineKey, false)
     val respectAgentPositioning by rememberPreference(RespectAgentPositioningKey, true)
+    val lyricsTextSize by rememberPreference(LyricsTextSizeKey, 36f)
+    val lyricsLineSpacing by rememberPreference(LyricsLineSpacingKey, 1.3f)
     val showIntervalIndicator by rememberPreference(ShowIntervalIndicatorKey, true)
     
     // AI Translation Preferences
@@ -833,7 +837,7 @@ fun ExperimentalLyrics(
                                         isSelectionModeActive = isSelectionModeActive, currentPositionState = currentPositionState,
                                         lyricsOffset = (currentSong?.song?.lyricsOffset ?: 0).toLong(),
                                         nextLineTimeMs = lines.getOrNull(index + 1)?.time,
-                                        playerConnection = playerConnection, lyricsTextSize = 36f, lyricsLineSpacing = 1.3f,
+                                        playerConnection = playerConnection, lyricsTextSize = lyricsTextSize, lyricsLineSpacing = lyricsLineSpacing,
                                         expressiveAccent = expressiveAccent, lyricsTextPosition = lyricsTextPosition,
                                         respectAgentPositioning = respectAgentPositioning, isAutoScrollEnabled = isAutoScrollEnabled,
                                         displayedCurrentLineIndex = deferredCurrentLineIndex, romanizeAsMain = romanizeAsMain,

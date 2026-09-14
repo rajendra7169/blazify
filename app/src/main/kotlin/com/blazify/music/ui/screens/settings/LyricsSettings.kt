@@ -22,6 +22,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -49,9 +50,11 @@ import com.blazify.music.constants.EnableLrcLibKey
 import com.blazify.music.constants.EnableLyricsPlus
 import com.blazify.music.constants.EnablePaxsenixKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
+import com.blazify.music.constants.LyricsLineSpacingKey
 import com.blazify.music.constants.LyricsProviderOrderKey
 import com.blazify.music.constants.LyricsClickKey
 import com.blazify.music.constants.LyricsTextPositionKey
+import com.blazify.music.constants.LyricsTextSizeKey
 import com.blazify.music.constants.RespectAgentPositioningKey
 import com.blazify.music.lyrics.LyricsProviderRegistry
 import com.blazify.music.ui.component.DraggableLyricsProviderItem
@@ -63,6 +66,7 @@ import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
+import kotlin.math.roundToInt
 
 /**
  * One home for lyrics settings — display, sources, translation and romanization —
@@ -78,6 +82,8 @@ fun LyricsSettings(navController: NavController) {
         rememberPreference(HideStatusBarOnFullscreenKey, defaultValue = false)
     val (respectAgentPositioning, onRespectAgentPositioningChange) =
         rememberPreference(RespectAgentPositioningKey, defaultValue = true)
+    val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 36f)
+    val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.3f)
 
     // Sources (moved from Content).
     val (enableKugou, onEnableKugouChange) = rememberPreference(EnableKugouKey, defaultValue = true)
@@ -162,6 +168,40 @@ fun LyricsSettings(navController: NavController) {
                         title = { Text(stringResource(R.string.lyrics_text_position)) },
                         description = { Text(lyricsPosition.positionLabel()) },
                         onClick = { showLyricsPositionDialog = true },
+                    ),
+                )
+                add(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.lyrics),
+                        title = { Text(stringResource(R.string.lyrics_text_size)) },
+                        description = {
+                            Column {
+                                Text(lyricsTextSize.roundToInt().toString())
+                                Slider(
+                                    value = lyricsTextSize,
+                                    onValueChange = { onLyricsTextSizeChange(it.roundToInt().toFloat()) },
+                                    valueRange = 24f..48f,
+                                    steps = 11,
+                                )
+                            }
+                        },
+                    ),
+                )
+                add(
+                    Material3SettingsItem(
+                        icon = painterResource(R.drawable.lyrics),
+                        title = { Text(stringResource(R.string.lyrics_line_spacing)) },
+                        description = {
+                            Column {
+                                Text("%.1f×".format(lyricsLineSpacing))
+                                Slider(
+                                    value = lyricsLineSpacing,
+                                    onValueChange = { onLyricsLineSpacingChange((it * 10).roundToInt() / 10f) },
+                                    valueRange = 1.0f..1.8f,
+                                    steps = 7,
+                                )
+                            }
+                        },
                     ),
                 )
                 add(
