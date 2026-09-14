@@ -75,6 +75,7 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.LocalSyncUtils
 import com.blazify.music.R
 import com.blazify.music.constants.ListItemHeight
+import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.constants.LocalMusicFoldersKey
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.constants.ListThumbnailSize
@@ -143,6 +144,8 @@ fun SongMenu(
     )
 
     val isPinned by database.speedDialDao.isPinned(song.id).collectAsStateWithLifecycle(initialValue = false)
+    val (hiddenSongIds, setHiddenSongIds) = rememberPreference(HiddenSongIdsKey, emptySet())
+    val isHidden = song.id in hiddenSongIds
 
     // Podcast subscription state for episodes
     val podcastEntity by produceState<PodcastEntity?>(initialValue = null, song) {
@@ -721,6 +724,37 @@ fun SongMenu(
                         } else {
                             null
                         },
+                        Material3MenuItemData(
+                            title = {
+                                Text(
+                                    text = stringResource(
+                                        if (isHidden) R.string.play_this_song_again else R.string.dont_play_this_song,
+                                    ),
+                                )
+                            },
+                            description = {
+                                Text(
+                                    text = stringResource(
+                                        if (isHidden) R.string.play_this_song_again_hint else R.string.dont_play_this_song_hint,
+                                    ),
+                                )
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(if (isHidden) R.drawable.play else R.drawable.hide_image),
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                setHiddenSongIds(if (isHidden) hiddenSongIds - song.id else hiddenSongIds + song.id)
+                                Toast.makeText(
+                                    context,
+                                    if (isHidden) R.string.song_unhidden else R.string.song_hidden,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                                onDismiss()
+                            },
+                        ),
                     ),
             )
         }

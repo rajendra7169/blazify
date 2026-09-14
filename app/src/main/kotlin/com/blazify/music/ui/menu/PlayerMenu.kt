@@ -87,6 +87,7 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.ui.component.AudioOutputDialog
 import com.blazify.music.utils.AudioOutput
+import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.constants.ListItemHeight
 import com.blazify.music.constants.VarispeedKey
 import com.blazify.music.listentogether.ConnectionState
@@ -126,6 +127,8 @@ fun PlayerMenu(
     // downloaded, put on a radio, looked up, or opened on a page that does not
     // exist. Offered and then failing is what reads as the app being broken.
     val isLocal = LocalMusic.isLocal(mediaMetadata.id)
+    val (hiddenSongIds, setHiddenSongIds) = rememberPreference(HiddenSongIdsKey, emptySet())
+    val isHidden = mediaMetadata.id in hiddenSongIds
     val navController = LocalNavController.current
     val context = LocalContext.current
     val database = LocalDatabase.current
@@ -462,6 +465,46 @@ fun PlayerMenu(
             Material3MenuGroup(
                 items =
                     buildList {
+                        add(
+                            Material3MenuItemData(
+                                title = {
+                                    Text(
+                                        text = stringResource(
+                                            if (isHidden) R.string.play_this_song_again else R.string.dont_play_this_song,
+                                        ),
+                                    )
+                                },
+                                description = {
+                                    Text(
+                                        text = stringResource(
+                                            if (isHidden) R.string.play_this_song_again_hint else R.string.dont_play_this_song_hint,
+                                        ),
+                                    )
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(if (isHidden) R.drawable.play else R.drawable.hide_image),
+                                        contentDescription = null,
+                                    )
+                                },
+                                onClick = {
+                                    val hiding = !isHidden
+                                    setHiddenSongIds(
+                                        if (hiding) hiddenSongIds + mediaMetadata.id else hiddenSongIds - mediaMetadata.id,
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        if (hiding) R.string.song_hidden else R.string.song_unhidden,
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                    onDismiss()
+                                    // Hiding the song that is playing moves straight on to the next one.
+                                    if (hiding && playerConnection.player.hasNextMediaItem()) {
+                                        playerConnection.player.seekToNext()
+                                    }
+                                },
+                            ),
+                        )
                         // Don't show "View Artist" for podcasts - only show "View Podcast"
                         if (artists.isNotEmpty() && !isPodcast && !isLocal) {
                             add(

@@ -45,6 +45,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import com.blazify.music.constants.HiddenSongIdsKey
+import com.blazify.music.utils.rememberPreference
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +106,8 @@ fun YouTubeSongMenu(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
+    val (hiddenSongIds, setHiddenSongIds) = rememberPreference(HiddenSongIdsKey, emptySet())
+    val isHidden = song.id in hiddenSongIds
     val librarySong by database.song(song.id).collectAsStateWithLifecycle(initialValue = null)
     val download by LocalDownloadUtil.current.getDownload(song.id).collectAsStateWithLifecycle(initialValue = null)
     val coroutineScope = rememberCoroutineScope()
@@ -407,7 +412,44 @@ fun YouTubeSongMenu(
                                 onDismiss()
                             }
                         )
-                    } else null
+                    } else null,
+                    Material3MenuItemData(
+                        title = {
+                            Text(
+                                text = stringResource(
+                                    if (isHidden) R.string.play_this_song_again else R.string.dont_play_this_song,
+                                ),
+                            )
+                        },
+                        description = {
+                            Text(
+                                text = stringResource(
+                                    if (isHidden) R.string.play_this_song_again_hint else R.string.dont_play_this_song_hint,
+                                ),
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                painter = painterResource(if (isHidden) R.drawable.play else R.drawable.hide_image),
+                                contentDescription = null,
+                            )
+                        },
+                        onClick = {
+                            if (!isHidden) {
+                                // Save the song so it has a name and artwork in Hidden songs.
+                                coroutineScope.launch(Dispatchers.IO) {
+                                    database.withTransaction { insert(song.toMediaMetadata()) }
+                                }
+                            }
+                            setHiddenSongIds(if (isHidden) hiddenSongIds - song.id else hiddenSongIds + song.id)
+                            Toast.makeText(
+                                context,
+                                if (isHidden) R.string.song_unhidden else R.string.song_hidden,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                            onDismiss()
+                        }
+                    )
                 )
             )
         }

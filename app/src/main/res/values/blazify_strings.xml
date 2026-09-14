@@ -949,6 +949,16 @@
     <string name="unpin_from_speed_dial">Unpin from speed dial</string>
     <string name="speed_dial_pin_hint">Keeps it in the grid at the top of Home</string>
     <string name="speed_dial_unpin_hint">Takes it out of the grid at the top of Home</string>
+    <string name="dont_play_this_song">Don\'t play this song</string>
+    <string name="dont_play_this_song_hint">It won\'t come up in picks, radio or autoplay</string>
+    <string name="play_this_song_again">Play this song again</string>
+    <string name="play_this_song_again_hint">Let it come up in picks, radio and autoplay</string>
+    <string name="song_hidden">You won\'t hear this song unless you pick it yourself</string>
+    <string name="song_unhidden">This song can come up again</string>
+    <string name="hidden_songs">Hidden songs</string>
+    <string name="hidden_songs_desc">Songs you asked not to be played for you</string>
+    <string name="hidden_songs_empty">No hidden songs. Choose Don\'t play this song in a song\'s menu to hide one.</string>
+    <string name="unhide">Unhide</string>
     <string name="pin">Pin</string>
     <string name="unpin">Unpin</string>
     <string name="randomize_home_order">Randomize home screen order</string>
