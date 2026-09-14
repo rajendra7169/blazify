@@ -841,11 +841,18 @@ object LyricsUtils {
         return lines.lastIndex
     }
 
+    // Shorter than this between a line's last word and the next line is a breath, not a break.
+    // Matches the gap that gets the interval marker.
+    private const val SHORT_BREATH_MS = 4_000L
+
     /**
      * Returns the set of line indices that are currently active (being sung).
      * A line is active if playback position >= line.time AND position < line end time.
      * Line end time = the last word's endTime if word timings exist, otherwise the next line's start time.
      * This supports simultaneous singers whose lines overlap in time.
+     *
+     * After a short breath the line stays lit until the next one starts. Ending it on its last
+     * word left nothing lit for that moment, which read as the lyrics falling out of sync.
      */
     fun findActiveLineIndices(
         lines: List<LyricsEntry>,
@@ -861,7 +868,13 @@ object LyricsUtils {
             // Determine this line's end time
             val lineEndMs: Long = if (!line.words.isNullOrEmpty()) {
                 // Use last word's endTime converted to ms
-                (line.words.last().endTime * 1000).toLong()
+                val wordsEndMs = (line.words.last().endTime * 1000).toLong()
+                val nextStartMs = lines.getOrNull(index + 1)?.time
+                if (!line.isBackground && nextStartMs != null && nextStartMs - wordsEndMs in 1 until SHORT_BREATH_MS) {
+                    nextStartMs
+                } else {
+                    wordsEndMs
+                }
             } else {
                 // Fallback: next line's start time
                 if (index + 1 < lines.size) lines[index + 1].time else Long.MAX_VALUE
