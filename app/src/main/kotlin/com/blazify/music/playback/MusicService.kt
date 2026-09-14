@@ -2653,7 +2653,7 @@ class MusicService :
         lastPodcastSpeed = null
         if (inListenTogetherRoom()) return
         val current = player.playbackParameters
-        val showId = metadata?.takeIf { it.isEpisode }?.album?.id
+        val showId = metadata?.let(::podcastShowId)
         val target =
             if (showId != null) {
                 if (speedBeforeEpisodes == null) speedBeforeEpisodes = current.speed
@@ -2675,13 +2675,20 @@ class MusicService :
         if (speed == lastPodcastSpeed) return
         // Listen Together nudges the speed to stay in sync; that isn't somebody's choice.
         if (inListenTogetherRoom()) return
-        val showId = player.currentMetadata?.takeIf { it.isEpisode }?.album?.id ?: return
+        val showId = player.currentMetadata?.let(::podcastShowId) ?: return
         lastPodcastSpeed = speed
         if (podcastSpeeds[showId] == speed) return
         val updated = podcastSpeeds + (showId to speed)
         podcastSpeeds = updated
         scope.launch { safeDataStoreEdit { it[PodcastSpeedsKey] = encodePodcastSpeeds(updated) } }
     }
+
+    /**
+     * The show an episode belongs to. Episodes opened from search or a queue can arrive
+     * without their podcast attached, so the channel that publishes them stands in for it.
+     */
+    private fun podcastShowId(metadata: com.blazify.music.models.MediaMetadata): String? =
+        if (!metadata.isEpisode) null else metadata.album?.id ?: metadata.artists.firstOrNull()?.id
 
     private fun decodePodcastSpeeds(raw: String): Map<String, Float> =
         raw.split(';').mapNotNull { entry ->
