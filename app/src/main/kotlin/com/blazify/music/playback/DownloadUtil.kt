@@ -98,7 +98,7 @@ constructor(
                 return@Factory dataSpec
             }
 
-            songUrlCache[mediaId]?.takeIf { it.second < System.currentTimeMillis() }?.let {
+            songUrlCache[mediaId]?.takeIf { it.second > System.currentTimeMillis() }?.let {
                 return@Factory dataSpec.withUri(it.first.toUri())
             }
 
@@ -171,7 +171,7 @@ constructor(
                 "${it}&range=0-${actualContentLength}"
             }
 
-            songUrlCache[mediaId] = streamUrl to playbackData.streamExpiresInSeconds * 1000L
+            songUrlCache[mediaId] = streamUrl to (System.currentTimeMillis() + playbackData.streamExpiresInSeconds * 1000L)
             dataSpec.withUri(streamUrl.toUri())
         }
 
