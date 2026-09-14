@@ -27,6 +27,7 @@ import com.blazify.innertube.pages.ExplorePage
 import com.blazify.innertube.pages.HomePage
 import com.blazify.innertube.utils.completed
 import com.blazify.music.constants.HideExplicitKey
+import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HideYoutubeShortsKey
 import com.blazify.music.constants.InnerTubeCookieKey
@@ -294,6 +295,7 @@ class HomeViewModel @Inject constructor(
     private suspend fun getDailyDiscover() {
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
         val hideExplicit = context.dataStore.get(HideExplicitKey, false)
+        val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
         val likedSongs = database.likedSongsByCreateDateAsc().first()
         if (likedSongs.isEmpty()) return
 
@@ -311,6 +313,7 @@ class HomeViewModel @Inject constructor(
                             val recommendations = page.songs
                                 .filter { item ->
                                     if (hideVideoSongs && item.isVideoSong) return@filter false
+                                    if (item.id in hiddenSongIds) return@filter false
                                     // Only when the listener asked for it. This used to drop every
                                     // explicit song whatever the setting said, which quietly emptied
                                     // Daily Discover for anyone whose taste runs to hip-hop or rap.
@@ -345,6 +348,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun getQuickPicks() {
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
+        val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
         when (quickPicksEnum.first()) {
             QuickPicks.QUICK_PICKS -> {
                 val relatedSongs = database.quickPicks().first().filterVideoSongs(hideVideoSongs)
@@ -384,12 +388,12 @@ class HomeViewModel @Inject constructor(
                     similar = ytSimilarSongs,
                     forgotten = forgotten,
                     id = { it.id },
-                )
+                ).filterNot { it.id in hiddenSongIds }
             }
             QuickPicks.LAST_LISTEN -> {
                 val song = database.events().first().firstOrNull()?.song
                 if (song != null && database.hasRelatedSongs(song.id)) {
-                    quickPicks.value = database.getRelatedSongs(song.id).first().filterVideoSongs(hideVideoSongs).shuffled().take(20)
+                    quickPicks.value = database.getRelatedSongs(song.id).first().filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(20)
                 }
             }
         }
@@ -475,6 +479,7 @@ class HomeViewModel @Inject constructor(
         val hideExplicit = context.dataStore.get(HideExplicitKey, false)
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
         val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
+        val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
         val fromTimeStamp = LocalDateTime.now().minusWeeks(2)
 
         // Phase 1: Load essential sections in parallel — local DB (fast) + YouTube home page.
@@ -484,12 +489,12 @@ class HomeViewModel @Inject constructor(
 
             launch(Dispatchers.IO) {
                 forgottenFavorites.value = database.forgottenFavorites().first()
-                    .filterVideoSongs(hideVideoSongs).shuffled().take(20)
+                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(20)
             }
 
             launch(Dispatchers.IO) {
                 val songs = database.mostPlayedSongs(fromTimeStamp = fromTimeStamp, limit = 15, offset = 5, toTimeStamp = LocalDateTime.now()).first()
-                    .filterVideoSongs(hideVideoSongs).shuffled().take(10)
+                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(10)
                 val albums = database.mostPlayedAlbums(fromTimeStamp, limit = 8, offset = 2).first()
                     .filter { it.album.thumbnailUrl != null }.shuffled().take(5)
                 val artists = database.mostPlayedArtists(fromTimeStamp).first()
@@ -550,6 +555,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { item -> item.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }
                             .shuffled().take(12)
                             .ifEmpty { return@mapNotNull null }
                     )
@@ -571,6 +577,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { it.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }
                             .shuffled()
                             .ifEmpty { return@mapNotNull null }
                     )
@@ -595,6 +602,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { it.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }
                             .shuffled().take(10)
                             .ifEmpty { return@mapNotNull null }
                     )
@@ -740,6 +748,23 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
+        // A song hidden with "Don't play this song" leaves the Home picks straight
+        // away, not only after the next refresh.
+        viewModelScope.launch {
+            context.dataStore.data.map { it[HiddenSongIdsKey] ?: emptySet() }
+                .distinctUntilChanged()
+                .collect { hidden ->
+                    if (hidden.isEmpty()) return@collect
+                    quickPicks.value = quickPicks.value?.filterNot { it.id in hidden }
+                    forgottenFavorites.value = forgottenFavorites.value?.filterNot { it.id in hidden }
+                    keepListening.value = keepListening.value?.filterNot { it is Song && it.id in hidden }
+                    dailyDiscover.value = dailyDiscover.value?.filterNot { it.recommendation.id in hidden }
+                    similarRecommendations.value = similarRecommendations.value?.map { rec ->
+                        rec.copy(items = rec.items.filterNot { it is SongItem && it.id in hidden })
+                    }
+                }
+        }
+
         // Run sync in separate coroutine with cooldown to avoid blocking UI
         viewModelScope.launch(Dispatchers.IO) {
             syncUtils.tryAutoSync()

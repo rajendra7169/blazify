@@ -17,18 +17,21 @@ import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.PlaylistItem
 import com.blazify.innertube.pages.MoodAndGenres
 import com.blazify.innertube.utils.completed
+import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.db.MusicDatabase
 import com.blazify.music.di.DownloadCache
 import com.blazify.music.di.PlayerCache
 import com.blazify.music.db.entities.Artist
 import com.blazify.music.db.entities.Playlist
 import com.blazify.music.db.entities.Song
+import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -47,9 +50,11 @@ class YoursViewModel @Inject constructor(
         .map { events -> events.map { it.song }.distinctBy { it.id }.take(15) }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // Recommended: locally-derived quick picks.
-    val recommended = database.quickPicks()
-        .map { it.take(15) }
+    // Recommended: locally-derived quick picks, minus songs hidden with "Don't play this song".
+    val recommended = combine(
+        database.quickPicks(),
+        context.dataStore.data.map { it[HiddenSongIdsKey] ?: emptySet() },
+    ) { songs, hidden -> songs.filterNot { it.id in hidden }.take(15) }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     // Liked songs (drives the Favorites card thumbnail + count).
