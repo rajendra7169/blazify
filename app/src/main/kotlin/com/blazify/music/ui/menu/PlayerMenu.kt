@@ -951,6 +951,14 @@ fun TempoPitchDialog(onDismiss: () -> Unit) {
                         valueText = { "x$it" },
                         modifier = Modifier.padding(bottom = 12.dp),
                     )
+                    if (playerConnection.player.currentMetadata?.isEpisode == true) {
+                        Text(
+                            text = stringResource(R.string.podcast_speed_remembered),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 12.dp),
+                        )
+                    }
                 }
                 ValueAdjuster(
                     icon = R.drawable.discover_tune,
