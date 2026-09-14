@@ -15,15 +15,19 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +53,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -69,6 +75,8 @@ import com.blazify.music.ui.screens.settings.ThemePhonePreview
 import com.blazify.music.ui.theme.BlazifyTheme
 import com.blazify.music.ui.theme.BlazeGradientEnd
 import com.blazify.music.ui.theme.BlazeThemeColor
+import com.materialkolor.PaletteStyle
+import com.materialkolor.rememberDynamicColorScheme
 import kotlinx.coroutines.launch
 
 /** Which mock the phone frames show — one per page, matching what the copy claims. */
@@ -238,8 +246,8 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
 
 /**
  * Picks the mock shown inside a phone frame. HOME and LYRICS reuse the same
- * previews the Look & Feel hub renders, so onboarding shows the real thing;
- * TOGETHER and THEME are simple stand-ins for screens that have no preview yet.
+ * previews the Look & Feel hub renders; TOGETHER and THEME are drawn after the
+ * real Listen Together and Look & Feel screens, card for card.
  */
 @Composable
 private fun OnboardInterior(screen: OnboardScreen, accent: Color, pureBlack: Boolean) {
@@ -254,7 +262,7 @@ private fun OnboardInterior(screen: OnboardScreen, accent: Color, pureBlack: Boo
                 position = LyricsPosition.CENTER,
             )
         OnboardScreen.TOGETHER -> TogetherSampleInterior(accent, pureBlack)
-        OnboardScreen.THEME -> ThemePickerSampleInterior(accent, pureBlack)
+        OnboardScreen.THEME -> LookAndFeelSampleInterior(accent, pureBlack)
     }
 }
 
@@ -424,90 +432,151 @@ private fun SampleListener(name: String, host: Boolean) {
     }
 }
 
-/** Customisation: the accent swatches plus a couple of the style toggles. */
+/** Size of the phone preview pinned at the top of the real Look & Feel hub. */
+private val HubPreviewWidth = 198.dp
+private val HubPreviewHeight = 425.dp
+
+/**
+ * The Look & Feel hub as it really is: the live phone preview on top, the
+ * Theme / Player / Mini-player / Lyrics tabs, and the Theme tab's mode circles
+ * and colour palette underneath.
+ */
 @Composable
-private fun ThemePickerSampleInterior(accent: Color, pureBlack: Boolean) {
+private fun LookAndFeelSampleInterior(accent: Color, pureBlack: Boolean) {
     BlazifyTheme(darkTheme = true, pureBlack = pureBlack, themeColor = accent) {
         val cs = MaterialTheme.colorScheme
-        val swatches = listOf(
-            BlazeThemeColor, Color(0xFF00ACC1), Color(0xFF8E24AA),
-            Color(0xFF43A047), Color(0xFFE53935), Color(0xFF3949AB),
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(cs.background)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-        ) {
-            Spacer(Modifier.height(10.dp))
-            Text("Theme", color = cs.onSurface, fontSize = 9.sp, lineHeight = 10.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Text("Accent colour", color = cs.onSurfaceVariant, fontSize = 5.5.sp, lineHeight = 6.sp)
-            Spacer(Modifier.height(5.dp))
-            // Two rows of swatches; the page accent reads as selected.
-            swatches.chunked(3).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(bottom = 6.dp)) {
-                    row.forEach { c ->
-                        val selected = c == accent
+        BoxWithConstraints(Modifier.fillMaxSize().background(cs.background)) {
+            // The hub's own preview, laid out at its real size and shrunk to fit,
+            // so it is the same home mock the hub shows rather than a sketch of it.
+            val previewHeight = maxHeight * 0.44f
+            val scale = previewHeight / HubPreviewHeight
+            Column(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // Top bar: back · Look & Feel.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                ) {
+                    Icon(painterResource(R.drawable.arrow_back), null, tint = cs.onSurface, modifier = Modifier.size(10.dp))
+                    Spacer(Modifier.width(7.dp))
+                    Text(stringResource(R.string.look_and_feel), color = cs.onSurface, fontSize = 10.sp, lineHeight = 11.sp)
+                }
+                Spacer(Modifier.height(8.dp))
+                Box(
+                    modifier = Modifier.size(HubPreviewWidth * scale, previewHeight),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ThemePhoneFrame(
+                        modifier = Modifier
+                            .requiredSize(HubPreviewWidth, HubPreviewHeight)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            },
+                    ) {
+                        ThemePhonePreview(darkMode = DarkMode.ON, pureBlack = pureBlack, themeColor = accent)
+                    }
+                }
+                Spacer(Modifier.height(9.dp))
+
+                // Tab strip, Theme selected; it runs off the edge like the real one.
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState(), enabled = false),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    listOf(R.string.theme, R.string.player, R.string.mini_player, R.string.lyrics).forEachIndexed { i, label ->
+                        val active = i == 0
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(if (active) cs.primary else cs.surfaceContainerHighest)
+                                .padding(horizontal = 9.dp, vertical = 4.dp),
+                        ) {
+                            Text(
+                                stringResource(label),
+                                color = if (active) cs.onPrimary else cs.onSurfaceVariant,
+                                fontSize = 6.sp, lineHeight = 7.sp, maxLines = 1,
+                                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+
+                // Theme tab controls.
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(cs.surfaceContainerHigh)
+                        .padding(9.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    Text(stringResource(R.string.theme_mode), color = cs.onSurface, fontSize = 7.5.sp, lineHeight = 8.sp)
+                    // System (selected) · divider · light · dark · pure black.
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .background(c)
-                                .then(
-                                    if (selected) Modifier.border(1.5.dp, cs.onSurface, CircleShape)
-                                    else Modifier,
-                                ),
+                                .background(Color.Black)
+                                .border(1.5.dp, cs.inversePrimary, CircleShape),
                             contentAlignment = Alignment.Center,
                         ) {
-                            if (selected) {
-                                Icon(painterResource(R.drawable.check), null, tint = Color.White, modifier = Modifier.size(10.dp))
-                            }
+                            Icon(painterResource(R.drawable.sync), null, tint = Color.White, modifier = Modifier.size(9.dp))
+                        }
+                        Box(Modifier.width(0.6.dp).height(14.dp).background(cs.outlineVariant))
+                        listOf(Color(0xFFFFF8F5), Color(0xFF221A17), Color.Black).forEach { fill ->
+                            Box(Modifier.size(20.dp).clip(CircleShape).background(fill))
+                        }
+                    }
+                    Spacer(Modifier.height(2.dp))
+                    Text(stringResource(R.string.color_palette), color = cs.onSurface, fontSize = 7.5.sp, lineHeight = 8.sp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState(), enabled = false),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    ) {
+                        // Dynamic colours first, then the presets with Blaze picked.
+                        Box(
+                            modifier = Modifier.size(20.dp).clip(CircleShape).background(cs.surfaceVariant),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(painterResource(R.drawable.palette), null, tint = cs.onSurfaceVariant, modifier = Modifier.size(10.dp))
+                        }
+                        listOf(
+                            BlazeThemeColor, Color(0xFFEC5464), Color(0xFFD81B60), Color(0xFF8E24AA), Color(0xFF5E35B1),
+                        ).forEach { seed ->
+                            SamplePaletteSwatch(seed, selected = seed == BlazeThemeColor)
                         }
                     }
                 }
             }
-            Spacer(Modifier.height(4.dp))
-            // A few style rows with switch-shaped pills.
-            listOf("Dynamic colour" to true, "Pure black" to true, "Player style" to false).forEach { (label, on) ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 3.5.dp),
-                ) {
-                    Text(label, color = cs.onSurface, fontSize = 6.sp, lineHeight = 6.5.sp, modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .width(16.dp)
-                            .height(9.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(if (on) cs.primary else cs.onSurface.copy(alpha = 0.18f)),
-                        contentAlignment = if (on) Alignment.CenterEnd else Alignment.CenterStart,
-                    ) {
-                        Box(Modifier.padding(horizontal = 1.5.dp).size(6.dp).clip(CircleShape).background(Color.White))
-                    }
-                }
-            }
-            Spacer(Modifier.weight(1f))
-            // Live-preview strip, echoing the real hub.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(26.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Brush.horizontalGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, 0.4f)))),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 5.dp)) {
-                    Box(Modifier.size(18.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f)))
-                    Spacer(Modifier.width(5.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text("Live preview", color = Color.White, fontSize = 6.sp, lineHeight = 6.5.sp, fontWeight = FontWeight.Bold)
-                        Text("Updates as you tweak", color = Color.White.copy(alpha = 0.7f), fontSize = 5.sp, lineHeight = 5.5.sp)
-                    }
-                    Icon(painterResource(R.drawable.play), null, tint = Color.White, modifier = Modifier.size(10.dp))
-                }
-            }
-            Spacer(Modifier.height(6.dp))
+        }
+    }
+}
+
+/** A palette swatch drawn the way the Theme tab draws it: a top half and two bottom quarters. */
+@Composable
+private fun SamplePaletteSwatch(seed: Color, selected: Boolean) {
+    val scheme = rememberDynamicColorScheme(seedColor = seed, isDark = true, style = PaletteStyle.TonalSpot)
+    val shape = if (selected) RoundedCornerShape(5.dp) else CircleShape
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .clip(shape)
+            .then(if (selected) Modifier.border(1.5.dp, MaterialTheme.colorScheme.inversePrimary, shape) else Modifier),
+    ) {
+        Canvas(Modifier.fillMaxSize()) {
+            val half = Size(size.width / 2, size.height / 2)
+            drawRect(scheme.onPrimary, size = Size(size.width, size.height / 2))
+            drawRect(scheme.secondary, topLeft = Offset(0f, size.height / 2), size = half)
+            drawRect(scheme.tertiary, topLeft = Offset(size.width / 2, size.height / 2), size = half)
         }
     }
 }
