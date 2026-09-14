@@ -75,10 +75,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
@@ -982,7 +985,7 @@ internal fun ThemePhonePreview(
                 isFloating -> RoundedCornerShape(12.dp)
                 else -> RoundedCornerShape(50)
             }
-            val miniArtShape = if (isFlat || isFloating) RoundedCornerShape(5.dp) else CircleShape
+            val miniArtShape = if (isFlat) RoundedCornerShape(5.dp) else CircleShape
             val onMini = when (miniBgStyle) {
                 MiniPlayerBackgroundStyle.GRADIENT -> cs.onPrimary
                 MiniPlayerBackgroundStyle.PURE_BLACK -> Color.White
@@ -1002,16 +1005,40 @@ internal fun ThemePhonePreview(
                         .then(if (isFloating) Modifier.shadow(4.dp, miniShape, clip = false) else Modifier)
                         .height(34.dp)
                         .clip(miniShape)
-                        .then(miniBackground),
+                        .then(miniBackground)
+                        .then(if (isFlat) Modifier else Modifier.border(0.6.dp, onMini.copy(alpha = 0.25f), miniShape)),
                     contentAlignment = Alignment.CenterStart,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
-                        Box(Modifier.size(23.dp).clip(miniArtShape)) {
-                            val url = meta?.thumbnailUrl
-                            if (url != null) {
-                                AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                            } else {
-                                Box(Modifier.fillMaxSize().background(onMini.copy(alpha = 0.85f)))
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
+                        // The real mini-player wraps the round art in a progress ring;
+                        // only the flat design keeps a plain square thumbnail.
+                        val ringColor = if (miniBgStyle == MiniPlayerBackgroundStyle.GRADIENT) onMini else cs.primary
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(if (isFlat) 23.dp else 26.dp)
+                                .then(
+                                    if (isFlat) {
+                                        Modifier
+                                    } else {
+                                        Modifier.drawWithContent {
+                                            drawContent()
+                                            val stroke = Stroke(width = 1.6.dp.toPx(), cap = StrokeCap.Round)
+                                            val inset = stroke.width / 2
+                                            val arcSize = Size(size.width - stroke.width, size.height - stroke.width)
+                                            drawArc(onMini.copy(alpha = 0.2f), 0f, 360f, false, Offset(inset, inset), arcSize, style = stroke)
+                                            drawArc(ringColor, -90f, 360f * 0.35f, false, Offset(inset, inset), arcSize, style = stroke)
+                                        }
+                                    },
+                                ),
+                        ) {
+                            Box(Modifier.size(if (isFlat) 23.dp else 21.dp).clip(miniArtShape)) {
+                                val url = meta?.thumbnailUrl
+                                if (url != null) {
+                                    AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                                } else {
+                                    Box(Modifier.fillMaxSize().background(onMini.copy(alpha = 0.85f)))
+                                }
                             }
                         }
                         Spacer(Modifier.width(7.dp))
@@ -1042,9 +1069,16 @@ internal fun ThemePhonePreview(
                             MiniPlayerDesign.FLAT ->
                                 Icon(painterResource(R.drawable.favorite_border), null, tint = onMini, modifier = Modifier.size(11.dp))
                             else -> {
-                                Icon(painterResource(R.drawable.playlist_add), null, tint = onMini.copy(alpha = 0.9f), modifier = Modifier.size(11.dp))
-                                Spacer(Modifier.width(5.dp))
-                                Icon(painterResource(R.drawable.favorite_border), null, tint = onMini.copy(alpha = 0.9f), modifier = Modifier.size(11.dp))
+                                // Follow artist · add to playlist · like, each in an outlined circle.
+                                listOf(R.drawable.person, R.drawable.add, R.drawable.favorite_border).forEachIndexed { i, icon ->
+                                    if (i > 0) Spacer(Modifier.width(3.dp))
+                                    Box(
+                                        modifier = Modifier.size(18.dp).border(0.6.dp, onMini.copy(alpha = 0.3f), CircleShape),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Icon(painterResource(icon), null, tint = onMini.copy(alpha = 0.75f), modifier = Modifier.size(9.dp))
+                                    }
+                                }
                             }
                         }
                     }
