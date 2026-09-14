@@ -37,7 +37,6 @@ val SelectedThemeColorKey = intPreferencesKey("selectedThemeColor")
 val DarkModeKey = stringPreferencesKey("darkMode")
 val PureBlackKey = booleanPreferencesKey("pureBlack")
 val PureBlackMiniPlayerKey = booleanPreferencesKey("pureBlackMiniPlayer")
-val MiniPlayerOutlineKey = booleanPreferencesKey("miniPlayerOutline")
 val MiniPlayerBackgroundStyleKey = stringPreferencesKey("miniPlayerBackgroundStyle")
 
 enum class MiniPlayerBackgroundStyle {
@@ -92,7 +91,6 @@ val AlarmPlaylistIdKey = stringPreferencesKey("alarmPlaylistId")
 val AlarmRandomSongKey = booleanPreferencesKey("alarmRandomSong")
 val AlarmNextTriggerAtKey = longPreferencesKey("alarmNextTriggerAt")
 val AlarmEntriesKey = stringPreferencesKey("alarmEntries")
-val DeveloperModeKey = booleanPreferencesKey("developerMode")
 
 enum class SliderStyle {
     DEFAULT,
@@ -124,7 +122,6 @@ val ProxyTypeKey = stringPreferencesKey("proxyType")
 val ProxyUsernameKey = stringPreferencesKey("proxyUsername")
 val ProxyPasswordKey = stringPreferencesKey("proxyPassword")
 val YtmSyncKey = booleanPreferencesKey("ytmSync")
-val SelectedYtmPlaylistsKey = stringPreferencesKey("selectedYtmPlaylists")
 val CheckForUpdatesKey = booleanPreferencesKey("checkForUpdates")
 val UpdateNotificationsEnabledKey = booleanPreferencesKey("updateNotifications")
 val LastUpdateCheckTimeKey = longPreferencesKey("lastUpdateCheckTime")
@@ -190,17 +187,6 @@ val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
 val DisableScreenshotKey = booleanPreferencesKey("disableScreenshot")
 
-// Stream sources — which innertube clients are used for stream resolution (Settings → Stream sources).
-val StreamSourceWebRemixKey = booleanPreferencesKey("streamSourceWebRemix")
-val StreamSourceTVHTML5Key = booleanPreferencesKey("streamSourceTVHTML5")
-val StreamSourceAndroidVRKey = booleanPreferencesKey("streamSourceAndroidVR")
-val StreamSourceVisionOSKey = booleanPreferencesKey("streamSourceVisionOS")
-val StreamSourceIOSKey = booleanPreferencesKey("streamSourceIOS")
-val StreamSourceWebCreatorKey = booleanPreferencesKey("streamSourceWebCreator")
-val StreamSourceAndroidCreatorKey = booleanPreferencesKey("streamSourceAndroidCreator")
-
-val EnableDynamicIconKey = booleanPreferencesKey("enableDynamicIcon")
-
 val EnableDiscordRPCKey = booleanPreferencesKey("discordRPCEnable")
 val DiscordInfoDismissedKey = booleanPreferencesKey("discordInfoDismissed")
 val DiscordUsernameKey = stringPreferencesKey("discordUsername")
@@ -226,7 +212,6 @@ val EnableGoogleCastKey = booleanPreferencesKey("enableGoogleCast")
 // Listen Together
 val ListenTogetherServerUrlKey = stringPreferencesKey("listenTogetherServerUrl")
 val ListenTogetherUsernameKey = stringPreferencesKey("listenTogetherUsername")
-val EnableListenTogetherKey = booleanPreferencesKey("enableListenTogether")
 val ListenTogetherAutoApprovalKey = booleanPreferencesKey("listenTogetherAutoApproval")
 val ListenTogetherAutoApproveSuggestionsKey = booleanPreferencesKey("listenTogetherAutoApproveSuggestions")
 val ListenTogetherSyncVolumeKey = booleanPreferencesKey("listenTogetherSyncVolume")
@@ -556,7 +541,6 @@ val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
 val LyricsLineSpacingKey = floatPreferencesKey("lyricsLineSpacing")
 val RespectAgentPositioningKey = booleanPreferencesKey("respectAgentPositioning")
 val ShowIntervalIndicatorKey = booleanPreferencesKey("showIntervalIndicator")
-val ExperimentalLyricsKey = booleanPreferencesKey("experimentalLyrics")
 
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")
 val SleepTimerDefaultKey = floatPreferencesKey("sleepTimerDefault")
