@@ -41,8 +41,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,8 +76,6 @@ import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.constants.PlayerHorizontalPadding
-import com.blazify.music.constants.SeekAmountSecondsKey
-import com.blazify.music.constants.SeekExtraSeconds
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.ThumbnailCornerRadius
 import com.blazify.music.listentogether.RoomRole
@@ -293,9 +289,7 @@ fun Thumbnail(
         }
     }
 
-    // Seek effect state
-    var showSeekEffect by remember { mutableStateOf(false) }
-    var seekDirection by remember { mutableStateOf("") }
+    val playerSeeker = rememberPlayerSeeker(playerConnection)
 
     Box(
         modifier = modifier
@@ -362,13 +356,6 @@ fun Thumbnail(
                         )
                     }
 
-                    // Remember the onSeek callback to prevent recomposition
-                    val onSeekCallback = remember {
-                        { direction: String, showEffect: Boolean ->
-                            seekDirection = direction
-                            showSeekEffect = showEffect
-                        }
-                    }
                     
                     // Derive scroll enabled state to prevent unnecessary recomposition
                     val isScrollEnabled by remember(swipeThumbnail) {
@@ -399,7 +386,7 @@ fun Thumbnail(
                                 cropAlbumArt = cropAlbumArt,
                                 textBackgroundColor = textBackgroundColor,
                                 layoutDirection = layoutDirection,
-                                onSeek = onSeekCallback,
+                                seeker = playerSeeker,
                                 playerConnection = playerConnection,
                                 context = context,
                                 isLandscape = isLandscape,
@@ -413,22 +400,7 @@ fun Thumbnail(
             }
         }
 
-        // Seek effect
-        LaunchedEffect(showSeekEffect) {
-            if (showSeekEffect) {
-                delay(1000)
-                showSeekEffect = false
-            }
-        }
-
-        AnimatedVisibility(
-            visible = showSeekEffect,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier.align(Alignment.Center)
-        ) {
-            SeekEffectOverlay(seekDirection = seekDirection)
-        }
+        SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
     }
 }
 
@@ -496,7 +468,7 @@ private fun ThumbnailItem(
     cropAlbumArt: Boolean,
     textBackgroundColor: Color,
     layoutDirection: LayoutDirection,
-    onSeek: (String, Boolean) -> Unit,
+    seeker: PlayerSeeker,
     playerConnection: com.blazify.music.playback.PlayerConnection,
     context: android.content.Context,
     isLandscape: Boolean = false,
@@ -505,11 +477,6 @@ private fun ThumbnailItem(
     currentMediaThumbnail: String? = null,
     modifier: Modifier = Modifier,
 ) {
-    val incrementalSeekSkipEnabled by rememberPreference(SeekExtraSeconds, defaultValue = false)
-    val seekAmountSeconds by rememberPreference(SeekAmountSecondsKey, defaultValue = 10)
-    var skipMultiplier by remember { mutableIntStateOf(1) }
-    var lastTapTime by remember { mutableLongStateOf(0L) }
-
     Box(
         modifier = modifier
             .then(
@@ -526,37 +493,7 @@ private fun ThumbnailItem(
                 // Render entire thumbnail item on separate hardware layer for smooth animations
                 compositingStrategy = CompositingStrategy.Offscreen
             }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onDoubleTap = { offset ->
-                        if (isListenTogetherGuest) return@detectTapGestures
-
-                        val currentPosition = playerConnection.player.currentPosition
-                        val duration = playerConnection.player.duration
-
-                        val now = System.currentTimeMillis()
-                        if (incrementalSeekSkipEnabled && now - lastTapTime < 1000) {
-                            skipMultiplier++
-                        } else {
-                            skipMultiplier = 1
-                        }
-                        lastTapTime = now
-
-                        val skipAmount = seekAmountSeconds * 1000 * skipMultiplier
-
-                        val isLeftSide = (layoutDirection == LayoutDirection.Ltr && offset.x < size.width / 2) ||
-                                (layoutDirection == LayoutDirection.Rtl && offset.x > size.width / 2)
-
-                        if (isLeftSide) {
-                            playerConnection.player.seekTo((currentPosition - skipAmount).coerceAtLeast(0))
-                            onSeek(context.getString(R.string.seek_backward_dynamic, skipAmount / 1000), true)
-                        } else {
-                            playerConnection.player.seekTo((currentPosition + skipAmount).coerceAtMost(duration))
-                            onSeek(context.getString(R.string.seek_forward_dynamic, skipAmount / 1000), true)
-                        }
-                    }
-                )
-            },
+            .doubleTapToSeek(seeker, layoutDirection == LayoutDirection.Rtl, enabled = !isListenTogetherGuest),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -644,22 +581,3 @@ private fun ThumbnailImage(
     }
 }
 
-/**
- * Seek effect overlay showing seek direction.
- */
-@Composable
-private fun SeekEffectOverlay(
-    seekDirection: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = seekDirection,
-        color = Color.White,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-        modifier = modifier
-            .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
-            .padding(8.dp)
-    )
-}
