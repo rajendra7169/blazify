@@ -608,6 +608,41 @@ internal fun LyricsSampleInterior(
                 Text("2:33", color = Color.White.copy(alpha = 0.8f), fontSize = 5.sp, lineHeight = 5.5.sp)
                 Text("5:21", color = Color.White.copy(alpha = 0.8f), fontSize = 5.sp, lineHeight = 5.5.sp)
             }
+            Spacer(Modifier.height(7.dp))
+            // Transport row, same order as the player: shuffle · previous · play · next · repeat.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(painterResource(R.drawable.shuffle), null, tint = Color.White, modifier = Modifier.size(9.dp))
+                Icon(painterResource(R.drawable.skip_previous), null, tint = Color.White, modifier = Modifier.size(10.dp))
+                Box(
+                    modifier = Modifier.size(24.dp).clip(RoundedCornerShape(8.dp)).background(Color.White),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(R.drawable.pause), null, tint = Color.Black, modifier = Modifier.size(12.dp))
+                }
+                Icon(painterResource(R.drawable.skip_next), null, tint = Color.White, modifier = Modifier.size(10.dp))
+                Icon(painterResource(R.drawable.repeat), null, tint = Color.White, modifier = Modifier.size(9.dp))
+            }
+            Spacer(Modifier.height(8.dp))
+            // The player's bottom actions, with Lyrics lit because that's the page you're on.
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                listOf(
+                    R.drawable.queue_music to R.string.queue,
+                    R.drawable.cast to R.string.cast,
+                    R.drawable.bedtime to R.string.sleep_timer,
+                    R.drawable.lyrics to R.string.lyrics,
+                ).forEach { (icon, label) ->
+                    val tint = if (label == R.string.lyrics) BlazeThemeColor else Color.White.copy(alpha = 0.85f)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Icon(painterResource(icon), null, tint = tint, modifier = Modifier.size(8.dp))
+                        Text(stringResource(label), color = tint, fontSize = 4.5.sp, lineHeight = 5.sp, maxLines = 1)
+                    }
+                }
+            }
+            Spacer(Modifier.height(4.dp))
         }
     }
 }
