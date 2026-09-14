@@ -6,11 +6,8 @@
 package com.blazify.music.ui.component
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.blazify.music.constants.ExperimentalLyricsKey
-import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.LyricsViewModel
 
 @Composable
@@ -20,20 +17,12 @@ fun Lyrics(
     showLyrics: Boolean,
     lyricsViewModel: LyricsViewModel = hiltViewModel()
 ) {
-    val (experimentalLyrics, _) = rememberPreference(key = ExperimentalLyricsKey, defaultValue = true)
-
-    if (experimentalLyrics) {
-        ExperimentalLyrics(
-            sliderPositionProvider = sliderPositionProvider,
-            modifier = modifier,
-            showLyrics = showLyrics,
-            lyricsViewModel = lyricsViewModel
-        )
-    } else {
-        OriginalLyrics(
-            sliderPositionProvider = sliderPositionProvider,
-            modifier = modifier,
-            showLyrics = showLyrics
-        )
-    }
+    // The newer lyrics view is the only one now. It was already the default, and
+    // the old view only survived behind a switch that still called the new one beta.
+    ExperimentalLyrics(
+        sliderPositionProvider = sliderPositionProvider,
+        modifier = modifier,
+        showLyrics = showLyrics,
+        lyricsViewModel = lyricsViewModel
+    )
 }

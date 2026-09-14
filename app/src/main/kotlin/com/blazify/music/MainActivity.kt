@@ -142,7 +142,6 @@ import com.blazify.music.constants.DisableScreenshotKey
 import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.EnableHighRefreshRateKey
 import com.blazify.music.constants.EnableLandscapeScalingKey
-import com.blazify.music.constants.ExperimentalLyricsKey
 import androidx.datastore.preferences.core.edit
 import com.blazify.music.constants.LastSeenVersionKey
 import com.blazify.music.constants.UpdateDeclinedVersionKey

@@ -22,7 +22,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -31,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,20 +48,12 @@ import com.blazify.music.constants.EnableKugouKey
 import com.blazify.music.constants.EnableLrcLibKey
 import com.blazify.music.constants.EnableLyricsPlus
 import com.blazify.music.constants.EnablePaxsenixKey
-import com.blazify.music.constants.ExperimentalLyricsKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
 import com.blazify.music.constants.LyricsProviderOrderKey
-import com.blazify.music.constants.LyricsAnimationStyle
-import com.blazify.music.constants.LyricsAnimationStyleKey
 import com.blazify.music.constants.LyricsClickKey
-import com.blazify.music.constants.LyricsGlowEffectKey
-import com.blazify.music.constants.LyricsLineSpacingKey
-import com.blazify.music.constants.LyricsScrollKey
 import com.blazify.music.constants.LyricsTextPositionKey
-import com.blazify.music.constants.LyricsTextSizeKey
 import com.blazify.music.constants.RespectAgentPositioningKey
 import com.blazify.music.lyrics.LyricsProviderRegistry
-import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.DraggableLyricsProviderItem
 import com.blazify.music.ui.component.DraggableLyricsProviderList
 import com.blazify.music.ui.component.EnumDialog
@@ -73,8 +63,6 @@ import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
-import java.util.Locale
-import kotlin.math.roundToInt
 
 /**
  * One home for lyrics settings — display, sources, translation and romanization —
@@ -86,19 +74,10 @@ fun LyricsSettings(navController: NavController) {
     val (lyricsPosition, onLyricsPositionChange) =
         rememberEnumPreference(LyricsTextPositionKey, defaultValue = LyricsPosition.CENTER)
     val (lyricsClick, onLyricsClickChange) = rememberPreference(LyricsClickKey, defaultValue = true)
-    val (lyricsScroll, onLyricsScrollChange) = rememberPreference(LyricsScrollKey, defaultValue = true)
     val (hideStatusBarOnFullscreen, onHideStatusBarOnFullscreenChange) =
         rememberPreference(HideStatusBarOnFullscreenKey, defaultValue = false)
     val (respectAgentPositioning, onRespectAgentPositioningChange) =
         rememberPreference(RespectAgentPositioningKey, defaultValue = true)
-    val (experimentalLyrics, onExperimentalLyricsChange) =
-        rememberPreference(ExperimentalLyricsKey, defaultValue = true)
-    val (lyricsGlowEffect, onLyricsGlowEffectChange) =
-        rememberPreference(LyricsGlowEffectKey, defaultValue = false)
-    val (lyricsAnimationStyle, onLyricsAnimationStyleChange) =
-        rememberEnumPreference(LyricsAnimationStyleKey, defaultValue = LyricsAnimationStyle.FADE)
-    val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 24f)
-    val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.2f)
 
     // Sources (moved from Content).
     val (enableKugou, onEnableKugouChange) = rememberPreference(EnableKugouKey, defaultValue = true)
@@ -120,10 +99,6 @@ fun LyricsSettings(navController: NavController) {
         "YouTube" to "YouTube",
     )
 
-    var showExperimentalLyricsBetaDialog by remember { mutableStateOf(false) }
-    var showLyricsAnimationStyleDialog by remember { mutableStateOf(false) }
-    var showLyricsTextSizeDialog by remember { mutableStateOf(false) }
-    var showLyricsLineSpacingDialog by remember { mutableStateOf(false) }
     var showLyricsPositionDialog by rememberSaveable { mutableStateOf(false) }
     var showProviderSelectionDialog by rememberSaveable { mutableStateOf(false) }
     var showProviderPriorityDialog by rememberSaveable { mutableStateOf(false) }
@@ -184,65 +159,6 @@ fun LyricsSettings(navController: NavController) {
                 add(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.lyrics),
-                        title = { Text(stringResource(R.string.experimental_lyrics)) },
-                        description = { Text(stringResource(R.string.experimental_lyrics_desc)) },
-                        showBadge = true,
-                        trailingContent = {
-                            Switch(
-                                checked = experimentalLyrics,
-                                onCheckedChange = {
-                                    if (!experimentalLyrics) showExperimentalLyricsBetaDialog = true
-                                    else onExperimentalLyricsChange(false)
-                                },
-                                thumbContent = switchIcon(experimentalLyrics),
-                            )
-                        },
-                        onClick = {
-                            if (!experimentalLyrics) showExperimentalLyricsBetaDialog = true
-                            else onExperimentalLyricsChange(false)
-                        },
-                    ),
-                )
-                if (!experimentalLyrics) {
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.lyrics),
-                            title = { Text(stringResource(R.string.lyrics_glow_effect)) },
-                            description = { Text(stringResource(R.string.lyrics_glow_effect_desc)) },
-                            trailingContent = {
-                                Switch(checked = lyricsGlowEffect, onCheckedChange = onLyricsGlowEffectChange, thumbContent = switchIcon(lyricsGlowEffect))
-                            },
-                            onClick = { onLyricsGlowEffectChange(!lyricsGlowEffect) },
-                        ),
-                    )
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.lyrics),
-                            title = { Text(stringResource(R.string.lyrics_animation_style_title)) },
-                            description = { Text(lyricsAnimationStyle.label()) },
-                            onClick = { showLyricsAnimationStyleDialog = true },
-                        ),
-                    )
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.lyrics),
-                            title = { Text(stringResource(R.string.lyrics_text_size)) },
-                            description = { Text("${lyricsTextSize.roundToInt()} sp") },
-                            onClick = { showLyricsTextSizeDialog = true },
-                        ),
-                    )
-                    add(
-                        Material3SettingsItem(
-                            icon = painterResource(R.drawable.lyrics),
-                            title = { Text(stringResource(R.string.lyrics_line_spacing)) },
-                            description = { Text(String.format(Locale.US, "%.1f", lyricsLineSpacing)) },
-                            onClick = { showLyricsLineSpacingDialog = true },
-                        ),
-                    )
-                }
-                add(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.lyrics),
                         title = { Text(stringResource(R.string.lyrics_text_position)) },
                         description = { Text(lyricsPosition.positionLabel()) },
                         onClick = { showLyricsPositionDialog = true },
@@ -273,17 +189,6 @@ fun LyricsSettings(navController: NavController) {
                 add(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.lyrics),
-                        title = { Text(stringResource(R.string.lyrics_auto_scroll)) },
-                        description = { Text(stringResource(R.string.lyrics_auto_scroll_desc)) },
-                        trailingContent = {
-                            Switch(checked = lyricsScroll, onCheckedChange = onLyricsScrollChange, thumbContent = switchIcon(lyricsScroll))
-                        },
-                        onClick = { onLyricsScrollChange(!lyricsScroll) },
-                    ),
-                )
-                add(
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.lyrics),
                         title = { Text(stringResource(R.string.hide_status_bar_fullscreen)) },
                         description = { Text(stringResource(R.string.hide_status_bar_fullscreen_desc)) },
                         trailingContent = {
@@ -307,62 +212,6 @@ fun LyricsSettings(navController: NavController) {
             values = LyricsPosition.values().toList(),
             valueText = { it.positionLabel() },
         )
-    }
-    if (showLyricsAnimationStyleDialog) {
-        EnumDialog(
-            onDismiss = { showLyricsAnimationStyleDialog = false },
-            onSelect = { onLyricsAnimationStyleChange(it); showLyricsAnimationStyleDialog = false },
-            title = stringResource(R.string.lyrics_animation_style_title),
-            current = lyricsAnimationStyle,
-            values = LyricsAnimationStyle.values().toList(),
-            valueText = { it.label() },
-        )
-    }
-    if (showLyricsTextSizeDialog) {
-        var tempTextSize by remember { mutableFloatStateOf(lyricsTextSize) }
-        DefaultDialog(
-            onDismiss = { tempTextSize = lyricsTextSize; showLyricsTextSizeDialog = false },
-            buttons = {
-                TextButton(onClick = { tempTextSize = 24f }) { Text(stringResource(R.string.reset)) }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { tempTextSize = lyricsTextSize; showLyricsTextSizeDialog = false }) { Text(stringResource(android.R.string.cancel)) }
-                TextButton(onClick = { onLyricsTextSizeChange(tempTextSize); showLyricsTextSizeDialog = false }) { Text(stringResource(android.R.string.ok)) }
-            },
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.lyrics_text_size), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(bottom = 16.dp))
-                Text("${tempTextSize.roundToInt()} sp", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(bottom = 16.dp))
-                Slider(value = tempTextSize, onValueChange = { tempTextSize = it }, valueRange = 12f..48f, modifier = Modifier.fillMaxWidth())
-            }
-        }
-    }
-    if (showLyricsLineSpacingDialog) {
-        var tempLineSpacing by remember { mutableFloatStateOf(lyricsLineSpacing) }
-        DefaultDialog(
-            onDismiss = { tempLineSpacing = lyricsLineSpacing; showLyricsLineSpacingDialog = false },
-            buttons = {
-                TextButton(onClick = { tempLineSpacing = 1.3f }) { Text(stringResource(R.string.reset)) }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { tempLineSpacing = lyricsLineSpacing; showLyricsLineSpacingDialog = false }) { Text(stringResource(android.R.string.cancel)) }
-                TextButton(onClick = { onLyricsLineSpacingChange(tempLineSpacing); showLyricsLineSpacingDialog = false }) { Text(stringResource(android.R.string.ok)) }
-            },
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.lyrics_line_spacing), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(bottom = 16.dp))
-                Text(String.format(Locale.US, "%.1f", tempLineSpacing), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(bottom = 16.dp))
-                Slider(value = tempLineSpacing, onValueChange = { tempLineSpacing = it }, valueRange = 1.0f..3.0f, modifier = Modifier.fillMaxWidth())
-            }
-        }
-    }
-    if (showExperimentalLyricsBetaDialog) {
-        DefaultDialog(
-            onDismiss = { showExperimentalLyricsBetaDialog = false },
-            title = { Text(stringResource(R.string.experimental_lyrics_beta_title)) },
-            buttons = {
-                TextButton(onClick = { showExperimentalLyricsBetaDialog = false }) { Text(stringResource(R.string.cancel)) }
-                TextButton(onClick = { showExperimentalLyricsBetaDialog = false; onExperimentalLyricsChange(true) }) { Text(stringResource(R.string.enable)) }
-            },
-        ) { Text(stringResource(R.string.experimental_lyrics_beta_message)) }
     }
 
     if (showProviderSelectionDialog) {
@@ -484,14 +333,4 @@ private fun LyricsPosition.positionLabel(): String = when (this) {
     LyricsPosition.LEFT -> stringResource(R.string.left)
     LyricsPosition.CENTER -> stringResource(R.string.center)
     LyricsPosition.RIGHT -> stringResource(R.string.right)
-}
-
-@Composable
-private fun LyricsAnimationStyle.label(): String = when (this) {
-    LyricsAnimationStyle.NONE -> stringResource(R.string.lyrics_animation_none)
-    LyricsAnimationStyle.FADE -> stringResource(R.string.lyrics_animation_fade)
-    LyricsAnimationStyle.GLOW -> stringResource(R.string.lyrics_animation_glow)
-    LyricsAnimationStyle.SLIDE -> stringResource(R.string.lyrics_animation_slide)
-    LyricsAnimationStyle.KARAOKE -> stringResource(R.string.lyrics_animation_karaoke)
-    LyricsAnimationStyle.APPLE -> stringResource(R.string.lyrics_animation_apple)
 }
