@@ -35,6 +35,7 @@ import com.blazify.innertube.models.filterVideoSongs
 import com.blazify.music.R
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
+import com.blazify.music.constants.HiddenSongIdsKey
 import com.blazify.music.constants.MediaSessionConstants
 import com.blazify.music.constants.SongSortType
 import com.blazify.music.db.MusicDatabase
@@ -577,6 +578,19 @@ constructor(
         }
     }
 
+    /** Drops hidden songs, keeping the one at the start index and moving the index with it. */
+    private fun MediaItemsWithStartPosition.withoutHidden(hiddenIds: Set<String>): MediaItemsWithStartPosition {
+        if (hiddenIds.isEmpty() || mediaItems.isEmpty()) return this
+        val start = startIndex.coerceIn(0, mediaItems.lastIndex)
+        val kept = ArrayList<MediaItem>(mediaItems.size)
+        var newIndex = 0
+        mediaItems.forEachIndexed { i, item ->
+            if (i == start) newIndex = kept.size
+            if (i == start || item.mediaId !in hiddenIds) kept.add(item)
+        }
+        return MediaItemsWithStartPosition(kept, newIndex, startPositionMs)
+    }
+
     override fun onSetMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
@@ -594,7 +608,7 @@ constructor(
                 mediaItems.firstOrNull()?.mediaId?.split("/")
             } ?: return@future defaultResult
 
-            when (path.firstOrNull()) {
+            val result = when (path.firstOrNull()) {
                 MusicService.SONG -> {
                     val songId = path.getOrNull(1) ?: return@future defaultResult
                     val allSongs = database.songsByCreateDateAsc().first()
@@ -774,6 +788,9 @@ constructor(
 
                 else -> defaultResult
             }
+            // Android Auto hands its queue straight to the player, so songs hidden with
+            // "Don't play this song" are left out here, all but the one that was picked.
+            result.withoutHidden(context.dataStore.get(HiddenSongIdsKey, emptySet()))
         }
 
     private fun drawableUri(
