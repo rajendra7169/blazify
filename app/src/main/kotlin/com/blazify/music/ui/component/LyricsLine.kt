@@ -148,6 +148,7 @@ internal fun LyricsLine(
     isSelectionModeActive: Boolean,
     currentPositionState: Long,
     lyricsOffset: Long,
+    nextLineTimeMs: Long?,
     playerConnection: PlayerConnection,
     lyricsTextSize: Float,
     lyricsLineSpacing: Float,
@@ -265,16 +266,23 @@ internal fun LyricsLine(
                 val effectiveWords = if (item.words?.isNotEmpty() == true) {
                     item.words
                 } else if (mainText != null) {
-                    remember(mainText, item.time) {
+                    // No word timings: spread the words over the time the line is sung, longer
+                    // words taking longer, finishing a little before the next line. Lighting them
+                    // all within half a second of the start ran far ahead of the singing.
+                    remember(mainText, item.time, nextLineTimeMs) {
                         val words = mainText.split(Regex("\\s+")).filter { it.isNotBlank() }
-                        val wordDurationSec = 0.18
-                        val wordStaggerSec = 0.03
                         val startTimeSec = item.time / 1000.0
+                        val lineMs = ((nextLineTimeMs ?: (item.time + 4_000L)) - item.time).coerceIn(600L, 8_000L)
+                        val sungSec = lineMs * 0.85 / 1000.0
+                        val totalChars = words.sumOf { it.length }.coerceAtLeast(1)
+                        var charsBefore = 0
                         words.mapIndexed { idx, wordText ->
+                            val wordStartSec = startTimeSec + sungSec * charsBefore / totalChars
+                            charsBefore += wordText.length
                             WordTimestamp(
                                 text = wordText,
-                                startTime = startTimeSec + (idx * wordStaggerSec),
-                                endTime = startTimeSec + (idx * wordStaggerSec) + wordDurationSec,
+                                startTime = wordStartSec,
+                                endTime = startTimeSec + sungSec * charsBefore / totalChars,
                                 hasTrailingSpace = idx < words.size - 1
                             )
                         }
