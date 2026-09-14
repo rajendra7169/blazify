@@ -375,6 +375,21 @@ a.rm-row:hover .rm-vote,a.rm-row:focus-visible .rm-vote{border-color:var(--amber
 @keyframes rmPulse{0%{box-shadow:0 0 0 0 rgba(255,167,38,.55)}70%{box-shadow:0 0 0 9px rgba(255,167,38,0)}100%{box-shadow:0 0 0 0 rgba(255,167,38,0)}}
 @media (prefers-reduced-motion:reduce){.next .rm-dot{animation:none}}
 
+/* ── help Blazify grow: the feature cards again, as things to do ── */
+.hg .f{display:flex;flex-direction:column;align-items:flex-start;color:inherit;text-decoration:none}
+.hg .f>.ic{color:var(--amber);margin-bottom:14px}
+.hg .f p{flex:1}
+.hg .f:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.hg-count{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:99px;background:rgba(255,167,38,.14);color:var(--amber);
+  font-size:12.5px;font-weight:500;vertical-align:2px;font-variant-numeric:tabular-nums}
+.hg-go{margin-top:14px;display:inline-flex;align-items:center;gap:7px;color:var(--amber);font-size:14px;font-weight:500}
+.hg-go::after{content:'\2192';transition:transform .25s}
+.hg a.f:hover .hg-go::after{transform:translateX(4px)}
+.hg-links{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.hg-links a{padding:7px 14px;border-radius:99px;border:1px solid var(--line);color:var(--cream);text-decoration:none;font-size:13.5px;
+  transition:border-color .25s,color .25s}
+.hg-links a:hover{border-color:var(--amber);color:var(--amber)}
+
 
 /* ── the lyrics demo: the one feature worth showing in motion ── */
 .stage{
@@ -898,6 +913,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
 <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.5 6 .9-4.35 4.25 1.03 6L12 17l-5.38 2.85 1.03-6L3.3 9.6l6-.9z" stroke-linejoin="round"/></symbol>
+<symbol id="i-bug" viewBox="0 0 24 24"><rect x="7.2" y="8" width="9.6" height="12" rx="4.8"/><path d="M9.5 8V6.8a2.5 2.5 0 0 1 5 0V8M12 12.2V20M3.8 13.4h3.4M16.8 13.4h3.4M4.8 8.8l2.7 1.7M19.2 8.8l-2.7 1.7M4.8 18.6l2.8-1.6M19.2 18.6l-2.8-1.6"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.2 17.8h5.6M10 20.8h4"/><path d="M12 3.2a6 6 0 0 0-3.6 10.8c.6.5.9 1.1.9 1.9v1.9h5.4v-1.9c0-.8.3-1.4.9-1.9A6 6 0 0 0 12 3.2z"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="17.8" cy="5.6" r="2.6"/><circle cx="6.2" cy="12" r="2.6"/><circle cx="17.8" cy="18.4" r="2.6"/><path d="M8.5 10.8l7-3.9M8.5 13.2l7 3.9"/></symbol>
 </defs></svg>
 <div class="waves" aria-hidden="true">
   <svg class="w1" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
@@ -1322,6 +1341,55 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
   </div>
 </section>
 
+<section id="grow" class="hg">
+  <div class="shell">
+    <h2 class="title rise">Help Blazify <em>grow</em></h2>
+    <p class="lede rise">Enjoying Blazify? It's made by one person and spreads by word of mouth, so each of these makes a real difference. Most take less than a minute.</p>
+
+    <div class="feat">
+      <a class="f rise" href="https://github.com/rajendra7169/blazify" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>
+        <h4>Star us on GitHub<span class="hg-count" id="helpStars" hidden></span></h4>
+        <p>One tap. Stars are how new people decide an open-source app is worth trying.</p>
+        <span class="hg-go">Star Blazify</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify/issues/new?template=bug_report.yml" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-bug"/></svg>
+        <h4>Report bugs</h4>
+        <p>Something broken? The form takes a minute, and only one box is required.</p>
+        <span class="hg-go">Report a bug</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg>
+        <h4>Suggest features</h4>
+        <p>Tell us what's missing, or upvote an idea that's already on the roadmap.</p>
+        <span class="hg-go">Suggest a feature</span>
+      </a>
+      <a class="f rise" href="https://rajendra7169.github.io/blazify/" id="shareBlazify" role="button">
+        <svg class="ic" aria-hidden="true"><use href="#i-share"/></svg>
+        <h4>Share Blazify</h4>
+        <p>Send it to a friend who's tired of ads. Most people find Blazify this way.</p>
+        <span class="hg-go" id="shareLabel" aria-live="polite">Share the link</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-code"/></svg>
+        <h4>Contribute</h4>
+        <p>Fix a bug, polish a screen or help test new builds. Pull requests and UI/UX ideas are both welcome.</p>
+        <span class="hg-go">See the source</span>
+      </a>
+      <div class="f rise">
+        <svg class="ic" aria-hidden="true"><use href="#i-users"/></svg>
+        <h4>Join our community</h4>
+        <p>Follow the WhatsApp channel for news, and ask anything in Discussions.</p>
+        <div class="hg-links">
+          <a href="https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y" rel="noopener">WhatsApp channel</a>
+          <a href="https://github.com/rajendra7169/blazify/discussions" rel="noopener">Discussions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="mp" id="mp" role="complementary" aria-label="Get Blazify">
   <span class="cover" aria-hidden="true"></span>
   <span class="txt"><b>Blazify</b><span>Stream it. Feel it. Blaze it.</span></span>
@@ -1367,6 +1435,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <h5>Community</h5>
         <a href="https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y" rel="noopener">WhatsApp channel</a>
         <a href="https://github.com/rajendra7169/blazify/discussions">Discussions</a>
+        <a href="https://github.com/rajendra7169/blazify/discussions/categories/ideas">Vote on ideas</a>
+        <a href="#grow">Help Blazify grow</a>
       </div>
       <div class="f-col">
         <h5>Author</h5>
@@ -1824,6 +1894,11 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     if (!el || typeof n !== 'number' || n <= 0) return;
     el.textContent = n.toLocaleString();
     el.hidden = false;
+    const help = document.getElementById('helpStars');
+    if (help) {
+      help.textContent = n.toLocaleString() + (n === 1 ? ' star' : ' stars');
+      help.hidden = false;
+    }
   };
 
   const applyVersions = v => {
@@ -1903,6 +1978,30 @@ const io = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.12, rootMargin: '0px 0px -40px' });
 document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+/* Share: the phone's own share sheet where there is one, so the link goes
+   straight into WhatsApp or Messenger; on a computer, copy it instead. */
+(function () {
+  const btn = document.getElementById('shareBlazify');
+  const label = document.getElementById('shareLabel');
+  if (!btn || !label) return;
+  const url = 'https://rajendra7169.github.io/blazify/';
+  const idle = label.textContent;
+  const say = t => {
+    label.textContent = t;
+    setTimeout(() => { label.textContent = idle; }, 2400);
+  };
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    if (navigator.share) {
+      navigator.share({ title: 'Blazify', text: 'A free music player with no ads and no tracking.', url: url }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => say('Link copied'), () => say(url));
+    } else {
+      say(url);
+    }
+  });
+})();
 </script>
 </body>
 </html>
