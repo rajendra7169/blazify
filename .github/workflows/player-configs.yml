@@ -1,0 +1,61 @@
+name: Player configs
+
+# Keeps the player-configs branch in step with the upstream player registry.
+# The app downloads player_configs.json from that branch, so when YouTube ships
+# a new player the config for it reaches phones within a few hours, with no app
+# update. A failed run leaves the branch on its last good copy and GitHub sends
+# an email, so a moved or broken upstream gets noticed.
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: player-configs
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      UPSTREAM: https://raw.githubusercontent.com/MetrolistGroup/faraday/master/registry
+    steps:
+      - name: Check out the sync script
+        uses: actions/checkout@v4
+        with:
+          path: main
+          sparse-checkout: scripts
+
+      - name: Check out the player-configs branch
+        uses: actions/checkout@v4
+        with:
+          ref: player-configs
+          path: configs
+
+      - name: Download the upstream files
+        run: |
+          curl -fsSL --retry 3 --retry-delay 15 -o upstream_configs.json "$UPSTREAM/player_configs.json" \
+            || echo "::error::Could not download player_configs.json"
+          curl -fsSL --retry 3 --retry-delay 15 -o upstream_registry.json "$UPSTREAM/player-registry.json" \
+            || echo "::error::Could not download player-registry.json"
+
+      - name: Merge them into our copy
+        run: python3 main/scripts/sync_player_configs.py upstream_configs.json upstream_registry.json configs
+
+      - name: Save the changes
+        if: success() || failure()
+        working-directory: configs
+        run: |
+          git add player_configs.json player-registry.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update player configs"
+          git push
