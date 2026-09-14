@@ -15,12 +15,14 @@
 package com.blazify.music.ui.player
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +32,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,8 +53,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /* ---- layout (fractions of the square stage) ---- */
 private const val DISC_CX = 0.46f        // record slightly left — gives the arm its lane
@@ -68,11 +80,18 @@ fun VinylTurntable(
     // Playback progress 0..1 — the arm starts near the centre and tracks
     // outward as the song plays, leaving the record right at the end.
     progress: Float = 0f,
+    // Called for each turn you give the record: true when turned clockwise
+    // (forward), false when turned back. Leave null and the record can't be turned.
+    onTurn: ((forward: Boolean) -> Unit)? = null,
 ) {
-    // Continuous rotation while playing; freezes (keeps its angle) when paused.
+    // Continuous rotation while playing; freezes (keeps its angle) when paused
+    // and while a finger is turning it.
     val rotation = remember { Animatable(0f) }
-    LaunchedEffect(isPlaying) {
-        if (!isPlaying) return@LaunchedEffect
+    var turning by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val latestOnTurn by rememberUpdatedState(onTurn)
+    LaunchedEffect(isPlaying, turning) {
+        if (!isPlaying || turning) return@LaunchedEffect
         while (true) {
             rotation.animateTo(
                 targetValue = rotation.value + 360f,
@@ -119,6 +138,12 @@ fun VinylTurntable(
             modifier = Modifier
                 .size(discSize)
                 .offset(x = discOffsetX, y = discOffsetY)
+                .turnToSeek(
+                    enabled = onTurn != null,
+                    onTurn = { forward -> latestOnTurn?.invoke(forward) },
+                    rotation = rotation,
+                    scope = scope,
+                ) { turning = it }
                 .graphicsLayer { rotationZ = rotation.value },
         )
 
@@ -148,6 +173,72 @@ fun VinylTurntable(
                     transformOrigin = TransformOrigin(ARM_BX, ARM_BY)
                 },
         ) { drawTonearm() }
+    }
+}
+
+/**
+ * Turning the record seeks. Each full turn is one step. A quick flick that
+ * doesn't make it all the way round still counts as one, and the record
+ * finishes that turn on its own so it looks like it really went round.
+ */
+private fun Modifier.turnToSeek(
+    enabled: Boolean,
+    onTurn: (forward: Boolean) -> Unit,
+    rotation: Animatable<Float, AnimationVector1D>,
+    scope: CoroutineScope,
+    onTurning: (Boolean) -> Unit,
+): Modifier {
+    if (!enabled) return this
+    // Set up once: the song keeps changing underneath, and restarting this on
+    // every redraw would drop a turn halfway through.
+    return pointerInput(Unit) {
+        var lastAngle = 0f
+        var turned = 0f
+        fun angleAt(pos: Offset) =
+            atan2(pos.y - size.height / 2f, pos.x - size.width / 2f) * 180f / PI.toFloat()
+        detectDragGestures(
+            onDragStart = { pos ->
+                onTurning(true)
+                lastAngle = angleAt(pos)
+                turned = 0f
+            },
+            onDrag = { change, _ ->
+                change.consume()
+                val angle = angleAt(change.position)
+                var delta = angle - lastAngle
+                if (delta > 180f) delta -= 360f
+                if (delta < -180f) delta += 360f
+                lastAngle = angle
+                turned += delta
+                scope.launch { rotation.snapTo(rotation.value + delta) }
+                while (turned >= 360f) {
+                    onTurn(true)
+                    turned -= 360f
+                }
+                while (turned <= -360f) {
+                    onTurn(false)
+                    turned += 360f
+                }
+            },
+            onDragEnd = {
+                if (abs(turned) >= 30f) {
+                    val forward = turned > 0f
+                    onTurn(forward)
+                    val rest = (if (forward) 360f else -360f) - turned
+                    scope.launch {
+                        rotation.animateTo(rotation.value + rest, tween(durationMillis = 450))
+                        onTurning(false)
+                    }
+                } else {
+                    onTurning(false)
+                }
+                turned = 0f
+            },
+            onDragCancel = {
+                turned = 0f
+                onTurning(false)
+            },
+        )
     }
 }
 

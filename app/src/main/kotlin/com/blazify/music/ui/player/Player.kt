@@ -2056,6 +2056,7 @@ fun BottomSheetPlayer(
                             VinylTurntable(
                                 thumbnailUrl = mediaMetadata?.thumbnailUrl,
                                 isPlaying = effectiveIsPlaying,
+                                onTurn = if (isListenTogetherGuest) null else { forward -> playerSeeker.seek(forward) },
                                 modifier = Modifier.fillMaxSize().padding(horizontal = PlayerHorizontalPadding),
                                 fallbackBrush = Brush.linearGradient(
                                     listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary),
@@ -2067,6 +2068,7 @@ fun BottomSheetPlayer(
                                         0f
                                     },
                             )
+                            SeekMessage(playerSeeker)
                         }
 
                         mediaMetadata?.let {
