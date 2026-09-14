@@ -56,8 +56,9 @@ class WrappedManager(
         scope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    val fromTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 1, 1, 0, 0, 0)
-                    val toTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 12, 31, 23, 59, 59)
+                    val year = WrappedConstants.year()
+                    val fromTimestamp = WrappedConstants.start(year)
+                    val toTimestamp = WrappedConstants.end(year)
                     val allSongs = databaseDao.mostPlayedSongsStats(fromTimestamp, toTimeStamp = toTimestamp, limit = -1).first()
 
                     val playlistId = UUID.randomUUID().toString()
@@ -71,7 +72,7 @@ class WrappedManager(
 
                     val newPlaylist = PlaylistEntity(
                         id = playlistId,
-                        name = WrappedConstants.PLAYLIST_NAME,
+                        name = WrappedConstants.playlistName(year),
                         thumbnailUrl = file.toURI().toString(),
                         bookmarkedAt = LocalDateTime.now(),
                         isEditable = true
@@ -132,8 +133,9 @@ class WrappedManager(
 
             // Artist Part: Top artist's song with specific rule
             val topArtist = topArtists.firstOrNull()
-            val fromTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 1, 1, 0, 0, 0)
-            val toTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 12, 31, 23, 59, 59)
+            val year = WrappedConstants.year()
+            val fromTimestamp = WrappedConstants.start(year)
+            val toTimestamp = WrappedConstants.end(year)
 
             val artistSong = topArtist?.let { artist ->
                 val artistTopSongs = databaseDao.artistSongs(
@@ -176,8 +178,9 @@ class WrappedManager(
         if (_state.value.isDataReady) return
         Timber.tag("WrappedManager").d("Starting Wrapped data preparation")
 
-        val fromTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 1, 1, 0, 0, 0)
-        val toTimestamp = LocalDateTime.of(WrappedConstants.YEAR, 12, 31, 23, 59, 59)
+        val year = WrappedConstants.year()
+        val fromTimestamp = WrappedConstants.start(year)
+        val toTimestamp = WrappedConstants.end(year)
 
         withContext(Dispatchers.IO) {
             val accountInfoDeferred = async { YouTube.accountInfo().getOrNull() }

@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blazify.music.R
+import com.blazify.music.ui.screens.wrapped.WrappedConstants
 import com.blazify.music.ui.theme.bbhBartle
 import kotlinx.coroutines.delay
 
@@ -126,7 +127,7 @@ fun WrappedIntro(onNext: () -> Unit) {
             label = "intro rotation"
         )
 
-        // Background "2025" text
+        // Background year, drawn from the date so it moves on each December
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -138,7 +139,7 @@ fun WrappedIntro(onNext: () -> Unit) {
         ) {
             BoxWithConstraints {
                 AutoResizingText(
-                    text = stringResource(id = R.string.wrapped_year),
+                    text = WrappedConstants.year().toString(),
                     style = TextStyle.Default.copy(
                         fontFamily = bbhBartle,
                         fontSize = 800.sp, // Increased size

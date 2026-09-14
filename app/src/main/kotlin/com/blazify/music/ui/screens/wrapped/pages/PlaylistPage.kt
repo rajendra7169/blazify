@@ -102,7 +102,7 @@ fun PlaylistPage() {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = stringResource(R.string.wrapped_playlist_title, WrappedConstants.YEAR),
+                text = stringResource(R.string.wrapped_playlist_title, WrappedConstants.year()),
                 style = TextStyle(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
