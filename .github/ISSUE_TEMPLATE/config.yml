@@ -1,0 +1,17 @@
+# Blank issues stay on. Report a problem in the app opens issues/new with the
+# version and phone already written into the body, and turning blank issues off
+# would send those links to the template picker and drop what was filled in.
+blank_issues_enabled: true
+contact_links:
+  - name: 🗳️ Vote on what gets built next
+    url: https://github.com/rajendra7169/blazify/discussions/categories/ideas
+    about: Every planned feature has a post in Ideas. Upvote the ones you want most.
+  - name: 🙋 Ask a question
+    url: https://github.com/rajendra7169/blazify/discussions/categories/q-a
+    about: Not sure how something works? Ask in Discussions.
+  - name: 🖥️ Windows or Linux app
+    url: https://github.com/rajendra7169/blazify-desktop/issues
+    about: Problems with the desktop app go to its own tracker.
+  - name: 📱 iPhone app
+    url: https://github.com/rajendra7169/blazify-ios/issues
+    about: Problems with the iPhone app go to its own tracker.

@@ -1,0 +1,71 @@
+name: 🐛 Bug report
+description: Something in Blazify is broken or not working the way it should
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Only the first box is required, so fill in what you can and skip the rest.
+
+        **Tip:** if a song fails to play, the error card in the player has a **Copy details** button. Paste what it copies at the bottom of this form.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A sentence or two is plenty.
+      placeholder: The song stops after about 30 seconds and the next one doesn't start.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can it be made to happen again?
+      placeholder: |
+        1. Open …
+        2. Tap …
+        3. …
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+
+  - type: input
+    id: version
+    attributes:
+      label: Blazify version
+      description: Found in Settings › About.
+      placeholder: e.g. 9.13.3
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where did you download it?
+      options:
+        - GitHub releases
+        - F-Droid or IzzyOnDroid
+        - APKPure
+        - Appteka
+        - Somewhere else, or not sure
+
+  - type: input
+    id: device
+    attributes:
+      label: Phone and Android version
+      placeholder: e.g. Samsung Galaxy A52, Android 14
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or a screen recording
+      description: Drag files into this box. A short recording is often the quickest way to show a problem.
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Copied details
+      description: From the Copy details button on a playback error, if you have them.
+      render: text

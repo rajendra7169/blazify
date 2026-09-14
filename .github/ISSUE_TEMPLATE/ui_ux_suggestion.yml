@@ -1,0 +1,63 @@
+name: 🎨 UI/UX suggestion
+description: Something could look better, feel smoother or be easier to find
+title: "[UI/UX] "
+labels: ["ui/ux"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        How Blazify looks and feels is a big part of what makes it Blazify, so suggestions like this are very welcome.
+
+        A screenshot with a circle or an arrow drawn on it usually says more than a paragraph.
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where in the app?
+      options:
+        - Home
+        - Search
+        - Library
+        - Full player
+        - Mini player
+        - Lyrics
+        - Queue
+        - Settings
+        - Look & Feel
+        - Widgets or notification
+        - Somewhere else
+    validations:
+      required: true
+
+  - type: dropdown
+    id: design
+    attributes:
+      label: Which player design?
+      description: Only if the suggestion is about the player.
+      options:
+        - Classic
+        - Ring
+        - Full Art
+        - Record
+        - Cassette
+        - Not about the player
+
+  - type: textarea
+    id: now
+    attributes:
+      label: What feels off right now?
+      placeholder: The shuffle and repeat icons are hard to tell apart when they are switched on.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would make it better?
+      placeholder: Show a small dot under the icon when it is on.
+    validations:
+      required: true
+
+  - type: textarea
+    id: pictures
+    attributes:
+      label: Screenshots, sketches or examples from other apps
+      description: Drag images into this box.

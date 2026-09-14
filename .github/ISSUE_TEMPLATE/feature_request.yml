@@ -1,0 +1,41 @@
+name: 💡 Feature request
+description: Suggest something new for Blazify to do
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good ideas often come from people who use the app every day, so thank you.
+
+        Before writing, have a quick look at the [roadmap ideas](https://github.com/rajendra7169/blazify/discussions/categories/ideas). If yours is already there, an upvote on it counts for more than a new request, because the most wanted ideas get built first.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like Blazify to do?
+      placeholder: Let me import my playlists from Spotify.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: What would it help you with?
+      description: The problem behind an idea often matters more than the exact way it's solved.
+      placeholder: I have years of playlists there and rebuilding them by hand takes forever.
+
+  - type: input
+    id: elsewhere
+    attributes:
+      label: Seen it in another app?
+      description: Naming the app helps show how it could work.
+      placeholder: e.g. SimpMusic, Spotify, Apple Music
+
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Want to be involved?
+      options:
+        - label: I'd be happy to test it before it's released
+        - label: I'd like to help build it
