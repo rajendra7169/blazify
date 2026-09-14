@@ -3076,12 +3076,14 @@ class MusicService :
     }
 
     /**
-     * Checks if the error is caused by an expired/forbidden URL (HTTP 403).
-     * This typically happens when a YouTube stream URL expires.
+     * Checks if the error is caused by an expired/forbidden URL (HTTP 403 or 410).
+     * This typically happens when a YouTube stream URL expires: the content server
+     * refuses it (403) or reports it as gone (410). Both mean the same thing here —
+     * the link has to be fetched again.
      */
     private fun isExpiredUrlError(error: PlaybackException): Boolean {
         val responseCode = getHttpResponseCode(error)
-        return responseCode == 403
+        return responseCode == 403 || responseCode == 410
     }
 
     /**
@@ -3230,7 +3232,7 @@ class MusicService :
             }
 
             isExpiredUrlError(error) -> {
-                Timber.tag(TAG).d("Expired URL (403) detected, refreshing stream URL")
+                Timber.tag(TAG).d("Expired URL (403/410) detected, refreshing stream URL")
                 handleExpiredUrlError(mediaId)
                 return
             }
@@ -3459,7 +3461,7 @@ class MusicService :
     }
 
     /**
-     * Handles expired URL (403) errors by clearing caches and retrying.
+     * Handles expired URL (403/410) errors by clearing caches and retrying.
      */
     private fun handleExpiredUrlError(mediaId: String?) {
         if (mediaId == null) {
@@ -3478,7 +3480,7 @@ class MusicService :
             Timber.tag(TAG).e(e, "Failed to clear decryption caches")
         }
 
-        // A 403 can also mean the cipher produced a wrong-but-non-throwing signature from a
+        // A refused stream can also mean the cipher produced a wrong-but-non-throwing signature from a
         // stale/wrong player config — invisible to the cipher's own exception-retry. Ask it to
         // re-fetch its config (rate-limited); if that corrects the table, the cipher rebuilds its
         // WebView on the next decipher — no app restart. Affects every cipher client
@@ -3499,7 +3501,7 @@ class MusicService :
                 player.seekTo(currentIndex, currentPosition)
                 player.prepare()
 
-                Timber.tag(TAG).d("Retrying playback for $mediaId after 403 error")
+                Timber.tag(TAG).d("Retrying playback for $mediaId after a refused stream")
             }
     }
 
