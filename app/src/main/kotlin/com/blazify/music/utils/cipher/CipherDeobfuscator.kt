@@ -160,7 +160,7 @@ object CipherDeobfuscator {
             Timber.tag(TAG).w("signatureTimestamp: could not fetch player JS")
             return null
         }
-        if (hash == undecipherablePlayerHash) {
+        if (hash == undecipherablePlayerHash && hash !in PlayerConfigStore.knownHashes()) {
             // Naming a player we cannot decipher is worse than naming none. The
             // number sent here decides which player generation the site mints
             // the signature for, and a signature minted for one generation and
@@ -436,10 +436,18 @@ object CipherDeobfuscator {
         // config table changes, and proving it again costs over a second of parsing
         // per song — on the first song, on top of everything else a cold start pays.
         // The verdict now survives restarts, so this falls straight through to the
-        // clients that need no signature at all.
+        // clients that need no signature at all. The sources are still asked in the
+        // background, so a config published since then helps the next song, and the
+        // verdict is dropped the moment the table knows this player.
         if (hash == undecipherablePlayerHash) {
-            Timber.tag(TAG).d("Player $hash cannot be deciphered here — skipping the parse")
-            return null
+            if (hash in PlayerConfigStore.knownHashes()) {
+                Timber.tag(TAG).d("The config table has learned player $hash since it was ruled out — trying again")
+                forgetUndecipherable()
+            } else {
+                PlayerConfigStore.refreshInBackground(hash)
+                Timber.tag(TAG).d("Player $hash cannot be deciphered here — skipping the parse")
+                return null
+            }
         }
 
         // Run full analysis for logging - pass the known hash from PlayerJsFetcher
