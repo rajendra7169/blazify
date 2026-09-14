@@ -488,6 +488,12 @@ fun ContentSettings(
                         )
                     },
                     onClick = { onHideYoutubeShortsChange(!hideYoutubeShorts) }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.music_note),
+                    title = { Text(stringResource(R.string.hidden_songs)) },
+                    description = { Text(stringResource(R.string.hidden_songs_desc)) },
+                    onClick = { navController.navigate("settings/content/hidden_songs") }
                 )
             )
         )
