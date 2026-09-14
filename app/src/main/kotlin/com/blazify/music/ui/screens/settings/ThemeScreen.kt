@@ -914,7 +914,7 @@ internal fun ThemePhonePreview(
             ) {
                 Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
                 Spacer(Modifier.width(5.dp))
-                Text("Search songs, artists…", fontSize = 7.sp, color = searchTint, maxLines = 1, modifier = Modifier.weight(1f))
+                Text("Search songs, albums, artists...", fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
             Spacer(Modifier.height(8.dp))
@@ -924,7 +924,7 @@ internal fun ThemePhonePreview(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState(), enabled = false),
             ) {
-                listOf("Energize", "Relax", "Feel good", "Workout", "Party").forEach { label ->
+                listOf("Energize", "Feel good", "Relax", "Workout", "Party").forEach { label ->
                     // Fixed thin height + explicit lineHeight — the inherited text
                     // line-box was inflating these pills no matter the padding.
                     Box(
