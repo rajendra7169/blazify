@@ -566,9 +566,12 @@ fun PlayerMenu(
                                         text = if (isPinned) stringResource(R.string.unpin_from_speed_dial) else stringResource(R.string.pin_to_speed_dial),
                                     )
                                 },
+                                description = {
+                                    Text(stringResource(if (isPinned) R.string.speed_dial_unpin_hint else R.string.speed_dial_pin_hint))
+                                },
                                 icon = {
                                     Icon(
-                                        painter = painterResource(if (isPinned) R.drawable.remove else R.drawable.add),
+                                        painter = painterResource(R.drawable.ic_push_pin),
                                         contentDescription = null,
                                         modifier = Modifier.size(24.dp),
                                     )
