@@ -50,6 +50,8 @@ import com.blazify.music.constants.EnableLrcLibKey
 import com.blazify.music.constants.EnableLyricsPlus
 import com.blazify.music.constants.EnablePaxsenixKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
+import com.blazify.music.constants.LyricsAnimationStyle
+import com.blazify.music.constants.LyricsAnimationStyleKey
 import com.blazify.music.constants.LyricsGlowEffectKey
 import com.blazify.music.constants.LyricsLineSpacingKey
 import com.blazify.music.constants.LyricsProviderOrderKey
@@ -86,6 +88,8 @@ fun LyricsSettings(navController: NavController) {
     val (lyricsTextSize, onLyricsTextSizeChange) = rememberPreference(LyricsTextSizeKey, defaultValue = 36f)
     val (lyricsLineSpacing, onLyricsLineSpacingChange) = rememberPreference(LyricsLineSpacingKey, defaultValue = 1.3f)
     val (lyricsGlow, onLyricsGlowChange) = rememberPreference(LyricsGlowEffectKey, defaultValue = true)
+    val (lyricsAnimationStyle, onLyricsAnimationStyleChange) =
+        rememberEnumPreference(LyricsAnimationStyleKey, defaultValue = LyricsAnimationStyle.KARAOKE)
 
     // Sources (moved from Content).
     val (enableKugou, onEnableKugouChange) = rememberPreference(EnableKugouKey, defaultValue = true)
@@ -108,6 +112,7 @@ fun LyricsSettings(navController: NavController) {
     )
 
     var showLyricsPositionDialog by rememberSaveable { mutableStateOf(false) }
+    var showAnimationStyleDialog by rememberSaveable { mutableStateOf(false) }
     var showProviderSelectionDialog by rememberSaveable { mutableStateOf(false) }
     var showProviderPriorityDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -209,13 +214,24 @@ fun LyricsSettings(navController: NavController) {
                 add(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.lyrics),
-                        title = { Text(stringResource(R.string.lyrics_glow_effect)) },
-                        trailingContent = {
-                            Switch(checked = lyricsGlow, onCheckedChange = onLyricsGlowChange, thumbContent = switchIcon(lyricsGlow))
-                        },
-                        onClick = { onLyricsGlowChange(!lyricsGlow) },
+                        title = { Text(stringResource(R.string.lyrics_animation_style)) },
+                        description = { Text(lyricsAnimationStyle.styleLabel()) },
+                        onClick = { showAnimationStyleDialog = true },
                     ),
                 )
+                // The glow sits on the word being sung, so it only means something word by word.
+                if (lyricsAnimationStyle == LyricsAnimationStyle.KARAOKE) {
+                    add(
+                        Material3SettingsItem(
+                            icon = painterResource(R.drawable.lyrics),
+                            title = { Text(stringResource(R.string.lyrics_glow_effect)) },
+                            trailingContent = {
+                                Switch(checked = lyricsGlow, onCheckedChange = onLyricsGlowChange, thumbContent = switchIcon(lyricsGlow))
+                            },
+                            onClick = { onLyricsGlowChange(!lyricsGlow) },
+                        ),
+                    )
+                }
                 add(
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.lyrics),
@@ -263,6 +279,17 @@ fun LyricsSettings(navController: NavController) {
             current = lyricsPosition,
             values = LyricsPosition.values().toList(),
             valueText = { it.positionLabel() },
+        )
+    }
+
+    if (showAnimationStyleDialog) {
+        EnumDialog(
+            onDismiss = { showAnimationStyleDialog = false },
+            onSelect = { onLyricsAnimationStyleChange(it); showAnimationStyleDialog = false },
+            title = stringResource(R.string.lyrics_animation_style),
+            current = lyricsAnimationStyle,
+            values = LyricsAnimationStyle.entries,
+            valueText = { it.styleLabel() },
         )
     }
 
@@ -378,6 +405,12 @@ private fun providerSwitchRow(title: String, desc: String, checked: Boolean, onC
             },
         )
     }
+}
+
+@Composable
+private fun LyricsAnimationStyle.styleLabel(): String = when (this) {
+    LyricsAnimationStyle.KARAOKE -> stringResource(R.string.lyrics_animation_karaoke)
+    LyricsAnimationStyle.FADE -> stringResource(R.string.lyrics_animation_fade)
 }
 
 @Composable

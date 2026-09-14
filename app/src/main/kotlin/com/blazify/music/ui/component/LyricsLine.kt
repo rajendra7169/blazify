@@ -154,6 +154,7 @@ internal fun LyricsLine(
     lyricsLineSpacing: Float,
     expressiveAccent: Color,
     glowEnabled: Boolean = true,
+    wordByWord: Boolean = true,
     lyricsTextPosition: LyricsPosition,
     respectAgentPositioning: Boolean,
     isAutoScrollEnabled: Boolean,
@@ -290,7 +291,7 @@ internal fun LyricsLine(
                     }
                 } else null
 
-                if (isSynced && effectiveWords != null && (isActiveLine || abs(index - displayedCurrentLineIndex) <= 3) && mainText != null) {
+                if (wordByWord && isSynced && effectiveWords != null && (isActiveLine || abs(index - displayedCurrentLineIndex) <= 3) && mainText != null) {
                     WordLevelLyrics(
                         mainText = mainText,
                         words = effectiveWords,
@@ -310,7 +311,9 @@ internal fun LyricsLine(
                 } else {
                     Text(
                         text = mainText ?: "",
-                        style = lyricStyle.copy(color = if (isActiveLine) expressiveAccent else lineColor),
+                        // With the fade style the active line keeps the animated line colour, so it
+                        // fades in over a moment instead of switching on.
+                        style = lyricStyle.copy(color = if (isActiveLine && wordByWord) expressiveAccent else lineColor),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

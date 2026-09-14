@@ -94,6 +94,8 @@ import com.blazify.music.constants.AiProviderKey
 import com.blazify.music.constants.AiSystemPromptKey
 import com.blazify.music.constants.DeeplApiKey
 import com.blazify.music.constants.DeeplFormalityKey
+import com.blazify.music.constants.LyricsAnimationStyle
+import com.blazify.music.constants.LyricsAnimationStyleKey
 import com.blazify.music.constants.LyricsClickKey
 import com.blazify.music.constants.LyricsGlowEffectKey
 import com.blazify.music.constants.LyricsRomanizeAsMainKey
@@ -178,6 +180,7 @@ fun ExperimentalLyrics(
     val lyricsTextSize by rememberPreference(LyricsTextSizeKey, 36f)
     val lyricsLineSpacing by rememberPreference(LyricsLineSpacingKey, 1.3f)
     val lyricsGlow by rememberPreference(LyricsGlowEffectKey, true)
+    val lyricsAnimationStyle by rememberEnumPreference(LyricsAnimationStyleKey, LyricsAnimationStyle.KARAOKE)
     val showIntervalIndicator by rememberPreference(ShowIntervalIndicatorKey, true)
     
     // AI Translation Preferences
@@ -839,7 +842,7 @@ fun ExperimentalLyrics(
                                         isSelectionModeActive = isSelectionModeActive, currentPositionState = currentPositionState,
                                         lyricsOffset = (currentSong?.song?.lyricsOffset ?: 0).toLong(),
                                         nextLineTimeMs = lines.getOrNull(index + 1)?.time,
-                                        playerConnection = playerConnection, lyricsTextSize = lyricsTextSize, lyricsLineSpacing = lyricsLineSpacing, glowEnabled = lyricsGlow,
+                                        playerConnection = playerConnection, lyricsTextSize = lyricsTextSize, lyricsLineSpacing = lyricsLineSpacing, glowEnabled = lyricsGlow, wordByWord = lyricsAnimationStyle == LyricsAnimationStyle.KARAOKE,
                                         expressiveAccent = expressiveAccent, lyricsTextPosition = lyricsTextPosition,
                                         respectAgentPositioning = respectAgentPositioning, isAutoScrollEnabled = isAutoScrollEnabled,
                                         displayedCurrentLineIndex = deferredCurrentLineIndex, romanizeAsMain = romanizeAsMain,

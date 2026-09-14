@@ -545,13 +545,10 @@ val LyricsGlowEffectKey = booleanPreferencesKey("lyricsGlowEffect")
 val LyricsRomanizeList = stringPreferencesKey("lyricsRomanizeList")
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
 
+// How a synced line lights up: word by word as it is sung, or the whole line fading in.
 enum class LyricsAnimationStyle {
-    NONE,
-    FADE,
-    GLOW,
-    SLIDE,
     KARAOKE,
-    APPLE,
+    FADE,
 }
 
 val LyricsTextSizeKey = floatPreferencesKey("lyricsTextSize")
