@@ -22,7 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -191,18 +191,21 @@ private fun Modifier.turnToSeek(
     if (!enabled) return this
     // Set up once: the song keeps changing underneath, and restarting this on
     // every redraw would drop a turn halfway through.
+    //
+    // Only sideways drags turn the record. Up and down belong to the player
+    // sheet, so swiping down on the record still closes the player.
     return pointerInput(Unit) {
         var lastAngle = 0f
         var turned = 0f
         fun angleAt(pos: Offset) =
             atan2(pos.y - size.height / 2f, pos.x - size.width / 2f) * 180f / PI.toFloat()
-        detectDragGestures(
+        detectHorizontalDragGestures(
             onDragStart = { pos ->
                 onTurning(true)
                 lastAngle = angleAt(pos)
                 turned = 0f
             },
-            onDrag = { change, _ ->
+            onHorizontalDrag = { change, _ ->
                 change.consume()
                 val angle = angleAt(change.position)
                 var delta = angle - lastAngle
