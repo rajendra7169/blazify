@@ -365,6 +365,48 @@ private fun TogetherSampleInterior(accent: Color, pureBlack: Boolean) {
                     SampleListener("Sam", host = false)
                 }
             }
+
+            // Leave room, in the error colour like the real button.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(cs.error)
+                    .padding(vertical = 5.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(painterResource(R.drawable.logout), null, tint = cs.onError, modifier = Modifier.size(8.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    stringResource(R.string.leave_room),
+                    color = cs.onError, fontSize = 6.5.sp, lineHeight = 7.sp, fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            // Settings link card at the bottom of the screen.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(cs.surfaceContainerHigh)
+                    .padding(7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(painterResource(R.drawable.settings), null, tint = cs.primary, modifier = Modifier.size(10.dp))
+                Spacer(Modifier.width(6.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.settings),
+                        color = cs.onSurface, fontSize = 7.sp, lineHeight = 8.sp, fontWeight = FontWeight.Medium,
+                    )
+                    Text(
+                        stringResource(R.string.listen_together_settings_desc),
+                        color = cs.onSurfaceVariant, fontSize = 5.sp, lineHeight = 6.sp, maxLines = 1,
+                    )
+                }
+                Icon(painterResource(R.drawable.arrow_forward), null, tint = cs.primary, modifier = Modifier.size(8.dp))
+            }
         }
     }
 }
