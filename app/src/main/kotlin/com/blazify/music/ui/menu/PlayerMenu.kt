@@ -85,6 +85,7 @@ import com.blazify.music.LocalDownloadUtil
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.extensions.currentMetadata
 import com.blazify.music.ui.component.AudioOutputDialog
 import com.blazify.music.utils.AudioOutput
 import com.blazify.music.constants.HiddenSongIdsKey
@@ -1014,6 +1015,13 @@ fun SpeedDialog(onDismiss: () -> Unit) {
                     valueText = { "x$it" },
                     modifier = Modifier.padding(bottom = 12.dp),
                 )
+                if (playerConnection.player.currentMetadata?.isEpisode == true) {
+                    Text(
+                        text = stringResource(R.string.podcast_speed_remembered),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
     )

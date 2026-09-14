@@ -967,6 +967,7 @@
     <string name="qs_tile_nothing_playing">Nothing playing</string>
     <string name="shortcut_shuffle">Shuffle</string>
     <string name="shortcut_shuffle_long">Shuffle liked songs</string>
+    <string name="podcast_speed_remembered">This podcast keeps this speed next time</string>
     <string name="pin">Pin</string>
     <string name="unpin">Unpin</string>
     <string name="randomize_home_order">Randomize home screen order</string>

@@ -141,6 +141,8 @@ enum class AudioQuality {
 val SaveDataOnMobileKey = booleanPreferencesKey("saveDataOnMobile")
 // Downloads wait for Wi-Fi (an unmetered network) when this is on.
 val DownloadOnWifiOnlyKey = booleanPreferencesKey("downloadOnWifiOnly")
+// Playback speed chosen for each podcast show, as "showId=speed;showId=speed".
+val PodcastSpeedsKey = stringPreferencesKey("podcastSpeeds")
 
 val AudioOffload = booleanPreferencesKey("enableOffload")
 val AudioTrackPlaybackParamsKey = booleanPreferencesKey("audioTrackPlaybackParams")

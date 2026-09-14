@@ -132,6 +132,7 @@ import com.blazify.music.constants.EnableSongCacheKey
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HiddenSongIdsKey
+import com.blazify.music.constants.PodcastSpeedsKey
 import com.blazify.music.constants.SaveDataOnMobileKey
 import com.blazify.music.constants.HistoryDuration
 import com.blazify.music.constants.LastFMUseNowPlaying
@@ -505,6 +506,15 @@ class MusicService :
     private var cachedHideVideoSongs = false
     @Volatile
     private var cachedHiddenSongIds: Set<String> = emptySet()
+
+    // Podcast speed per show: the saved speed for each show id.
+    @Volatile
+    private var podcastSpeeds: Map<String, Float> = emptyMap()
+    // The speed the service itself last set or saved, so that change isn't saved again.
+    @Volatile
+    private var lastPodcastSpeed: Float? = null
+    // What songs were playing at before episodes started; put back when songs resume.
+    private var speedBeforeEpisodes: Float? = null
     @Volatile
     private var cachedShufflePlaylistFirst = false
     @Volatile
@@ -1279,6 +1289,9 @@ class MusicService :
         }
         scope.launch {
             dataStore.data.map { it[SaveDataOnMobileKey] ?: true }.distinctUntilChanged().collect { YTPlayerUtils.saveDataOnMobile = it }
+        }
+        scope.launch {
+            dataStore.data.map { it[PodcastSpeedsKey].orEmpty() }.distinctUntilChanged().collect { podcastSpeeds = decodePodcastSpeeds(it) }
         }
         scope.launch {
             dataStore.data.map { it[ShufflePlaylistFirstKey] ?: false }.distinctUntilChanged().collect { cachedShufflePlaylistFirst = it }
@@ -2623,6 +2636,57 @@ class MusicService :
      * Restore podcast episode playback position from database.
      * Seeks to saved position if available.
      */
+    private fun inListenTogetherRoom() = ::listenTogetherManager.isInitialized && listenTogetherManager.isInRoom
+
+    /**
+     * Podcast speed per show: an episode plays at the speed last chosen for its show,
+     * and songs go back to the speed they had once episodes stop. Nothing changes in a
+     * Listen Together room, where the room sets the pace.
+     */
+    private fun applyPodcastSpeed(metadata: com.blazify.music.models.MediaMetadata?) {
+        lastPodcastSpeed = null
+        if (inListenTogetherRoom()) return
+        val current = player.playbackParameters
+        val showId = metadata?.takeIf { it.isEpisode }?.album?.id
+        val target =
+            if (showId != null) {
+                if (speedBeforeEpisodes == null) speedBeforeEpisodes = current.speed
+                podcastSpeeds[showId] ?: return
+            } else {
+                val restore = speedBeforeEpisodes ?: return
+                speedBeforeEpisodes = null
+                restore
+            }
+        if (target == current.speed) return
+        lastPodcastSpeed = target
+        // The plain speed dialog keeps pitch equal to speed; tempo and pitch mode keeps its own pitch.
+        val pitch = if (current.pitch == current.speed) target else current.pitch
+        player.playbackParameters = PlaybackParameters(target, pitch)
+    }
+
+    /** Saves a speed the listener picked during an episode for that episode's show. */
+    private fun rememberPodcastSpeed(speed: Float) {
+        if (speed == lastPodcastSpeed) return
+        // Listen Together nudges the speed to stay in sync; that isn't somebody's choice.
+        if (inListenTogetherRoom()) return
+        val showId = player.currentMetadata?.takeIf { it.isEpisode }?.album?.id ?: return
+        lastPodcastSpeed = speed
+        if (podcastSpeeds[showId] == speed) return
+        val updated = podcastSpeeds + (showId to speed)
+        podcastSpeeds = updated
+        scope.launch { safeDataStoreEdit { it[PodcastSpeedsKey] = encodePodcastSpeeds(updated) } }
+    }
+
+    private fun decodePodcastSpeeds(raw: String): Map<String, Float> =
+        raw.split(';').mapNotNull { entry ->
+            val id = entry.substringBefore('=', "")
+            val speed = entry.substringAfter('=', "").toFloatOrNull()
+            if (id.isBlank() || speed == null) null else id to speed
+        }.toMap()
+
+    private fun encodePodcastSpeeds(speeds: Map<String, Float>): String =
+        speeds.entries.joinToString(";") { "${it.key}=${it.value}" }
+
     private fun restoreEpisodePosition(episodeId: String) {
         scope.launch(Dispatchers.IO + SilentHandler) {
             val savedPosition = database.getPlaybackPosition(episodeId)
@@ -2670,6 +2734,7 @@ class MusicService :
                 restoreEpisodePosition(newMetadata.id)
             }
         }
+        applyPodcastSpeed(newMetadata)
 
         // Force Repeat One if the player ignored it and auto-advanced
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
@@ -2968,6 +3033,7 @@ class MusicService :
 
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
         super.onPlaybackParametersChanged(playbackParameters)
+        rememberPodcastSpeed(playbackParameters.speed)
         if (playbackParameters.speed != lastPlaybackSpeed) {
             Timber.tag("DiscordSvc").d("onPlaybackParametersChanged: speed changed %s -> %s", lastPlaybackSpeed, playbackParameters.speed)
             lastPlaybackSpeed = playbackParameters.speed
