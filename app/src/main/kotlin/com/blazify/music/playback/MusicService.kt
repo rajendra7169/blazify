@@ -486,6 +486,10 @@ class MusicService :
 
     private var consecutivePlaybackErr = 0
     private var retryJob: Job? = null
+
+    // Watches a song that starts loading and never gets going. See watchForInitialStall().
+    private var initialStallJob: Job? = null
+    private var initialStallCheckedMediaId: String? = null
     private var retryCount = 0
     // True only when stopOnError() paused playback purely because of a network outage
     // (waitOnNetworkError exhausting its attempts). Lets triggerRetry() know it's safe —
@@ -572,6 +576,10 @@ class MusicService :
     private var currentMediaIdRetryCount = mutableMapOf<String, Int>()
     private val MAX_RETRY_PER_SONG = 3
     private val RETRY_DELAY_MS = 1000L
+
+    // A song that has not played a single second after this long is stuck, not slow.
+    private val INITIAL_STALL_TIMEOUT_MS = 15_000L
+    private val INITIAL_STALL_POSITION_MS = 1_000L
 
     // Track failed songs to prevent infinite retry loops
     private val recentlyFailedSongs = mutableSetOf<String>()
@@ -2728,6 +2736,10 @@ class MusicService :
             }
         }
         lastTransitionedMediaId = mediaItem?.mediaId
+        initialStallJob?.cancel()
+        initialStallJob = null
+        initialStallCheckedMediaId = null
+        watchForInitialStall(player.playbackState)
         // A Play next pick that has started playing is no longer waiting.
         mediaItem?.mediaId?.let { pendingPlayNextIds.remove(it) }
 
@@ -2814,9 +2826,61 @@ class MusicService :
         }
     }
 
+    /**
+     * A song that starts loading and never plays.
+     *
+     * A stream link can be accepted and still serve nothing: the content server holds the
+     * connection open, or the link was minted for a player generation it will not honour.
+     * Nothing fails, so there is no error to react to — the song simply sits there loading
+     * while the person waits, and only a skip or a restart gets out of it.
+     *
+     * So a song that has played nothing after [INITIAL_STALL_TIMEOUT_MS] is given a fresh
+     * link, once. Once per song on purpose: a slow connection deserves patience, not a
+     * refetch every fifteen seconds.
+     */
+    private fun watchForInitialStall(
+        @Player.State playbackState: Int,
+    ) {
+        val mediaId = player.currentMediaItem?.mediaId
+        val stalling = playbackState == Player.STATE_BUFFERING &&
+            player.playWhenReady &&
+            player.currentPosition < INITIAL_STALL_POSITION_MS &&
+            mediaId != null &&
+            initialStallCheckedMediaId != mediaId
+
+        if (!stalling) {
+            initialStallJob?.cancel()
+            initialStallJob = null
+            return
+        }
+        if (initialStallJob?.isActive == true) return
+
+        initialStallJob =
+            scope.launch {
+                delay(INITIAL_STALL_TIMEOUT_MS)
+
+                // Anything that got better while we waited — it started, it was paused, the
+                // song was changed — means there is nothing to recover from.
+                if (player.playbackState != Player.STATE_BUFFERING ||
+                    !player.playWhenReady ||
+                    player.currentPosition >= INITIAL_STALL_POSITION_MS ||
+                    player.currentMediaItem?.mediaId != mediaId
+                ) {
+                    return@launch
+                }
+
+                initialStallCheckedMediaId = mediaId
+                Timber.tag(TAG).w("Stream for $mediaId never started playing — fetching a fresh one")
+                performAggressiveCacheClear(mediaId)
+                handleExpiredUrlError(mediaId)
+            }
+    }
+
     override fun onPlaybackStateChanged(
         @Player.State playbackState: Int,
     ) {
+        watchForInitialStall(playbackState)
+
         if (playbackState == Player.STATE_ENDED) {
             // Check sleep timer guard - don't autoplay/repeat if sleep timer will pause
             val timer = sleepTimer ?: return
