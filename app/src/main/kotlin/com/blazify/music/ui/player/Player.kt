@@ -5,6 +5,8 @@
 
 package com.blazify.music.ui.player
 
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.blazify.music.ui.component.BlazeLoader
 import androidx.activity.compose.BackHandler
 import android.content.ClipData
@@ -365,6 +367,8 @@ fun BottomSheetPlayer(
     val listenTogetherManager = LocalListenTogetherManager.current
     val listenTogetherRoleState = listenTogetherManager?.role?.collectAsStateWithLifecycle(initialValue = RoomRole.NONE)
     val isListenTogetherGuest = listenTogetherRoleState?.value == RoomRole.GUEST
+    val playerSeeker = rememberPlayerSeeker(playerConnection)
+    val isRtlLayout = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     // Cast state - safely access castConnectionHandler to prevent crashes during service lifecycle changes
     val castHandler =
@@ -1891,12 +1895,14 @@ fun BottomSheetPlayer(
                         modifier =
                             Modifier
                                 .fillMaxSize()
-                                .animateContentSize(),
+                                .animateContentSize()
+                                .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
                     ) {
                         FullArtBackground(
                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             modifier = Modifier.fillMaxSize(),
                         )
+                        SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
                         // "Now Playing" + source header centred at the top, over the artwork
                         // (same as the classic ThumbnailHeader, with shadows for readability).
                         val fullArtQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
@@ -2107,7 +2113,10 @@ fun BottomSheetPlayer(
 
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
                         ) {
                             CassetteTape(
                                 isPlaying = effectiveIsPlaying,
@@ -2121,6 +2130,7 @@ fun BottomSheetPlayer(
                                 accent = MaterialTheme.colorScheme.primary,
                                 thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             )
+                            SeekMessage(playerSeeker)
                         }
 
                         // Title / artist (over the dynamic background).
