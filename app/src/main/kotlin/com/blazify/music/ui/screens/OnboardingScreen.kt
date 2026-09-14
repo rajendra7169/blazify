@@ -86,7 +86,6 @@ private data class OnboardPage(
     val titleRes: Int,
     val bodyRes: Int,
     val iconRes: Int,
-    val accent: Color,
     /** Front frame — the screen this page is actually about. */
     val front: OnboardScreen,
     /** Back frame — a second, different screen so the pair doesn't read as a duplicate. */
@@ -100,10 +99,10 @@ private data class OnboardPage(
 fun OnboardingScreen(onFinish: () -> Unit) {
     val pages = remember {
         listOf(
-            OnboardPage(R.string.onboard_1_title, R.string.onboard_1_body, R.drawable.play, BlazeThemeColor, OnboardScreen.HOME, OnboardScreen.LYRICS),
-            OnboardPage(R.string.onboard_2_title, R.string.onboard_2_body, R.drawable.lyrics, Color(0xFF00ACC1), OnboardScreen.LYRICS, OnboardScreen.HOME),
-            OnboardPage(R.string.onboard_3_title, R.string.onboard_3_body, R.drawable.group_add, Color(0xFF8E24AA), OnboardScreen.TOGETHER, OnboardScreen.HOME),
-            OnboardPage(R.string.onboard_4_title, R.string.onboard_4_body, R.drawable.gradient, Color(0xFF43A047), OnboardScreen.THEME, OnboardScreen.LYRICS),
+            OnboardPage(R.string.onboard_1_title, R.string.onboard_1_body, R.drawable.play, OnboardScreen.HOME, OnboardScreen.LYRICS),
+            OnboardPage(R.string.onboard_2_title, R.string.onboard_2_body, R.drawable.lyrics, OnboardScreen.LYRICS, OnboardScreen.HOME),
+            OnboardPage(R.string.onboard_3_title, R.string.onboard_3_body, R.drawable.group_add, OnboardScreen.TOGETHER, OnboardScreen.HOME),
+            OnboardPage(R.string.onboard_4_title, R.string.onboard_4_body, R.drawable.gradient, OnboardScreen.THEME, OnboardScreen.LYRICS),
         )
     }
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -214,11 +213,11 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
                         alpha = 0.55f
                     },
             ) {
-                OnboardInterior(screen = page.back, accent = page.accent, pureBlack = true)
+                OnboardInterior(screen = page.back)
             }
             // Front frame: the screen this page is about.
             ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.78f)) {
-                OnboardInterior(screen = page.front, accent = page.accent, pureBlack = false)
+                OnboardInterior(screen = page.front)
             }
         }
 
@@ -250,7 +249,11 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
  * real Listen Together and Look & Feel screens, card for card.
  */
 @Composable
-private fun OnboardInterior(screen: OnboardScreen, accent: Color, pureBlack: Boolean) {
+private fun OnboardInterior(screen: OnboardScreen) {
+    // A fresh install opens in Blaze amber on pure black, so that's what the
+    // phones show; a different tint per page made them look like another app.
+    val accent = BlazeThemeColor
+    val pureBlack = true
     when (screen) {
         OnboardScreen.HOME ->
             ThemePhonePreview(darkMode = DarkMode.ON, pureBlack = pureBlack, themeColor = accent)
