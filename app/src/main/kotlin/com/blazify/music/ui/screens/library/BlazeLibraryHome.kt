@@ -28,6 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.blazify.music.LocalDatabase
 import com.blazify.music.utils.LocalMusic
+import com.blazify.music.utils.rememberPreference
+import com.blazify.music.constants.ShowCachedPlaylistKey
+import com.blazify.music.constants.ShowDownloadedPlaylistKey
+import com.blazify.music.constants.ShowLikedPlaylistKey
+import com.blazify.music.constants.ShowTopPlaylistKey
+import com.blazify.music.constants.ShowUploadedPlaylistKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.LazyColumn
@@ -84,6 +90,12 @@ fun BlazeLibraryHome(
         }
     val topThumbs by viewModel.topThumbnails.collectAsStateWithLifecycle()
     val cachedThumbs by viewModel.cachedThumbnails.collectAsStateWithLifecycle()
+    // Appearance > Auto playlists decides which of these cards show up here.
+    val (showLiked) = rememberPreference(ShowLikedPlaylistKey, defaultValue = true)
+    val (showTop) = rememberPreference(ShowTopPlaylistKey, defaultValue = true)
+    val (showCached) = rememberPreference(ShowCachedPlaylistKey, defaultValue = true)
+    val (showDownloaded) = rememberPreference(ShowDownloadedPlaylistKey, defaultValue = true)
+    val (showUploaded) = rememberPreference(ShowUploadedPlaylistKey, defaultValue = true)
     val songsWord = stringResource(R.string.songs).lowercase()
 
     // Featured user playlists surfaced as system-style cards (by name).
@@ -100,7 +112,7 @@ fun BlazeLibraryHome(
         }
 
         // ---- System playlists ----
-        item("liked") {
+        if (showLiked) item("liked") {
             LongPad {
                 BlazePlaylistCard(
                     title = stringResource(R.string.liked),
@@ -150,7 +162,7 @@ fun BlazeLibraryHome(
                 }
             }
         }
-        item("top") {
+        if (showTop) item("top") {
             LongPad {
                 BlazePlaylistCard(
                     title = stringResource(R.string.your_top_50),
@@ -163,33 +175,65 @@ fun BlazeLibraryHome(
                 )
             }
         }
-        item("cached_downloaded") {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                BlazePlaylistCard(
-                    title = stringResource(R.string.cached_playlist),
-                    subtitle = "",
-                    thumbnails = cachedThumbs,
-                    seedColor = Color(0xFF00838F),
-                    aspectRatio = BOX_RATIO,
-                    iconRes = R.drawable.cached,
-                    onClick = { navController.navigate("cache_playlist/cached") },
-                    modifier = Modifier.weight(1f),
-                )
-                BlazePlaylistCard(
-                    title = stringResource(R.string.offline),
-                    subtitle = "",
-                    thumbnails = downloadedThumbs,
-                    seedColor = Color(0xFF283593),
-                    aspectRatio = BOX_RATIO,
-                    iconRes = R.drawable.download,
-                    onClick = { navController.navigate("auto_playlist/downloaded") },
-                    modifier = Modifier.weight(1f),
-                )
+        // Cached and Downloaded share a row. With only one of them switched on it
+        // takes the full width, like the other single cards.
+        if (showCached && showDownloaded) {
+            item("cached_downloaded") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.cached_playlist),
+                        subtitle = "",
+                        thumbnails = cachedThumbs,
+                        seedColor = Color(0xFF00838F),
+                        aspectRatio = BOX_RATIO,
+                        iconRes = R.drawable.cached,
+                        onClick = { navController.navigate("cache_playlist/cached") },
+                        modifier = Modifier.weight(1f),
+                    )
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.offline),
+                        subtitle = "",
+                        thumbnails = downloadedThumbs,
+                        seedColor = Color(0xFF283593),
+                        aspectRatio = BOX_RATIO,
+                        iconRes = R.drawable.download,
+                        onClick = { navController.navigate("auto_playlist/downloaded") },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        } else if (showCached) {
+            item("cached") {
+                LongPad {
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.cached_playlist),
+                        subtitle = "",
+                        thumbnails = cachedThumbs,
+                        seedColor = Color(0xFF00838F),
+                        aspectRatio = LONG_RATIO,
+                        iconRes = R.drawable.cached,
+                        onClick = { navController.navigate("cache_playlist/cached") },
+                    )
+                }
+            }
+        } else if (showDownloaded) {
+            item("downloaded") {
+                LongPad {
+                    BlazePlaylistCard(
+                        title = stringResource(R.string.offline),
+                        subtitle = "",
+                        thumbnails = downloadedThumbs,
+                        seedColor = Color(0xFF283593),
+                        aspectRatio = LONG_RATIO,
+                        iconRes = R.drawable.download,
+                        onClick = { navController.navigate("auto_playlist/downloaded") },
+                    )
+                }
             }
         }
         // Asked here rather than at launch. Local music is not something the app
@@ -241,7 +285,7 @@ fun BlazeLibraryHome(
                 }
             }
         }
-        item("uploaded") {
+        if (showUploaded) item("uploaded") {
             LongPad {
                 BlazePlaylistCard(
                     title = stringResource(R.string.uploaded_playlist),

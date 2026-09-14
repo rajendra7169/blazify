@@ -84,7 +84,6 @@ import androidx.core.content.edit
 import androidx.navigation.NavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
-import com.blazify.music.constants.ChipSortTypeKey
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.DensityScale
@@ -98,7 +97,6 @@ import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.HideStatusBarOnFullscreenKey
-import com.blazify.music.constants.LibraryFilter
 import com.blazify.music.constants.ListenTogetherInTopBarKey
 import com.blazify.music.constants.LyricsAnimationStyle
 import com.blazify.music.constants.LyricsAnimationStyleKey
@@ -355,12 +353,6 @@ fun AppearanceSettings(
             it != PlayerBackgroundStyle.BLUR || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
-    val (defaultChip, onDefaultChipChange) =
-        rememberEnumPreference(
-            key = ChipSortTypeKey,
-            defaultValue = LibraryFilter.LIBRARY,
-        )
-
     var showSliderOptionDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -456,33 +448,6 @@ fun AppearanceSettings(
                     NavigationTab.HOME -> stringResource(R.string.home)
                     NavigationTab.SEARCH -> stringResource(R.string.search)
                     NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
-                }
-            },
-        )
-    }
-
-    var showDefaultChipDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    if (showDefaultChipDialog) {
-        EnumDialog(
-            onDismiss = { showDefaultChipDialog = false },
-            onSelect = {
-                onDefaultChipChange(it)
-                showDefaultChipDialog = false
-            },
-            title = stringResource(R.string.default_lib_chips),
-            current = defaultChip,
-            values = LibraryFilter.values().toList(),
-            valueText = {
-                when (it) {
-                    LibraryFilter.SONGS -> stringResource(R.string.songs)
-                    LibraryFilter.ARTISTS -> stringResource(R.string.artists)
-                    LibraryFilter.ALBUMS -> stringResource(R.string.albums)
-                    LibraryFilter.PLAYLISTS -> stringResource(R.string.playlists)
-                    LibraryFilter.PODCASTS -> stringResource(R.string.filter_podcasts)
-                    LibraryFilter.LIBRARY -> stringResource(R.string.filter_library)
                 }
             },
         )
@@ -1045,23 +1010,6 @@ fun AppearanceSettings(
                             )
                         },
                         onClick = { showDefaultOpenTabDialog = true },
-                    ),
-                    Material3SettingsItem(
-                        icon = painterResource(R.drawable.tab),
-                        title = { Text(stringResource(R.string.default_lib_chips)) },
-                        description = {
-                            Text(
-                                when (defaultChip) {
-                                    LibraryFilter.SONGS -> stringResource(R.string.songs)
-                                    LibraryFilter.ARTISTS -> stringResource(R.string.artists)
-                                    LibraryFilter.ALBUMS -> stringResource(R.string.albums)
-                                    LibraryFilter.PLAYLISTS -> stringResource(R.string.playlists)
-                                    LibraryFilter.PODCASTS -> stringResource(R.string.filter_podcasts)
-                                    LibraryFilter.LIBRARY -> stringResource(R.string.filter_library)
-                                },
-                            )
-                        },
-                        onClick = { showDefaultChipDialog = true },
                     ),
                     Material3SettingsItem(
                         icon = painterResource(R.drawable.swipe),
