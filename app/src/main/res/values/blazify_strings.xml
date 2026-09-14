@@ -642,6 +642,7 @@
 
     <!-- Playback errors -->
     <string name="error_playback_failed">Playback failed</string>
+    <string name="error_age_restricted">This song is age-restricted, and Blazify can\'t play age-restricted songs yet.</string>
     <string name="error_job_cancelled">The video is not available for playback. Try again or skip to the next song.</string>
     <string name="error_episode_save">Failed to save episode</string>
     <string name="error_episode_remove">Failed to remove episode</string>

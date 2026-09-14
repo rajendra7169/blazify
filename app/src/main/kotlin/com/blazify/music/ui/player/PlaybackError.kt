@@ -43,15 +43,7 @@ fun PlaybackError(
         ?: error.message 
         ?: stringResource(R.string.error_unknown)
     
-    // Check if this is an age-restricted content error
-    // Age-restricted content typically returns 403 Forbidden or contains age-related messages
-    val isAgeRestricted = rawErrorMessage.contains("age", ignoreCase = true) ||
-            rawErrorMessage.contains("Sign in to confirm your age", ignoreCase = true) ||
-            rawErrorMessage.contains("LOGIN_REQUIRED", ignoreCase = true) ||
-            rawErrorMessage.contains("confirm your age", ignoreCase = true) ||
-            rawErrorMessage.contains("403", ignoreCase = true) ||
-            rawErrorMessage.contains("Response code: 403", ignoreCase = true) ||
-            error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS
+    val isAgeRestricted = isAgeRestrictedMessage(rawErrorMessage)
 
     // Check if this is a "job cancelled" error from YouTube
     // YouTube returns this when the playback job cannot be started (often transient)
@@ -61,7 +53,7 @@ fun PlaybackError(
                     rawErrorMessage.contains("cancellat", ignoreCase = true))
     
     val errorMessage = if (isAgeRestricted) {
-        "This app does not support playing age-restricted songs. We are working on fixing this issue."
+        stringResource(R.string.error_age_restricted)
     } else if (isJobCancelled) {
         stringResource(R.string.error_job_cancelled)
     } else {
@@ -138,6 +130,19 @@ fun PlaybackError(
         }
     }
 }
+
+/**
+ * Whether an error message really says the song is age-restricted.
+ *
+ * Only the site's own wording counts. A bare 403 or a bad HTTP status is far more often a
+ * stream link that has expired, and the old check for plain "age" also matched words like
+ * "page" and "image", so ordinary failures were blamed on age restrictions.
+ */
+internal fun isAgeRestrictedMessage(message: String): Boolean =
+    message.contains("confirm your age", ignoreCase = true) ||
+        message.contains("age-restricted", ignoreCase = true) ||
+        message.contains("age restricted", ignoreCase = true) ||
+        message.contains("LOGIN_REQUIRED", ignoreCase = true)
 
 /**
  * Get human-readable error code name from PlaybackException error code
