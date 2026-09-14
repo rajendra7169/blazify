@@ -238,7 +238,6 @@ fun ExperimentalLyrics(
     // the view model only puts the head entry in front when timestamps were parsed. Anything
     // else gets the scroll that follows playback progress instead of waiting for a line time.
     val isSynced = remember(lines) { lines.firstOrNull() === LyricsEntry.HEAD_LYRICS_ENTRY }
-    val hasWordTimings = remember(lines) { lines.any { it.words?.isNotEmpty() == true } }
 
     // For PLAIN (un-timestamped) lyrics we drive the scroll from playback progress.
     // Weight each line by how much text it carries (long lines linger, short ones
@@ -418,7 +417,9 @@ fun ExperimentalLyrics(
             val effectivePosition = position + lyricsOffset
 
             val initialActiveIndices = findActiveLineIndices(lines, effectivePosition)
-            val scrollActiveIndicesRaw = findActiveLineIndices(lines, effectivePosition + (if (hasWordTimings) 0L else 250L))
+            // Start moving to a line a little before it is sung. The move itself takes about
+            // three quarters of a second, so starting right on time left every line arriving late.
+            val scrollActiveIndicesRaw = findActiveLineIndices(lines, effectivePosition + 300L)
             
             val scrollActiveIndices = scrollActiveIndicesRaw.toMutableSet()
             for (i in scrollActiveIndicesRaw) {
