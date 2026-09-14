@@ -5,8 +5,14 @@
 
 package com.blazify.music.ui.player
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,10 +24,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -29,20 +37,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.PlaybackException
+import com.blazify.music.BuildConfig
+import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import java.time.Instant
 
 @Composable
 fun PlaybackError(
     error: PlaybackException,
     retry: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val playerConnection = LocalPlayerConnection.current
+    val mediaMetadata = playerConnection?.mediaMetadata?.collectAsStateWithLifecycle()?.value
+    val streamClient = playerConnection?.currentStreamClient?.collectAsStateWithLifecycle()?.value
+
     // Build detailed error info for debugging
-    val rawErrorMessage = error.cause?.cause?.message 
-        ?: error.cause?.message 
-        ?: error.message 
+    val rawErrorMessage = error.cause?.cause?.message
+        ?: error.cause?.message
+        ?: error.message
         ?: stringResource(R.string.error_unknown)
-    
+
     val isAgeRestricted = isAgeRestrictedMessage(rawErrorMessage)
 
     // Check if this is a "job cancelled" error from YouTube
@@ -51,7 +68,7 @@ fun PlaybackError(
             (rawErrorMessage.contains("cancelled", ignoreCase = true) ||
                     rawErrorMessage.contains("canceled", ignoreCase = true) ||
                     rawErrorMessage.contains("cancellat", ignoreCase = true))
-    
+
     val errorMessage = if (isAgeRestricted) {
         stringResource(R.string.error_age_restricted)
     } else if (isJobCancelled) {
@@ -59,7 +76,7 @@ fun PlaybackError(
     } else {
         rawErrorMessage
     }
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -74,9 +91,9 @@ fun PlaybackError(
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         // Main error message
         Text(
             text = stringResource(R.string.error_playback_failed),
@@ -84,9 +101,9 @@ fun PlaybackError(
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         // Error details
         Text(
             text = errorMessage,
@@ -96,9 +113,9 @@ fun PlaybackError(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
-        
+
         Spacer(modifier = Modifier.height(4.dp))
-        
+
         // Error code
         Text(
             text = "Code: ${getErrorCodeName(error.errorCode)} (${error.errorCode})",
@@ -109,27 +126,105 @@ fun PlaybackError(
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // Retry button
-        Button(
-            onClick = retry,
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.replay),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(text = stringResource(R.string.retry))
+            // Retry button
+            Button(
+                onClick = retry,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.replay),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = stringResource(R.string.retry))
+            }
+
+            // A plain-text report someone can paste into a bug report, so "it doesn't play"
+            // arrives with the error, the song and the phone it happened on.
+            OutlinedButton(
+                onClick = {
+                    val song = mediaMetadata?.let { meta ->
+                        val artists = meta.artists.joinToString { it.name }
+                        listOf(meta.title, artists).filter { it.isNotBlank() }.joinToString(" - ") + " (${meta.id})"
+                    }
+                    val report = playbackErrorReport(
+                        error = error,
+                        errorCodeName = getErrorCodeName(error.errorCode),
+                        errorCode = error.errorCode,
+                        timestampMs = error.timestampMs,
+                        app = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.FLAVOR}, ${BuildConfig.ARCHITECTURE}",
+                        android = "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+                        device = "${Build.MANUFACTURER} ${Build.MODEL}",
+                        song = song,
+                        streamClient = streamClient,
+                    )
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Blazify playback report", report))
+                    // Android 13 and newer confirm a copy on their own.
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                        Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                    }
+                },
+                shape = RoundedCornerShape(20.dp),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.content_copy),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = stringResource(R.string.copy_details))
+            }
         }
     }
 }
+
+/**
+ * The text "Copy details" puts on the clipboard.
+ *
+ * It holds what a bug report needs and nothing personal: no account, no cookies, and links in
+ * error messages are cut down to their host, since stream links carry signed tokens.
+ */
+internal fun playbackErrorReport(
+    error: Throwable,
+    errorCodeName: String,
+    errorCode: Int,
+    timestampMs: Long,
+    app: String,
+    android: String,
+    device: String,
+    song: String?,
+    streamClient: String?,
+): String = buildString {
+    appendLine("Blazify playback report")
+    appendLine("Time: ${Instant.ofEpochMilli(timestampMs)}")
+    appendLine("App: $app")
+    appendLine("Android: $android")
+    appendLine("Device: $device")
+    appendLine("Song: ${song ?: "unknown"}")
+    appendLine("Stream: ${streamClient ?: "unknown"}")
+    appendLine("Error: $errorCodeName ($errorCode)")
+    appendLine("Causes:")
+    generateSequence(error) { it.cause }.take(8).forEach { cause ->
+        val message = cause.message?.let(::withoutLinkDetails)?.takeIf { it.isNotBlank() }
+        appendLine("- ${cause.javaClass.simpleName}" + (message?.let { ": $it" } ?: ""))
+    }
+}.trimEnd()
+
+private val LINK = Regex("""https?://([^/\s?#]+)[^\s]*""")
+
+internal fun withoutLinkDetails(text: String): String = LINK.replace(text) { "${it.groupValues[1]}/…" }
 
 /**
  * Whether an error message really says the song is age-restricted.
