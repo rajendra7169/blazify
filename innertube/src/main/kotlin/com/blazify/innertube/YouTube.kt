@@ -2117,6 +2117,26 @@ object YouTube {
                     )
                 }
 
+                // Top artists rows: a name and a subscriber count, opening the artist's page.
+                renderer.navigationEndpoint?.browseEndpoint?.isArtistEndpoint == true -> {
+                    val name =
+                        renderer.flexColumns
+                            .getOrNull(0)
+                            ?.musicResponsiveListItemFlexColumnRenderer
+                            ?.text
+                            ?.runs
+                            ?.firstOrNull()
+                            ?.text
+                            ?.takeIf { it.isNotBlank() } ?: return null
+                    ArtistItem(
+                        id = renderer.navigationEndpoint?.browseEndpoint?.browseId ?: return null,
+                        title = name,
+                        thumbnail = renderer.thumbnail?.musicThumbnailRenderer?.getThumbnailUrl(),
+                        shuffleEndpoint = null,
+                        radioEndpoint = null,
+                    )
+                }
+
                 else -> {
                     null
                 }
@@ -2185,6 +2205,30 @@ object YouTube {
                             renderer.subtitleBadges?.any {
                                 it.musicInlineBadgeRenderer?.icon?.iconType == "MUSIC_EXPLICIT_BADGE"
                             } == true,
+                    )
+                }
+
+                // Chart playlists such as "Daily Top Music Videos - Global". The charts page lists
+                // these now instead of songs, so dropping them left Charts empty.
+                renderer.isPlaylist -> {
+                    PlaylistItem(
+                        id = renderer.navigationEndpoint.browseEndpoint?.browseId?.removePrefix("VL") ?: return null,
+                        title = renderer.title.runs?.firstOrNull()?.text ?: return null,
+                        author =
+                            renderer.subtitle?.runs?.lastOrNull()?.let {
+                                Artist(name = it.text, id = it.navigationEndpoint?.browseEndpoint?.browseId)
+                            },
+                        songCountText = null,
+                        thumbnail = renderer.thumbnailRenderer.musicThumbnailRenderer?.getThumbnailUrl() ?: return null,
+                        playEndpoint =
+                            renderer.thumbnailOverlay
+                                ?.musicItemThumbnailOverlayRenderer
+                                ?.content
+                                ?.musicPlayButtonRenderer
+                                ?.playNavigationEndpoint
+                                ?.watchPlaylistEndpoint,
+                        shuffleEndpoint = null,
+                        radioEndpoint = null,
                     )
                 }
 
