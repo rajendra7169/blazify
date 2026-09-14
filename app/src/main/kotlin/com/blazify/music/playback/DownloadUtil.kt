@@ -105,7 +105,8 @@ constructor(
             val playbackData = runBlocking(Dispatchers.IO) {
                 YTPlayerUtils.playerResponseForPlayback(
                     mediaId,
-                    audioQuality = audioQuality,
+                    // A download is kept, so Auto means full quality even on mobile data.
+                    audioQuality = if (audioQuality == AudioQuality.AUTO) AudioQuality.HIGH else audioQuality,
                     connectivityManager = connectivityManager,
                 )
             }.getOrThrow()
