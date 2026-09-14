@@ -71,6 +71,7 @@
     <string name="now_playing">Now Playing</string>
 
     <string name="lyrics">Lyrics</string>
+    <string name="more">More</string>
     <string name="close">Close</string>
     <string name="hide_player_thumbnail">Hide player thumbnail</string>
     <string name="hide_player_thumbnail_desc">Replace the album artwork with the app logo in the player</string>

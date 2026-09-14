@@ -2208,7 +2208,6 @@ fun BottomSheetPlayer(
                         // Retro segmented bottom row: lyrics · queue · sleep · more.
                         mediaMetadata?.let { meta ->
                             RetroBottomRow(
-                                accent = MaterialTheme.colorScheme.primary,
                                 mediaMetadata = meta,
                                 state = state,
                                 onLyrics = { showInlineLyrics = true },
@@ -3127,30 +3126,40 @@ private fun RetroTransportRow(
     }
 }
 
+/** One key of the retro bottom row: icon with its name underneath. */
 @Composable
-private fun RowScope.RetroSegment(bg: Color, iconRes: Int, tint: Color, onClick: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
+private fun RowScope.RetroSegment(iconRes: Int, label: String, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .weight(1f)
-            .height(50.dp)
-            .background(bg)
-            .clickable(onClick = onClick),
+            .height(62.dp)
+            .background(RetroDarkKey)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 2.dp),
     ) {
-        Icon(painterResource(iconRes), contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+        Icon(painterResource(iconRes), contentDescription = null, tint = RetroCream, modifier = Modifier.size(22.dp))
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = label,
+            color = RetroCream.copy(alpha = 0.85f),
+            fontSize = 10.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
 /**
  * Retro segmented bottom row: lyrics · queue · sleep timer · theme · more.
  *
- * All five are plain dark keys. This row only shows while lyrics are closed, and accent
- * on this player means "on" (play, shuffle, repeat), so an accent lyrics key read as
- * already selected.
+ * All five are plain dark keys with their name under the icon, so nobody has to guess
+ * what a moon or a palette does. They stay plain because this row only shows while
+ * lyrics are closed, and accent on this player means "on" (play, shuffle, repeat).
  */
 @Composable
 private fun RetroBottomRow(
-    accent: Color,
     mediaMetadata: MediaMetadata,
     state: BottomSheetState,
     onLyrics: () -> Unit,
@@ -3166,15 +3175,15 @@ private fun RetroBottomRow(
             .shadow(8.dp, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp)),
     ) {
-        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.lyrics, tint = RetroCream, onClick = onLyrics)
-        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.queue_music, tint = RetroCream, onClick = onQueue)
-        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.bedtime, tint = RetroCream, onClick = onSleep)
-        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.palette, tint = RetroCream) {
+        RetroSegment(R.drawable.lyrics, stringResource(R.string.lyrics), onClick = onLyrics)
+        RetroSegment(R.drawable.queue_music, stringResource(R.string.queue), onClick = onQueue)
+        RetroSegment(R.drawable.bedtime, stringResource(R.string.sleep_timer), onClick = onSleep)
+        RetroSegment(R.drawable.palette, stringResource(R.string.theme)) {
             // Theme gallery: collapse the player first so the page is visible.
             state.collapseSoft()
             navController.navigate("settings/appearance/player_design")
         }
-        RetroSegment(bg = RetroDarkKey, iconRes = R.drawable.more_horiz, tint = RetroCream) {
+        RetroSegment(R.drawable.more_horiz, stringResource(R.string.more)) {
             menuState.show {
                 PlayerMenu(
                     mediaMetadata = mediaMetadata,
