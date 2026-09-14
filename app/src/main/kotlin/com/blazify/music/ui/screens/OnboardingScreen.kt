@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -257,7 +258,11 @@ private fun OnboardInterior(screen: OnboardScreen, accent: Color, pureBlack: Boo
     }
 }
 
-/** Listen Together: room code, the shared song, and who else is in the room. */
+/**
+ * Listen Together as it looks once you're hosting a room: the connection card,
+ * the room code with its copy buttons, and who's listening. Same cards, colours
+ * and labels as the real screen, just smaller.
+ */
 @Composable
 private fun TogetherSampleInterior(accent: Color, pureBlack: Boolean) {
     BlazifyTheme(darkTheme = true, pureBlack = pureBlack, themeColor = accent) {
@@ -265,61 +270,156 @@ private fun TogetherSampleInterior(accent: Color, pureBlack: Boolean) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(lerp(cs.primary, Color.Black, 0.55f), cs.background)))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .background(cs.background)
+                .padding(horizontal = 9.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
-            Spacer(Modifier.height(10.dp))
-            Text("Listen Together", color = Color.White, fontSize = 9.sp, lineHeight = 10.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(6.dp))
-            // Room code pill with a copy affordance.
+            // Top bar: back · logo · Blaze Together.
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = 0.16f))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
+                modifier = Modifier.padding(top = 12.dp, bottom = 2.dp),
             ) {
-                Text("BLZ-4K92", color = Color.White, fontSize = 6.5.sp, lineHeight = 7.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Icon(painterResource(R.drawable.arrow_back), null, tint = cs.onSurface, modifier = Modifier.size(10.dp))
+                Spacer(Modifier.width(6.dp))
+                Image(painterResource(R.drawable.blaze_logo), null, modifier = Modifier.size(9.dp))
                 Spacer(Modifier.width(4.dp))
-                Icon(painterResource(R.drawable.content_copy), null, tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(7.dp))
+                Text(stringResource(R.string.blaze_together), color = cs.onSurface, fontSize = 9.sp, lineHeight = 10.sp)
             }
-            Spacer(Modifier.height(12.dp))
-            // The song everyone is hearing.
-            Box(
+
+            // Connection card.
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.62f)
-                    .aspectRatio(1f)
+                    .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(Brush.linearGradient(listOf(cs.primary, lerp(cs.primary, Color.Black, 0.45f)))),
-                contentAlignment = Alignment.Center,
+                    .background(cs.primaryContainer)
+                    .padding(7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(painterResource(R.drawable.music_note), null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(26.dp))
-            }
-            Spacer(Modifier.height(8.dp))
-            Text("Playing in sync", color = Color.White, fontSize = 7.5.sp, lineHeight = 8.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(2.dp))
-            Text("4 listeners", color = Color.White.copy(alpha = 0.65f), fontSize = 5.5.sp, lineHeight = 6.sp)
-            Spacer(Modifier.height(10.dp))
-            // Listener avatars — the host tinted, the rest neutral.
-            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                repeat(4) { i ->
-                    Box(
-                        modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape)
-                            .background(if (i == 0) cs.primary else Color.White.copy(alpha = 0.18f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(painterResource(R.drawable.person), null, tint = Color.White, modifier = Modifier.size(9.dp))
-                    }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(5.dp).clip(CircleShape).background(cs.primary))
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        stringResource(R.string.listen_together_connected),
+                        color = cs.primary, fontSize = 7.sp, lineHeight = 8.sp, fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(Modifier.height(5.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
+                    SamplePill(stringResource(R.string.disconnect), cs.primary, cs.onPrimary, Modifier.weight(1f))
+                    SamplePill("Reconnect", cs.secondaryContainer, cs.onSecondaryContainer, Modifier.weight(1f))
                 }
             }
-            Spacer(Modifier.weight(1f))
-            Box(Modifier.fillMaxWidth().height(3.dp).clip(RoundedCornerShape(2.dp)).background(Color.White.copy(alpha = 0.25f))) {
-                Box(Modifier.fillMaxWidth(0.55f).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(cs.primary))
+
+            // Room code card.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(cs.surfaceContainerHighest)
+                    .padding(horizontal = 7.dp, vertical = 9.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(stringResource(R.string.room_code), color = cs.onSurfaceVariant, fontSize = 5.5.sp, lineHeight = 6.sp)
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    "K7M2QX9P",
+                    color = cs.primary, fontSize = 13.sp, lineHeight = 14.sp,
+                    fontWeight = FontWeight.Bold, letterSpacing = 2.sp, maxLines = 1,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(stringResource(R.string.listen_together_you_are_host), color = cs.onSurfaceVariant, fontSize = 5.5.sp, lineHeight = 6.sp)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SamplePill(stringResource(R.string.copy_link), cs.secondaryContainer, cs.onSecondaryContainer, icon = R.drawable.link)
+                    SamplePill(stringResource(R.string.copy_code), cs.secondaryContainer, cs.onSecondaryContainer, icon = R.drawable.content_copy)
+                }
             }
-            Spacer(Modifier.height(6.dp))
+
+            // Who's in the room — the host gets the crown.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(cs.surfaceContainerHigh)
+                    .padding(7.dp),
+            ) {
+                Text(
+                    "${stringResource(R.string.connected_users)} (3)",
+                    color = cs.primary, fontSize = 7.sp, lineHeight = 8.sp, fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SampleListener("Alex", host = true)
+                    SampleListener("Maya", host = false)
+                    SampleListener("Sam", host = false)
+                }
+            }
+        }
+    }
+}
+
+/** A small button shape from the room screen, optionally with a leading icon. */
+@Composable
+private fun SamplePill(
+    text: String,
+    container: Color,
+    content: Color,
+    modifier: Modifier = Modifier,
+    icon: Int? = null,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(5.dp))
+            .background(container)
+            .padding(horizontal = 5.dp, vertical = 3.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon != null) {
+            Icon(painterResource(icon), null, tint = content, modifier = Modifier.size(6.dp))
+            Spacer(Modifier.width(2.dp))
+        }
+        Text(text, color = content, fontSize = 5.5.sp, lineHeight = 6.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
+/** One avatar from the connected users row: initial in a circle, name, and Host under the host. */
+@Composable
+private fun SampleListener(name: String, host: Boolean) {
+    val cs = MaterialTheme.colorScheme
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box {
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .clip(CircleShape)
+                    .background(if (host) cs.primary else cs.surfaceVariant),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    name.take(1),
+                    color = if (host) cs.onPrimary else cs.onSurfaceVariant,
+                    fontSize = 9.sp, lineHeight = 10.sp, fontWeight = FontWeight.Bold,
+                )
+            }
+            if (host) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 2.dp, y = 2.dp)
+                        .size(9.dp)
+                        .clip(CircleShape)
+                        .background(cs.primary),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(R.drawable.crown), null, tint = cs.onPrimary, modifier = Modifier.size(5.dp))
+                }
+            }
+        }
+        Spacer(Modifier.height(3.dp))
+        Text(name, color = if (host) cs.primary else cs.onSurface, fontSize = 5.5.sp, lineHeight = 6.sp, fontWeight = FontWeight.Medium)
+        if (host) {
+            Text(stringResource(R.string.host_label), color = cs.primary.copy(alpha = 0.8f), fontSize = 4.5.sp, lineHeight = 5.sp)
         }
     }
 }
