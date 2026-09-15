@@ -11,6 +11,7 @@ really do change the order.
 - **Vote.** Every idea below has its own post in
   [Discussions › Ideas](https://github.com/rajendra7169/blazify/discussions/categories/ideas).
   Press the ⬆️ upvote arrow on the ones you want most. The most wanted get built first.
+- **Poll.** Short on time? [Pick the one feature you want first](https://github.com/rajendra7169/blazify/discussions/17).
 - **Suggest.** Something missing? Open a
   [feature request](https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml)
   or a [UI/UX suggestion](https://github.com/rajendra7169/blazify/issues/new?template=ui_ux_suggestion.yml).
