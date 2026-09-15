@@ -8,6 +8,10 @@ Blazify is a music player for Android devices, built with Kotlin and Jetpack Com
 * Play the music already on your phone, beside everything else, in the same queue and the same player
 * A queue that you can reorder by dragging, save as a playlist, or start a radio from
 * Sleep timer, with an end-of-track option so it never cuts off mid-song
+* Don't play this song: keep a song out of queues, radio and suggestions
+* Double-tap to seek on every player, and podcasts that keep their own speed
+* A Quick Settings play/pause tile, and shortcuts for Liked, Downloads and Shuffle
+* Save data on mobile networks, and download only on Wi-Fi
 
 <b>Sound</b>
 
