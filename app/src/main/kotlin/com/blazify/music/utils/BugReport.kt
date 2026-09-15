@@ -42,29 +42,23 @@ object BugReport {
             append("Language ${Locale.getDefault()}")
         }
 
-    private fun body(): String =
-        """
-        **What happened**
+    /** The bug report form, with the version and phone already filled in. */
+    fun issueUrl(): String =
+        issueUrl(
+            version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}, ${BuildConfig.FLAVOR})",
+            device = "${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE} " +
+                "(API ${Build.VERSION.SDK_INT}), language ${Locale.getDefault()}",
+        )
 
-
-        **What you expected instead**
-
-
-        **How to make it happen again**
-        1.
-        2.
-
-        ---
-        ```
-        ${details()}
-        ```
-        """.trimIndent()
-
-    fun issueUrl(): String {
-        val title = URLEncoder.encode("", "UTF-8")
-        val body = URLEncoder.encode(body(), "UTF-8")
-        return "$ISSUES?title=$title&body=$body"
-    }
+    /**
+     * The form fills each box from a query parameter named after the field's
+     * id, so these land in their own boxes instead of one block of text in an
+     * otherwise blank issue. The ids are the ones in
+     * .github/ISSUE_TEMPLATE/bug_report.yml, and renaming one there leaves its
+     * box empty here without any error.
+     */
+    internal fun issueUrl(version: String, device: String): String =
+        "$ISSUES?template=bug_report.yml&version=${encode(version)}&device=${encode(device)}"
 
     /**
      * The tracker needs an account, and most people who use a music player do
