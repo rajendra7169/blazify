@@ -80,7 +80,14 @@ Screenshots, install guides and everything else: **[blazify website](https://raj
 | **Gapless audio** | Media3/ExoPlayer with selectable audio quality |
 | **Radio & autoplay** | Keeps the music going with related tracks after the queue ends |
 | **Offline downloads** | Save anything for listening without a connection |
+| **Your own music** | Plays the music already on your phone beside everything streamed, browse by folder, fix badly tagged files |
 | **Queue control** | Drag to reorder, swipe to remove, shuffle, repeat one/all |
+| **Don't play this song** | Hide a song from queues, radio, recommendations and Android Auto |
+| **Double-tap to seek** | On every player design, as far as you choose |
+| **Podcasts** | Each show remembers its own playback speed |
+| **Mobile data controls** | Save data on mobile networks, download only on Wi-Fi |
+| **Quick controls** | Play/pause tile in Quick Settings, plus Liked, Downloads and Shuffle shortcuts |
+| **Charts & new releases** | Right from the Search tab |
 | **Audio tools** | Volume normalisation, tempo and pitch control, skip-silence |
 | **Sleep timer** | Live countdown, plus an end-of-song mode |
 | **Song recognition** | Identify whatever is playing around you |
@@ -105,7 +112,7 @@ Screenshots, install guides and everything else: **[blazify website](https://raj
 | **Custom colours** | Or pick your own: saturation/value field, hue rail, hex entry |
 | **Pure black** | True black dark mode for OLED panels |
 | **5 player layouts** | Classic · Ring · Full art · Record · Cassette |
-| **4 seek-bar styles** | Capsule · Wavy · Slim · Squiggly |
+| **3 seek-bar styles** | Capsule · Wavy · Slim |
 | **Navigation styles** | Four nav-bar looks, plus a configurable home header |
 
 ### 📖 Lyrics
@@ -128,13 +135,13 @@ Screenshots, install guides and everything else: **[blazify website](https://raj
 | **Android Auto** | Full in-car playback |
 | **Widgets** | Home-screen controls |
 | **Backup & restore** | Your whole library in one file: songs, playlists, history, sign-in |
-| **In-app updates** | Tells you when a new version is out, downloads it, and installs it |
+| **In-app updates** | Tells you when a new version is out, downloads it, and installs it. Want new things early? Turn on beta updates |
 
 ---
 
 ## Roadmap
 
-What is planned, what has been asked for, and what is deliberately not being done: **[ROADMAP.md](ROADMAP.md)**. Local music on Android shipped in 9.13.2.
+What is planned, what has been asked for, and what is deliberately not being done: **[ROADMAP.md](ROADMAP.md)**. Vote on what comes next in [Ideas](https://github.com/rajendra7169/blazify/discussions/categories/ideas), or pick one in the [poll](https://github.com/rajendra7169/blazify/discussions/17).
 
 ---
 
@@ -143,6 +150,7 @@ What is planned, what has been asked for, and what is deliberately not being don
 Download the latest APK from **[Releases](https://github.com/rajendra7169/blazify/releases/latest)**.
 
 Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK, nothing else to do.
+It runs on ARM phones and tablets, and on Intel and AMD devices too, such as Waydroid and Android emulators.
 
 ### Automatic updates with Obtainium
 
@@ -237,11 +245,14 @@ so there is no group chat to mute, and nobody's phone number is shown to anyone.
 **[Discussions](https://github.com/rajendra7169/blazify/discussions)** — ask how
 something works, or say what you would like built next. Local music support, the
 tag editor and folder browsing were all added because someone asked for them.
+Every planned idea has its own post in
+[Ideas](https://github.com/rajendra7169/blazify/discussions/categories/ideas): upvote the
+ones you want most.
 
-**[Issues](https://github.com/rajendra7169/blazify/issues)** — for bugs. Or use
-**Settings → Report a bug** inside the app: it attaches your device details and
-logs automatically, which is usually the difference between a bug that gets
-fixed and one that cannot be reproduced.
+**[Issues](https://github.com/rajendra7169/blazify/issues)** — for bugs, feature ideas
+and UI/UX suggestions, each with a short form. Or use **Settings → Report a problem**
+inside the app: it fills in your app version and phone for you, which is usually the
+difference between a bug that gets fixed and one that cannot be reproduced.
 
 ---
 
