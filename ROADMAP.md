@@ -59,6 +59,10 @@ Already built and being tested on real phones.
 - A Play/pause tile for Quick Settings, and Liked, Downloads and Shuffle shortcuts on the app icon.
 - Mobile data controls in Player settings, and downloads at full quality when audio quality is Auto.
 
+**More devices**
+- Installs on Intel and AMD devices too: Waydroid on Linux, Android emulators, and x86 tablets
+  and TV boxes. Voted for in [#15](https://github.com/rajendra7169/blazify/discussions/15).
+
 ---
 
 ## 📋 Planned
@@ -67,7 +71,6 @@ Decided, and waiting their turn. Votes decide the order.
 
 | Idea | What it means | |
 | --- | --- | --- |
-| **Install on Intel and AMD devices (x86)** | For Waydroid on Linux, Android emulators, and x86 tablets and TV boxes | [Vote](https://github.com/rajendra7169/blazify/discussions/15) |
 | **Search inside the lyrics** | Find a word or line in the lyrics and jump straight to it | [Vote](https://github.com/rajendra7169/blazify/discussions/14) |
 | **Import playlists from Spotify** | Bring your playlists over instead of rebuilding them by hand | [Vote](https://github.com/rajendra7169/blazify/discussions/13) |
 | **Skip the talking in music videos (SponsorBlock)** | Jump past intros, sponsor messages and non-music parts | [Vote](https://github.com/rajendra7169/blazify/discussions/12) |
