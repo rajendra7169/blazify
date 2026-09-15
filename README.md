@@ -172,6 +172,29 @@ steps here: **[MIGRATION.md](MIGRATION.md)**.
 
 ---
 
+## Thank you 🙏
+
+Blazify would not exist without the people who came before it.
+
+It started as a fork of **Metrolist**, which itself builds on **InnerTune** and **OuterTune**.
+The streaming core, the player, the library, and years of fixes for every time YouTube changed
+something were written by their developers and contributors, long before Blazify had a name.
+Everything here stands on those pillars.
+
+To everyone who built and looked after these projects: thank you, from the bottom of my heart.
+Blazify is my way of carrying that work a little further, and it stays free and open source
+under the same GPL-3.0 licence you shared yours under.
+
+| Project | By | What it gave |
+|---|---|---|
+| **[InnerTune](https://github.com/z-huang/InnerTune)** | Zion Huang, Malopieds and contributors | Where it all began: the YouTube Music client the others grew from |
+| **[OuterTune](https://github.com/OuterTune/OuterTune)** | Davide Garberi, Michael Zh and contributors | Took InnerTune further, with local music and much more |
+| **[Metrolist](https://github.com/MetrolistGroup/Metrolist)** | The Metrolist team and contributors | The project Blazify was forked from, and the base of its streaming core |
+
+Thanks also to **[ViMusic](https://github.com/vfsfitvnm/ViMusic)**, whose player sheet still lives on
+inside the app, and to **[NewPipe Extractor](https://github.com/TeamNewPipe/NewPipeExtractor)** and
+**[PipePipe](https://github.com/InfinityLoop1308/PipePipe)**, whose extractor work BlazifyExtractor is built on.
+
 ## Libraries & Integrations
 
 <details>
