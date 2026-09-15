@@ -2183,7 +2183,7 @@ fun BottomSheetPlayer(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                         )
 
-                        Spacer(Modifier.height(14.dp))
+                        Spacer(Modifier.height(22.dp))
 
                         // Chunky 3D retro transport.
                         val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
@@ -2203,21 +2203,10 @@ fun BottomSheetPlayer(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                         )
 
-                        Spacer(Modifier.height(14.dp))
-
-                        // Retro segmented bottom row: lyrics · queue · sleep · more.
-                        mediaMetadata?.let { meta ->
-                            RetroBottomRow(
-                                mediaMetadata = meta,
-                                state = state,
-                                onLyrics = { showInlineLyrics = true },
-                                onQueue = { queueSheetState.expandSoft() },
-                                onSleep = { showSleepTimerDialog = true },
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                            )
-                        }
-
-                        Spacer(Modifier.height(16.dp))
+                        // The retro bottom row is drawn further down, in the strip the hidden
+                        // queue peek keeps free. With its 9dp of that strip this makes the
+                        // same 22dp gap under the transport as above it.
+                        Spacer(Modifier.height(13.dp))
                     }
                 } else {
                     Column(
@@ -2338,6 +2327,32 @@ fun BottomSheetPlayer(
                     textColor = TextBackgroundColor,
                     bottomInset = ringNavBottomInset,
                     onClick = { showInlineLyrics = true },
+                )
+            }
+        }
+
+        // CASSETTE design: the retro bottom row sits low, in the strip at the bottom that the
+        // hidden queue peek still takes up (78dp above the navigation bar). The queue sheet
+        // keeps handling taps and drags there, so the row is drawn over it, the same way as
+        // RING's overlay, and fades out as the queue is dragged open.
+        if (playerDesign == PlayerDesign.CASSETTE && !isFullScreen && !showInlineLyrics &&
+            queueSheetState.progress < 0.999f
+        ) {
+            mediaMetadata?.let { meta ->
+                RetroBottomRow(
+                    mediaMetadata = meta,
+                    state = state,
+                    onLyrics = { showInlineLyrics = true },
+                    onQueue = { queueSheetState.expandSoft() },
+                    onSleep = { showSleepTimerDialog = true },
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f))
+                            .windowInsetsPadding(
+                                WindowInsets.systemBars.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
+                            ).padding(start = PlayerHorizontalPadding, end = PlayerHorizontalPadding, bottom = 8.dp),
                 )
             }
         }
