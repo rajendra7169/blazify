@@ -110,20 +110,8 @@ app/src/main/java/com/blazify/music/listentogether/proto/*
 .build-fftw
 app/src/main/cpp/coverart/
 
-# Agents dir
-.claude
-.antigravity*
-.gemini
-.opencode
-.cursor*
-.codeium
-
 # Local-only files (never commit)
-CLAUDE.md
 .local/
 
 # Local technical docs (do not publish)
 docs/*.pdf
-
-# browser-automation leftovers
-.playwright-mcp/
