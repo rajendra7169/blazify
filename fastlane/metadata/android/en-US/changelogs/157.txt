@@ -1,0 +1,6 @@
+"Don't play this song" keeps a song out of queues, radio and recommendations.
+Double-tap to seek on every player design. Podcasts remember their own speed.
+Lyrics stay in step better, with settings for size, spacing, glow and style.
+Songs start without a wasted attempt on a player YouTube kept refusing.
+New: Quick Settings play/pause tile, app icon shortcuts, mobile data controls,
+Charts and New releases in Search, and builds for Intel and AMD devices.
