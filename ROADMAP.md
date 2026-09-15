@@ -15,6 +15,8 @@ really do change the order.
 - **Suggest.** Something missing? Open a
   [feature request](https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml)
   or a [UI/UX suggestion](https://github.com/rajendra7169/blazify/issues/new?template=ui_ux_suggestion.yml).
+- **Try betas.** Switch on **Get beta updates** in **Settings › Updater** to get
+  new versions before everyone else, and tell us what breaks.
 - **Report.** Found something broken? A
   [bug report](https://github.com/rajendra7169/blazify/issues/new?template=bug_report.yml)
   takes a minute, and only one box is required.
@@ -23,7 +25,15 @@ really do change the order.
 
 ## 🚧 Coming in the next release
 
-Already built and being tested on real phones.
+Nothing built yet. The next update picks from **Planned** below, in the order
+the votes and the [poll](https://github.com/rajendra7169/blazify/discussions/17) decide.
+
+---
+
+## 🎉 New in 9.14.0
+
+Out now: [download it](https://github.com/rajendra7169/blazify/releases/latest),
+or update from **Settings › Updater**.
 
 **Playback you can count on**
 - Songs start faster and fail less often. Blazify keeps its own up-to-date copy
