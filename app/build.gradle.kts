@@ -115,8 +115,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
+        // Intel/AMD too: without them the APK will not install on Waydroid, most Android
+        // emulators, or x86 tablets and TV boxes that have no ARM translation. The only
+        // native code is two small AndroidX libraries, so each one adds about 20 KB.
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
         }
 
         // LastFM API keys from GitHub Secrets
