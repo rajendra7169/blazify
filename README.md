@@ -174,15 +174,16 @@ steps here: **[MIGRATION.md](MIGRATION.md)**.
 
 ## Thank you 🙏
 
-Blazify is built on the pillars of incredible open-source work.
+Blazify stands on the foundation of remarkable open-source projects and the talented people behind them.
+Their contributions inspire us to build with the same spirit of collaboration, innovation, and openness.
 
 **Main inspirations**
 
 | Project | Authors |
 |---|---|
-| **[InnerTune](https://github.com/z-huang/InnerTune)** | Zion Huang · Malopieds |
-| **[OuterTune](https://github.com/OuterTune/OuterTune)** | Davide Garberi · Michael Zh |
-| **[Metrolist](https://github.com/MetrolistGroup/Metrolist)** | Mo Agamy · Nyx |
+| **InnerTune** | [Zion Huang](https://github.com/z-huang) · [Malopieds](https://github.com/Malopieds) |
+| **OuterTune** | [Davide Garberi](https://github.com/DD3Boh) · [Michael Zh](https://github.com/mikooomich) |
+| **Metrolist** | [Mo Agamy](https://github.com/mostafaalagamy) · [Nyx](https://github.com/nyxiereal) |
 
 ## Libraries & Integrations
 
