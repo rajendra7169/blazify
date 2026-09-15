@@ -2183,7 +2183,7 @@ fun BottomSheetPlayer(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                         )
 
-                        Spacer(Modifier.height(22.dp))
+                        Spacer(Modifier.height(CassetteSectionGap))
 
                         // Chunky 3D retro transport.
                         val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
@@ -2203,10 +2203,10 @@ fun BottomSheetPlayer(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                         )
 
-                        // The retro bottom row is drawn further down, in the strip the hidden
-                        // queue peek keeps free. With its 9dp of that strip this makes the
-                        // same 22dp gap under the transport as above it.
-                        Spacer(Modifier.height(13.dp))
+                        // The retro bottom row is drawn further down, over the strip the hidden
+                        // queue peek keeps free; this leaves the same gap under the transport
+                        // as above it.
+                        Spacer(Modifier.height(CassetteSpacerUnderTransport))
                     }
                 } else {
                     Column(
@@ -2352,7 +2352,11 @@ fun BottomSheetPlayer(
                             .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f))
                             .windowInsetsPadding(
                                 WindowInsets.systemBars.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
-                            ).padding(start = PlayerHorizontalPadding, end = PlayerHorizontalPadding, bottom = 8.dp),
+                            ).padding(
+                                start = PlayerHorizontalPadding,
+                                end = PlayerHorizontalPadding,
+                                bottom = CassetteRowBottomMargin,
+                            ),
                 )
             }
         }
@@ -2989,6 +2993,22 @@ private val RetroCream = Color(0xFFF2E7D0)
 private val RetroInk = Color(0xFF3A2F24)
 private val RetroDarkKey = Color(0xFF2A241E)
 
+/** Space between the waveform card, the transport row and the bottom row. */
+private val CassetteSectionGap = 30.dp
+
+/** How far the bottom row sits above the navigation bar. */
+private val CassetteRowBottomMargin = 28.dp
+
+private val CassetteRowHeight = 62.dp
+
+/**
+ * The player column already stops [QueuePeekHeight] + 1dp above the navigation bar (the queue
+ * sheet's collapsed height), and the bottom row is drawn inside or above that strip. This is the
+ * spacer under the transport row that leaves exactly [CassetteSectionGap] above the bottom row.
+ */
+private val CassetteSpacerUnderTransport =
+    CassetteSectionGap - (QueuePeekHeight + 1.dp - CassetteRowHeight - CassetteRowBottomMargin)
+
 /** Retro waveform progress card: times on top, seekable bars, favourite heart. */
 @Composable
 private fun RetroWaveformCard(
@@ -3149,7 +3169,7 @@ private fun RowScope.RetroSegment(iconRes: Int, label: String, onClick: () -> Un
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .weight(1f)
-            .height(62.dp)
+            .height(CassetteRowHeight)
             .background(RetroDarkKey)
             .clickable(onClick = onClick)
             .padding(horizontal = 2.dp),
