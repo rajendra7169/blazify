@@ -31,6 +31,11 @@ off.
 - Listen Together: play in sync with friends over a room code
 - Backup and restore your whole library to a single file
 - Android Auto, home-screen widgets, last.fm scrobbling
+- Plays the music already on the phone beside streamed songs (Android)
+- "Don't play this song" hides a song from queues, radio and recommendations
+- Double-tap to seek on every player design; each podcast keeps its own speed
+- Mobile data controls and Wi-Fi-only downloads
+- Opt-in beta updates for people who want new versions early
 
 ## Privacy
 
@@ -43,6 +48,7 @@ signed out.
 
 - Android: https://github.com/rajendra7169/blazify/releases/latest
 - Windows and Linux: https://github.com/rajendra7169/blazify-desktop/releases/latest
+- iPhone: https://github.com/rajendra7169/blazify-ios/releases/latest (sideloaded IPA)
 - Not on the Google Play Store, because apps that stream audio from YouTube are
   removed from it. Installed by sideloading the APK.
 
