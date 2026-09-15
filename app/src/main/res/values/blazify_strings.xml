@@ -1327,4 +1327,8 @@
 
     <!-- Player bottom row -->
     <string name="cast">Cast</string>
+
+    <!-- Updater -->
+    <string name="beta_updates">Get beta updates</string>
+    <string name="beta_updates_desc">Try new versions before everyone else. Betas can have bugs; turn this off to wait for the next stable update.</string>
 </resources>

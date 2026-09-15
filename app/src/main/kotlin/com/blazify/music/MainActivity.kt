@@ -135,6 +135,7 @@ import com.blazify.innertube.models.SongItem
 import com.blazify.innertube.models.WatchEndpoint
 import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.AppLanguageKey
+import com.blazify.music.constants.BetaUpdatesKey
 import com.blazify.music.constants.CheckForUpdatesKey
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DefaultOpenTabKey
@@ -544,7 +545,9 @@ class MainActivity : ComponentActivity() {
                         val notifEnabled = dataStore.get(UpdateNotificationsEnabledKey, true)
                         if (!updatesEnabled) return@withContext
 
-                        Updater.checkForUpdate().onSuccess { (releaseInfo, hasUpdate) ->
+                        Updater.checkForUpdate(
+                            includeBetas = dataStore.get(BetaUpdatesKey, false),
+                        ).onSuccess { (releaseInfo, hasUpdate) ->
                             if (releaseInfo != null) {
                                 onLatestVersionNameChange(releaseInfo.versionName)
                                 // Offer it in the app, once. A notification can be

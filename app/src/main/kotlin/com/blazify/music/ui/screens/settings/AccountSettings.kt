@@ -66,6 +66,7 @@ import com.blazify.innertube.utils.parseCookieString
 import com.blazify.music.BuildConfig
 import com.blazify.music.R
 import com.blazify.music.constants.AccountChannelHandleKey
+import com.blazify.music.constants.BetaUpdatesKey
 import com.blazify.music.constants.AccountEmailKey
 import com.blazify.music.constants.AccountNameKey
 import com.blazify.music.constants.DataSyncIdKey
@@ -92,6 +93,7 @@ fun AccountSettings(
     showSettings: Boolean = true,
 ) {
     val context = LocalContext.current
+    val (betaUpdates) = rememberPreference(BetaUpdatesKey, false)
     var showDeveloperDialog by remember { mutableStateOf(false) }
     var updateState by remember { mutableStateOf<UpdateCheck>(UpdateCheck.Idle) }
     val repoUrl = stringResource(R.string.blazify_repo_url)
@@ -452,7 +454,7 @@ fun AccountSettings(
                         if (updateState == UpdateCheck.Running) return@PreferenceEntry
                         updateState = UpdateCheck.Running
                         scope.launch {
-                            val result = Updater.checkForUpdate(forceRefresh = true)
+                            val result = Updater.checkForUpdate(forceRefresh = true, includeBetas = betaUpdates)
                             updateState =
                                 result.fold(
                                     onSuccess = { (release, isNewer) ->

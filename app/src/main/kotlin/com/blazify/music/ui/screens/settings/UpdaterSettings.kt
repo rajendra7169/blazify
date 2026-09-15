@@ -43,6 +43,7 @@ import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.ui.component.UpdateDialog
 import com.blazify.music.constants.CheckForUpdatesKey
 import com.blazify.music.constants.UpdateNotificationsEnabledKey
+import com.blazify.music.constants.BetaUpdatesKey
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.Material3SettingsGroup
 import com.blazify.music.ui.component.Material3SettingsItem
@@ -60,6 +61,7 @@ fun UpdaterScreen(
 ) {
     val (checkForUpdates, onCheckForUpdatesChange) = rememberPreference(CheckForUpdatesKey, true)
     val (updateNotifications, onUpdateNotificationsChange) = rememberPreference(UpdateNotificationsEnabledKey, true)
+    val (betaUpdates, onBetaUpdatesChange) = rememberPreference(BetaUpdatesKey, false)
 
     val context = LocalContext.current
     var isChecking by remember { mutableStateOf(false) }
@@ -84,7 +86,7 @@ fun UpdaterScreen(
             checkError = null
             withContext(Dispatchers.IO) {
                 Updater
-                    .checkForUpdate(forceRefresh = true)
+                    .checkForUpdate(forceRefresh = true, includeBetas = betaUpdates)
                     .onSuccess { (releaseInfo, hasUpdate) ->
                         if (releaseInfo != null) {
                             latestVersion = releaseInfo.versionName
@@ -99,6 +101,17 @@ fun UpdaterScreen(
             }
             isChecking = false
         }
+    }
+
+    // A result from before the switch changed answers the wrong question, so it goes.
+    fun changeBetaUpdates(enabled: Boolean) {
+        onBetaUpdatesChange(enabled)
+        latestVersion = null
+        latestRelease = null
+        updateAvailable = false
+        changelogContent = null
+        checkedOnce = false
+        checkError = null
     }
 
     Column(
@@ -175,6 +188,21 @@ fun UpdaterScreen(
                             ),
                         )
                     }
+
+                    add(
+                        Material3SettingsItem(
+                            title = { Text(stringResource(R.string.beta_updates)) },
+                            description = { Text(stringResource(R.string.beta_updates_desc)) },
+                            icon = painterResource(R.drawable.bug_report),
+                            trailingContent = {
+                                Switch(
+                                    checked = betaUpdates,
+                                    onCheckedChange = { changeBetaUpdates(it) },
+                                )
+                            },
+                            onClick = { changeBetaUpdates(!betaUpdates) },
+                        ),
+                    )
                 },
         )
 
