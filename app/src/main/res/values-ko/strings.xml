@@ -267,4 +267,10 @@
     <string name="auto_skip_next_on_error_desc">끊김 없는 재생 경험 보장</string>
     <string name="disable_screenshot_desc">이 설정을 켜면, 스크린샷이 비활성화되고 최근 앱에서 보이는 앱 화면이 숨겨집니다.</string>
     <string name="action_login">로그인</string>
+    <string name="pause">일시정지</string>
+    <string name="theme_desc">앱 테마 맞춤 설정</string>
+    <string name="theme_colors">테마 및 색상</string>
+    <string name="theme_mode">테마 모드</string>
+    <string name="color_palette">색상 팔레트</string>
+    <string name="use_system_colors">시스템 색상 사용</string>
 </resources>
