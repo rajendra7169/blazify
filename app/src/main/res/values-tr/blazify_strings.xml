@@ -1186,4 +1186,12 @@
     <string name="cast">Yayınla</string>
     <string name="beta_updates">Beta güncellemelerini al</string>
     <string name="beta_updates_desc">Yeni sürümleri herkesten önce deneyin. Beta sürümlerde hata olabilir; bir sonraki kararlı sürümü beklemek için kapatın.</string>
+    <string name="home_greeting_morning">Günaydın\n🌅</string>
+    <string name="home_greeting_afternoon">Tünaydın\n☀️</string>
+    <string name="home_greeting_evening">İyi\nakşamlar 🌆</string>
+    <string name="home_greeting_night">İyi\ngeceler 🌙</string>
+    <string name="home_enjoy_music">Müziğin tadını çıkarın 🎵</string>
+    <string name="home_search_hint">Şarkı, albüm, sanatçı arayın…</string>
+    <string name="reconnect">Yeniden bağlan</string>
+    <string name="no_recognition_history">Tanıma geçmişi yok</string>
 </resources>

@@ -1177,4 +1177,12 @@
     <string name="cast">Truyền</string>
     <string name="beta_updates">Nhận bản cập nhật beta</string>
     <string name="beta_updates_desc">Dùng thử phiên bản mới trước mọi người. Bản beta có thể có lỗi; tắt để chờ bản ổn định tiếp theo.</string>
+    <string name="home_greeting_morning">Chào\nbuổi sáng 🌅</string>
+    <string name="home_greeting_afternoon">Chào\nbuổi chiều ☀️</string>
+    <string name="home_greeting_evening">Chào\nbuổi tối 🌆</string>
+    <string name="home_greeting_night">Chúc\nngủ ngon 🌙</string>
+    <string name="home_enjoy_music">Tận hưởng âm nhạc nhé 🎵</string>
+    <string name="home_search_hint">Tìm bài hát, album, nghệ sĩ…</string>
+    <string name="reconnect">Kết nối lại</string>
+    <string name="no_recognition_history">Chưa có lịch sử nhận dạng</string>
 </resources>

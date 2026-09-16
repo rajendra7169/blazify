@@ -1186,4 +1186,12 @@
     <string name="cast">Streamen</string>
     <string name="beta_updates">Beta-Updates erhalten</string>
     <string name="beta_updates_desc">Neue Versionen vor allen anderen ausprobieren. Betas können Fehler haben; ausschalten, um auf die nächste stabile Version zu warten.</string>
+    <string name="home_greeting_morning">Guten\nMorgen 🌅</string>
+    <string name="home_greeting_afternoon">Guten\nTag ☀️</string>
+    <string name="home_greeting_evening">Guten\nAbend 🌆</string>
+    <string name="home_greeting_night">Gute\nNacht 🌙</string>
+    <string name="home_enjoy_music">Viel Spaß mit der Musik 🎵</string>
+    <string name="home_search_hint">Songs, Alben, Künstler suchen…</string>
+    <string name="reconnect">Neu verbinden</string>
+    <string name="no_recognition_history">Kein Erkennungsverlauf</string>
 </resources>

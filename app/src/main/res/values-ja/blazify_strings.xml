@@ -1177,4 +1177,12 @@
     <string name="cast">キャスト</string>
     <string name="beta_updates">ベータ版のアップデートを受け取る</string>
     <string name="beta_updates_desc">新しいバージョンをいち早く試せます。ベータ版には不具合があることがあります。オフにすると次の安定版を待ちます。</string>
+    <string name="home_greeting_morning">おはよう\nございます 🌅</string>
+    <string name="home_greeting_afternoon">こんにちは\n☀️</string>
+    <string name="home_greeting_evening">こんばんは\n🌆</string>
+    <string name="home_greeting_night">おやすみ\nなさい 🌙</string>
+    <string name="home_enjoy_music">音楽を楽しもう 🎵</string>
+    <string name="home_search_hint">曲、アルバム、アーティストを検索…</string>
+    <string name="reconnect">再接続</string>
+    <string name="no_recognition_history">認識履歴はありません</string>
 </resources>

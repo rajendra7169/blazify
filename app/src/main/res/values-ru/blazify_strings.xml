@@ -1204,4 +1204,12 @@
     <string name="cast">Трансляция</string>
     <string name="beta_updates">Получать бета-версии</string>
     <string name="beta_updates_desc">Пробуйте новые версии раньше всех. В бета-версиях бывают ошибки; отключите, чтобы ждать следующую стабильную версию.</string>
+    <string name="home_greeting_morning">Доброе\nутро 🌅</string>
+    <string name="home_greeting_afternoon">Добрый\nдень ☀️</string>
+    <string name="home_greeting_evening">Добрый\nвечер 🌆</string>
+    <string name="home_greeting_night">Доброй\nночи 🌙</string>
+    <string name="home_enjoy_music">Наслаждайтесь музыкой 🎵</string>
+    <string name="home_search_hint">Искать песни, альбомы, исполнителей…</string>
+    <string name="reconnect">Переподключиться</string>
+    <string name="no_recognition_history">Истории распознавания нет</string>
 </resources>

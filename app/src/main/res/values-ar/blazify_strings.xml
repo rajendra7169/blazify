@@ -1220,4 +1220,12 @@
     <string name="cast">إرسال</string>
     <string name="beta_updates">الحصول على تحديثات تجريبية</string>
     <string name="beta_updates_desc">جرّب الإصدارات الجديدة قبل الجميع. قد تحتوي الإصدارات التجريبية على أخطاء؛ أوقفه لانتظار الإصدار المستقر التالي.</string>
+    <string name="home_greeting_morning">صباح\nالخير 🌅</string>
+    <string name="home_greeting_afternoon">طاب\nيومك ☀️</string>
+    <string name="home_greeting_evening">مساء\nالخير 🌆</string>
+    <string name="home_greeting_night">تصبح\nعلى خير 🌙</string>
+    <string name="home_enjoy_music">استمتع بالموسيقى 🎵</string>
+    <string name="home_search_hint">ابحث عن أغانٍ وألبومات وفنانين…</string>
+    <string name="reconnect">إعادة الاتصال</string>
+    <string name="no_recognition_history">لا يوجد سجل للتعرّف</string>
 </resources>

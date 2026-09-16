@@ -1177,4 +1177,12 @@
     <string name="cast">投放</string>
     <string name="beta_updates">获取测试版更新</string>
     <string name="beta_updates_desc">抢先试用新版本。测试版可能有问题；关闭后将等待下一个正式版本。</string>
+    <string name="home_greeting_morning">早上\n好 🌅</string>
+    <string name="home_greeting_afternoon">下午\n好 ☀️</string>
+    <string name="home_greeting_evening">晚上\n好 🌆</string>
+    <string name="home_greeting_night">晚安\n好梦 🌙</string>
+    <string name="home_enjoy_music">享受音乐吧 🎵</string>
+    <string name="home_search_hint">搜索歌曲、专辑、艺人…</string>
+    <string name="reconnect">重新连接</string>
+    <string name="no_recognition_history">没有识别记录</string>
 </resources>

@@ -1177,4 +1177,12 @@
     <string name="cast">Transmisi</string>
     <string name="beta_updates">Dapatkan pembaruan beta</string>
     <string name="beta_updates_desc">Coba versi baru lebih dulu daripada yang lain. Versi beta bisa memiliki bug; matikan untuk menunggu versi stabil berikutnya.</string>
+    <string name="home_greeting_morning">Selamat\nPagi 🌅</string>
+    <string name="home_greeting_afternoon">Selamat\nSiang ☀️</string>
+    <string name="home_greeting_evening">Selamat\nSore 🌆</string>
+    <string name="home_greeting_night">Selamat\nMalam 🌙</string>
+    <string name="home_enjoy_music">Nikmati musiknya 🎵</string>
+    <string name="home_search_hint">Cari lagu, album, artis…</string>
+    <string name="reconnect">Sambungkan ulang</string>
+    <string name="no_recognition_history">Belum ada riwayat pengenalan</string>
 </resources>

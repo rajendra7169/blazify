@@ -1195,4 +1195,12 @@
     <string name="cast">Transmitir</string>
     <string name="beta_updates">Receber versões beta</string>
     <string name="beta_updates_desc">Teste as versões novas antes de todo mundo. Betas podem ter bugs; desative para esperar a próxima versão estável.</string>
+    <string name="home_greeting_morning">Bom\ndia 🌅</string>
+    <string name="home_greeting_afternoon">Boa\ntarde ☀️</string>
+    <string name="home_greeting_evening">Boa\nnoite 🌆</string>
+    <string name="home_greeting_night">Boa\nnoite 🌙</string>
+    <string name="home_enjoy_music">Curta a música 🎵</string>
+    <string name="home_search_hint">Pesquise músicas, álbuns, artistas…</string>
+    <string name="reconnect">Reconectar</string>
+    <string name="no_recognition_history">Nenhum histórico de reconhecimento</string>
 </resources>

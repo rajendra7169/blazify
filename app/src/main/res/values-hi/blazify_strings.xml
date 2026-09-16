@@ -1186,4 +1186,12 @@
     <string name="cast">कास्ट करें</string>
     <string name="beta_updates">बीटा अपडेट पाएँ</string>
     <string name="beta_updates_desc">नए वर्शन सबसे पहले आज़माएँ। बीटा में गड़बड़ियाँ हो सकती हैं; अगले स्थिर वर्शन का इंतज़ार करने के लिए इसे बंद करें।</string>
+    <string name="home_greeting_morning">सुप्रभात\n🌅</string>
+    <string name="home_greeting_afternoon">शुभ\nदोपहर ☀️</string>
+    <string name="home_greeting_evening">शुभ\nसंध्या 🌆</string>
+    <string name="home_greeting_night">शुभ\nरात्रि 🌙</string>
+    <string name="home_enjoy_music">संगीत का आनंद लें 🎵</string>
+    <string name="home_search_hint">गाने, एल्बम, कलाकार खोजें…</string>
+    <string name="reconnect">फिर से कनेक्ट करें</string>
+    <string name="no_recognition_history">पहचान का कोई इतिहास नहीं</string>
 </resources>
