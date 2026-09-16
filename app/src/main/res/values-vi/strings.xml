@@ -267,4 +267,10 @@
     <string name="use_login_for_browse">Đăng nhập để xem nội dung</string>
     <string name="use_login_for_browse_desc">Điều này có thể ảnh hưởng đến nội dung bạn nhìn thấy, ví dụ như hiện những album dành riêng cho premium nếu bạn đăng nhập với tài khoản Premium</string>
     <string name="action_login">Đăng nhập</string>
+    <string name="pause">Tạm dừng</string>
+    <string name="theme_desc">Tùy chỉnh giao diện ứng dụng</string>
+    <string name="theme_colors">Giao diện &amp; Màu sắc</string>
+    <string name="theme_mode">Chế độ giao diện</string>
+    <string name="color_palette">Bảng màu</string>
+    <string name="use_system_colors">Dùng màu hệ thống</string>
 </resources>
