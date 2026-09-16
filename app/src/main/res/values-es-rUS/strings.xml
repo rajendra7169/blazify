@@ -285,4 +285,10 @@
     <string name="clear_translation_models">Modelos de traducción claros</string>
     <string name="action_like_all">Me gustan todas</string>
     <string name="squiggly">Ondulado</string>
+    <string name="pause">Pausar</string>
+    <string name="theme_desc">Personaliza el tema de la aplicación</string>
+    <string name="theme_colors">Tema y colores</string>
+    <string name="theme_mode">Modo del tema</string>
+    <string name="color_palette">Paleta de colores</string>
+    <string name="use_system_colors">Usar los colores del sistema</string>
 </resources>
