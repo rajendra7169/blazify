@@ -2459,8 +2459,11 @@ fun BottomSheetPlayer(
         ) {
             mediaMetadata?.let { meta ->
                 RetroBottomRow(
-                    mediaMetadata = meta,
-                    state = state,
+                    lyricsOpen = false,
+                    sleepTimerEnabled = sleepTimerEnabled,
+                    sleepTimerTimeLeft = sleepTimerTimeLeft,
+                    sleepEnabled = !isListenTogetherGuest,
+                    accent = MaterialTheme.colorScheme.primary,
                     onLyrics = { showInlineLyrics = true },
                     onQueue = { queueSheetState.expandSoft() },
                     onSleep = { showSleepTimerDialog = true },
@@ -3382,79 +3385,69 @@ private fun RetroTransportRow(
     }
 }
 
-/** One key of the retro bottom row: icon with its name underneath. */
-@Composable
-private fun RowScope.RetroSegment(iconRes: Int, label: String, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .weight(1f)
-            .height(CassetteRowHeight)
-            .background(RetroDarkKey)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 2.dp),
-    ) {
-        Icon(painterResource(iconRes), contentDescription = null, tint = RetroCream, modifier = Modifier.size(22.dp))
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = label,
-            color = RetroCream.copy(alpha = 0.85f),
-            fontSize = 10.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
 /**
- * Retro segmented bottom row: lyrics · queue · sleep timer · theme · more.
+ * Retro segmented bottom row: queue · cast · sleep timer · lyrics.
  *
- * All five are plain dark keys with their name under the icon, so nobody has to guess
- * what a moon or a palette does. They stay plain because this row only shows while
- * lyrics are closed, and accent on this player means "on" (play, shuffle, repeat).
+ * The same four controls, in the same order, as the bottom row of every other design, drawn
+ * as dark keys that belong to this one. Cast is left out where it is unavailable, as it is
+ * elsewhere. Lyrics lights up while the lyrics page is open.
  */
 @Composable
 private fun RetroBottomRow(
-    mediaMetadata: MediaMetadata,
-    state: BottomSheetState,
+    lyricsOpen: Boolean,
+    sleepTimerEnabled: Boolean,
+    sleepTimerTimeLeft: Long,
+    sleepEnabled: Boolean,
+    accent: Color,
     onLyrics: () -> Unit,
     onQueue: () -> Unit,
     onSleep: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navController = LocalNavController.current
-    val menuState = LocalMenuState.current
-    val bottomSheetPageState = LocalBottomSheetPageState.current
     Row(
         modifier = modifier
             .shadow(8.dp, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp)),
     ) {
-        RetroSegment(R.drawable.lyrics, stringResource(R.string.lyrics), onClick = onLyrics)
-        RetroSegment(R.drawable.queue_music, stringResource(R.string.queue), onClick = onQueue)
-        RetroSegment(R.drawable.bedtime, stringResource(R.string.sleep_timer), onClick = onSleep)
-        RetroSegment(R.drawable.palette, stringResource(R.string.theme)) {
-            // Theme gallery: collapse the player first so the page is visible.
-            state.collapseSoft()
-            navController.navigate("settings/appearance/player_design")
-        }
-        RetroSegment(R.drawable.more_horiz, stringResource(R.string.more)) {
-            menuState.show {
-                PlayerMenu(
-                    mediaMetadata = mediaMetadata,
-                    playerBottomSheetState = state,
-                    onShowDetailsDialog = {
-                        mediaMetadata.id.let {
-                            bottomSheetPageState.show {
-                                ShowMediaInfo(it)
-                            }
-                        }
-                    },
-                    onDismiss = menuState::dismiss,
-                )
-            }
-        }
+        val key = Modifier
+            .weight(1f)
+            .height(CassetteRowHeight)
+            .background(RetroDarkKey)
+            .padding(top = 6.dp)
+        PlayerBottomButton(
+            icon = R.drawable.queue_music,
+            label = stringResource(R.string.queue),
+            active = false,
+            tint = RetroCream,
+            activeTint = accent,
+            modifier = key,
+            onClick = onQueue,
+        )
+        CastButton(
+            modifier = key,
+            tintColor = RetroCream,
+            label = stringResource(R.string.cast),
+            activeTint = accent,
+        )
+        PlayerBottomButton(
+            icon = R.drawable.bedtime,
+            label = if (sleepTimerEnabled) makeTimeString(sleepTimerTimeLeft) else stringResource(R.string.sleep_timer),
+            active = sleepTimerEnabled,
+            tint = RetroCream,
+            activeTint = accent,
+            enabled = sleepEnabled,
+            modifier = key,
+            onClick = onSleep,
+        )
+        PlayerBottomButton(
+            icon = R.drawable.lyrics,
+            label = stringResource(R.string.lyrics),
+            active = lyricsOpen,
+            tint = RetroCream,
+            activeTint = accent,
+            modifier = key,
+            onClick = onLyrics,
+        )
     }
 }
 
