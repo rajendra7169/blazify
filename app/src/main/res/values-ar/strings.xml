@@ -312,4 +312,10 @@
     <string name="use_login_for_browse">استخدم تسجيل الدخول لتصفح المحتوى</string>
     <string name="use_login_for_browse_desc">يمكن أن يؤثر ذلك على المحتوى الذي تراه، فعلى سبيل المثال، يعرض الألبومات المخصصة للمشتركين المميزين فقط إذا كنت مسجلاً الدخول باستخدام حساب مميز</string>
     <string name="action_login">تسجيل دخول</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="theme_desc">خصّص مظهر التطبيق</string>
+    <string name="theme_colors">المظهر والألوان</string>
+    <string name="theme_mode">وضع المظهر</string>
+    <string name="color_palette">لوحة الألوان</string>
+    <string name="use_system_colors">استخدام ألوان النظام</string>
 </resources>
