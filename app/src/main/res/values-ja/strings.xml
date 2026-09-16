@@ -267,4 +267,10 @@
     <string name="use_login_for_browse_desc">例えば、Premiumのアカウントでログインしたときに、Premium限定のアルバムが表示されるようになります。</string>
     <string name="use_login_for_browse">表示されるコンテンツをアカウントと連携する</string>
     <string name="action_login">ログイン</string>
+    <string name="pause">一時停止</string>
+    <string name="theme_desc">アプリのテーマをカスタマイズ</string>
+    <string name="theme_colors">テーマと色</string>
+    <string name="theme_mode">テーマモード</string>
+    <string name="color_palette">カラーパレット</string>
+    <string name="use_system_colors">システムの色を使う</string>
 </resources>
