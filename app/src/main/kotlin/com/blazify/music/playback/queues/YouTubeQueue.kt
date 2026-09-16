@@ -57,6 +57,13 @@ class YouTubeQueue(
                         }
                     }
 
+                    if (items.isEmpty()) {
+                        // An empty answer is as useless as a failed one: the player is left with
+                        // nothing and the song simply never starts, with nothing on screen to say
+                        // why. Ask for the item itself instead.
+                        fallbackStatus()?.let { return@withContext it }
+                    }
+
                     endpoint = nextResult.endpoint
                     continuation = nextResult.continuation
                     retryCount = 0
@@ -77,8 +84,38 @@ class YouTubeQueue(
                     }
                 }
             }
+            // YouTube has no queue for some items, and a song nobody can queue is still a song
+            // somebody asked to hear. Falling back to that one song turns "nothing happens, for
+            // ever" into music playing, without a queue behind it.
+            fallbackStatus()?.let { return@withContext it }
+
             throw lastException ?: Exception("Failed to get initial status")
         }
+    }
+
+    /**
+     * What to play when YouTube has no queue for an item: the item itself.
+     *
+     * Some videos and mixes come back with no queue at all, or with an empty one. Without this
+     * the player is handed nothing, and a song tapped from the home screen sits there loading
+     * for ever with no error to act on.
+     */
+    private suspend fun fallbackStatus(): Queue.Status? {
+        val current = endpoint
+        val videoId = current.videoId
+        val playlistId = current.playlistId
+        val songs =
+            when {
+                videoId != null -> YouTube.queue(videoIds = listOf(videoId)).getOrNull()
+                playlistId != null -> YouTube.queue(playlistId = playlistId).getOrNull()
+                else -> null
+            }
+        if (songs.isNullOrEmpty()) return null
+        return Queue.Status(
+            title = null,
+            items = songs.map { it.toMediaItem() },
+            mediaItemIndex = 0,
+        )
     }
 
     override fun hasNextPage(): Boolean = continuation != null

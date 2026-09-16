@@ -3111,6 +3111,11 @@ object YouTube {
         )
     }
 
+    /** Thrown when YouTube sends no queue for an item, so there is nothing to play after it. */
+    class NoQueueException(
+        val videoId: String?,
+    ) : IllegalStateException("No queue for ${videoId ?: "this item"}")
+
     suspend fun next(
         endpoint: WatchEndpoint,
         continuation: String? = null,
@@ -3138,7 +3143,11 @@ object YouTube {
                         ?.content
                         ?.musicQueueRenderer
                         ?.content
-                        ?.playlistPanelRenderer!!
+                        ?.playlistPanelRenderer
+                    // Not every item comes back with a queue: plain videos and some mixes have
+                    // none at all. There is nothing to build from that, and forcing it through
+                    // surfaced as a NullPointerException that told the caller nothing.
+                    ?: throw NoQueueException(endpoint.videoId)
             val title =
                 response.contents.singleColumnMusicWatchNextResultsRenderer
                     ?.tabbedRenderer
