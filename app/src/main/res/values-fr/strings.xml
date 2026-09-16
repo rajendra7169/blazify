@@ -285,4 +285,10 @@
     <string name="use_login_for_browse">Utiliser le compte connecté pour parcourir le contenu</string>
     <string name="use_login_for_browse_desc">Ceci peut influencer le contenu que vous voyez et affiche par exemple les albums Premium si vous êtes connecté avec un compte Premium</string>
     <string name="action_login">Se connecter</string>
+    <string name="pause">Pause</string>
+    <string name="theme_desc">Personnaliser le thème de l\'application</string>
+    <string name="theme_colors">Thème et couleurs</string>
+    <string name="theme_mode">Mode du thème</string>
+    <string name="color_palette">Palette de couleurs</string>
+    <string name="use_system_colors">Utiliser les couleurs du système</string>
 </resources>
