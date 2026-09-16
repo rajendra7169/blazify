@@ -2874,43 +2874,89 @@ private fun RingLyricsCard(
         Spacer(Modifier.height(10.dp))
         if (isLoading) {
             LyricsSkeleton(textColor)
-        } else if (currentIndex >= 0) {
-            val prev = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() }
-            val curr = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() }
-            val next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() }
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = prev ?: " ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor.copy(alpha = 0.45f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
+        } else {
+            // The card used to show only its heading until the first line was sung, and stayed
+            // that way for songs with no timed lyrics at all: an empty strip across the bottom of
+            // the player. It always shows three lines now — what is coming up during the intro,
+            // the opening of lyrics that have no timing, or a plain note when there are none.
+            val plainLines = remember(lyricsText, entries) {
+                if (entries.isNotEmpty() || lyricsText.isNullOrBlank() || lyricsText == LyricsEntity.LYRICS_NOT_FOUND) {
+                    emptyList()
+                } else {
+                    lyricsText.lines().map { it.trim() }.filter { it.isNotEmpty() }
+                }
+            }
+            when {
+                entries.isNotEmpty() && currentIndex >= 0 -> RingLyricsLines(
+                    previous = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() },
+                    current = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() } ?: "♪",
+                    next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() },
+                    textColor = textColor,
                 )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = curr ?: "♪",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
+                entries.isNotEmpty() -> RingLyricsLines(
+                    previous = null,
+                    current = "♪",
+                    next = entries.firstOrNull { it.text.isNotBlank() }?.text,
+                    textColor = textColor,
                 )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = next ?: " ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor.copy(alpha = 0.45f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
+                plainLines.isNotEmpty() -> RingLyricsLines(
+                    previous = null,
+                    current = plainLines[0],
+                    next = plainLines.getOrNull(1),
+                    textColor = textColor,
+                )
+                else -> RingLyricsLines(
+                    previous = null,
+                    current = stringResource(R.string.lyrics_not_found),
+                    next = null,
+                    textColor = textColor,
+                    highlight = false,
                 )
             }
         }
+    }
+}
+
+/** Three centred lines: the one just sung, the one being sung, and the one coming up. */
+@Composable
+private fun RingLyricsLines(
+    previous: String?,
+    current: String,
+    next: String?,
+    textColor: Color,
+    highlight: Boolean = true,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = previous ?: " ",
+            style = MaterialTheme.typography.bodyMedium,
+            color = textColor.copy(alpha = 0.45f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = current,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = if (highlight) FontWeight.Bold else FontWeight.Normal,
+            color = if (highlight) MaterialTheme.colorScheme.primary else textColor.copy(alpha = 0.6f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = next ?: " ",
+            style = MaterialTheme.typography.bodyMedium,
+            color = textColor.copy(alpha = 0.45f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
