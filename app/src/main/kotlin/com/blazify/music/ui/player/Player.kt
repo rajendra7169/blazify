@@ -7,6 +7,8 @@ package com.blazify.music.ui.player
 
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import com.blazify.music.ui.component.PlayerBottomButton
+import com.blazify.music.ui.component.CastButton
 import com.blazify.music.ui.component.BlazeLoader
 import androidx.activity.compose.BackHandler
 import android.content.ClipData
@@ -2348,17 +2350,52 @@ fun BottomSheetPlayer(
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                 horizontalAlignment = Alignment.Start,
             ) {
+                // The same four controls as every other design, in the same order, just above
+                // the lyrics card that this design keeps at the bottom.
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
                 ) {
-                    RingIconButton(R.drawable.bedtime, TextBackgroundColor, size = 24) {
-                        showSleepTimerDialog = true
-                    }
-                    mediaMetadata?.let {
-                        RingMoreButton(mediaMetadata = it, state = state, tint = TextBackgroundColor)
-                    }
+                    PlayerBottomButton(
+                        icon = R.drawable.queue_music,
+                        label = stringResource(R.string.queue),
+                        active = false,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
+                        modifier = Modifier.weight(1f),
+                        onClick = { queueSheetState.expandSoft() },
+                    )
+                    CastButton(
+                        modifier = Modifier.weight(1f),
+                        tintColor = TextBackgroundColor,
+                        label = stringResource(R.string.cast),
+                        activeTint = BlazeThemeColor,
+                    )
+                    PlayerBottomButton(
+                        icon = R.drawable.bedtime,
+                        label =
+                            if (sleepTimerEnabled) {
+                                makeTimeString(sleepTimerTimeLeft)
+                            } else {
+                                stringResource(R.string.sleep_timer)
+                            },
+                        active = sleepTimerEnabled,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
+                        enabled = !isListenTogetherGuest,
+                        modifier = Modifier.weight(1f),
+                        onClick = { showSleepTimerDialog = true },
+                    )
+                    PlayerBottomButton(
+                        icon = R.drawable.lyrics,
+                        label = stringResource(R.string.lyrics),
+                        active = false,
+                        tint = TextBackgroundColor,
+                        activeTint = BlazeThemeColor,
+                        modifier = Modifier.weight(1f),
+                        onClick = { showInlineLyrics = true },
+                    )
                 }
                 Spacer(Modifier.height(8.dp))
                 RingLyricsCard(
@@ -2987,47 +3024,6 @@ private fun LyricsSkeleton(textColor: Color) {
             )
             if (i < 2) Spacer(Modifier.height(8.dp))
         }
-    }
-}
-
-/** Plain 3-dots more button (matches the sleep-timer icon styling) that opens the player menu. */
-@Composable
-private fun RingMoreButton(
-    mediaMetadata: MediaMetadata,
-    state: BottomSheetState,
-    tint: Color,
-    size: Int = 24,
-) {
-    val menuState = LocalMenuState.current
-    val bottomSheetPageState = LocalBottomSheetPageState.current
-    Box(
-        modifier = Modifier
-            .size((size + 18).dp)
-            .clip(CircleShape)
-            .clickable {
-                menuState.show {
-                    PlayerMenu(
-                        mediaMetadata = mediaMetadata,
-                        playerBottomSheetState = state,
-                        onShowDetailsDialog = {
-                            mediaMetadata.id.let {
-                                bottomSheetPageState.show {
-                                    ShowMediaInfo(it)
-                                }
-                            }
-                        },
-                        onDismiss = menuState::dismiss,
-                    )
-                }
-            },
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.more_horiz),
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(size.dp),
-        )
     }
 }
 
