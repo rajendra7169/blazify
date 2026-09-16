@@ -1722,20 +1722,25 @@ class MainActivity : ComponentActivity() {
 
                 if (videoId != null) {
                     coroutineScope.launch(Dispatchers.IO) {
-                        YouTube
-                            .queue(listOf(videoId), playlistId)
-                            .onSuccess { queue ->
-                                withContext(Dispatchers.Main) {
-                                    playerConnection?.playQueue(
-                                        YouTubeQueue(
-                                            WatchEndpoint(videoId = queue.firstOrNull()?.id, playlistId = playlistId),
-                                            queue.firstOrNull()?.toMediaMetadata(),
-                                        ),
-                                    )
-                                }
-                            }.onFailure {
-                                reportException(it)
-                            }
+                        // The lookup is only for the title and artwork that show while the song
+                        // loads. It comes back empty for some videos and mixes, and the link still
+                        // names a song, so the id from the link is what the player is given —
+                        // handing it an empty one left the app showing a song it could never play.
+                        val first =
+                            YouTube
+                                .queue(listOf(videoId), playlistId)
+                                .getOrElse {
+                                    reportException(it)
+                                    null
+                                }?.firstOrNull()
+                        withContext(Dispatchers.Main) {
+                            playerConnection?.playQueue(
+                                YouTubeQueue(
+                                    WatchEndpoint(videoId = first?.id ?: videoId, playlistId = playlistId),
+                                    first?.toMediaMetadata(),
+                                ),
+                            )
+                        }
                     }
                 } else if (playlistId != null) {
                     coroutineScope.launch(Dispatchers.IO) {
