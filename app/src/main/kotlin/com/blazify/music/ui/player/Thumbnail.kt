@@ -79,7 +79,6 @@ import com.blazify.music.constants.PlayerHorizontalPadding
 import com.blazify.music.constants.SwipeThumbnailKey
 import com.blazify.music.constants.ThumbnailCornerRadius
 import com.blazify.music.listentogether.RoomRole
-import com.blazify.music.ui.component.CastButton
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.delay
@@ -515,14 +514,7 @@ private fun ThumbnailItem(
                     cropArtwork = cropAlbumArt
                 )
             }
-            
-            // Cast button at top-right corner of thumbnail
-            CastButton(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp),
-                tintColor = textBackgroundColor
-            )
+
         }
     }
 }
