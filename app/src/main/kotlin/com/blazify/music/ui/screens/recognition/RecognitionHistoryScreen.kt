@@ -193,7 +193,7 @@ fun RecognitionHistoryScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No recognition history",
+                        text = stringResource(R.string.no_recognition_history),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

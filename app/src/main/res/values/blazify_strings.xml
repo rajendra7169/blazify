@@ -458,6 +458,16 @@
     <string name="settings_section_storage">Storage &amp; Data</string>
     <string name="settings_section_system">System &amp; About</string>
 
+    <!-- Home header -->
+    <string name="home_greeting_morning">Good\nMorning 🌅</string>
+    <string name="home_greeting_afternoon">Good\nAfternoon ☀️</string>
+    <string name="home_greeting_evening">Good\nEvening 🌆</string>
+    <string name="home_greeting_night">Good\nNight 🌙</string>
+    <string name="home_enjoy_music">Enjoy the music 🎵</string>
+    <string name="home_search_hint">Search songs, albums, artists…</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="no_recognition_history">No recognition history</string>
+
     <!-- Live broadcasts -->
     <string name="live">LIVE</string>
 

@@ -590,13 +590,13 @@ internal fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable
     }
 }
 
-private fun greetingLine(): String {
+private fun greetingLineRes(): Int {
     val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
     return when {
-        hour in 5..11 -> "Good\nMorning 🌅"
-        hour in 12..16 -> "Good\nAfternoon ☀️"
-        hour in 17..20 -> "Good\nEvening 🌆"
-        else -> "Good\nNight 🌙"
+        hour in 5..11 -> R.string.home_greeting_morning
+        hour in 12..16 -> R.string.home_greeting_afternoon
+        hour in 17..20 -> R.string.home_greeting_evening
+        else -> R.string.home_greeting_night
     }
 }
 
@@ -694,9 +694,9 @@ internal fun ThemePhonePreview(
                     // Explicit lineHeights kill the inherited tall line-boxes, compressing
                     // the block: the greeting sits lower, 'Enjoy the music' higher, with
                     // even padding above and below.
-                    Text(greetingLine(), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
-                    Text("Music Lover", color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("Enjoy the music 🎵", color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(stringResource(greetingLineRes()), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
+                    Text(stringResource(R.string.blaze_greeting_default_name), color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(stringResource(R.string.home_enjoy_music), color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Spacer(Modifier.height(9.dp))
@@ -713,7 +713,7 @@ internal fun ThemePhonePreview(
             ) {
                 Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
                 Spacer(Modifier.width(5.dp))
-                Text("Search songs, albums, artists...", fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.home_search_hint), fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
             Spacer(Modifier.height(8.dp))
@@ -741,7 +741,7 @@ internal fun ThemePhonePreview(
             Spacer(Modifier.height(9.dp))
             // "Quick picks" header + a small Play all pill.
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Quick picks", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+                Text(stringResource(R.string.quick_picks), fontSize = 9.sp, fontWeight = FontWeight.Bold, color = cs.primary)
                 Box(
                     modifier = Modifier
                         .height(10.dp)
@@ -750,7 +750,7 @@ internal fun ThemePhonePreview(
                         .padding(horizontal = 8.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("Play all", fontSize = 4.5.sp, lineHeight = 5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
+                    Text(stringResource(R.string.play_all), fontSize = 4.5.sp, lineHeight = 5.sp, fontWeight = FontWeight.Medium, color = cs.primary)
                 }
             }
             Spacer(Modifier.height(7.dp))

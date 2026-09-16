@@ -160,7 +160,7 @@ fun BlazeHomeHeader(
                     .padding(start = 20.dp),
             ) {
                 Text(
-                    text = greeting(),
+                    text = stringResource(greetingRes()),
                     color = onCard,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
@@ -179,7 +179,7 @@ fun BlazeHomeHeader(
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = "Enjoy the music 🎵",
+                    text = stringResource(R.string.home_enjoy_music),
                     color = onCard.copy(alpha = 0.85f),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
@@ -228,7 +228,7 @@ fun BlazeHomeHeader(
             // Keep the placeholder on one line: on narrow screens it used to wrap and
             // grow the search bar's height, so ellipsize instead.
             Text(
-                text = "Search songs, albums, artists...",
+                text = stringResource(R.string.home_search_hint),
                 color = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
                 fontSize = 15.sp,
                 maxLines = 1,
@@ -250,12 +250,12 @@ fun BlazeHomeHeader(
     }
 }
 
-private fun greeting(): String {
+private fun greetingRes(): Int {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     return when {
-        hour in 5..11 -> "Good\nMorning 🌅"
-        hour in 12..16 -> "Good\nAfternoon ☀️"
-        hour in 17..20 -> "Good\nEvening 🌆"
-        else -> "Good\nNight 🌙"
+        hour in 5..11 -> R.string.home_greeting_morning
+        hour in 12..16 -> R.string.home_greeting_afternoon
+        hour in 17..20 -> R.string.home_greeting_evening
+        else -> R.string.home_greeting_night
     }
 }
