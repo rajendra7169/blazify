@@ -105,10 +105,30 @@ object YTPlayerUtils {
 
     private const val MAIN_CLIENT_TRUST_MS = 10 * 60 * 1000L
 
-    private fun mainClientTrusted() = android.os.SystemClock.elapsedRealtime() < mainClientTrustedUntil
+    /**
+     * Where the trust is written down. Without it the first song after every launch paid for the
+     * test again — the song people wait on most, since everything else is still starting too.
+     */
+    @Volatile
+    private var streamHealth: android.content.SharedPreferences? = null
+
+    private const val TRUSTED_UNTIL_KEY = "main_client_trusted_until"
+
+    fun initialize(context: android.content.Context) {
+        val prefs = context.getSharedPreferences("stream_health", android.content.Context.MODE_PRIVATE)
+        streamHealth = prefs
+        mainClientTrustedUntil = prefs.getLong(TRUSTED_UNTIL_KEY, 0L)
+    }
+
+    private fun mainClientTrusted() = System.currentTimeMillis() < mainClientTrustedUntil
+
+    private fun setMainClientTrustedUntil(until: Long) {
+        mainClientTrustedUntil = until
+        streamHealth?.edit()?.putLong(TRUSTED_UNTIL_KEY, until)?.apply()
+    }
 
     private fun trustMainClient() {
-        mainClientTrustedUntil = android.os.SystemClock.elapsedRealtime() + MAIN_CLIENT_TRUST_MS
+        setMainClientTrustedUntil(System.currentTimeMillis() + MAIN_CLIENT_TRUST_MS)
     }
 
     /**
@@ -139,14 +159,14 @@ object YTPlayerUtils {
     /** A stream was refused: test the main client's addresses again before playing them. */
     fun distrustMainClient() {
         if (mainClientTrustedUntil != 0L) {
-            mainClientTrustedUntil = 0
+            setMainClientTrustedUntil(0L)
             Timber.tag(logTag).d("Main client no longer trusted — its streams will be tested again")
         }
     }
 
     private fun noteMainClientRefused() {
         mainClientRefusedAt = System.currentTimeMillis()
-        mainClientTrustedUntil = 0
+        setMainClientTrustedUntil(0L)
         Timber.tag(logTag).d("Main client refused a stream — resting it for five minutes")
     }
 
