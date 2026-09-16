@@ -583,6 +583,18 @@ class MusicService :
     private val INITIAL_STALL_TIMEOUT_MS = 15_000L
     private val INITIAL_STALL_POSITION_MS = 1_000L
 
+    /** One fresh link, and then the song is treated as failed rather than buffering forever. */
+    private val MAX_INITIAL_STALL_ATTEMPTS = 2
+
+    /**
+     * The wait after the fresh link is shorter than the first one: by then the song has already
+     * had its patience, and every extra second is somebody staring at a screen playing nothing.
+     */
+    private val RETRY_STALL_TIMEOUT_MS = 7_000L
+
+    /** The stream lookup runs on the player's own thread, so it must never wait forever. */
+    private val STREAM_RESOLVE_TIMEOUT_MS = 45_000L
+
     // Track failed songs to prevent infinite retry loops
     private val recentlyFailedSongs = mutableSetOf<String>()
     private var failedSongsClearJob: Job? = null
@@ -1958,7 +1970,12 @@ class MusicService :
             if (initialStatus.title != null) {
                 queueTitle = initialStatus.title
             }
-            if (initialStatus.items.isEmpty()) return@launch
+            if (initialStatus.items.isEmpty()) {
+                // Nothing to play and nothing said: this is what a tap that "does nothing" looks
+                // like from the inside, so at least leave a trace of it.
+                Timber.tag(TAG).w("Queue came back empty for ${queue.preloadItem?.id ?: "this item"} — nothing to play")
+                return@launch
+            }
             // Track original queue size for shuffle playlist first feature
             originalQueueSize = initialStatus.items.size
             if (queue.preloadItem != null) {
@@ -2857,8 +2874,10 @@ class MusicService :
      * while the person waits, and only a skip or a restart gets out of it.
      *
      * So a song that has played nothing after [INITIAL_STALL_TIMEOUT_MS] is given a fresh
-     * link, once. Once per song on purpose: a slow connection deserves patience, not a
-     * refetch every fifteen seconds.
+     * link. Once, because a slow connection deserves patience rather than a refetch every
+     * fifteen seconds — but only once: if the new link is just as silent, the song is treated
+     * as the failure it is, so the queue moves on or playback stops and says so. Sitting in a
+     * silent buffer with nothing on screen is the one outcome nobody can act on.
      */
     private fun watchForInitialStall(
         @Player.State playbackState: Int,
@@ -2879,22 +2898,30 @@ class MusicService :
 
         initialStallJob =
             scope.launch {
-                delay(INITIAL_STALL_TIMEOUT_MS)
+                repeat(MAX_INITIAL_STALL_ATTEMPTS) { attempt ->
+                    delay(if (attempt == 0) INITIAL_STALL_TIMEOUT_MS else RETRY_STALL_TIMEOUT_MS)
 
-                // Anything that got better while we waited — it started, it was paused, the
-                // song was changed — means there is nothing to recover from.
-                if (player.playbackState != Player.STATE_BUFFERING ||
-                    !player.playWhenReady ||
-                    player.currentPosition >= INITIAL_STALL_POSITION_MS ||
-                    player.currentMediaItem?.mediaId != mediaId
-                ) {
-                    return@launch
+                    // Anything that got better while we waited — it started, it was paused, the
+                    // song was changed — means there is nothing to recover from.
+                    if (player.playbackState != Player.STATE_BUFFERING ||
+                        !player.playWhenReady ||
+                        player.currentPosition >= INITIAL_STALL_POSITION_MS ||
+                        player.currentMediaItem?.mediaId != mediaId
+                    ) {
+                        return@launch
+                    }
+
+                    initialStallCheckedMediaId = mediaId
+                    if (attempt == 0) {
+                        Timber.tag(TAG).w("Stream for $mediaId never started playing — fetching a fresh one")
+                        performAggressiveCacheClear(mediaId)
+                        handleExpiredUrlError(mediaId)
+                    } else {
+                        Timber.tag(TAG).w("Stream for $mediaId is still silent after a fresh link — giving up")
+                        markSongAsFailed(mediaId)
+                        handleFinalFailure()
+                    }
                 }
-
-                initialStallCheckedMediaId = mediaId
-                Timber.tag(TAG).w("Stream for $mediaId never started playing — fetching a fresh one")
-                performAggressiveCacheClear(mediaId)
-                handleExpiredUrlError(mediaId)
             }
     }
 
@@ -2967,6 +2994,11 @@ class MusicService :
             player.pause()
             return
         }
+
+        // Pressing play on a song that is already buffering does not change the playback state,
+        // so nothing tells the stall watch to start. That is exactly the case it exists for —
+        // a restored queue whose song never starts — so it is re-armed here as well.
+        watchForInitialStall(player.playbackState)
 
         if (reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) {
             if (playWhenReady) {
@@ -4132,13 +4164,18 @@ class MusicService :
             }
 
             Timber.tag(TAG).i("FETCHING STREAM: $mediaId | quality=$audioQuality")
+            // This runs on the player's own thread: whatever happens, it has to come back.
+            // Without the limit a lookup that never answers leaves the player buffering
+            // forever, with no error and nothing on screen to act on.
             val playbackData =
                 runBlocking(Dispatchers.IO) {
-                    YTPlayerUtils.playerResponseForPlayback(
-                        mediaId,
-                        audioQuality = audioQuality,
-                        connectivityManager = connectivityManager,
-                    )
+                    withTimeoutOrNull(STREAM_RESOLVE_TIMEOUT_MS) {
+                        YTPlayerUtils.playerResponseForPlayback(
+                            mediaId,
+                            audioQuality = audioQuality,
+                            connectivityManager = connectivityManager,
+                        )
+                    } ?: Result.failure(java.net.SocketTimeoutException("Stream lookup timed out"))
                 }.getOrElse { throwable ->
                     when (throwable) {
                         is PlaybackException -> {
