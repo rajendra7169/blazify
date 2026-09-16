@@ -243,6 +243,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -497,8 +498,15 @@ class MusicService :
     // Watches a song that starts loading and never gets going. See watchForInitialStall().
     private var initialStallJob: Job? = null
 
-    /** Broadcasts that are on air, so their item is played as a live stream rather than a file. */
-    private val liveMediaIds = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    /**
+     * Broadcasts that are on air, so their item is played as a live stream rather than a file —
+     * and so the screens can mark them, since nothing else about such an item says what it is.
+     */
+    val liveBroadcasts = MutableStateFlow<Set<String>>(emptySet())
+
+    private fun markAsLive(mediaId: String) {
+        liveBroadcasts.update { it + mediaId }
+    }
 
     /** When each broadcast was last started over, so a failing one cannot loop. */
     private val liveRestartedAt = java.util.concurrent.ConcurrentHashMap<String, Long>()
@@ -2258,7 +2266,27 @@ class MusicService :
     // picking 5, 9 and 11 plays 5, 9, 11 rather than 11, 9, 5.
     private val pendingPlayNextIds = mutableListOf<String>()
 
+    /**
+     * Drops the broadcasts from a list of items on their way into the queue.
+     *
+     * A station is not a song waiting its turn: it has no end, so anything put behind it would
+     * never be reached, and it cannot wait either — it is only ever whatever is on air now.
+     */
+    private fun withoutBroadcasts(items: List<MediaItem>): List<MediaItem> {
+        val onAir = liveBroadcasts.value
+        if (onAir.isEmpty()) return items
+        val queueable = items.filter { it.mediaId !in onAir }
+        if (queueable.size != items.size) {
+            Timber.tag(TAG).d("Left ${items.size - queueable.size} broadcast(s) out of the queue")
+        }
+        return queueable
+    }
+
     fun playNext(items: List<MediaItem>) {
+        @Suppress("NAME_SHADOWING")
+        val items = withoutBroadcasts(items)
+        if (items.isEmpty()) return
+
         // If queue is empty or player is idle, play immediately instead
         if (player.mediaItemCount == 0 || player.playbackState == STATE_IDLE) {
             pendingPlayNextIds.clear()
@@ -2369,6 +2397,10 @@ class MusicService :
     }
 
     fun addToQueue(items: List<MediaItem>) {
+        @Suppress("NAME_SHADOWING")
+        val items = withoutBroadcasts(items)
+        if (items.isEmpty()) return
+
         if (dataStore.get(PreventDuplicateTracksInQueueKey, false)) {
             val itemIds = items.map { it.mediaId }.toSet()
             val indicesToRemove = mutableListOf<Int>()
@@ -2786,13 +2818,33 @@ class MusicService :
         // "fully cached" if it advanced AUTOmatically (i.e. it actually finished),
         // never on a manual skip/seek. lastTransitionedMediaId must be read BEFORE
         // it gets overwritten below.
+        // A broadcast has no end to reach: when the playlist it was given runs out the player
+        // treats that as the item finishing and walks on to the next one, which is a station
+        // turning itself into a song. Go back to it and pick the broadcast up where it is now.
+        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+            val leftBehind = lastTransitionedMediaId
+            if (leftBehind != null &&
+                leftBehind != mediaItem?.mediaId &&
+                leftBehind in liveBroadcasts.value &&
+                allowLiveRestart(leftBehind)
+            ) {
+                val index = (0 until player.mediaItemCount).firstOrNull { player.getMediaItemAt(it).mediaId == leftBehind }
+                if (index != null) {
+                    Timber.tag(TAG).i("A broadcast does not end: staying on $leftBehind")
+                    player.seekTo(index, C.TIME_UNSET)
+                    restartLiveStream(leftBehind)
+                    return
+                }
+            }
+        }
+
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
             lastTransitionedMediaId?.let { previousId ->
                 scope.launch(Dispatchers.IO) { markCachedIfFullyDownloaded(previousId) }
             }
         }
         lastTransitionedMediaId = mediaItem?.mediaId
-        mediaItem?.mediaId?.takeIf { it in liveMediaIds }?.let { playAsLiveStream(it) }
+        mediaItem?.mediaId?.takeIf { it in liveBroadcasts.value }?.let { playAsLiveStream(it) }
         initialStallJob?.cancel()
         initialStallJob = null
         initialStallCheckedMediaId = null
@@ -2856,6 +2908,8 @@ class MusicService :
 
         if (cachedAutoLoadMore &&
             reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT &&
+            // A station plays on its own: it has no end for a next song to follow.
+            player.currentMediaItem?.mediaId !in liveBroadcasts.value &&
             player.mediaItemCount - player.currentMediaItemIndex <= 5 &&
             currentQueue.hasNextPage() &&
             !(cachedDisableLoadMoreWhenRepeatAll && player.repeatMode == REPEAT_MODE_ALL)
@@ -2949,6 +3003,14 @@ class MusicService :
         watchForInitialStall(playbackState)
 
         if (playbackState == Player.STATE_ENDED) {
+            // A broadcast that runs out of playlist has not finished, it has fallen behind:
+            // ask for where it is now instead of moving on to the next thing in the queue.
+            val onAir = player.currentMediaItem?.mediaId
+            if (onAir != null && onAir in liveBroadcasts.value && allowLiveRestart(onAir)) {
+                restartLiveStream(onAir)
+                return
+            }
+
             // Check sleep timer guard - don't autoplay/repeat if sleep timer will pause
             val timer = sleepTimer ?: return
             if (timer.isActive && timer.pauseWhenSongEnd) {
@@ -3332,13 +3394,9 @@ class MusicService :
         // it was still being read as a file when it turned out to be a broadcast, or it has been
         // playing for hours and the playlist it was given has run out. Starting it over covers
         // both, and the interval keeps a broadcast that is simply off the air from looping.
-        if (mediaId != null && mediaId in liveMediaIds) {
-            val now = SystemClock.elapsedRealtime()
-            if (now - (liveRestartedAt[mediaId] ?: 0L) > LIVE_RESTART_INTERVAL_MS) {
-                liveRestartedAt[mediaId] = now
-                restartLiveStream(mediaId)
-                return
-            }
+        if (mediaId != null && mediaId in liveBroadcasts.value && allowLiveRestart(mediaId)) {
+            restartLiveStream(mediaId)
+            return
         }
 
         // A file on the phone has nothing to recover.
@@ -3814,6 +3872,8 @@ class MusicService :
     }
 
     private suspend fun performInstantSilenceSkip() {
+        // There is nothing ahead in a broadcast to jump to: it is only ever at now.
+        if (player.currentMediaItem?.mediaId in liveBroadcasts.value) return
         val duration = player.duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: return
         if (duration <= INSTANT_SILENCE_SKIP_STEP_MS) return
 
@@ -4138,7 +4198,7 @@ class MusicService :
 
         if (playback.isLive) {
             // Known one song ahead, so the item is already marked by the time it starts.
-            liveMediaIds.add(nextId)
+            markAsLive(nextId)
             liveManifestUrls[nextId] = playback.streamUrl
             withContext(Dispatchers.Main) { playAsLiveStream(nextId) }
             return
@@ -4184,6 +4244,17 @@ class MusicService :
      * station left playing all day reaches the end of one — and since the item is by then
      * addressed by that playlist rather than by its id, nothing would look it up again.
      */
+    /**
+     * True at most once every [LIVE_RESTART_INTERVAL_MS] for a broadcast, so one that has really
+     * gone off the air is let go instead of being started over for ever.
+     */
+    private fun allowLiveRestart(mediaId: String): Boolean {
+        val now = SystemClock.elapsedRealtime()
+        if (now - (liveRestartedAt[mediaId] ?: 0L) <= LIVE_RESTART_INTERVAL_MS) return false
+        liveRestartedAt[mediaId] = now
+        return true
+    }
+
     private fun restartLiveStream(mediaId: String) {
         val index = (0 until player.mediaItemCount).firstOrNull { player.getMediaItemAt(it).mediaId == mediaId } ?: return
         val item = player.getMediaItemAt(index)
@@ -4321,7 +4392,7 @@ class MusicService :
             // A broadcast on air: nothing here to cache, measure or store, and the player has to
             // be told it is playing a live stream rather than a file before it reads a byte.
             if (nonNullPlayback.isLive) {
-                liveMediaIds.add(mediaId)
+                markAsLive(mediaId)
                 liveManifestUrls[mediaId] = nonNullPlayback.streamUrl
                 Handler(Looper.getMainLooper()).post { playAsLiveStream(mediaId) }
                 return@Factory dataSpec.withUri(nonNullPlayback.streamUrl.toUri())
@@ -5262,6 +5333,9 @@ class MusicService :
     private fun scheduleCrossfade() {
         crossfadeTriggerJob?.cancel()
         crossfadeTriggerJob = null
+        // What a broadcast reports as its length is only the few seconds it keeps behind the live
+        // edge, so fading out of it would mean fading out every half minute, for ever.
+        if (player.currentMediaItem?.mediaId in liveBroadcasts.value) return
         if (!crossfadeEnabled || crossfadeDuration <= 0f || player.duration == C.TIME_UNSET || player.duration <= crossfadeDuration) return
         if (crossfadeGapless && isNextItemGapless()) return
         if (!player.hasNextMediaItem() && player.repeatMode != REPEAT_MODE_ONE) return
