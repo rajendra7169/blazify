@@ -45,6 +45,7 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -78,7 +79,11 @@ import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
 import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.session.CommandButton
@@ -491,6 +496,15 @@ class MusicService :
 
     // Watches a song that starts loading and never gets going. See watchForInitialStall().
     private var initialStallJob: Job? = null
+
+    /** Broadcasts that are on air, so their item is played as a live stream rather than a file. */
+    private val liveMediaIds = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+    /** When each broadcast was last started over, so a failing one cannot loop. */
+    private val liveRestartedAt = java.util.concurrent.ConcurrentHashMap<String, Long>()
+
+    /** The playlist of segments each broadcast is coming from, kept for as long as it is queued. */
+    private val liveManifestUrls = java.util.concurrent.ConcurrentHashMap<String, String>()
     private var initialStallCheckedMediaId: String? = null
     private var retryCount = 0
     // True only when stopOnError() paused playback purely because of a network outage
@@ -594,6 +608,9 @@ class MusicService :
 
     /** The stream lookup runs on the player's own thread, so it must never wait forever. */
     private val STREAM_RESOLVE_TIMEOUT_MS = 45_000L
+
+    /** How long a broadcast must play before it is allowed to be started over again. */
+    private val LIVE_RESTART_INTERVAL_MS = 30_000L
 
     // Track failed songs to prevent infinite retry loops
     private val recentlyFailedSongs = mutableSetOf<String>()
@@ -2775,6 +2792,7 @@ class MusicService :
             }
         }
         lastTransitionedMediaId = mediaItem?.mediaId
+        mediaItem?.mediaId?.takeIf { it in liveMediaIds }?.let { playAsLiveStream(it) }
         initialStallJob?.cancel()
         initialStallJob = null
         initialStallCheckedMediaId = null
@@ -3310,6 +3328,19 @@ class MusicService :
             .w(error, "Player error occurred for $mediaId: errorCode=${error.errorCode}, message=${error.message}")
         reportException(error)
 
+        // A broadcast has its own two ways of failing, and neither is helped by anything below:
+        // it was still being read as a file when it turned out to be a broadcast, or it has been
+        // playing for hours and the playlist it was given has run out. Starting it over covers
+        // both, and the interval keeps a broadcast that is simply off the air from looping.
+        if (mediaId != null && mediaId in liveMediaIds) {
+            val now = SystemClock.elapsedRealtime()
+            if (now - (liveRestartedAt[mediaId] ?: 0L) > LIVE_RESTART_INTERVAL_MS) {
+                liveRestartedAt[mediaId] = now
+                restartLiveStream(mediaId)
+                return
+            }
+        }
+
         // A file on the phone has nothing to recover.
         //
         // Everything below this point is written for streams: clear the cache,
@@ -3738,6 +3769,24 @@ class MusicService :
         }
     }
 
+    private fun createNetworkDataSource(): DataSource.Factory =
+        DefaultDataSource.Factory(
+            this,
+            OkHttpDataSource.Factory(
+                OkHttpClient
+                    .Builder()
+                    .proxy(YouTube.proxy)
+                    .proxyAuthenticator { _, response ->
+                        YouTube.proxyAuth?.let { auth ->
+                            response.request
+                                .newBuilder()
+                                .header("Proxy-Authorization", auth)
+                                .build()
+                        } ?: response.request
+                    }.build(),
+            ),
+        )
+
     private fun createCacheDataSource(): CacheDataSource.Factory =
         CacheDataSource
             .Factory()
@@ -3746,24 +3795,7 @@ class MusicService :
                 CacheDataSource
                     .Factory()
                     .setCache(playerCache)
-                    .setUpstreamDataSourceFactory(
-                        DefaultDataSource.Factory(
-                            this,
-                            OkHttpDataSource.Factory(
-                                OkHttpClient
-                                    .Builder()
-                                    .proxy(YouTube.proxy)
-                                    .proxyAuthenticator { _, response ->
-                                        YouTube.proxyAuth?.let { auth ->
-                                            response.request
-                                                .newBuilder()
-                                                .header("Proxy-Authorization", auth)
-                                                .build()
-                                        } ?: response.request
-                                    }.build(),
-                            ),
-                        ),
-                    ),
+                    .setUpstreamDataSourceFactory(createNetworkDataSource()),
             ).setCacheWriteDataSinkFactory(null)
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
@@ -4104,13 +4136,86 @@ class MusicService :
             }
         }
 
+        if (playback.isLive) {
+            // Known one song ahead, so the item is already marked by the time it starts.
+            liveMediaIds.add(nextId)
+            liveManifestUrls[nextId] = playback.streamUrl
+            withContext(Dispatchers.Main) { playAsLiveStream(nextId) }
+            return
+        }
+
         songUrlCache[nextId] =
             playback.streamUrl to System.currentTimeMillis() + (playback.streamExpiresInSeconds * 1000L)
         Timber.tag(TAG).d("Warmed next stream: $nextId via ${playback.streamClient}")
     }
 
+    /**
+     * Makes sure a broadcast is queued as a live stream.
+     *
+     * The player reads an item the way its address and type say, and it decides that once, when
+     * the item is prepared — long before the lookup that reveals a broadcast. Changing the type
+     * alone changes nothing, because an item that keeps its address is updated in place and keeps
+     * the reader it already has: that is how a 24/7 station sat there playing nothing. Putting the
+     * playlist of segments in as the address rebuilds the item, and the broadcast starts.
+     */
+    private fun playAsLiveStream(mediaId: String) {
+        val manifestUrl = liveManifestUrls[mediaId] ?: return
+        val index = (0 until player.mediaItemCount).firstOrNull { player.getMediaItemAt(it).mediaId == mediaId } ?: return
+        val item = player.getMediaItemAt(index)
+        if (item.localConfiguration?.uri?.toString() == manifestUrl) return
+
+        Timber.tag(TAG).i("Playing $mediaId as a live stream")
+        player.replaceMediaItem(
+            index,
+            item
+                .buildUpon()
+                .setUri(manifestUrl)
+                .setMimeType(MimeTypes.APPLICATION_M3U8)
+                // Nothing about a broadcast is worth keeping: it is different every second.
+                .setCustomCacheKey(null)
+                .build(),
+        )
+        player.prepare()
+    }
+
+    /**
+     * Starts a broadcast over: either as the broadcast it has just turned out to be, or on a
+     * fresh playlist when the one it was given has run out. A playlist lasts a few hours, so a
+     * station left playing all day reaches the end of one — and since the item is by then
+     * addressed by that playlist rather than by its id, nothing would look it up again.
+     */
+    private fun restartLiveStream(mediaId: String) {
+        val index = (0 until player.mediaItemCount).firstOrNull { player.getMediaItemAt(it).mediaId == mediaId } ?: return
+        val item = player.getMediaItemAt(index)
+        val manifestUrl = liveManifestUrls[mediaId]
+
+        if (manifestUrl != null && item.localConfiguration?.uri?.toString() != manifestUrl) {
+            playAsLiveStream(mediaId)
+            return
+        }
+
+        Timber.tag(TAG).i("Asking for $mediaId's playlist again")
+        liveManifestUrls.remove(mediaId)
+        player.replaceMediaItem(
+            index,
+            item
+                .buildUpon()
+                .setUri(mediaId)
+                .setMimeType(null)
+                .setCustomCacheKey(mediaId)
+                .build(),
+        )
+        player.prepare()
+    }
+
     private fun createDataSourceFactory(): DataSource.Factory {
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
+            // A live broadcast is a playlist of segments, and the player asks for each segment by
+            // its own full address. Those have nothing to look up here, so they go straight out.
+            if (dataSpec.uri.scheme?.startsWith("http") == true) {
+                return@Factory dataSpec
+            }
+
             val mediaId = dataSpec.key ?: error("No media id")
 
             // A song that lives on the phone has nothing to resolve. Hand the
@@ -4212,6 +4317,15 @@ class MusicService :
                 requireNotNull(playbackData) {
                     getString(R.string.error_unknown)
                 }
+
+            // A broadcast on air: nothing here to cache, measure or store, and the player has to
+            // be told it is playing a live stream rather than a file before it reads a byte.
+            if (nonNullPlayback.isLive) {
+                liveMediaIds.add(mediaId)
+                liveManifestUrls[mediaId] = nonNullPlayback.streamUrl
+                Handler(Looper.getMainLooper()).post { playAsLiveStream(mediaId) }
+                return@Factory dataSpec.withUri(nonNullPlayback.streamUrl.toUri())
+            }
             run {
                 val format = nonNullPlayback.format
                 val loudnessDb = nonNullPlayback.audioConfig?.loudnessDb
@@ -4285,14 +4399,49 @@ class MusicService :
      * choose between: the cost is a few sniffs on a local file that the
      * shorter list turned into a song that could not be played at all.
      */
-    private fun createMediaSourceFactory() =
-        DefaultMediaSourceFactory(
-            createDataSourceFactory(),
-            DefaultExtractorsFactory()
-                // A stream whose container says nothing is still a stream: keep
-                // trying rather than refusing at the first unrecognised byte.
-                .setConstantBitrateSeekingEnabled(true),
-        )
+    private fun createMediaSourceFactory(): MediaSource.Factory {
+        val dataSourceFactory = createDataSourceFactory()
+        val files =
+            DefaultMediaSourceFactory(
+                dataSourceFactory,
+                DefaultExtractorsFactory()
+                    // A stream whose container says nothing is still a stream: keep
+                    // trying rather than refusing at the first unrecognised byte.
+                    .setConstantBitrateSeekingEnabled(true),
+            )
+        // A broadcast is read straight from the network: there is nothing to look up (the playlist
+        // and its segments carry full addresses) and nothing worth keeping, since every second of
+        // it is gone as soon as it has played.
+        val broadcasts = HlsMediaSource.Factory(createNetworkDataSource())
+
+        // A song arrives as one file; a broadcast arrives as a playlist of segments that keeps
+        // growing, and the two are read in completely different ways. An ordinary song's address
+        // is only its id until the moment it is played, so nothing can be told from it; a
+        // broadcast is the one case where the item already carries the real address, and it says
+        // so — that is the difference this reads.
+        return object : MediaSource.Factory {
+            override fun getSupportedTypes(): IntArray = files.supportedTypes
+
+            override fun setDrmSessionManagerProvider(provider: DrmSessionManagerProvider): MediaSource.Factory {
+                files.setDrmSessionManagerProvider(provider)
+                broadcasts.setDrmSessionManagerProvider(provider)
+                return this
+            }
+
+            override fun setLoadErrorHandlingPolicy(policy: LoadErrorHandlingPolicy): MediaSource.Factory {
+                files.setLoadErrorHandlingPolicy(policy)
+                broadcasts.setLoadErrorHandlingPolicy(policy)
+                return this
+            }
+
+            override fun createMediaSource(mediaItem: MediaItem): MediaSource =
+                if (mediaItem.localConfiguration?.mimeType == MimeTypes.APPLICATION_M3U8) {
+                    broadcasts.createMediaSource(mediaItem)
+                } else {
+                    files.createMediaSource(mediaItem)
+                }
+        }
+    }
 
     private fun createRenderersFactory(
         normalizationProcessor: VolumeNormalizationAudioProcessor,
