@@ -186,6 +186,9 @@ class PlayerConnection(
     val canSkipNext = MutableStateFlow(true)
 
     val error = MutableStateFlow<PlaybackException?>(null)
+
+    /** The items that turned out to be broadcasts on air, so the screens can mark them. */
+    val liveBroadcasts = service.liveBroadcasts
     val isMuted = service.isMuted
     val currentStreamClient = service.currentStreamClient
 
