@@ -285,4 +285,10 @@
     <string name="use_login_for_browse">Utilice el inicio de sesión para ver el contenido</string>
     <string name="use_login_for_browse_desc">Esto puede influir en el contenido que ve y, por ejemplo, muestra álbumes exclusivos si ha iniciado sesión con una cuenta Premium</string>
     <string name="action_login">Acceder</string>
+    <string name="pause">Pausar</string>
+    <string name="theme_desc">Personaliza el tema de la aplicación</string>
+    <string name="theme_colors">Tema y colores</string>
+    <string name="theme_mode">Modo del tema</string>
+    <string name="color_palette">Paleta de colores</string>
+    <string name="use_system_colors">Usar los colores del sistema</string>
 </resources>
