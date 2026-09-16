@@ -3390,6 +3390,10 @@ class MusicService :
             .w(error, "Player error occurred for $mediaId: errorCode=${error.errorCode}, message=${error.message}")
         reportException(error)
 
+        // Streams from the main client may be played without testing them first; after any
+        // failure the next address it hands out is tested again, whatever the failure was.
+        YTPlayerUtils.distrustMainClient()
+
         // A broadcast has its own two ways of failing, and neither is helped by anything below:
         // it was still being read as a file when it turned out to be a broadcast, or it has been
         // playing for hours and the playlist it was given has run out. Starting it over covers

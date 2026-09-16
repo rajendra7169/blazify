@@ -90,8 +90,38 @@ object YTPlayerUtils {
 
     private const val MAIN_CLIENT_REST_MS = 5 * 60 * 1000L
 
+    /**
+     * Until when the main client's streams are played without testing them first.
+     *
+     * Testing an address costs a request of its own before the player makes the same request
+     * again, and on a phone that is half a second to a second added to every new song — most of
+     * the difference between tapping a song here and in apps that just play it. Once the main
+     * client has passed a test its addresses keep working, so the test is only repeated when the
+     * trust runs out or a stream is refused ([distrustMainClient]), which puts the check back for
+     * the retry and lets a broken client fall through to the others as before.
+     */
+    @Volatile
+    private var mainClientTrustedUntil: Long = 0
+
+    private const val MAIN_CLIENT_TRUST_MS = 10 * 60 * 1000L
+
+    private fun mainClientTrusted() = android.os.SystemClock.elapsedRealtime() < mainClientTrustedUntil
+
+    private fun trustMainClient() {
+        mainClientTrustedUntil = android.os.SystemClock.elapsedRealtime() + MAIN_CLIENT_TRUST_MS
+    }
+
+    /** A stream was refused: test the main client's addresses again before playing them. */
+    fun distrustMainClient() {
+        if (mainClientTrustedUntil != 0L) {
+            mainClientTrustedUntil = 0
+            Timber.tag(logTag).d("Main client no longer trusted — its streams will be tested again")
+        }
+    }
+
     private fun noteMainClientRefused() {
         mainClientRefusedAt = System.currentTimeMillis()
+        mainClientTrustedUntil = 0
         Timber.tag(logTag).d("Main client refused a stream — resting it for five minutes")
     }
 
@@ -679,7 +709,16 @@ object YTPlayerUtils {
                     break
                 }
 
-                if (validateStatus(streamUrl)) {
+                // Private uploads and age-restricted songs keep their test: those are exactly the
+                // cases where the main client's address can look fine and still be refused.
+                val isMainClient = currentClient.clientName == MAIN_CLIENT.clientName
+                val playWithoutTest =
+                    isMainClient && mainClientTrusted() && !isUploadedTrack && !wasOriginallyAgeRestricted
+                if (playWithoutTest) {
+                    Timber.tag(logTag).d("Main client trusted — playing its stream without a test request")
+                }
+                if (playWithoutTest || validateStatus(streamUrl)) {
+                    if (isMainClient && !playWithoutTest) trustMainClient()
                     // working stream found
                     Timber.tag(logTag).d("Stream validated successfully with client: ${currentClient.clientName}")
                     // Log for release builds
@@ -1061,5 +1100,7 @@ object YTPlayerUtils {
 
     fun forceRefreshForVideo(videoId: String) {
         Timber.tag(logTag).d("Force refreshing for videoId: $videoId")
+        // The stream may have been played without a test; the retry must not skip it again.
+        distrustMainClient()
     }
 }
