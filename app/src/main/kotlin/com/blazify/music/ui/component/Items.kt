@@ -1100,17 +1100,23 @@ fun MediaMetadataListItem(
     isSelected: Boolean = false,
     isActive: Boolean = false,
     isPlaying: Boolean = false,
+    isLive: Boolean = false,
     trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
     ListItem(
         title = mediaMetadata.title,
         subtitle = {
             if (mediaMetadata.explicit) Icon.Explicit()
+            // A broadcast is marked instead of given a length, which it does not have.
+            if (isLive) {
+                LiveBadge()
+                Spacer(Modifier.width(6.dp))
+            }
             Text(
                 text = buildAnnotatedString {
                     val base = joinByBullet(
                         mediaMetadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                        makeTimeString(mediaMetadata.duration * 1000L)
+                        if (isLive) null else makeTimeString(mediaMetadata.duration * 1000L)
                     )
                     append(base)
                     if (mediaMetadata.suggestedBy != null && base.isNotEmpty()) {

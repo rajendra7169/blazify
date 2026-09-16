@@ -197,6 +197,7 @@ import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.component.Lyrics
+import com.blazify.music.ui.component.LiveBadge
 import com.blazify.music.ui.component.PlayerSliderTrack
 import com.blazify.music.ui.component.ResizableIconButton
 import com.blazify.music.ui.component.SquigglySlider
@@ -369,6 +370,9 @@ fun BottomSheetPlayer(
 
     val playbackState by playerConnection.playbackState.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
+    // A broadcast is wherever it is right now: it gets a LIVE mark instead of a time it is at.
+    val liveBroadcasts by playerConnection.liveBroadcasts.collectAsState()
+    val isLive = mediaMetadata?.id in liveBroadcasts
     val currentSong by playerConnection.currentSong.collectAsStateWithLifecycle(initialValue = null)
     val automix by playerConnection.service.automixItems.collectAsStateWithLifecycle()
     val repeatMode by playerConnection.repeatMode.collectAsStateWithLifecycle()
@@ -1481,21 +1485,25 @@ fun BottomSheetPlayer(
                             .fillMaxWidth()
                             .padding(horizontal = PlayerHorizontalPadding + 4.dp),
                 ) {
-                    Text(
-                        text = makeTimeString(sliderPosition ?: effectivePosition),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = TextBackgroundColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    if (isLive) {
+                        LiveBadge()
+                    } else {
+                        Text(
+                            text = makeTimeString(sliderPosition ?: effectivePosition),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextBackgroundColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
 
-                    Text(
-                        text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = TextBackgroundColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                        Text(
+                            text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextBackgroundColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
 
@@ -1976,6 +1984,7 @@ fun BottomSheetPlayer(
                         }
                     RingPlayerLayout(
                         mediaMetadata = mediaMetadata,
+                        isLive = isLive,
                         nowPlayingFrom = ringQueueTitle ?: mediaMetadata?.album?.title,
                         isFavorite = ringIsFavorite,
                         position = sliderPosition ?: effectivePosition,
@@ -2189,6 +2198,7 @@ fun BottomSheetPlayer(
                         RetroWaveformCard(
                             position = sliderPosition ?: effectivePosition,
                             duration = duration,
+                            isLive = isLive,
                             accent = MaterialTheme.colorScheme.primary,
                             isFavorite = cassetteIsFavorite,
                             onToggleLike = { playerConnection.toggleLike() },
@@ -2590,6 +2600,7 @@ fun MoreActionsButton(
 @Composable
 private fun RingPlayerLayout(
     mediaMetadata: MediaMetadata?,
+    isLive: Boolean,
     nowPlayingFrom: String?,
     isFavorite: Boolean,
     position: Long,
@@ -2737,12 +2748,16 @@ private fun RingPlayerLayout(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding + 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
-                Text(
-                    text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = textColor,
-                )
+                if (isLive) {
+                    LiveBadge()
+                } else {
+                    Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
+                    Text(
+                        text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = textColor,
+                    )
+                }
             }
         }
 
@@ -3007,6 +3022,8 @@ private fun FullArtBackground(
 
 private val RetroCream = Color(0xFFF2E7D0)
 private val RetroInk = Color(0xFF3A2F24)
+// The cassette card is cream, so the broadcast mark goes darker to stay readable on it.
+private val RetroLiveRed = Color(0xFFC62828)
 private val RetroDarkKey = Color(0xFF2A241E)
 
 /** Space between the waveform card, the transport row and the bottom row. */
@@ -3030,6 +3047,7 @@ private val CassetteSpacerUnderTransport =
 private fun RetroWaveformCard(
     position: Long,
     duration: Long,
+    isLive: Boolean,
     accent: Color,
     isFavorite: Boolean,
     onToggleLike: () -> Unit,
@@ -3046,12 +3064,16 @@ private fun RetroWaveformCard(
     ) {
         Column(Modifier.weight(1f)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(makeTimeString(position), style = MaterialTheme.typography.labelSmall, color = RetroInk)
-                Text(
-                    text = if (duration != C.TIME_UNSET && duration > 0) makeTimeString(duration) else "",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = RetroInk,
-                )
+                if (isLive) {
+                    LiveBadge(color = RetroLiveRed)
+                } else {
+                    Text(makeTimeString(position), style = MaterialTheme.typography.labelSmall, color = RetroInk)
+                    Text(
+                        text = if (duration != C.TIME_UNSET && duration > 0) makeTimeString(duration) else "",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = RetroInk,
+                    )
+                }
             }
             Spacer(Modifier.height(4.dp))
             val frac = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f

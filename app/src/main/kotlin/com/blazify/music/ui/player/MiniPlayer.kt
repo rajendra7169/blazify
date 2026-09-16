@@ -110,6 +110,7 @@ import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import com.blazify.music.ui.component.LiveBadge
 import com.blazify.music.ui.component.Icon as MIcon
 import androidx.compose.ui.draw.blur
 import com.blazify.music.constants.MiniPlayerBackgroundStyle
@@ -757,6 +758,8 @@ private fun NewMiniPlayerSongInfo(
     modifier: Modifier = Modifier,
 ) {
     val error by LocalPlayerConnection.current?.error?.collectAsState() ?: remember { mutableStateOf(null) }
+    val liveBroadcasts by LocalPlayerConnection.current?.liveBroadcasts?.collectAsState()
+        ?: remember { mutableStateOf(emptySet()) }
 
     Column(
         modifier = modifier,
@@ -777,6 +780,10 @@ private fun NewMiniPlayerSongInfo(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (metadata.explicit) MIcon.Explicit()
+                if (metadata.id in liveBroadcasts) {
+                    LiveBadge()
+                    Spacer(Modifier.width(6.dp))
+                }
                  if (metadata.artists.any { it.name.isNotBlank() }) {
                      Text(
                          text = metadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
@@ -1131,14 +1138,22 @@ private fun LegacyMiniMediaInfo(
                 modifier = Modifier.basicMarquee(),
             )
 
-             if (mediaMetadata.artists.any { it.name.isNotBlank() }) {
-                 Text(
-                     text = mediaMetadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                     color = MaterialTheme.colorScheme.secondary,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val liveBroadcasts by LocalPlayerConnection.current?.liveBroadcasts?.collectAsState()
+                    ?: remember { mutableStateOf(emptySet()) }
+                if (mediaMetadata.id in liveBroadcasts) {
+                    LiveBadge()
+                    Spacer(Modifier.width(6.dp))
+                }
+                if (mediaMetadata.artists.any { it.name.isNotBlank() }) {
+                    Text(
+                        text = mediaMetadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }

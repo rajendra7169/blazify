@@ -515,6 +515,7 @@ fun Queue(
     ) {
         val queueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
         val queueWindows by playerConnection.queueWindows.collectAsStateWithLifecycle()
+        val liveBroadcasts by playerConnection.liveBroadcasts.collectAsStateWithLifecycle()
         val automix by playerConnection.service.automixItems.collectAsStateWithLifecycle()
         val mutableQueueWindows = remember { mutableStateListOf<Timeline.Window>() }
         val queueLength =
@@ -697,6 +698,7 @@ fun Queue(
                                     isSelected = false,
                                     isActive = isActive,
                                     isPlaying = isPlaying && isActive,
+                                    isLive = window.mediaItem.mediaId in liveBroadcasts,
                                     trailingContent = {
                                         if (inSelectMode) {
                                             Checkbox(
