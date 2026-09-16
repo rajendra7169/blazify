@@ -276,4 +276,10 @@
     <string name="use_login_for_browse">Anmeldung zum Durchsuchen von Inhalten verwenden</string>
     <string name="use_login_for_browse_desc">Dies kann Einfluss darauf haben, welche Inhalte du siehst und zeigt zum Beispiel nur Premium-Alben an, wenn Sie mit einem Premium-Konto angemeldet sind</string>
     <string name="action_login">Anmelden</string>
+    <string name="pause">Pause</string>
+    <string name="theme_desc">App-Design anpassen</string>
+    <string name="theme_colors">Design &amp; Farben</string>
+    <string name="theme_mode">Designmodus</string>
+    <string name="color_palette">Farbpalette</string>
+    <string name="use_system_colors">Systemfarben verwenden</string>
 </resources>
