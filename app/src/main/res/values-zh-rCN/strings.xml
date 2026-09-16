@@ -267,4 +267,10 @@
     <string name="use_login_for_browse_desc">这可能会影响您看到的内容，例如，如果您使用会员账号登录，则会显示仅会员专辑</string>
     <string name="use_login_for_browse">登录账号浏览内容</string>
     <string name="action_login">登录</string>
+    <string name="pause">暂停</string>
+    <string name="theme_desc">自定义应用主题</string>
+    <string name="theme_colors">主题与颜色</string>
+    <string name="theme_mode">主题模式</string>
+    <string name="color_palette">调色板</string>
+    <string name="use_system_colors">使用系统颜色</string>
 </resources>
