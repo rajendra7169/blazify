@@ -294,4 +294,10 @@
     <string name="use_login_for_browse">Авторизуйтесь для просмотра контента</string>
     <string name="use_login_for_browse_desc">Это влияет на отображение контента и, в частности, открывает доступ к премиум-альбомам при входе с премиум-учётной записью</string>
     <string name="action_login">Войти</string>
+    <string name="pause">Пауза</string>
+    <string name="theme_desc">Настройте тему приложения</string>
+    <string name="theme_colors">Тема и цвета</string>
+    <string name="theme_mode">Режим темы</string>
+    <string name="color_palette">Палитра</string>
+    <string name="use_system_colors">Использовать системные цвета</string>
 </resources>
