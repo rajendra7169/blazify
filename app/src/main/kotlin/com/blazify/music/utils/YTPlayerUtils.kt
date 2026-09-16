@@ -111,6 +111,31 @@ object YTPlayerUtils {
         mainClientTrustedUntil = android.os.SystemClock.elapsedRealtime() + MAIN_CLIENT_TRUST_MS
     }
 
+    /**
+     * The error for a song YouTube itself refuses to play — removed, blocked in this country,
+     * private. Every client has already been asked by the time it is raised, so trying again
+     * only repeats the same answers; the player moves on instead.
+     */
+    const val ERROR_CODE_SONG_UNAVAILABLE = PlaybackException.CUSTOM_ERROR_CODE_BASE + 1
+
+    /** Songs refused that way, and when, so the next request for one is answered at once. */
+    private val unavailableSongs = java.util.concurrent.ConcurrentHashMap<String, Long>()
+
+    private const val UNAVAILABLE_MEMORY_MS = 10 * 60 * 1000L
+
+    fun isSongUnavailable(error: Throwable?): Boolean {
+        var cause = error
+        repeat(6) {
+            if (cause is PlaybackException &&
+                (cause as PlaybackException).errorCode == ERROR_CODE_SONG_UNAVAILABLE
+            ) {
+                return true
+            }
+            cause = cause?.cause ?: return false
+        }
+        return false
+    }
+
     /** A stream was refused: test the main client's addresses again before playing them. */
     fun distrustMainClient() {
         if (mainClientTrustedUntil != 0L) {
@@ -336,8 +361,21 @@ object YTPlayerUtils {
         audioQuality: AudioQuality,
         connectivityManager: ConnectivityManager,
     ): Result<PlaybackData> {
+        // Refused a moment ago: every client would only say so again, two seconds later.
+        unavailableSongs[videoId]?.let { refusedAt ->
+            if (System.currentTimeMillis() - refusedAt < UNAVAILABLE_MEMORY_MS) {
+                Timber.tag(logTag).d("$videoId was refused by YouTube moments ago — not asking again")
+                return Result.failure(
+                    PlaybackException("Video unavailable", null, ERROR_CODE_SONG_UNAVAILABLE),
+                )
+            }
+            unavailableSongs.remove(videoId)
+        }
+
         val first = resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
         if (first.isSuccess) return first
+        // A fresh identity does not change what YouTube will play in this country.
+        if (isSongUnavailable(first.exceptionOrNull())) return first
 
         if (!renewIdentity()) return first
         return resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
@@ -768,10 +806,14 @@ object YTPlayerUtils {
             if (isUploadedTrack) {
                 println("[PLAYBACK_DEBUG] FAILURE: Playability not OK for uploaded track - status=${streamPlayerResponse.playabilityStatus.status}, reason=$errorReason")
             }
+            // Only a plain refusal is final. A sign-in or bot check can clear up with a fresh
+            // identity or a moment's wait, so those keep the old error and its retries.
+            val refused = streamPlayerResponse.playabilityStatus.status in setOf("UNPLAYABLE", "ERROR")
+            if (refused) unavailableSongs[videoId] = System.currentTimeMillis()
             throw PlaybackException(
                 errorReason,
                 null,
-                PlaybackException.ERROR_CODE_REMOTE_ERROR
+                if (refused) ERROR_CODE_SONG_UNAVAILABLE else PlaybackException.ERROR_CODE_REMOTE_ERROR,
             )
         }
 

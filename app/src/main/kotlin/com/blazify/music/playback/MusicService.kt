@@ -3425,6 +3425,16 @@ class MusicService :
             return
         }
 
+        // YouTube has said no to this song — removed, blocked here, private — after every client
+        // was asked. Clearing caches and asking three more times only kept people waiting some
+        // seventeen seconds for the same answer before the next song started.
+        if (mediaId != null && YTPlayerUtils.isSongUnavailable(error)) {
+            Timber.tag(TAG).w("YouTube will not play $mediaId (${error.cause?.cause?.message ?: error.message}), moving on")
+            markSongAsFailed(mediaId)
+            handleFinalFailure()
+            return
+        }
+
         if (mediaId != null && hasExceededRetryLimit(mediaId)) {
             Timber.tag(TAG).w("Song $mediaId has exceeded retry limit, skipping")
             markSongAsFailed(mediaId)
