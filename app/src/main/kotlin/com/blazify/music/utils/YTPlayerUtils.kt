@@ -228,7 +228,63 @@ object YTPlayerUtils {
         val streamUrl: String,
         val streamExpiresInSeconds: Int,
         val streamClient: String = "unknown",
+        /** A broadcast that is on air: the stream URL is a playlist of segments, not a file. */
+        val isLive: Boolean = false,
     )
+
+    /**
+     * Makes a broadcast's playlist address one the content servers will answer.
+     *
+     * The address is a path of steps rather than a query, and every segment address the playlist
+     * hands back is built from it. Two of those steps decide whether a single byte arrives: the
+     * throttle challenge has to be solved, and the session's proof of origin has to be carried —
+     * exactly as they are for an ordinary song. Left as they come, the playlist itself loads
+     * and then every segment in it is refused, which is a broadcast that sits there playing
+     * nothing.
+     */
+    private suspend fun liveManifestUrl(
+        manifestUrl: String,
+        streamingDataPoToken: String?,
+    ): String {
+        val solved = CipherDeobfuscator.transformNParamInPath(manifestUrl)
+        if (streamingDataPoToken == null) return solved
+
+        // The address ends in the name of the playlist to fetch; the proof goes before it.
+        val suffix = Regex("/(?:file|playlist)/index\\.m3u8$").find(solved)?.value.orEmpty()
+        val base = solved.removeSuffix(suffix).trimEnd('/')
+        return "$base/pot/${Uri.encode(streamingDataPoToken)}$suffix"
+    }
+
+    /**
+     * Stand-in for the format a live broadcast does not have.
+     *
+     * Everything downstream expects a format to describe what is playing — bitrate, length,
+     * loudness. A broadcast has none of that: it is a playlist that keeps growing, with no end
+     * and no size. This says exactly that instead of leaving the fields to guesswork.
+     */
+    private fun liveFormat(url: String) =
+        PlayerResponse.StreamingData.Format(
+            itag = 0,
+            url = url,
+            mimeType = "application/x-mpegURL",
+            bitrate = 0,
+            width = null,
+            height = null,
+            contentLength = null,
+            quality = "live",
+            fps = null,
+            qualityLabel = null,
+            averageBitrate = null,
+            audioQuality = null,
+            approxDurationMs = null,
+            audioSampleRate = null,
+            audioChannels = null,
+            loudnessDb = null,
+            lastModified = null,
+            signatureCipher = null,
+            cipher = null,
+            audioTrack = null,
+        )
     /**
      * Custom player response intended to use for playback.
      * Metadata like audioConfig and videoDetails are from [MAIN_CLIENT].
@@ -338,6 +394,27 @@ object YTPlayerUtils {
 
         var audioConfig = mainPlayerResponse.playerConfig?.audioConfig
         val videoDetails = mainPlayerResponse.videoDetails
+
+        // A broadcast that is on air has no ordinary formats to choose between: YouTube serves it
+        // as a playlist of segments instead. There is nothing to decipher, nothing to validate and
+        // no length to read, so the playlist is handed back as it is and the player is told what
+        // it is dealing with. This is what a 24/7 station is, and without it such an item resolved
+        // to an address that never sent a single byte.
+        val hlsManifestUrl = mainPlayerResponse.streamingData?.hlsManifestUrl
+        if (videoDetails?.isLive == true && hlsManifestUrl != null) {
+            val playlistUrl = liveManifestUrl(hlsManifestUrl, poToken?.streamingDataPoToken)
+            Timber.tag(TAG).i("Live broadcast: playing the segment playlist for videoId=$videoId")
+            return@runCatching PlaybackData(
+                audioConfig = audioConfig,
+                videoDetails = videoDetails,
+                playbackTracking = mainPlayerResponse.playbackTracking,
+                format = liveFormat(playlistUrl),
+                streamUrl = playlistUrl,
+                streamExpiresInSeconds = mainPlayerResponse.streamingData?.expiresInSeconds ?: 0,
+                streamClient = MAIN_CLIENT.clientName,
+                isLive = true,
+            )
+        }
         val playbackTracking = mainPlayerResponse.playbackTracking
         var format: PlayerResponse.StreamingData.Format? = null
         var streamUrl: String? = null
