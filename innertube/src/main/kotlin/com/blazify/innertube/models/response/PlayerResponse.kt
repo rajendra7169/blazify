@@ -40,6 +40,8 @@ data class PlayerResponse(
         val formats: List<Format>?,
         val adaptiveFormats: List<Format>,
         val expiresInSeconds: Int,
+        /** Live broadcasts are served as a playlist of segments; the ordinary formats stay empty. */
+        val hlsManifestUrl: String? = null,
     ) {
         @Serializable
         data class Format(
@@ -85,6 +87,10 @@ data class PlayerResponse(
         val author: String?,
         val channelId: String,
         val lengthSeconds: String,
+        /** True while a broadcast is on air. */
+        val isLive: Boolean? = null,
+        /** True for anything that was ever broadcast live, including the recording afterwards. */
+        val isLiveContent: Boolean? = null,
         val musicVideoType: String?,
         val viewCount: String?,
         val thumbnail: Thumbnails,
