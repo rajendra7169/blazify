@@ -261,7 +261,7 @@ fun BottomSheetPlayer(
     val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
     // Height reserved at the bottom of the RING layout for its lyrics-card overlay.
     val ringNavBottomInset = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
-    val ringBottomOverlayHeight = 172.dp + ringNavBottomInset
+    val ringBottomOverlayHeight = 208.dp + ringNavBottomInset
 
     var showInlineLyrics by rememberSaveable {
         mutableStateOf(false)
@@ -1989,7 +1989,6 @@ fun BottomSheetPlayer(
                         }
                     }
                 } else if (playerDesign == PlayerDesign.RING && !showInlineLyrics) {
-                    val ringNav = LocalNavController.current
                     val ringShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
                     val ringQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
                     val ringIsEpisode = currentSong?.song?.isEpisode == true
@@ -2034,12 +2033,25 @@ fun BottomSheetPlayer(
                         onPrevious = { playerConnection.seekToPrevious() },
                         onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                         onToggleLike = { playerConnection.toggleLike() },
-                        onOpenQueue = { queueSheetState.expandSoft() },
                         onShowLyrics = { showInlineLyrics = true },
                         onCollapse = { state.collapseSoft() },
-                        onOpenTheme = {
-                            state.collapseSoft()
-                            ringNav.navigate("settings/appearance/player_design")
+                        titleActions = {
+                            // Theme and the song menu sit beside the title, as on the other designs.
+                            Spacer(Modifier.size(12.dp))
+                            PlayerThemeButton(
+                                textButtonColor = textButtonColor,
+                                iconButtonColor = iconButtonColor,
+                                state = state,
+                            )
+                            Spacer(Modifier.size(12.dp))
+                            mediaMetadata?.let {
+                                PlayerMoreMenuButton(
+                                    mediaMetadata = it,
+                                    state = state,
+                                    textButtonColor = textButtonColor,
+                                    iconButtonColor = iconButtonColor,
+                                )
+                            }
                         },
                         onToggleShuffle = {
                             playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
@@ -2671,11 +2683,10 @@ private fun RingPlayerLayout(
     onPrevious: () -> Unit,
     onToggleRepeat: () -> Unit,
     onToggleLike: () -> Unit,
-    onOpenQueue: () -> Unit,
     onShowLyrics: () -> Unit,
     onCollapse: () -> Unit,
-    onOpenTheme: () -> Unit,
     onToggleShuffle: () -> Unit,
+    titleActions: @Composable RowScope.() -> Unit = {},
     seeker: PlayerSeeker? = null,
     rtl: Boolean = false,
     modifier: Modifier = Modifier,
@@ -2717,8 +2728,9 @@ private fun RingPlayerLayout(
                     )
                 }
             }
-            // Theme icon — plain, no background (matches the minimize icon).
-            RingIconButton(R.drawable.palette, textColor, size = 24, onClick = onOpenTheme)
+            // Balances the minimize button so the heading stays centred; the theme button now
+            // sits beside the song title.
+            Spacer(Modifier.size(46.dp))
         }
 
         // --- ring ---
@@ -2747,37 +2759,31 @@ private fun RingPlayerLayout(
 
         Spacer(Modifier.height(8.dp))
 
-        // --- queue · title/artist · favourite ---
+        // --- title/artist on the left · favourite · theme · menu, as on the other designs ---
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            RingIconButton(R.drawable.queue_music, textColor, size = 26, onClick = onOpenQueue)
             Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                horizontalAlignment = Alignment.Start,
             ) {
                 Text(
                     text = mediaMetadata?.title.orEmpty(),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     color = textColor,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().basicMarquee(),
+                    modifier = Modifier.basicMarquee(),
                 )
                 val artistText = mediaMetadata?.artists?.joinToString { it.name }.orEmpty()
                 if (artistText.isNotBlank()) {
                     Text(
                         text = artistText,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         color = textColor.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().basicMarquee(),
+                        modifier = Modifier.basicMarquee(),
                     )
                 }
             }
@@ -2794,6 +2800,7 @@ private fun RingPlayerLayout(
                 enabled = !isLive,
                 onClick = onToggleLike,
             )
+            titleActions()
         }
 
         Spacer(Modifier.height(6.dp))
