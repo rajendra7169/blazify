@@ -267,4 +267,10 @@
     <string name="action_login">登入</string>
     <string name="use_login_for_browse">使用登入身分瀏覽內容</string>
     <string name="use_login_for_browse_desc">這會影響你看到的內容，例如若你使用 Premium 會員帳號登入，系統將會顯示 Premium 會員專屬專輯</string>
+    <string name="pause">暫停</string>
+    <string name="theme_desc">自訂應用程式主題</string>
+    <string name="theme_colors">主題與色彩</string>
+    <string name="theme_mode">主題模式</string>
+    <string name="color_palette">調色盤</string>
+    <string name="use_system_colors">使用系統色彩</string>
 </resources>
