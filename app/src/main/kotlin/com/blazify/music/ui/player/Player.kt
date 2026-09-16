@@ -584,6 +584,11 @@ fun BottomSheetPlayer(
             }
         }
 
+    // The play/pause button always carries the colour taken from the artwork, as Ring's does,
+    // whatever colour the other player buttons use: it is the one control people look for.
+    val playButtonColor = MaterialTheme.colorScheme.primary
+    val playIconColor = MaterialTheme.colorScheme.onPrimary
+
     // Separate colors for Previous/Next buttons in PRIMARY/TERTIARY modes
     val (sideButtonContainerColor, sideButtonContentColor) =
         when {
@@ -1640,8 +1645,8 @@ fun BottomSheetPlayer(
                                 interactionSource = playPauseInteractionSource,
                                 colors =
                                     IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = textButtonColor,
-                                        contentColor = iconButtonColor,
+                                        containerColor = playButtonColor,
+                                        contentColor = playIconColor,
                                     ),
                                 modifier =
                                     Modifier
@@ -1755,7 +1760,7 @@ fun BottomSheetPlayer(
                                     Modifier
                                         .size(72.dp)
                                         .clip(RoundedCornerShape(playPauseRoundness))
-                                        .background(textButtonColor)
+                                        .background(playButtonColor)
                                         .clickable {
                                             if (isListenTogetherGuest) {
                                                 playerConnection.toggleMute()
@@ -1792,7 +1797,7 @@ fun BottomSheetPlayer(
                                             },
                                         ),
                                     contentDescription = null,
-                                    colorFilter = ColorFilter.tint(iconButtonColor),
+                                    colorFilter = ColorFilter.tint(playIconColor),
                                     modifier =
                                         Modifier
                                             .align(Alignment.Center)
