@@ -2346,6 +2346,25 @@ fun BottomSheetPlayer(
             )
         }
 
+        // A way down from the full player at the top left, where Ring always had one. Ring draws
+        // its own inside its top bar and Cassette one in its own style; these three share this.
+        if (!isFullScreen && !showInlineLyrics && queueSheetState.progress < 0.999f &&
+            playerDesign in setOf(PlayerDesign.CLASSIC, PlayerDesign.FULL_ART, PlayerDesign.RECORD)
+        ) {
+            RingIconButton(
+                res = R.drawable.expand_more,
+                tint = TextBackgroundColor,
+                size = 28,
+                modifier =
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Start))
+                        .padding(start = 6.dp, top = 8.dp)
+                        .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f)),
+                onClick = { state.collapseSoft() },
+            )
+        }
+
         // RING design: bottom overlay (sleep+more row + lyrics card) drawn on top
         // of the queue peek so the lyrics card starts from the very bottom.
         // Fades out as the queue is dragged open so it doesn't cover the queue.
@@ -3062,10 +3081,11 @@ private fun RingIconButton(
     tint: Color,
     size: Int = 26,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size((size + 18).dp)
             .clip(CircleShape)
             .clickable(enabled = enabled, onClick = onClick),
