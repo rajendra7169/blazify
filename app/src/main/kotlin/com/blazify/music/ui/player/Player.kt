@@ -1929,6 +1929,85 @@ fun BottomSheetPlayer(
                     targetValue = if (isFullScreen) 0.dp else queueSheetState.collapsedBound,
                     label = "bottomPadding",
                 )
+                // Cassette's title, progress and transport. Used on its front page and, so that the
+                // controls do not turn into another design's, on its lyrics page too.
+                val cassetteControls: @Composable () -> Unit = {
+                    // Title / artist on the left, with the like, theme and menu keys beside
+                    // them — the same arrangement as the other designs, in this one's style.
+                    val cassetteIsEpisode = currentSong?.song?.isEpisode == true
+                    val cassetteIsFavorite =
+                        if (cassetteIsEpisode) {
+                            currentSong?.song?.inLibrary != null
+                        } else {
+                            currentSong?.song?.liked == true
+                        }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                            Text(
+                                text = mediaMetadata?.title.orEmpty(),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                color = TextBackgroundColor,
+                                modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
+                            )
+                            Text(
+                                text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+                                style = MaterialTheme.typography.titleSmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = TextBackgroundColor.copy(alpha = 0.7f),
+                            )
+                        }
+                        mediaMetadata?.let {
+                            CassetteTitleKeys(
+                                mediaMetadata = it,
+                                state = state,
+                                isFavorite = cassetteIsFavorite,
+                                isLive = isLive,
+                                onToggleLike = { playerConnection.toggleLike() },
+                            )
+                        }
+                    }
+    
+                    Spacer(Modifier.height(12.dp))
+    
+                    // Retro waveform progress card (times + seekable bars).
+                    RetroWaveformCard(
+                        position = sliderPosition ?: effectivePosition,
+                        duration = duration,
+                        isLive = isLive,
+                        accent = MaterialTheme.colorScheme.primary,
+                        onSeek = { pos ->
+                            playerConnection.player.seekTo(pos)
+                            position = pos
+                        },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                    )
+    
+                    Spacer(Modifier.height(CassetteSectionGap))
+    
+                    // Chunky 3D retro transport.
+                    val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+                    RetroTransportRow(
+                        isPlaying = effectiveIsPlaying,
+                        shuffleOn = cassetteShuffle,
+                        repeatMode = repeatMode,
+                        accent = MaterialTheme.colorScheme.primary,
+                        flatColor = TextBackgroundColor,
+                        onToggleShuffle = {
+                            playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
+                        },
+                        onPrevious = { playerConnection.seekToPrevious() },
+                        onTogglePlay = { playerConnection.togglePlayPause() },
+                        onNext = { playerConnection.seekToNext() },
+                        onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                    )
+                }
                 if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
                     // FULL_ART: album art fills the WHOLE screen (even behind the bottom
                     // queue peek) for a seamless look; controls float over the bottom scrim.
@@ -2191,81 +2270,7 @@ fun BottomSheetPlayer(
                             SeekMessage(playerSeeker)
                         }
 
-                        // Title / artist on the left, with the like, theme and menu keys beside
-                        // them — the same arrangement as the other designs, in this one's style.
-                        val cassetteIsEpisode = currentSong?.song?.isEpisode == true
-                        val cassetteIsFavorite =
-                            if (cassetteIsEpisode) {
-                                currentSong?.song?.inLibrary != null
-                            } else {
-                                currentSong?.song?.liked == true
-                            }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                        ) {
-                            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                                Text(
-                                    text = mediaMetadata?.title.orEmpty(),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    color = TextBackgroundColor,
-                                    modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
-                                )
-                                Text(
-                                    text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    color = TextBackgroundColor.copy(alpha = 0.7f),
-                                )
-                            }
-                            mediaMetadata?.let {
-                                CassetteTitleKeys(
-                                    mediaMetadata = it,
-                                    state = state,
-                                    isFavorite = cassetteIsFavorite,
-                                    isLive = isLive,
-                                    onToggleLike = { playerConnection.toggleLike() },
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        // Retro waveform progress card (times + seekable bars).
-                        RetroWaveformCard(
-                            position = sliderPosition ?: effectivePosition,
-                            duration = duration,
-                            isLive = isLive,
-                            accent = MaterialTheme.colorScheme.primary,
-                            onSeek = { pos ->
-                                playerConnection.player.seekTo(pos)
-                                position = pos
-                            },
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                        )
-
-                        Spacer(Modifier.height(CassetteSectionGap))
-
-                        // Chunky 3D retro transport.
-                        val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
-                        RetroTransportRow(
-                            isPlaying = effectiveIsPlaying,
-                            shuffleOn = cassetteShuffle,
-                            repeatMode = repeatMode,
-                            accent = MaterialTheme.colorScheme.primary,
-                            flatColor = TextBackgroundColor,
-                            onToggleShuffle = {
-                                playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
-                            },
-                            onPrevious = { playerConnection.seekToPrevious() },
-                            onTogglePlay = { playerConnection.togglePlayPause() },
-                            onNext = { playerConnection.seekToNext() },
-                            onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                        )
+                        cassetteControls()
 
                         // The retro bottom row is drawn further down, over the strip the hidden
                         // queue peek keeps free; this leaves the same gap under the transport
@@ -2311,11 +2316,17 @@ fun BottomSheetPlayer(
                             }
                         }
 
-                        mediaMetadata?.let {
-                            controlsContent(it)
-                        }
+                        if (playerDesign == PlayerDesign.CASSETTE) {
+                            cassetteControls()
+                            // Leaves room for the retro bottom row, as on the front page.
+                            Spacer(Modifier.height(CassetteSpacerUnderTransport))
+                        } else {
+                            mediaMetadata?.let {
+                                controlsContent(it)
+                            }
 
-                        Spacer(Modifier.height(30.dp))
+                            Spacer(Modifier.height(30.dp))
+                        }
                     }
                 }
             }
@@ -2349,8 +2360,8 @@ fun BottomSheetPlayer(
                 // owns the bottom) and on CASSETTE (its retro bottom row replaces it).
                 // The full lyrics page keeps the peek as usual.
                 showCollapsedContent = !(
-                    (playerDesign == PlayerDesign.RING || playerDesign == PlayerDesign.CASSETTE) &&
-                        !showInlineLyrics
+                    (playerDesign == PlayerDesign.RING && !showInlineLyrics) ||
+                        playerDesign == PlayerDesign.CASSETTE
                 ),
             )
         }
@@ -2470,17 +2481,17 @@ fun BottomSheetPlayer(
         // hidden queue peek still takes up (78dp above the navigation bar). The queue sheet
         // keeps handling taps and drags there, so the row is drawn over it, the same way as
         // RING's overlay, and fades out as the queue is dragged open.
-        if (playerDesign == PlayerDesign.CASSETTE && !isFullScreen && !showInlineLyrics &&
+        if (playerDesign == PlayerDesign.CASSETTE && !isFullScreen &&
             queueSheetState.progress < 0.999f
         ) {
             mediaMetadata?.let { meta ->
                 RetroBottomRow(
-                    lyricsOpen = false,
+                    lyricsOpen = showInlineLyrics,
                     sleepTimerEnabled = sleepTimerEnabled,
                     sleepTimerTimeLeft = sleepTimerTimeLeft,
                     sleepEnabled = !isListenTogetherGuest,
                     accent = MaterialTheme.colorScheme.primary,
-                    onLyrics = { showInlineLyrics = true },
+                    onLyrics = { showInlineLyrics = !showInlineLyrics },
                     onQueue = { queueSheetState.expandSoft() },
                     onSleep = { showSleepTimerDialog = true },
                     modifier =
