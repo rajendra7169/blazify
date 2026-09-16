@@ -2191,32 +2191,8 @@ fun BottomSheetPlayer(
                             SeekMessage(playerSeeker)
                         }
 
-                        // Title / artist (over the dynamic background).
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
-                        ) {
-                            Text(
-                                text = mediaMetadata?.title.orEmpty(),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = TextBackgroundColor,
-                                modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
-                            )
-                            Text(
-                                text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
-                                style = MaterialTheme.typography.labelMedium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = TextBackgroundColor.copy(alpha = 0.7f),
-                            )
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        // Retro waveform progress card (times + seekable bars + heart).
+                        // Title / artist on the left, with the like, theme and menu keys beside
+                        // them — the same arrangement as the other designs, in this one's style.
                         val cassetteIsEpisode = currentSong?.song?.isEpisode == true
                         val cassetteIsFavorite =
                             if (cassetteIsEpisode) {
@@ -2224,13 +2200,46 @@ fun BottomSheetPlayer(
                             } else {
                                 currentSong?.song?.liked == true
                             }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
+                        ) {
+                            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                Text(
+                                    text = mediaMetadata?.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    color = TextBackgroundColor,
+                                    modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
+                                )
+                                Text(
+                                    text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = TextBackgroundColor.copy(alpha = 0.7f),
+                                )
+                            }
+                            mediaMetadata?.let {
+                                CassetteTitleKeys(
+                                    mediaMetadata = it,
+                                    state = state,
+                                    isFavorite = cassetteIsFavorite,
+                                    isLive = isLive,
+                                    onToggleLike = { playerConnection.toggleLike() },
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        // Retro waveform progress card (times + seekable bars).
                         RetroWaveformCard(
                             position = sliderPosition ?: effectivePosition,
                             duration = duration,
                             isLive = isLive,
                             accent = MaterialTheme.colorScheme.primary,
-                            isFavorite = cassetteIsFavorite,
-                            onToggleLike = { playerConnection.toggleLike() },
                             onSeek = { pos ->
                                 playerConnection.player.seekTo(pos)
                                 position = pos
@@ -3163,8 +3172,6 @@ private fun RetroWaveformCard(
     duration: Long,
     isLive: Boolean,
     accent: Color,
-    isFavorite: Boolean,
-    onToggleLike: () -> Unit,
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -3227,21 +3234,78 @@ private fun RetroWaveformCard(
                 }
             }
         }
-        Spacer(Modifier.width(10.dp))
-        Icon(
-            painter = painterResource(if (isFavorite) R.drawable.favorite else R.drawable.favorite_border),
-            contentDescription = null,
+    }
+}
+
+/** A small raised retro key holding one icon, for the Cassette title row and top bar. */
+@Composable
+private fun RetroIconKey(
+    iconRes: Int,
+    tint: Color = RetroInk,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(width = 44.dp, height = 40.dp)
+            .shadow(6.dp, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .background(RetroCream)
+            .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Icon(painterResource(iconRes), contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+    }
+}
+
+/** Like, theme and song menu as retro keys, beside the Cassette title. */
+@Composable
+private fun CassetteTitleKeys(
+    mediaMetadata: MediaMetadata,
+    state: BottomSheetState,
+    isFavorite: Boolean,
+    isLive: Boolean,
+    onToggleLike: () -> Unit,
+) {
+    val navController = LocalNavController.current
+    val menuState = LocalMenuState.current
+    val bottomSheetPageState = LocalBottomSheetPageState.current
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        RetroIconKey(
+            iconRes = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
+            // A broadcast is not a song to keep, so the heart is there but out of reach.
             tint =
                 when {
                     isLive -> RetroInk.copy(alpha = 0.3f)
                     isFavorite -> MaterialTheme.colorScheme.error
                     else -> RetroInk
                 },
-            modifier = Modifier
-                .size(26.dp)
-                .clip(CircleShape)
-                .clickable(enabled = !isLive, onClick = onToggleLike),
+            enabled = !isLive,
+            onClick = onToggleLike,
         )
+        RetroIconKey(iconRes = R.drawable.palette) {
+            // Theme gallery: collapse the player first so the page is visible.
+            state.collapseSoft()
+            navController.navigate("settings/appearance/player_design")
+        }
+        RetroIconKey(iconRes = R.drawable.more_horiz) {
+            menuState.show {
+                PlayerMenu(
+                    mediaMetadata = mediaMetadata,
+                    playerBottomSheetState = state,
+                    onShowDetailsDialog = {
+                        mediaMetadata.id.let {
+                            bottomSheetPageState.show {
+                                ShowMediaInfo(it)
+                            }
+                        }
+                    },
+                    onDismiss = menuState::dismiss,
+                )
+            }
+        }
     }
 }
 
