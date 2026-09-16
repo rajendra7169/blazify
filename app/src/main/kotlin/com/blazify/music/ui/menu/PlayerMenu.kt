@@ -134,6 +134,8 @@ fun PlayerMenu(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
+    val liveBroadcasts by playerConnection.liveBroadcasts.collectAsStateWithLifecycle()
+    val isLive = mediaMetadata.id in liveBroadcasts
     val playerVolume = playerConnection.service.playerVolume.collectAsStateWithLifecycle()
 
     // Cast state for volume control - safely access castConnectionHandler to prevent crashes
@@ -408,6 +410,8 @@ fun PlayerMenu(
                             },
                             text = stringResource(R.string.add_to_playlist),
                             onClick = { showChoosePlaylistDialog = true },
+                            // There is nothing of a broadcast to keep for later.
+                            enabled = !isLive,
                         ),
                         // Copying an address for a file only this phone has copies
                         // nothing anyone can open, so its place goes to something
@@ -690,6 +694,8 @@ fun PlayerMenu(
 
                             else -> {
                                 Material3MenuItemData(
+                                    // A broadcast never ends, so there is no file to keep.
+                                    enabled = !isLive,
                                     title = { Text(text = stringResource(R.string.action_download)) },
                                     icon = {
                                         Icon(

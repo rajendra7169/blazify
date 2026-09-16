@@ -24,6 +24,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -66,9 +67,10 @@ private fun Material3MenuItemRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                enabled = item.onClick != null,
+                enabled = item.enabled && item.onClick != null,
                 onClick = { item.onClick?.invoke() }
             )
+            .alpha(if (item.enabled) 1f else 0.4f)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -107,6 +109,8 @@ data class Material3MenuItemData(
     val title: @Composable () -> Unit,
     val description: (@Composable () -> Unit)? = null,
     val onClick: (() -> Unit)? = null,
+    /** False leaves the entry in place, greyed out, for something this item cannot do. */
+    val enabled: Boolean = true,
     val cardColors: CardColors? = null,
     val trailingContent: (@Composable () -> Unit)? = null
 )

@@ -224,6 +224,9 @@ private fun NewMiniPlayer(
     // Player states - only collect what's needed at this level
     val playbackState by playerConnection.playbackState.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
+    // Saving what is on air saves nothing: a station is only ever the moment it is at.
+    val liveBroadcasts by playerConnection.liveBroadcasts.collectAsStateWithLifecycle()
+    val isOnAir = mediaMetadata?.id in liveBroadcasts
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
 
@@ -547,6 +550,8 @@ private fun NewMiniPlayer(
                             },
                             outlineColor = outlineColor,
                             onSurfaceColor = onSurfaceColor,
+                            // A broadcast cannot sit in a playlist: there is nothing of it to keep.
+                            enabled = !isOnAir,
                         )
                     }
 
@@ -559,6 +564,7 @@ private fun NewMiniPlayer(
                     errorColor = errorColor,
                     outlineColor = outlineColor,
                     onSurfaceColor = onSurfaceColor,
+                    enabled = !isOnAir,
                 )
                 }
             }
@@ -824,6 +830,9 @@ private fun LegacyMiniPlayer(
 
     val playbackState by playerConnection.playbackState.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
+    // Saving what is on air saves nothing: a station is only ever the moment it is at.
+    val liveBroadcasts by playerConnection.liveBroadcasts.collectAsStateWithLifecycle()
+    val isOnAir = mediaMetadata?.id in liveBroadcasts
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
 
@@ -1223,6 +1232,7 @@ private fun AddToPlaylistButton(
     onClick: () -> Unit,
     outlineColor: Color,
     onSurfaceColor: Color,
+    enabled: Boolean = true,
 )
 
 {
@@ -1235,19 +1245,19 @@ private fun AddToPlaylistButton(
             .clip(CircleShape)
             .border(
                 width = 1.dp,
-                color = outlineColor.copy(alpha = 0.3f),
+                color = outlineColor.copy(alpha = if (enabled) 0.3f else 0.12f),
                 shape = CircleShape,
             )
             .background(
                 color = Color.Transparent,
                 shape = CircleShape,
             )
-            .clickable { onClick() },
+            .clickable(enabled = enabled) { onClick() },
     ) {
         Icon(
             painter = painterResource(R.drawable.add),
             contentDescription = contentDescription,
-            tint = onSurfaceColor.copy(alpha = 0.7f),
+            tint = onSurfaceColor.copy(alpha = if (enabled) 0.7f else 0.25f),
             modifier = Modifier.size(20.dp),
         )
     }
@@ -1259,6 +1269,7 @@ private fun FavoriteButton(
     errorColor: Color,
     outlineColor: Color,
     onSurfaceColor: Color,
+    enabled: Boolean = true,
 ) {
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -1275,17 +1286,27 @@ private fun FavoriteButton(
                 .clip(CircleShape)
                 .border(
                     width = 1.dp,
-                    color = if (isLiked) errorColor.copy(alpha = 0.5f) else outlineColor.copy(alpha = 0.3f),
+                    color =
+                        when {
+                            !enabled -> outlineColor.copy(alpha = 0.12f)
+                            isLiked -> errorColor.copy(alpha = 0.5f)
+                            else -> outlineColor.copy(alpha = 0.3f)
+                        },
                     shape = CircleShape,
                 ).background(
-                    color = if (isLiked) errorColor.copy(alpha = 0.1f) else Color.Transparent,
+                    color = if (isLiked && enabled) errorColor.copy(alpha = 0.1f) else Color.Transparent,
                     shape = CircleShape,
-                ).clickable { playerConnection.service.toggleLike() },
+                ).clickable(enabled = enabled) { playerConnection.service.toggleLike() },
     ) {
         Icon(
-            painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
+            painter = painterResource(if (isLiked && enabled) R.drawable.favorite else R.drawable.favorite_border),
             contentDescription = null,
-            tint = if (isLiked) errorColor else onSurfaceColor.copy(alpha = 0.7f),
+            tint =
+                when {
+                    !enabled -> onSurfaceColor.copy(alpha = 0.25f)
+                    isLiked -> errorColor
+                    else -> onSurfaceColor.copy(alpha = 0.7f)
+                },
             modifier = Modifier.size(20.dp),
         )
     }

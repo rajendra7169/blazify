@@ -1329,11 +1329,16 @@ fun BottomSheetPlayer(
                                 val isFavorite = if (isEpisode) currentSong?.song?.inLibrary != null else currentSong?.song?.liked == true
                                 FilledIconButton(
                                     onClick = playerConnection::toggleLike,
+                                    // A broadcast is not a song to keep: there is nothing of it
+                                    // to come back to later.
+                                    enabled = !isLive,
                                     shape = favShape,
                                     colors =
                                         IconButtonDefaults.filledIconButtonColors(
                                             containerColor = textButtonColor,
                                             contentColor = iconButtonColor,
+                                            disabledContainerColor = textButtonColor.copy(alpha = 0.3f),
+                                            disabledContentColor = iconButtonColor.copy(alpha = 0.4f),
                                         ),
                                     modifier = Modifier.size(42.dp),
                                 ) {
@@ -1383,7 +1388,7 @@ fun BottomSheetPlayer(
                                     Modifier
                                         .size(40.dp)
                                         .clip(RoundedCornerShape(24.dp))
-                                        .clickable { playerConnection.toggleLike() },
+                                        .clickable(enabled = !isLive) { playerConnection.toggleLike() },
                             ) {
                                 Icon(
                                     painter =
@@ -1391,7 +1396,12 @@ fun BottomSheetPlayer(
                                             if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
                                         ),
                                     contentDescription = null,
-                                    tint = if (isFavorite) MaterialTheme.colorScheme.error else TextBackgroundColor,
+                                    tint =
+                                        when {
+                                            isLive -> TextBackgroundColor.copy(alpha = 0.3f)
+                                            isFavorite -> MaterialTheme.colorScheme.error
+                                            else -> TextBackgroundColor
+                                        },
                                     modifier =
                                         Modifier
                                             .align(Alignment.Center)
@@ -2731,8 +2741,15 @@ private fun RingPlayerLayout(
             }
             RingIconButton(
                 res = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
-                tint = if (isFavorite) MaterialTheme.colorScheme.error else textColor,
+                // A broadcast is not a song to keep, so the heart is there but out of reach.
+                tint =
+                    when {
+                        isLive -> textColor.copy(alpha = 0.3f)
+                        isFavorite -> MaterialTheme.colorScheme.error
+                        else -> textColor
+                    },
                 size = 26,
+                enabled = !isLive,
                 onClick = onToggleLike,
             )
         }
@@ -2968,13 +2985,14 @@ private fun RingIconButton(
     res: Int,
     tint: Color,
     size: Int = 26,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .size((size + 18).dp)
             .clip(CircleShape)
-            .clickable(onClick = onClick),
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -3117,11 +3135,16 @@ private fun RetroWaveformCard(
         Icon(
             painter = painterResource(if (isFavorite) R.drawable.favorite else R.drawable.favorite_border),
             contentDescription = null,
-            tint = if (isFavorite) MaterialTheme.colorScheme.error else RetroInk,
+            tint =
+                when {
+                    isLive -> RetroInk.copy(alpha = 0.3f)
+                    isFavorite -> MaterialTheme.colorScheme.error
+                    else -> RetroInk
+                },
             modifier = Modifier
                 .size(26.dp)
                 .clip(CircleShape)
-                .clickable(onClick = onToggleLike),
+                .clickable(enabled = !isLive, onClick = onToggleLike),
         )
     }
 }
