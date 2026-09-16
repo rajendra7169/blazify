@@ -317,6 +317,63 @@ object CipherDeobfuscator {
         }
     }
 
+    /**
+     * Transform the 'n' challenge a manifest address carries as a path step (/n/<value>).
+     *
+     * A broadcast's playlist is addressed in path steps rather than query parameters, so the
+     * query-based transform above finds nothing in it. The challenge still has to be solved:
+     * the segments the playlist hands back inherit it, and the content server refuses every one
+     * of them with a 403 while it is left as it came.
+     */
+    suspend fun transformNParamInPath(url: String): String = deobfuscateMutex.withLock {
+        try {
+            val match = Regex("/n/([^/]+)").find(url)
+            if (match == null) {
+                Timber.tag(TAG).d("No 'n' step found in manifest address, skipping transform")
+                return@withLock url
+            }
+            val nValue = Uri.decode(match.groupValues[1])
+            val transformed = transformNValue(nValue)
+            if (transformed == null) {
+                Timber.tag(TAG).w("N-transform unavailable for manifest address")
+                return@withLock url
+            }
+            Timber.tag(TAG).d("Manifest n-param: $nValue -> $transformed")
+            url.replaceRange(match.groups[1]!!.range, Uri.encode(transformed))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: CipherRendererGoneException) {
+            onRendererGone(e, "manifest n-transform")
+            url
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Manifest n-transform failed, returning original address: ${e.message}")
+            url
+        }
+    }
+
+    /** Runs one 'n' challenge through the player script. Null when the script cannot be used. */
+    private suspend fun transformNValue(nValue: String): String? {
+        val webView = getOrCreateWebView(forceRefresh = false)
+        if (webView == null) {
+            Timber.tag(TAG).e("Failed to get CipherWebView for n-transform")
+            return null
+        }
+
+        Timber.tag(TAG).d("CipherWebView state:")
+        Timber.tag(TAG).d("  nFunctionAvailable: ${webView.nFunctionAvailable}")
+        Timber.tag(TAG).d("  discoveredNFuncName: ${webView.discoveredNFuncName}")
+        Timber.tag(TAG).d("  usingHardcodedMode: ${webView.usingHardcodedMode}")
+
+        if (!webView.nFunctionAvailable) {
+            Timber.tag(TAG).e("N-transform function was not discovered at init time")
+            return null
+        }
+
+        val transformed = webView.transformN(nValue)
+        rendererRecoveryPolicy.onSuccess()
+        return transformed
+    }
+
     private suspend fun transformNInternal(url: String): String {
         // Extract the 'n' parameter value from the URL
         val nMatch = Regex("[?&]n=([^&]+)").find(url)
@@ -331,25 +388,8 @@ object CipherDeobfuscator {
         Timber.tag(TAG).d("  encoded: $nValueEncoded")
         Timber.tag(TAG).d("  decoded: $nValue")
 
-        val webView = getOrCreateWebView(forceRefresh = false)
-        if (webView == null) {
-            Timber.tag(TAG).e("Failed to get CipherWebView for n-transform")
-            return url
-        }
-
-        Timber.tag(TAG).d("CipherWebView state:")
-        Timber.tag(TAG).d("  nFunctionAvailable: ${webView.nFunctionAvailable}")
-        Timber.tag(TAG).d("  discoveredNFuncName: ${webView.discoveredNFuncName}")
-        Timber.tag(TAG).d("  usingHardcodedMode: ${webView.usingHardcodedMode}")
-
-        if (!webView.nFunctionAvailable) {
-            Timber.tag(TAG).e("N-transform function was not discovered at init time")
-            return url
-        }
-
         Timber.tag(TAG).d("Calling webView.transformN()...")
-        val transformedN = webView.transformN(nValue)
-        rendererRecoveryPolicy.onSuccess()
+        val transformedN = transformNValue(nValue) ?: return url
 
         Timber.tag(TAG).d("=== N-TRANSFORM SUCCESS ===")
         Timber.tag(TAG).d("N-param: $nValue -> $transformedN")
