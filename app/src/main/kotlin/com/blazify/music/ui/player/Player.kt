@@ -2149,7 +2149,7 @@ fun BottomSheetPlayer(
                                 Modifier
                                     .fillMaxWidth()
                                     .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-                                    .padding(top = 8.dp, start = 48.dp, end = 48.dp),
+                                    .padding(top = 8.dp, start = 72.dp, end = 72.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.now_playing),
@@ -2369,6 +2369,22 @@ fun BottomSheetPlayer(
                         .align(Alignment.TopStart)
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Start))
                         .padding(start = 6.dp, top = 8.dp)
+                        .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f)),
+                onClick = { state.collapseSoft() },
+            )
+        }
+
+        // Cassette's way down: the same place, as one of its own raised keys.
+        if (!isFullScreen && !showInlineLyrics && queueSheetState.progress < 0.999f &&
+            playerDesign == PlayerDesign.CASSETTE
+        ) {
+            RetroIconKey(
+                iconRes = R.drawable.expand_more,
+                modifier =
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Start))
+                        .padding(start = PlayerHorizontalPadding, top = 10.dp)
                         .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f)),
                 onClick = { state.collapseSoft() },
             )
