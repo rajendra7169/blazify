@@ -2353,6 +2353,7 @@ fun BottomSheetPlayer(
             queueSheetState.progress < 0.999f
         ) {
             val overlayLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
+            FetchMissingLyrics(mediaMetadata, overlayLyrics)
             Column(
                 modifier =
                     Modifier
@@ -2454,6 +2455,60 @@ fun BottomSheetPlayer(
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/**
+ * Looks up the playing song's lyrics when there are none stored yet.
+ *
+ * Only the lyrics page used to do this, so anything else that shows lyrics — the Ring card —
+ * waited on a row that nobody was fetching and showed its loading bars for as long as the song
+ * played, whenever the song had not been through a track change first (after a restart, say).
+ */
+@Composable
+private fun FetchMissingLyrics(
+    mediaMetadata: MediaMetadata?,
+    currentLyrics: LyricsEntity?,
+) {
+    val playerConnection = LocalPlayerConnection.current ?: return
+    val context = LocalContext.current
+    val database = LocalDatabase.current
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(mediaMetadata?.id, currentLyrics) {
+        if (mediaMetadata != null && currentLyrics == null) {
+            // Tiny debounce only (rapid skips); the old 500ms delay made lyrics feel slow.
+            delay(100)
+            // Resolve a usable duration first — fetching with an unknown duration lets
+            // the fuzzy providers cache WRONG lyrics. Fall back to the player's duration;
+            // if neither is known yet, skip (the service preload will fetch once known).
+            val resolvedDuration =
+                if (mediaMetadata.duration > 0) {
+                    mediaMetadata.duration
+                } else {
+                    val playerMs = playerConnection.player.duration
+                    if (playerMs != C.TIME_UNSET && playerMs > 0) (playerMs / 1000).toInt() else -1
+                }
+            if (resolvedDuration <= 0) return@LaunchedEffect
+            val resolvedMetadata = mediaMetadata.copy(duration = resolvedDuration)
+            coroutineScope.launch(Dispatchers.IO) {
+                try {
+                    val entryPoint =
+                        EntryPointAccessors.fromApplication(
+                            context.applicationContext,
+                            com.blazify.music.di.LyricsHelperEntryPoint::class.java,
+                        )
+                    val lyricsHelper = entryPoint.lyricsHelper()
+                    val fetchedLyricsWithProvider = lyricsHelper.getLyrics(resolvedMetadata)
+                    database.query {
+                        upsert(LyricsEntity(resolvedMetadata.id, fetchedLyricsWithProvider.lyrics, fetchedLyricsWithProvider.provider))
+                    }
+                } catch (e: Exception) {
+                    // Handle error
+                }
+            }
+        }
+    }
+
+}
+
 @Composable
 fun InlineLyricsView(
     mediaMetadata: MediaMetadata?,
@@ -2493,40 +2548,7 @@ fun InlineLyricsView(
             }
         }
 
-    LaunchedEffect(mediaMetadata?.id, currentLyrics) {
-        if (mediaMetadata != null && currentLyrics == null) {
-            // Tiny debounce only (rapid skips); the old 500ms delay made lyrics feel slow.
-            delay(100)
-            // Resolve a usable duration first — fetching with an unknown duration lets
-            // the fuzzy providers cache WRONG lyrics. Fall back to the player's duration;
-            // if neither is known yet, skip (the service preload will fetch once known).
-            val resolvedDuration =
-                if (mediaMetadata.duration > 0) {
-                    mediaMetadata.duration
-                } else {
-                    val playerMs = playerConnection.player.duration
-                    if (playerMs != C.TIME_UNSET && playerMs > 0) (playerMs / 1000).toInt() else -1
-                }
-            if (resolvedDuration <= 0) return@LaunchedEffect
-            val resolvedMetadata = mediaMetadata.copy(duration = resolvedDuration)
-            coroutineScope.launch(Dispatchers.IO) {
-                try {
-                    val entryPoint =
-                        EntryPointAccessors.fromApplication(
-                            context.applicationContext,
-                            com.blazify.music.di.LyricsHelperEntryPoint::class.java,
-                        )
-                    val lyricsHelper = entryPoint.lyricsHelper()
-                    val fetchedLyricsWithProvider = lyricsHelper.getLyrics(resolvedMetadata)
-                    database.query {
-                        upsert(LyricsEntity(resolvedMetadata.id, fetchedLyricsWithProvider.lyrics, fetchedLyricsWithProvider.provider))
-                    }
-                } catch (e: Exception) {
-                    // Handle error
-                }
-            }
-        }
-    }
+    FetchMissingLyrics(mediaMetadata, currentLyrics)
 
     // Prefetch lyrics for the next queue item only while the lyrics pane is visible, the app is in the
     // foreground, and the current track's lyrics row has finished loading (avoids competing with the
