@@ -155,6 +155,7 @@ import com.blazify.music.constants.DarkModeKey
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.RowScope
@@ -2465,7 +2466,7 @@ fun BottomSheetPlayer(
                         onClick = { showInlineLyrics = true },
                     )
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(2.dp))
                 RingLyricsCard(
                     lyricsText = overlayLyrics?.lyrics,
                     isLoading = overlayLyrics == null,
@@ -2972,30 +2973,18 @@ private fun RingLyricsCard(
     val currentIndex = remember(entries, position) {
         if (entries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(entries, position)
     }
-    Column(
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
             .background(Color.Black.copy(alpha = 0.55f))
             .clickable(onClick = onClick)
-            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = bottomInset + 14.dp),
+            .padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = bottomInset + 12.dp)
+            // One height whatever it holds — loading bars, one line or a line that wraps — so the
+            // buttons above it stay where they are instead of being pushed into the transport.
+            .height(RingLyricsAreaHeight),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.show_lyrics),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = textColor,
-                modifier = Modifier.weight(1f),
-            )
-            Icon(
-                painter = painterResource(R.drawable.expand_less),
-                contentDescription = null,
-                tint = textColor,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        Spacer(Modifier.height(10.dp))
         if (isLoading) {
             LyricsSkeleton(textColor)
         } else {
@@ -3040,6 +3029,9 @@ private fun RingLyricsCard(
         }
     }
 }
+
+/** Room for the card's lines: one above, up to two for the current line, one below. */
+private val RingLyricsAreaHeight = 88.dp
 
 /** Three centred lines: the one just sung, the one being sung, and the one coming up. */
 @Composable
