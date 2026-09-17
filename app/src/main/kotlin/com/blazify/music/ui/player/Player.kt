@@ -1947,6 +1947,21 @@ fun BottomSheetPlayer(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                     ) {
+                        if (showInlineLyrics) {
+                            // The tape is out of sight on the lyrics page, so the artwork sits in
+                            // front of the title, small, as on the other designs' lyrics pages.
+                            AsyncImage(
+                                model = mediaMetadata?.thumbnailUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .shadow(6.dp, RoundedCornerShape(12.dp))
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(RetroCream),
+                            )
+                            Spacer(Modifier.width(12.dp))
+                        }
                         Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                             Text(
                                 text = mediaMetadata?.title.orEmpty(),
