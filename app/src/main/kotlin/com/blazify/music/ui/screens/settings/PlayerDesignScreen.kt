@@ -41,6 +41,11 @@ import com.blazify.music.constants.SliderStyleKey
 import com.blazify.music.utils.rememberEnumPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import com.blazify.music.db.entities.LyricsEntity
+import com.blazify.music.lyrics.LyricsUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -526,24 +531,33 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
 }
 
 @Composable
-private fun PreviewTransport(pc: PlayerConnection?, onColor: Color) {
+private fun PreviewTransport(pc: PlayerConnection?, onColor: Color, ringOrder: Boolean = false) {
     val cs = MaterialTheme.colorScheme
     val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    // Circle while paused, rounded square while playing, like the real play button.
+    val roundness by animateDpAsState(
+        targetValue = if (isPlaying) 15.dp else 23.dp,
+        animationSpec = tween(durationMillis = 90, easing = LinearEasing),
+        label = "previewPlayRoundness",
+    )
+    // Ring puts repeat first and shuffle last; the other designs do the opposite.
+    val first = if (ringOrder) R.drawable.repeat else R.drawable.shuffle
+    val last = if (ringOrder) R.drawable.shuffle else R.drawable.repeat
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MiniIcon(R.drawable.shuffle, onColor, 18)
+        MiniIcon(first, onColor, 18)
         MiniIcon(R.drawable.skip_previous, onColor, 22) { pc?.seekToPrevious() }
         Box(
-            Modifier.size(46.dp).clip(CircleShape).background(cs.primary).clickable { pc?.togglePlayPause() },
+            Modifier.size(46.dp).clip(RoundedCornerShape(roundness)).background(cs.primary).clickable { pc?.togglePlayPause() },
             contentAlignment = Alignment.Center,
         ) {
             Icon(painterResource(if (isPlaying) R.drawable.pause else R.drawable.play), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
         }
         MiniIcon(R.drawable.skip_next, onColor, 22) { pc?.seekToNext() }
-        MiniIcon(R.drawable.repeat, onColor, 18)
+        MiniIcon(last, onColor, 18)
     }
 }
 
@@ -558,26 +572,56 @@ private fun PreviewFavorite(pc: PlayerConnection?, color: Color) {
     ) { pc?.toggleLike() }
 }
 
-/** Collapsed queue peek bar (Queue - Sleep timer - Lyrics) shown at the bottom of the real player. */
+/** Heart · theme · more beside the title, the theme and more buttons as filled circles. */
 @Composable
-private fun PreviewQueuePeek(color: Color) {
+private fun PreviewTitleActions(pc: PlayerConnection?, textColor: Color) {
+    val pillIcon = if (textColor == Color.White) Color.Black else MaterialTheme.colorScheme.surface
+    PreviewFavorite(pc, textColor)
+    Spacer(Modifier.width(10.dp))
+    PreviewPillButton(R.drawable.palette, textColor, pillIcon)
+    Spacer(Modifier.width(8.dp))
+    PreviewPillButton(R.drawable.more_horiz, textColor, pillIcon)
+}
+
+/** "Now Playing" and the source in the middle, the collapse button on the left. */
+@Composable
+private fun PreviewHeader(meta: MediaMetadata?, textColor: Color, collapse: @Composable () -> Unit = { MiniIcon(R.drawable.expand_more, textColor, 20) }) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.align(Alignment.CenterStart)) { collapse() }
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 30.dp)) {
+            Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+            meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
+                Text(it, fontSize = 9.sp, color = textColor.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+}
+
+private val PreviewBottomItems = listOf(
+    R.drawable.queue_music to R.string.queue,
+    R.drawable.cast to R.string.cast,
+    R.drawable.bedtime to R.string.sleep_timer,
+    R.drawable.lyrics to R.string.lyrics,
+)
+
+/** The player's bottom row: Queue · Cast · Sleep timer · Lyrics, each label under its icon. */
+@Composable
+private fun PreviewQueuePeek(color: Color, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        modifier = modifier.fillMaxWidth().padding(top = 4.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PeekItem(R.drawable.queue_music, stringResource(R.string.queue), color)
-        PeekItem(R.drawable.bedtime, stringResource(R.string.sleep_timer), color)
-        PeekItem(R.drawable.lyrics, stringResource(R.string.lyrics), color)
+        PreviewBottomItems.forEach { (icon, label) -> PeekItem(icon, stringResource(label), color, Modifier.weight(1f)) }
     }
 }
 
 @Composable
-private fun PeekItem(res: Int, label: String, color: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+private fun PeekItem(res: Int, label: String, color: Color, modifier: Modifier = Modifier) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(painter = painterResource(res), contentDescription = null, tint = color, modifier = Modifier.size(14.dp))
-        Spacer(Modifier.width(4.dp))
-        Text(label, fontSize = 9.sp, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(2.dp))
+        Text(label, fontSize = 8.sp, lineHeight = 9.sp, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -590,17 +634,13 @@ private fun ClassicPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColo
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
+        PreviewHeader(meta, textColor)
         Spacer(Modifier.weight(0.4f))
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(20.dp), Modifier.fillMaxWidth(0.82f).aspectRatio(1f))
         Spacer(Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
-            PreviewFavorite(pc, textColor)
-            Spacer(Modifier.width(10.dp))
-            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
-            Spacer(Modifier.width(8.dp))
-            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
+            PreviewTitleActions(pc, textColor)
         }
         Spacer(Modifier.height(12.dp))
         PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
@@ -613,29 +653,52 @@ private fun ClassicPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColo
 
 /* ---------- RING ---------- */
 
+/** Ring's lyric lines above the bottom row: the song's own lyrics, or nothing when it has none. */
+@Composable
+private fun PreviewRingLyrics(pc: PlayerConnection?, textColor: Color) {
+    val cs = MaterialTheme.colorScheme
+    val lyrics by remember(pc) { pc?.currentLyrics ?: MutableStateFlow(null) }.collectAsState(initial = null)
+    val (pos, _) = rememberLivePosition(pc)
+    val entries = remember(lyrics) {
+        val text = lyrics?.lyrics?.trim()
+        if (text.isNullOrEmpty() || text == LyricsEntity.LYRICS_NOT_FOUND) emptyList() else LyricsUtils.parseLyrics(text)
+    }
+    val lines: Triple<String, String, String>? =
+        when {
+            // No song to read from: sample lines, so the design still shows its lyrics.
+            pc == null -> Triple("In the stillness of the night", "I feel the weight, the empty sight", "Whispers in my mind, they call")
+            entries.isEmpty() -> null
+            else -> {
+                val i = LyricsUtils.findCurrentLineIndex(entries, pos)
+                if (i < 0) {
+                    Triple("", "♪", entries.first().text)
+                } else {
+                    Triple(entries.getOrNull(i - 1)?.text.orEmpty(), entries[i].text, entries.getOrNull(i + 1)?.text.orEmpty())
+                }
+            }
+        }
+    if (lines == null) return
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(lines.first, fontSize = 9.sp, color = textColor.copy(alpha = 0.45f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(2.dp))
+        Text(lines.second, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(2.dp))
+        Text(lines.third, fontSize = 9.sp, color = textColor.copy(alpha = 0.45f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
 @Composable
 private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
     val cs = MaterialTheme.colorScheme
     val (pos, dur) = rememberLivePosition(pc)
     val progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
+    val shownDur = if (dur > 0) dur else PREVIEW_FALLBACK_DURATION
+    val shownPos = if (dur > 0) pos else (PREVIEW_FALLBACK_PROGRESS * PREVIEW_FALLBACK_DURATION).toLong()
     Column(
-        modifier = Modifier.fillMaxSize().padding(start = 14.dp, end = 14.dp, top = 14.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            MiniIcon(R.drawable.expand_more, textColor, 22)
-            Text(
-                text = stringResource(R.string.now_playing),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = textColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
-            )
-            MiniIcon(R.drawable.palette, textColor, 20)
-        }
+        PreviewHeader(meta, textColor)
         Spacer(Modifier.weight(0.4f))
         SeekableAlbumRing(
             thumbnailUrl = meta?.thumbnailUrl,
@@ -643,45 +706,32 @@ private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: 
             ringColor = cs.primary,
             trackColor = textColor.copy(alpha = 0.20f),
             onSeek = { f -> if (dur > 0) pc?.player?.seekTo((f * dur).toLong()) },
-            modifier = Modifier.fillMaxWidth(0.66f).aspectRatio(1f),
-            ringStrokeDp = 5f,
-            artPaddingDp = 9f,
+            modifier = Modifier.fillMaxWidth(0.68f).aspectRatio(1f),
+            ringStrokeDp = 4f,
+            artPaddingDp = 8f,
             fallbackBrush = previewArtBrush(),
             thumbColor = cs.primary,
+            // The times sit in a gap at the top of the ring, as in the real player.
+            topLabel = {
+                Text(
+                    "${makeTimeString(shownPos)} — ${makeTimeString(shownDur)}",
+                    fontSize = 8.sp,
+                    lineHeight = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor.copy(alpha = 0.85f),
+                )
+            },
         )
         Spacer(Modifier.weight(0.4f))
-        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniIcon(R.drawable.queue_music, textColor, 20)
-            PreviewFavorite(pc, textColor)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewTitleActions(pc, textColor)
         }
-        Spacer(Modifier.height(6.dp))
-        PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
-        Spacer(Modifier.height(8.dp))
-        PreviewTransport(pc, textColor)
-        Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            MiniIcon(R.drawable.bedtime, textColor, 18)
-            MiniIcon(R.drawable.more_horiz, textColor, 18)
-        }
-        Spacer(Modifier.height(8.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(Color.Black.copy(alpha = 0.45f))
-                .padding(horizontal = 12.dp, vertical = 12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.show_lyrics), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textColor, modifier = Modifier.weight(1f))
-                MiniIcon(R.drawable.expand_less, textColor, 16)
-            }
-            Spacer(Modifier.height(6.dp))
-            Text("In the stillness of the night", fontSize = 9.sp, color = textColor.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(2.dp))
-            Text("I feel the weight, the empty sight", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cs.primary, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(2.dp))
-            Text("Whispers in my mind, they call", fontSize = 9.sp, color = textColor.copy(alpha = 0.5f), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        }
+        Spacer(Modifier.height(12.dp))
+        PreviewTransport(pc, textColor, ringOrder = true)
+        Spacer(Modifier.weight(0.3f))
+        PreviewRingLyrics(pc, textColor)
+        PreviewQueuePeek(textColor)
     }
 }
 
@@ -696,26 +746,19 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
-        meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
-            Text(it, fontSize = 9.sp, color = textColor.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
+        PreviewHeader(meta, textColor)
         Spacer(Modifier.weight(0.3f))
         VinylTurntable(
             thumbnailUrl = meta?.thumbnailUrl,
             isPlaying = isPlaying,
-            modifier = Modifier.fillMaxWidth(0.94f).aspectRatio(1f),
+            modifier = Modifier.fillMaxWidth(0.84f).aspectRatio(1f),
             fallbackBrush = previewArtBrush(),
             progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
         )
         Spacer(Modifier.weight(0.3f))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
-            PreviewFavorite(pc, textColor)
-            Spacer(Modifier.width(10.dp))
-            PreviewPillButton(R.drawable.palette, textColor.copy(alpha = 0.14f), textColor)
-            Spacer(Modifier.width(8.dp))
-            PreviewPillButton(R.drawable.more_horiz, textColor.copy(alpha = 0.14f), textColor)
+            PreviewTitleActions(pc, textColor)
         }
         Spacer(Modifier.height(12.dp))
         PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
@@ -728,85 +771,124 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
 
 /* ---------- CASSETTE ---------- */
 
+private val PreviewRetroCream = Color(0xFFF2E7D0)
+private val PreviewRetroInk = Color(0xFF3A2F24)
+private val PreviewRetroShellTop = Color(0xFF4A3D31)
+private val PreviewRetroShellBottom = Color(0xFF262019)
+private val PreviewRetroShellEdge = Color(0xFF6B5B49)
+
+/** A small cream key, like the Cassette player's buttons. */
+@Composable
+private fun PreviewRetroKey(res: Int, tint: Color = PreviewRetroInk, onClick: (() -> Unit)? = null) {
+    Box(
+        Modifier
+            .size(width = 28.dp, height = 25.dp)
+            .shadow(2.dp, RoundedCornerShape(7.dp))
+            .clip(RoundedCornerShape(7.dp))
+            .background(PreviewRetroCream)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(painterResource(res), null, tint = tint, modifier = Modifier.size(14.dp))
+    }
+}
+
 @Composable
 private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
     val cs = MaterialTheme.colorScheme
     val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    val song by remember(pc) { pc?.currentSong ?: MutableStateFlow(null) }.collectAsState()
+    val liked = song?.song?.liked == true
     val (pos, dur) = rememberLivePosition(pc)
+    val frac = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
-        meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
-            Text(it, fontSize = 9.sp, color = textColor.copy(alpha = 0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
+        PreviewHeader(meta, textColor) { PreviewRetroKey(R.drawable.expand_more) }
         Spacer(Modifier.weight(0.4f))
         CassetteTape(
             isPlaying = isPlaying,
-            progress = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f,
+            progress = frac,
             modifier = Modifier.fillMaxWidth(0.92f),
             accent = cs.primary,
             thumbnailUrl = meta?.thumbnailUrl,
         )
-        Spacer(Modifier.weight(0.3f))
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) { PreviewTitle(meta, textColor) }
+        Spacer(Modifier.weight(0.4f))
+        // Title on the left, the heart · theme · more keys on the right.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewRetroKey(
+                if (liked) R.drawable.favorite else R.drawable.favorite_border,
+                tint = if (liked) cs.error else PreviewRetroInk,
+            ) { pc?.toggleLike() }
+            Spacer(Modifier.width(5.dp))
+            PreviewRetroKey(R.drawable.palette)
+            Spacer(Modifier.width(5.dp))
+            PreviewRetroKey(R.drawable.more_horiz)
+        }
         Spacer(Modifier.height(8.dp))
-        // Retro waveform card (cream, accent bars).
-        val cream = Color(0xFFF2E7D0)
-        val ink = Color(0xFF3A2F24)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        // Retro waveform card with the times, full width.
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(cream)
-                .padding(horizontal = 10.dp, vertical = 8.dp),
+                .background(PreviewRetroCream)
+                .padding(horizontal = 10.dp, vertical = 6.dp),
         ) {
-            Canvas(Modifier.weight(1f).height(22.dp)) {
-                val n = 24
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                val shownDur = if (dur > 0) dur else PREVIEW_FALLBACK_DURATION
+                Text(makeTimeString((frac * shownDur).toLong()), fontSize = 7.sp, lineHeight = 8.sp, color = PreviewRetroInk)
+                Text(makeTimeString(shownDur), fontSize = 7.sp, lineHeight = 8.sp, color = PreviewRetroInk)
+            }
+            Spacer(Modifier.height(3.dp))
+            Canvas(Modifier.fillMaxWidth().height(22.dp)) {
+                val n = 30
                 val gap = size.width / n
                 val barW = gap * 0.55f
-                val frac = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else 0.35f
                 for (i in 0 until n) {
                     val wave = kotlin.math.abs(kotlin.math.sin(i * 1.7) * 0.5 + kotlin.math.sin(i * 0.53 + 1.3) * 0.5)
                     val barH = size.height * (0.30f + 0.65f * wave.toFloat()).coerceIn(0.15f, 1f)
                     drawRoundRect(
-                        color = if ((i + 0.5f) / n <= frac) cs.primary else ink.copy(alpha = 0.25f),
+                        color = if ((i + 0.5f) / n <= frac) cs.primary else PreviewRetroInk.copy(alpha = 0.25f),
                         topLeft = Offset(gap * i + (gap - barW) / 2f, (size.height - barH) / 2f),
                         size = Size(barW, barH),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(barW / 2f, barW / 2f),
                     )
                 }
             }
-            Spacer(Modifier.width(8.dp))
-            MiniIcon(R.drawable.favorite_border, ink, 16)
         }
         Spacer(Modifier.height(10.dp))
-        // Retro key transport.
+        // Shuffle · previous · play · next · repeat, the middle three as keys.
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            Box(Modifier.size(width = 44.dp, height = 34.dp).clip(RoundedCornerShape(10.dp)).background(cream), contentAlignment = Alignment.Center) {
-                MiniIcon(R.drawable.skip_previous, ink, 18)
+            MiniIcon(R.drawable.shuffle, textColor, 15)
+            Spacer(Modifier.width(8.dp))
+            Box(Modifier.size(width = 40.dp, height = 32.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToPrevious() }, contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.skip_previous, PreviewRetroInk, 17)
             }
             Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(width = 52.dp, height = 38.dp).clip(RoundedCornerShape(10.dp)).background(cs.primary), contentAlignment = Alignment.Center) {
-                MiniIcon(if (isPlaying) R.drawable.pause else R.drawable.play, Color.White, 20)
+            Box(Modifier.size(width = 50.dp, height = 36.dp).clip(RoundedCornerShape(9.dp)).background(cs.primary).clickable { pc?.togglePlayPause() }, contentAlignment = Alignment.Center) {
+                MiniIcon(if (isPlaying) R.drawable.pause else R.drawable.play, Color.White, 19)
             }
             Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(width = 44.dp, height = 34.dp).clip(RoundedCornerShape(10.dp)).background(cream), contentAlignment = Alignment.Center) {
-                MiniIcon(R.drawable.skip_next, ink, 18)
+            Box(Modifier.size(width = 40.dp, height = 32.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToNext() }, contentAlignment = Alignment.Center) {
+                MiniIcon(R.drawable.skip_next, PreviewRetroInk, 17)
             }
+            Spacer(Modifier.width(8.dp))
+            MiniIcon(R.drawable.repeat, textColor, 15)
         }
-        Spacer(Modifier.height(10.dp))
-        // Retro segmented bottom row (lyrics · queue · sleep · theme · more).
-        Row(Modifier.clip(RoundedCornerShape(12.dp))) {
-            Box(Modifier.size(width = 40.dp, height = 34.dp).background(cs.primary), contentAlignment = Alignment.Center) {
-                MiniIcon(R.drawable.lyrics, Color.White, 15)
-            }
-            for (icon in listOf(R.drawable.queue_music, R.drawable.bedtime, R.drawable.palette, R.drawable.more_horiz)) {
-                Box(Modifier.size(width = 40.dp, height = 34.dp).background(Color(0xFF2A241E)), contentAlignment = Alignment.Center) {
-                    MiniIcon(icon, cream, 15)
-                }
+        Spacer(Modifier.weight(0.3f))
+        // The dark tape-shell strip with Queue · Cast · Sleep timer · Lyrics.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Brush.verticalGradient(listOf(PreviewRetroShellTop, PreviewRetroShellBottom)))
+                .border(1.dp, PreviewRetroShellEdge, RoundedCornerShape(12.dp))
+                .padding(vertical = 6.dp),
+        ) {
+            PreviewBottomItems.forEach { (icon, label) ->
+                PeekItem(icon, stringResource(label), PreviewRetroCream, Modifier.weight(1f))
             }
         }
     }
@@ -819,8 +901,11 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     Box(Modifier.fillMaxSize()) {
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
-        // "Now Playing" + source centred at the top (no minimize / more icons here).
+        // "Now Playing" + source centred at the top, the collapse button on the left.
         val fullArtShadow = Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f)
+        Box(Modifier.align(Alignment.TopStart).padding(start = 14.dp, top = 14.dp)) {
+            MiniIcon(R.drawable.expand_more, Color.White, 20)
+        }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp, start = 20.dp, end = 20.dp),
@@ -849,11 +934,7 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { PreviewTitle(meta, Color.White, shadow = true) }
-                PreviewFavorite(pc, Color.White)
-                Spacer(Modifier.width(10.dp))
-                PreviewPillButton(R.drawable.palette, Color.White.copy(alpha = 0.18f), Color.White)
-                Spacer(Modifier.width(8.dp))
-                PreviewPillButton(R.drawable.more_horiz, Color.White.copy(alpha = 0.18f), Color.White)
+                PreviewTitleActions(pc, Color.White)
             }
             Spacer(Modifier.height(10.dp))
             PreviewSlider(pc, MaterialTheme.colorScheme.primary, Color.White.copy(alpha = 0.25f), Color.White)
