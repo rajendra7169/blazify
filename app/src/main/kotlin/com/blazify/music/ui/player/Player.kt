@@ -2973,6 +2973,9 @@ private fun RingLyricsCard(
     val currentIndex = remember(entries, position) {
         if (entries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(entries, position)
     }
+    val currentOnClick by rememberUpdatedState(onClick)
+    // A swipe up opens the lyrics page, as a tap does: the card reads as the top of that page.
+    val swipeThreshold = with(LocalDensity.current) { 40.dp.toPx() }
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -2980,6 +2983,17 @@ private fun RingLyricsCard(
             .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
             .background(Color.Black.copy(alpha = 0.55f))
             .clickable(onClick = onClick)
+            .pointerInput(Unit) {
+                var dragged = 0f
+                detectVerticalDragGestures(
+                    onDragStart = { dragged = 0f },
+                    onDragEnd = { if (dragged < -swipeThreshold) currentOnClick() },
+                    onVerticalDrag = { change, amount ->
+                        change.consume()
+                        dragged += amount
+                    },
+                )
+            }
             .padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = bottomInset + 12.dp)
             // One height whatever it holds — loading bars, one line or a line that wraps — so the
             // buttons above it stay where they are instead of being pushed into the transport.
