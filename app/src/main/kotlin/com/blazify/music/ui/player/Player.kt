@@ -364,17 +364,17 @@ fun BottomSheetPlayer(
         }
     }
 
-    BackHandler(enabled = state.isExpanded) {
+    // Back steps out one layer at a time: full screen first, then lyrics, and only then does the
+    // player collapse. While lyrics or full screen are open, the sheet's own collapse handler and
+    // the one below are switched off, so this doesn't depend on which handler registered last
+    // (that order differed between phones). The queue sheet adds its handler when the queue
+    // opens, so Back with the queue open keeps closing just the queue.
+    val playerHasInnerLayer = isFullScreen || showInlineLyrics
+    BackHandler(enabled = state.isExpanded && !playerHasInnerLayer) {
         state.collapseSoft()
     }
 
-    // Back steps out one layer at a time: full screen first, then lyrics, and only then does the
-    // player collapse. The newest registered handler is asked first, and the player's sheet adds
-    // its own collapse handler each time it expands, so a handler registered here once would always
-    // lose to it. This one only enters composition while lyrics or full screen are open, which is
-    // after the sheet's. The queue sheet adds its handler when the queue opens, later still, so Back
-    // with the queue open keeps closing just the queue.
-    if (state.isExpanded && (isFullScreen || showInlineLyrics)) {
+    if (state.isExpanded && playerHasInnerLayer) {
         BackHandler {
             if (isFullScreen) {
                 isFullScreen = false
@@ -843,6 +843,7 @@ fun BottomSheetPlayer(
     BottomSheet(
         state = state,
         modifier = modifier,
+        collapseOnBack = !playerHasInnerLayer,
         background = {
             Box(
                 modifier =

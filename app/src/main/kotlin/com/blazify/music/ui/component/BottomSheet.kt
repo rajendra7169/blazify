@@ -64,6 +64,8 @@ fun BottomSheet(
     onDismiss: (() -> Unit)? = null,
     collapsedContent: @Composable BoxScope.() -> Unit,
     isExpandable: Boolean = true,
+    // False while the content has its own layer open that Back should close first.
+    collapseOnBack: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val density = LocalDensity.current
@@ -114,7 +116,7 @@ fun BottomSheet(
             }
     ) {
         if (!state.isCollapsed && !state.isDismissed) {
-            PredictiveBackHandler { progress ->
+            PredictiveBackHandler(enabled = collapseOnBack) { progress ->
                 val initialValue = state.value
                 try {
                     val range = initialValue - state.collapsedBound
