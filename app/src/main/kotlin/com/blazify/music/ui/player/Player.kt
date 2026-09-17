@@ -3276,6 +3276,9 @@ private fun FullArtBackground(
 
 private val RetroCream = Color(0xFFF2E7D0)
 private val RetroInk = Color(0xFF3A2F24)
+private val RetroShellTop = Color(0xFF4A3D31)
+private val RetroShellBottom = Color(0xFF262019)
+private val RetroShellEdge = Color(0xFF6B5B49)
 // The cassette card is cream, so the broadcast mark goes darker to stay readable on it.
 private val RetroLiveRed = Color(0xFFC62828)
 
@@ -3547,8 +3550,9 @@ private fun RetroBottomRow(
         modifier = modifier
             .shadow(8.dp, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp))
-            .background(RetroCream)
-            .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(18.dp)),
+            // Dark brown like the cassette shell, so the strip reads as part of the tape deck.
+            .background(Brush.verticalGradient(listOf(RetroShellTop, RetroShellBottom)))
+            .border(1.dp, RetroShellEdge, RoundedCornerShape(18.dp)),
     ) {
         val key = Modifier
             .weight(1f)
@@ -3558,14 +3562,14 @@ private fun RetroBottomRow(
             icon = R.drawable.queue_music,
             label = stringResource(R.string.queue),
             active = false,
-            tint = RetroInk,
+            tint = RetroCream,
             activeTint = accent,
             modifier = key,
             onClick = onQueue,
         )
         CastButton(
             modifier = key,
-            tintColor = RetroInk,
+            tintColor = RetroCream,
             label = stringResource(R.string.cast),
             activeTint = accent,
         )
@@ -3573,7 +3577,7 @@ private fun RetroBottomRow(
             icon = R.drawable.bedtime,
             label = if (sleepTimerEnabled) makeTimeString(sleepTimerTimeLeft) else stringResource(R.string.sleep_timer),
             active = sleepTimerEnabled,
-            tint = RetroInk,
+            tint = RetroCream,
             activeTint = accent,
             enabled = sleepEnabled,
             modifier = key,
@@ -3583,7 +3587,7 @@ private fun RetroBottomRow(
             icon = R.drawable.lyrics,
             label = stringResource(R.string.lyrics),
             active = lyricsOpen,
-            tint = RetroInk,
+            tint = RetroCream,
             activeTint = accent,
             modifier = key,
             onClick = onLyrics,
