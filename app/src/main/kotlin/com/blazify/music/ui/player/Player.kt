@@ -2137,18 +2137,6 @@ fun BottomSheetPlayer(
                         buttonBgColor = textButtonColor,
                         buttonFgColor = iconButtonColor,
                         bottomReserve = ringBottomOverlayHeight,
-                        sliderContent = { seekModifier ->
-                            // RING keeps the progress bar dynamic (album colour), like the ring arc.
-                            playerSeekBar(
-                                seekModifier,
-                                PlayerSliderColors.getSliderColors(
-                                    activeColor = textButtonColor,
-                                    playerBackground = playerBackground,
-                                    useDarkTheme = useDarkTheme,
-                                    activeOverride = MaterialTheme.colorScheme.primary,
-                                ),
-                            )
-                        },
                         onSeek = { pos ->
                             playerConnection.player.seekTo(pos)
                             position = pos
@@ -2803,7 +2791,6 @@ private fun RingPlayerLayout(
     buttonBgColor: Color,
     buttonFgColor: Color,
     bottomReserve: Dp,
-    sliderContent: @Composable (Modifier) -> Unit,
     onSeek: (Long) -> Unit,
     onTogglePlay: () -> Unit,
     onNext: () -> Unit,
@@ -2872,13 +2859,39 @@ private fun RingPlayerLayout(
                     progress = progress,
                     ringColor = MaterialTheme.colorScheme.primary,
                     trackColor = textColor.copy(alpha = 0.16f),
-                    onSeek = { f -> if (duration > 0) onSeek((f * duration).toLong()) },
+                    // A broadcast has nowhere to seek to.
+                    onSeek = { f -> if (duration > 0 && !isLive) onSeek((f * duration).toLong()) },
                     modifier = Modifier.size(side),
                     ringStrokeDp = 7f,
                     artPaddingDp = 18f,
                     thumbColor = MaterialTheme.colorScheme.primary,
                     onDoubleTapArt = seeker?.let { s -> { forward: Boolean -> s.seek(forward) } },
                     rtl = rtl,
+                    // The ring is this design's progress bar, so the times sit in a gap at its top.
+                    topLabel = {
+                        if (isLive) {
+                            LiveBadge()
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = makeTimeString(position),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text = "  —  ",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = textColor.copy(alpha = 0.5f),
+                                )
+                                Text(
+                                    text = if (duration != C.TIME_UNSET && duration > 0) makeTimeString(duration) else "--:--",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = textColor.copy(alpha = 0.7f),
+                                )
+                            }
+                        }
+                    },
                 )
                 if (seeker != null) SeekMessage(seeker)
             }
@@ -2932,27 +2945,7 @@ private fun RingPlayerLayout(
 
         Spacer(Modifier.height(6.dp))
 
-        // --- progress + times (uses the Settings slider style, same as classic) ---
-        sliderContent(Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding))
-        // The capsule style already carries "elapsed / total" in its thumb.
-        val ringSliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
-        if (ringSliderStyle != SliderStyle.DEFAULT) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding + 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                if (isLive) {
-                    LiveBadge()
-                } else {
-                    Text(makeTimeString(position), style = MaterialTheme.typography.labelMedium, color = textColor)
-                    Text(
-                        text = if (duration != C.TIME_UNSET) makeTimeString(duration) else "",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = textColor,
-                    )
-                }
-            }
-        }
+        Spacer(Modifier.height(8.dp))
 
         Spacer(Modifier.height(10.dp))
 
