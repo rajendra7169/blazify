@@ -2436,9 +2436,9 @@ fun BottomSheetPlayer(
             )
         }
 
-        // RING design: bottom overlay (sleep+more row + lyrics card) drawn on top
-        // of the queue peek so the lyrics card starts from the very bottom.
-        // Fades out as the queue is dragged open so it doesn't cover the queue.
+        // RING design: bottom overlay, drawn over the queue peek: the synced lines, fading in from
+        // above and out below, then the standard button row at the very bottom, where the other
+        // designs keep it. Fades out as the queue is dragged open so it doesn't cover the queue.
         if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics &&
             queueSheetState.progress < 0.999f
         ) {
@@ -2450,15 +2450,33 @@ fun BottomSheetPlayer(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f))
+                        // A darkening that builds towards the bottom keeps the lines and buttons
+                        // readable on light artwork without drawing a shape.
+                        .background(
+                            Brush.verticalGradient(
+                                0f to Color.Transparent,
+                                1f to Color.Black.copy(alpha = 0.35f),
+                            ),
+                        )
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                 horizontalAlignment = Alignment.Start,
             ) {
-                // The same four controls as every other design, in the same order, just above
-                // the lyrics card that this design keeps at the bottom.
+                RingLyricsCard(
+                    lyricsText = overlayLyrics?.lyrics,
+                    isLoading = overlayLyrics == null,
+                    position = sliderPosition ?: effectivePosition,
+                    textColor = TextBackgroundColor,
+                    onClick = { showInlineLyrics = true },
+                )
+                // The same four controls as every other design, in the same place at the very bottom.
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 4.dp)
+                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom)),
                 ) {
                     PlayerBottomButton(
                         icon = R.drawable.queue_music,
@@ -2500,15 +2518,6 @@ fun BottomSheetPlayer(
                         onClick = { showInlineLyrics = true },
                     )
                 }
-                Spacer(Modifier.height(2.dp))
-                RingLyricsCard(
-                    lyricsText = overlayLyrics?.lyrics,
-                    isLoading = overlayLyrics == null,
-                    position = sliderPosition ?: effectivePosition,
-                    textColor = TextBackgroundColor,
-                    bottomInset = ringNavBottomInset,
-                    onClick = { showInlineLyrics = true },
-                )
             }
         }
 
@@ -3003,7 +3012,6 @@ private fun RingLyricsCard(
     isLoading: Boolean,
     position: Long,
     textColor: Color,
-    bottomInset: Dp,
     onClick: () -> Unit,
 ) {
     val entries = remember(lyricsText) {
@@ -3016,17 +3024,10 @@ private fun RingLyricsCard(
     // A swipe up opens the lyrics page, as a tap does: the lines read as the top of that page.
     val swipeThreshold = with(LocalDensity.current) { 40.dp.toPx() }
     // No box: the lines sit on the player itself, which keeps the album colours running to the
-    // bottom edge. A darkening that only builds towards the bottom keeps them readable on light
-    // artwork without drawing a shape.
+    // bottom edge.
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    0f to Color.Transparent,
-                    1f to Color.Black.copy(alpha = 0.35f),
-                ),
-            )
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
@@ -3043,7 +3044,7 @@ private fun RingLyricsCard(
                     },
                 )
             }
-            .padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = bottomInset + 12.dp)
+            .padding(horizontal = 18.dp, vertical = 12.dp)
             // One height whatever it holds — loading bars, one line or a line that wraps — so the
             // buttons above it stay where they are instead of being pushed into the transport.
             .height(RingLyricsAreaHeight),
@@ -3052,14 +3053,17 @@ private fun RingLyricsCard(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
-                // The line just sung fades away as it rises towards the button row.
+                // The line just sung fades in from above and the next one fades out below, so the
+                // lines melt into the controls on either side.
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithContent {
                     drawContent()
                     drawRect(
                         brush = Brush.verticalGradient(
                             0f to Color.Transparent,
-                            0.45f to Color.Black,
+                            0.4f to Color.Black,
+                            0.7f to Color.Black,
+                            1f to Color.Transparent,
                         ),
                         blendMode = BlendMode.DstIn,
                     )
