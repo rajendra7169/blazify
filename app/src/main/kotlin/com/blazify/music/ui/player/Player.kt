@@ -22,8 +22,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.core.animateFloat
@@ -144,6 +145,8 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.navigation.NavController
+import androidx.compose.runtime.withFrameNanos
+import kotlinx.coroutines.flow.collectLatest
 import androidx.palette.graphics.Palette
 import com.blazify.music.LocalNavController
 import coil3.compose.AsyncImage
@@ -257,10 +260,31 @@ fun BottomSheetPlayer(
     val playerConnection = LocalPlayerConnection.current ?: return
 
     // Back from the design gallery lands on the page it was opened from; bring the player back up.
+    // Opening it, the gallery appears at once under the player (no page slide), and once it has
+    // been drawn the player fades away over it and is put down without the slide: sliding the
+    // player over the gallery redrew both on every frame and stuttered, and sliding it before the
+    // gallery was there showed the page underneath.
+    val playerFade = remember { Animatable(1f) }
+    // The sheet state is rebuilt when the mini player's resting place changes (the gallery hides
+    // the navigation bar), so always act on the newest one.
+    val latestState by rememberUpdatedState(state)
     LaunchedEffect(navController) {
-        navController.currentBackStackEntryFlow.collect { entry ->
+        navController.currentBackStackEntryFlow.collectLatest { entry ->
             if (entry.savedStateHandle.remove<Boolean>(ReopenPlayerKey) == true) {
-                state.expandSoft()
+                playerFade.snapTo(1f)
+                latestState.expandSoft()
+            }
+            if (entry.savedStateHandle.remove<Boolean>(CollapsePlayerKey) == true) {
+                try {
+                    // Two frames: the gallery is composed in the first and drawn in the second.
+                    withFrameNanos { }
+                    withFrameNanos { }
+                    playerFade.animateTo(0f, tween(durationMillis = 180, easing = LinearEasing))
+                    latestState.collapse(snap())
+                    withFrameNanos { }
+                } finally {
+                    playerFade.snapTo(1f)
+                }
             }
         }
     }
@@ -843,7 +867,7 @@ fun BottomSheetPlayer(
 
     BottomSheet(
         state = state,
-        modifier = modifier,
+        modifier = modifier.graphicsLayer { alpha = playerFade.value },
         collapseOnBack = !playerHasInnerLayer,
         background = {
             Box(
@@ -3605,7 +3629,8 @@ private fun RetroBottomRow(
 }
 
 private const val ReopenPlayerKey = "reopen_player"
-private const val PlayerDesignGalleryRoute = "settings/appearance/player_design"
+private const val CollapsePlayerKey = "collapse_player"
+const val PLAYER_DESIGN_GALLERY_ROUTE = "settings/appearance/player_design"
 
 /**
  * Opens the design gallery and then moves the player out of its way, and marks the page
@@ -3615,12 +3640,12 @@ private fun openPlayerDesignGallery(navController: NavController, state: BottomS
     // The button stays tappable while the player slides down, so a quick second tap would open
     // the gallery twice and Back would need pressing twice.
     val current = navController.currentBackStackEntry ?: return
-    if (current.destination.route == PlayerDesignGalleryRoute) return
+    if (current.destination.route == PLAYER_DESIGN_GALLERY_ROUTE) return
     current.savedStateHandle[ReopenPlayerKey] = true
-    navController.navigate(PlayerDesignGalleryRoute) { launchSingleTop = true }
-    // Slide the player down only once the gallery has replaced the page behind it (the page
-    // change takes 200 ms); collapsing first showed that page for a moment.
-    state.collapseAfter(delayMillis = 240, animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing))
+    navController.navigate(PLAYER_DESIGN_GALLERY_ROUTE) { launchSingleTop = true }
+    // The player slides down once the gallery has finished opening behind it (see
+    // BottomSheetPlayer); collapsing first showed the page underneath for a moment.
+    navController.currentBackStackEntry?.savedStateHandle?.set(CollapsePlayerKey, true)
 }
 
 @Composable

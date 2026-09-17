@@ -22,6 +22,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -190,6 +192,7 @@ import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.component.BottomSheetState
 import com.blazify.music.ui.component.rememberBottomSheetState
+import com.blazify.music.ui.player.PLAYER_DESIGN_GALLERY_ROUTE
 import com.blazify.music.ui.component.shimmer.ShimmerTheme
 import com.blazify.music.ui.menu.YouTubeSongMenu
 import com.blazify.music.ui.player.BottomSheetPlayer
@@ -1452,6 +1455,14 @@ class MainActivity : ComponentActivity() {
                                             NavigationTab.SEARCH -> Screens.Search
                                         }.route,
                                     enterTransition = {
+                                        // Opened from the full player, the theme gallery is there at once
+                                        // under the player, which then fades away over it (see
+                                        // BottomSheetPlayer); sliding it in would show this page for a moment.
+                                        if (targetState.destination.route == PLAYER_DESIGN_GALLERY_ROUTE &&
+                                            playerBottomSheetState.isExpanded
+                                        ) {
+                                            return@NavHost EnterTransition.None
+                                        }
                                         val currentRouteIndex = routeIndexMap[targetState.destination.route] ?: -1
                                         val previousRouteIndex = routeIndexMap[initialState.destination.route] ?: -1
 
@@ -1462,6 +1473,11 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     exitTransition = {
+                                        if (targetState.destination.route == PLAYER_DESIGN_GALLERY_ROUTE &&
+                                            playerBottomSheetState.isExpanded
+                                        ) {
+                                            return@NavHost ExitTransition.None
+                                        }
                                         val currentRouteIndex = routeIndexMap[initialState.destination.route] ?: -1
                                         val targetRouteIndex = routeIndexMap[targetState.destination.route] ?: -1
 
