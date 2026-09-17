@@ -2989,10 +2989,16 @@ private fun RingPlayerLayout(
                 onClick = onToggleRepeat,
             )
             RingIconButton(R.drawable.skip_previous, textColor, size = 34, onClick = onPrevious)
+            // Same morph as the other designs: a circle when paused, a rounded square while playing.
+            val playRoundness by animateDpAsState(
+                targetValue = if (isPlaying) 22.dp else 33.dp,
+                animationSpec = tween(durationMillis = 90, easing = LinearEasing),
+                label = "ringPlayRoundness",
+            )
             Box(
                 modifier = Modifier
                     .size(66.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(playRoundness))
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable(onClick = onTogglePlay),
                 contentAlignment = Alignment.Center,
