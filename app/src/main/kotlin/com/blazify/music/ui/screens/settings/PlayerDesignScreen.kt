@@ -114,8 +114,15 @@ import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.player.PlayerDesign
 import com.blazify.music.ui.utils.backToMain
-import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import com.blazify.music.utils.safeDataStoreEdit
+import com.blazify.music.utils.get
+import com.blazify.music.utils.dataStore
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.rememberCoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -123,16 +130,26 @@ fun PlayerDesignScreen(navController: NavController) {
     val designs = remember { PlayerDesign.entries.toList() }
     val playerConnection = LocalPlayerConnection.current
     val playerSheetState = LocalPlayerBottomSheetState.current
-    val (activeId, setActiveId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    // Read the saved design before the first frame. The usual preference state starts on the
+    // default for a frame, which showed Classic and "Apply" before jumping to the real design.
+    val storedId = remember { context.dataStore.get(PlayerDesignKey, PlayerDesign.CLASSIC.id) }
+    val activeId by remember {
+        context.dataStore.data
+            .map { it[PlayerDesignKey] ?: PlayerDesign.CLASSIC.id }
+            .distinctUntilChanged()
+    }.collectAsStateWithLifecycle(storedId)
+    val setActiveId: (String) -> Unit = { id ->
+        scope.launch { context.safeDataStoreEdit { it[PlayerDesignKey] = id } }
+    }
 
     val pagerState = rememberPagerState(
         initialPage = designs.indexOfFirst { it.id == activeId }.coerceAtLeast(0),
         pageCount = { designs.size },
     )
 
-    // The stored design arrives from DataStore after the first composition, so
-    // initialPage can still be the default. Whenever the stored design changes
-    // (including that first load), land on it. Deliberately NOT rememberSaveable:
+    // Whenever the stored design changes, land on it. Deliberately NOT rememberSaveable:
     // a saved "already jumped" flag survived re-entry and left the pager on the
     // default page. Guarded on isScrollInProgress so it never fights a swipe.
     LaunchedEffect(activeId) {
