@@ -3604,15 +3604,20 @@ private fun RetroBottomRow(
 }
 
 private const val ReopenPlayerKey = "reopen_player"
+private const val PlayerDesignGalleryRoute = "settings/appearance/player_design"
 
 /**
  * Collapses the player so the design gallery isn't hidden behind the sheet, and marks the page
  * underneath so the full player comes back when the user returns from the gallery.
  */
 private fun openPlayerDesignGallery(navController: NavController, state: BottomSheetState) {
-    navController.currentBackStackEntry?.savedStateHandle?.set(ReopenPlayerKey, true)
     state.collapseSoft()
-    navController.navigate("settings/appearance/player_design")
+    // The button stays tappable while the player slides down, so a quick second tap would open
+    // the gallery twice and Back would need pressing twice.
+    val current = navController.currentBackStackEntry ?: return
+    if (current.destination.route == PlayerDesignGalleryRoute) return
+    current.savedStateHandle[ReopenPlayerKey] = true
+    navController.navigate(PlayerDesignGalleryRoute) { launchSingleTop = true }
 }
 
 @Composable
