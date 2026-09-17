@@ -1932,6 +1932,7 @@ fun BottomSheetPlayer(
                 )
                 // Cassette's title, progress and transport. Used on its front page and, so that the
                 // controls do not turn into another design's, on its lyrics page too.
+                val cassetteLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
                 val cassetteControls: @Composable () -> Unit = {
                     // Title / artist on the left, with the like, theme and menu keys beside
                     // them — the same arrangement as the other designs, in this one's style.
@@ -1970,12 +1971,29 @@ fun BottomSheetPlayer(
                                 isFavorite = cassetteIsFavorite,
                                 isLive = isLive,
                                 onToggleLike = { playerConnection.toggleLike() },
+                                lyricsPage = showInlineLyrics,
+                                onToggleFullScreen = { isFullScreen = !isFullScreen },
+                                onLyricsMenu = {
+                                    menuState.show {
+                                        com.blazify.music.ui.menu.LyricsMenu(
+                                            lyricsProvider = { cassetteLyrics },
+                                            songProvider = { currentSong?.song },
+                                            mediaMetadataProvider = { it },
+                                            onDismiss = menuState::dismiss,
+                                            onShowOffsetDialog = {
+                                                bottomSheetPageState.show {
+                                                    ShowOffsetDialog(songProvider = { currentSong?.song })
+                                                }
+                                            },
+                                        )
+                                    }
+                                },
                             )
                         }
                     }
-    
+
                     Spacer(Modifier.height(12.dp))
-    
+
                     // Retro waveform progress card (times + seekable bars).
                     RetroWaveformCard(
                         position = sliderPosition ?: effectivePosition,
@@ -1988,12 +2006,18 @@ fun BottomSheetPlayer(
                         },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                     )
-    
-                    Spacer(Modifier.height(CassetteSectionGap))
-    
-                    // Chunky 3D retro transport.
+
+                    // Chunky 3D retro transport. Full-screen lyrics keep only the lines and what
+                    // is above them, down to the progress card, as on the other designs.
                     val cassetteShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
-                    RetroTransportRow(
+                    AnimatedVisibility(
+                        visible = !(showInlineLyrics && isFullScreen),
+                        enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                        exit = shrinkVertically(shrinkTowards = Alignment.Top) + slideOutVertically(targetOffsetY = { it }) + fadeOut(),
+                    ) {
+                        Column {
+                            Spacer(Modifier.height(CassetteSectionGap))
+                            RetroTransportRow(
                         isPlaying = effectiveIsPlaying,
                         shuffleOn = cassetteShuffle,
                         repeatMode = repeatMode,
@@ -2008,6 +2032,8 @@ fun BottomSheetPlayer(
                         onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                     )
+                        }
+                    }
                 }
                 if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
                     // FULL_ART: album art fills the WHOLE screen (even behind the bottom
@@ -2319,8 +2345,9 @@ fun BottomSheetPlayer(
 
                         if (playerDesign == PlayerDesign.CASSETTE) {
                             cassetteControls()
-                            // Leaves room for the retro bottom row, as on the front page.
-                            Spacer(Modifier.height(CassetteSpacerUnderTransport))
+                            // Leaves room for the retro bottom row, as on the front page; full screen
+                            // has no row below.
+                            Spacer(Modifier.height(if (isFullScreen) 24.dp else CassetteSpacerUnderTransport))
                         } else {
                             mediaMetadata?.let {
                                 controlsContent(it)
@@ -3200,7 +3227,7 @@ private val CassetteRowHeight = 62.dp
 private val CassetteSpacerUnderTransport =
     CassetteSectionGap - (QueuePeekHeight + 1.dp - CassetteRowHeight - CassetteRowBottomMargin)
 
-/** Retro waveform progress card: times on top, seekable bars, favourite heart. */
+/** Retro waveform progress card: times on top, seekable bars. */
 @Composable
 private fun RetroWaveformCard(
     position: Long,
@@ -3303,29 +3330,41 @@ private fun CassetteTitleKeys(
     isFavorite: Boolean,
     isLive: Boolean,
     onToggleLike: () -> Unit,
+    lyricsPage: Boolean = false,
+    onToggleFullScreen: () -> Unit = {},
+    onLyricsMenu: () -> Unit = {},
 ) {
     val navController = LocalNavController.current
     val menuState = LocalMenuState.current
     val bottomSheetPageState = LocalBottomSheetPageState.current
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        RetroIconKey(
-            iconRes = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
-            // A broadcast is not a song to keep, so the heart is there but out of reach.
-            tint =
-                when {
-                    isLive -> RetroInk.copy(alpha = 0.3f)
-                    isFavorite -> MaterialTheme.colorScheme.error
-                    else -> RetroInk
-                },
-            enabled = !isLive,
-            onClick = onToggleLike,
-        )
+        if (lyricsPage) {
+            // On the lyrics page this key goes full screen, as the heart's place does elsewhere.
+            RetroIconKey(iconRes = R.drawable.fullscreen, onClick = onToggleFullScreen)
+        } else {
+            RetroIconKey(
+                iconRes = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
+                // A broadcast is not a song to keep, so the heart is there but out of reach.
+                tint =
+                    when {
+                        isLive -> RetroInk.copy(alpha = 0.3f)
+                        isFavorite -> MaterialTheme.colorScheme.error
+                        else -> RetroInk
+                    },
+                enabled = !isLive,
+                onClick = onToggleLike,
+            )
+        }
         RetroIconKey(iconRes = R.drawable.palette) {
             // Theme gallery: collapse the player first so the page is visible.
             state.collapseSoft()
             navController.navigate("settings/appearance/player_design")
         }
         RetroIconKey(iconRes = R.drawable.more_horiz) {
+            if (lyricsPage) {
+                onLyricsMenu()
+                return@RetroIconKey
+            }
             menuState.show {
                 PlayerMenu(
                     mediaMetadata = mediaMetadata,
