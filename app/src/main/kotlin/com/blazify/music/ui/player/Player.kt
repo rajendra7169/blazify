@@ -103,6 +103,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
@@ -3016,15 +3020,25 @@ private fun RingLyricsCard(
         if (entries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(entries, position)
     }
     val currentOnClick by rememberUpdatedState(onClick)
-    // A swipe up opens the lyrics page, as a tap does: the card reads as the top of that page.
+    // A swipe up opens the lyrics page, as a tap does: the lines read as the top of that page.
     val swipeThreshold = with(LocalDensity.current) { 40.dp.toPx() }
+    // No box: the lines sit on the player itself, which keeps the album colours running to the
+    // bottom edge. A darkening that only builds towards the bottom keeps them readable on light
+    // artwork without drawing a shape.
     Box(
-        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
-            .background(Color.Black.copy(alpha = 0.55f))
-            .clickable(onClick = onClick)
+            .background(
+                Brush.verticalGradient(
+                    0f to Color.Transparent,
+                    1f to Color.Black.copy(alpha = 0.35f),
+                ),
+            )
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick,
+            )
             .pointerInput(Unit) {
                 var dragged = 0f
                 detectVerticalDragGestures(
@@ -3041,46 +3055,64 @@ private fun RingLyricsCard(
             // buttons above it stay where they are instead of being pushed into the transport.
             .height(RingLyricsAreaHeight),
     ) {
-        if (isLoading) {
-            LyricsSkeleton(textColor)
-        } else {
-            // The card used to show only its heading until the first line was sung, and stayed
-            // that way for songs with no timed lyrics at all: an empty strip across the bottom of
-            // the player. It always shows three lines now — what is coming up during the intro,
-            // the opening of lyrics that have no timing, or a plain note when there are none.
-            val plainLines = remember(lyricsText, entries) {
-                if (entries.isNotEmpty() || lyricsText.isNullOrBlank() || lyricsText == LyricsEntity.LYRICS_NOT_FOUND) {
-                    emptyList()
-                } else {
-                    lyricsText.lines().map { it.trim() }.filter { it.isNotEmpty() }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                // The line just sung fades away as it rises towards the button row.
+                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                .drawWithContent {
+                    drawContent()
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.45f to Color.Black,
+                        ),
+                        blendMode = BlendMode.DstIn,
+                    )
+                },
+        ) {
+            if (isLoading) {
+                LyricsSkeleton(textColor)
+            } else {
+                // The card used to show only its heading until the first line was sung, and stayed
+                // that way for songs with no timed lyrics at all: an empty strip across the bottom of
+                // the player. It always shows three lines now — what is coming up during the intro,
+                // the opening of lyrics that have no timing, or a plain note when there are none.
+                val plainLines = remember(lyricsText, entries) {
+                    if (entries.isNotEmpty() || lyricsText.isNullOrBlank() || lyricsText == LyricsEntity.LYRICS_NOT_FOUND) {
+                        emptyList()
+                    } else {
+                        lyricsText.lines().map { it.trim() }.filter { it.isNotEmpty() }
+                    }
                 }
-            }
-            when {
-                entries.isNotEmpty() && currentIndex >= 0 -> RingLyricsLines(
-                    previous = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() },
-                    current = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() } ?: "♪",
-                    next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() },
-                    textColor = textColor,
-                )
-                entries.isNotEmpty() -> RingLyricsLines(
-                    previous = null,
-                    current = "♪",
-                    next = entries.firstOrNull { it.text.isNotBlank() }?.text,
-                    textColor = textColor,
-                )
-                plainLines.isNotEmpty() -> RingLyricsLines(
-                    previous = null,
-                    current = plainLines[0],
-                    next = plainLines.getOrNull(1),
-                    textColor = textColor,
-                )
-                else -> RingLyricsLines(
-                    previous = null,
-                    current = stringResource(R.string.lyrics_not_found),
-                    next = null,
-                    textColor = textColor,
-                    highlight = false,
-                )
+                when {
+                    entries.isNotEmpty() && currentIndex >= 0 -> RingLyricsLines(
+                        previous = entries.getOrNull(currentIndex - 1)?.text?.takeIf { it.isNotBlank() },
+                        current = entries.getOrNull(currentIndex)?.text?.takeIf { it.isNotBlank() } ?: "♪",
+                        next = entries.getOrNull(currentIndex + 1)?.text?.takeIf { it.isNotBlank() },
+                        textColor = textColor,
+                    )
+                    entries.isNotEmpty() -> RingLyricsLines(
+                        previous = null,
+                        current = "♪",
+                        next = entries.firstOrNull { it.text.isNotBlank() }?.text,
+                        textColor = textColor,
+                    )
+                    plainLines.isNotEmpty() -> RingLyricsLines(
+                        previous = null,
+                        current = plainLines[0],
+                        next = plainLines.getOrNull(1),
+                        textColor = textColor,
+                    )
+                    else -> RingLyricsLines(
+                        previous = null,
+                        current = stringResource(R.string.lyrics_not_found),
+                        next = null,
+                        textColor = textColor,
+                        highlight = false,
+                    )
+                }
             }
         }
     }
