@@ -255,6 +255,15 @@ fun BottomSheetPlayer(
     val bottomSheetPageState = LocalBottomSheetPageState.current
     val playerConnection = LocalPlayerConnection.current ?: return
 
+    // Back from the design gallery lands on the page it was opened from; bring the player back up.
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect { entry ->
+            if (entry.savedStateHandle.remove<Boolean>(ReopenPlayerKey) == true) {
+                state.expandSoft()
+            }
+        }
+    }
+
     val (useNewPlayerDesign, onUseNewPlayerDesignChange) =
         rememberPreference(
             UseNewPlayerDesignKey,
@@ -3427,9 +3436,7 @@ private fun CassetteTitleKeys(
             )
         }
         RetroIconKey(iconRes = R.drawable.palette) {
-            // Theme gallery: collapse the player first so the page is visible.
-            state.collapseSoft()
-            navController.navigate("settings/appearance/player_design")
+            openPlayerDesignGallery(navController, state)
         }
         RetroIconKey(iconRes = R.drawable.more_horiz) {
             if (lyricsPage) {
@@ -3595,6 +3602,18 @@ private fun RetroBottomRow(
     }
 }
 
+private const val ReopenPlayerKey = "reopen_player"
+
+/**
+ * Collapses the player so the design gallery isn't hidden behind the sheet, and marks the page
+ * underneath so the full player comes back when the user returns from the gallery.
+ */
+private fun openPlayerDesignGallery(navController: NavController, state: BottomSheetState) {
+    navController.currentBackStackEntry?.savedStateHandle?.set(ReopenPlayerKey, true)
+    state.collapseSoft()
+    navController.navigate("settings/appearance/player_design")
+}
+
 @Composable
 private fun PlayerThemeButton(
     textButtonColor: Color,
@@ -3610,9 +3629,7 @@ private fun PlayerThemeButton(
                 .clip(RoundedCornerShape(24.dp))
                 .background(textButtonColor)
                 .clickable {
-                    // Collapse the player so the design gallery isn't hidden behind the sheet.
-                    state.collapseSoft()
-                    navController.navigate("settings/appearance/player_design")
+                    openPlayerDesignGallery(navController, state)
                 },
     ) {
         Image(
