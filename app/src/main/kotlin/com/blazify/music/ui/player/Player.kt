@@ -24,6 +24,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -264,9 +265,20 @@ fun BottomSheetPlayer(
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
     val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
     val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
-    // Height reserved at the bottom of the RING layout for its lyrics-card overlay.
+    // Height reserved at the bottom of the RING layout for its overlay: the button row, plus the
+    // synced lines when the song has any. A song without lyrics gets only the row, and the rest of
+    // the layout settles into the room instead of leaving a blank or a "no lyrics" note.
     val ringNavBottomInset = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
-    val ringBottomOverlayHeight = 208.dp + ringNavBottomInset
+    val ringLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
+    val ringHasLyrics =
+        remember(ringLyrics) {
+            val text = ringLyrics?.lyrics?.trim()
+            !text.isNullOrEmpty() && text != LyricsEntity.LYRICS_NOT_FOUND
+        }
+    val ringBottomOverlayHeight by animateDpAsState(
+        targetValue = (if (ringHasLyrics) 208.dp else 96.dp) + ringNavBottomInset,
+        label = "ringBottomOverlayHeight",
+    )
 
     var showInlineLyrics by rememberSaveable {
         mutableStateOf(false)
@@ -2461,13 +2473,19 @@ fun BottomSheetPlayer(
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
                 horizontalAlignment = Alignment.Start,
             ) {
-                RingLyricsCard(
-                    lyricsText = overlayLyrics?.lyrics,
-                    isLoading = overlayLyrics == null,
-                    position = sliderPosition ?: effectivePosition,
-                    textColor = TextBackgroundColor,
-                    onClick = { showInlineLyrics = true },
-                )
+                AnimatedVisibility(
+                    visible = ringHasLyrics,
+                    enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
+                    exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom),
+                ) {
+                    RingLyricsCard(
+                        lyricsText = overlayLyrics?.lyrics,
+                        isLoading = overlayLyrics == null,
+                        position = sliderPosition ?: effectivePosition,
+                        textColor = TextBackgroundColor,
+                        onClick = { showInlineLyrics = true },
+                    )
+                }
                 // The same four controls as every other design, in the same place at the very bottom.
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
