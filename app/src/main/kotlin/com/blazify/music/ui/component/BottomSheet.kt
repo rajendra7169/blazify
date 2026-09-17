@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.blazify.music.constants.NavigationBarAnimationSpec
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.pow
 
@@ -220,6 +221,18 @@ class BottomSheetState(
 
     fun collapseSoft() {
         collapse(spring(stiffness = Spring.StiffnessMediumLow))
+    }
+
+    /**
+     * Collapses after [delayMillis], for when a page is opening underneath the sheet: the sheet
+     * then slides away over that page instead of over the one being left.
+     */
+    fun collapseAfter(delayMillis: Long, animationSpec: AnimationSpec<Dp>) {
+        coroutineScope.launch {
+            delay(delayMillis)
+            onAnchorChanged(collapsedAnchor)
+            animatable.animateTo(collapsedBound, animationSpec)
+        }
     }
 
     fun expandSoft() {

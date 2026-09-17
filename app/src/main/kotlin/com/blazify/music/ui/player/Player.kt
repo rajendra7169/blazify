@@ -22,6 +22,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
@@ -3607,17 +3608,19 @@ private const val ReopenPlayerKey = "reopen_player"
 private const val PlayerDesignGalleryRoute = "settings/appearance/player_design"
 
 /**
- * Collapses the player so the design gallery isn't hidden behind the sheet, and marks the page
+ * Opens the design gallery and then moves the player out of its way, and marks the page
  * underneath so the full player comes back when the user returns from the gallery.
  */
 private fun openPlayerDesignGallery(navController: NavController, state: BottomSheetState) {
-    state.collapseSoft()
     // The button stays tappable while the player slides down, so a quick second tap would open
     // the gallery twice and Back would need pressing twice.
     val current = navController.currentBackStackEntry ?: return
     if (current.destination.route == PlayerDesignGalleryRoute) return
     current.savedStateHandle[ReopenPlayerKey] = true
     navController.navigate(PlayerDesignGalleryRoute) { launchSingleTop = true }
+    // Slide the player down only once the gallery has replaced the page behind it (the page
+    // change takes 200 ms); collapsing first showed that page for a moment.
+    state.collapseAfter(delayMillis = 240, animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing))
 }
 
 @Composable
