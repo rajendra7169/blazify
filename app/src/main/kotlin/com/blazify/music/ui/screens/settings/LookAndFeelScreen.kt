@@ -69,6 +69,7 @@ import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DefaultOpenTabKey
 import com.blazify.music.constants.DynamicThemeKey
@@ -337,8 +338,9 @@ fun LookAndFeelScreen(
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
                 // Keep clear of the mini player and the navigation bar at the bottom.
                 .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
-                // The title bar floats over this screen, so everything starts below it.
-                .padding(top = 56.dp, bottom = 8.dp),
+                // The title bar floats over this screen, so everything starts below its real
+                // height — 56dp left the tabs tucked under it.
+                .padding(top = AppBarHeight + 8.dp, bottom = 8.dp),
         ) {
             BoxWithConstraints(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -381,7 +383,7 @@ fun LookAndFeelScreen(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .padding(top = 56.dp)
+            .padding(top = AppBarHeight + 8.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
