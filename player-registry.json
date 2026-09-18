@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-18T18:08:07.791Z",
+  "updatedAt": "2026-09-18T21:07:22.678Z",
   "current": {
     "playerHash": "4fd832e7",
     "playerUrl": "https://www.youtube.com/s/player/4fd832e7/player_ias.vflset/en_GB/base.js",
@@ -16,6 +16,16 @@
       "validator": "faraday",
       "configPath": "registry/player_configs.json",
       "releaseTag": "player-0053e6c9"
+    },
+    {
+      "playerHash": "00f2569f",
+      "playerUrl": "https://www.youtube.com/s/player/00f2569f/player_ias.vflset/en_GB/base.js",
+      "sha256": "dc90ee2f4fa634cb8a73acfebb06c00cba6184fb8dbbf94edbf01437da8c2316",
+      "firstSeenAt": "2026-09-18T21:07:22.678Z",
+      "status": "validated",
+      "validator": "faraday",
+      "configPath": "registry/player_configs.json",
+      "releaseTag": "player-00f2569f"
     },
     {
       "playerHash": "00fd7bc3",
