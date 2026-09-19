@@ -94,6 +94,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -112,6 +113,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -329,10 +331,15 @@ fun BottomSheetPlayer(
         mutableStateOf(false)
     }
 
-    val playerBackground by rememberEnumPreference(
+    val chosenPlayerBackground by rememberEnumPreference(
         key = PlayerBackgroundStyleKey,
         defaultValue = PlayerBackgroundStyle.GRADIENT,
     )
+    // Standing up, the Video design puts its video on a plain background — black, or light in
+    // light mode — so it takes the plain colours; sideways the video fills the screen and the
+    // chosen style comes back.
+    val playerBackground =
+        if (playerDesign == PlayerDesign.VIDEO && !isLandscape) PlayerBackgroundStyle.DEFAULT else chosenPlayerBackground
     val playerButtonsStyle by rememberEnumPreference(
         key = PlayerButtonsStyleKey,
         defaultValue = PlayerButtonsStyle.DEFAULT,
@@ -2063,65 +2070,18 @@ fun BottomSheetPlayer(
                         }
                     }
                 }
-                if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
-                    // FULL_ART: album art fills the WHOLE screen (even behind the bottom
-                    // queue peek) for a seamless look; controls float over the bottom scrim.
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .animateContentSize()
-                                .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
-                    ) {
-                        FullArtBackground(
-                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
-                        // "Now Playing" + source header centred at the top, over the artwork
-                        // (same as the classic ThumbnailHeader, with shadows for readability).
-                        val fullArtQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
-                        val fullArtShadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f)
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-                                .padding(top = 14.dp, start = 48.dp, end = 48.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.now_playing),
-                                style = MaterialTheme.typography.titleMedium.copy(shadow = fullArtShadow),
-                                fontWeight = FontWeight.Bold,
-                                color = TextBackgroundColor,
-                            )
-                            val fullArtPlayingFrom = fullArtQueueTitle ?: mediaMetadata?.album?.title
-                            if (!fullArtPlayingFrom.isNullOrBlank()) {
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = fullArtPlayingFrom,
-                                    style = MaterialTheme.typography.titleMedium.copy(shadow = fullArtShadow),
-                                    color = TextBackgroundColor.copy(alpha = 0.8f),
-                                    maxLines = 1,
-                                    modifier = Modifier.basicMarquee(),
-                                )
-                            }
-                        }
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier =
-                                Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                                    .padding(bottom = bottomPadding),
-                        ) {
-                            mediaMetadata?.let {
-                                controlsContent(it)
-                            }
-                            Spacer(Modifier.height(30.dp))
-                        }
-                    }
+                if (playerDesign.fillsScreen && !showInlineLyrics) {
+                    FullArtPortrait(
+                        design = playerDesign,
+                        mediaMetadata = mediaMetadata,
+                        playerConnection = playerConnection,
+                        playerSeeker = playerSeeker,
+                        isRtlLayout = isRtlLayout,
+                        isListenTogetherGuest = isListenTogetherGuest,
+                        textColor = TextBackgroundColor,
+                        bottomPadding = bottomPadding,
+                        controlsContent = controlsContent,
+                    )
                 } else if (playerDesign == PlayerDesign.RING && !showInlineLyrics) {
                     val ringShuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
                     val ringQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
@@ -2413,7 +2373,7 @@ fun BottomSheetPlayer(
         // A way down from the full player at the top left, where Ring always had one. Ring draws
         // its own inside its top bar and Cassette one in its own style; these three share this.
         if (!isFullScreen && !showInlineLyrics && queueSheetState.progress < 0.999f &&
-            playerDesign in setOf(PlayerDesign.CLASSIC, PlayerDesign.FULL_ART, PlayerDesign.RECORD)
+            playerDesign in setOf(PlayerDesign.CLASSIC, PlayerDesign.FULL_ART, PlayerDesign.VIDEO, PlayerDesign.RECORD)
         ) {
             RingIconButton(
                 res = R.drawable.expand_more,
@@ -2844,9 +2804,10 @@ private fun BoxScope.LandscapePlayer(
             val verticalPaddingDp = with(density) { verticalPadding.toDp() }
             val verticalWindowInsets = WindowInsets(left = 0.dp, top = verticalPaddingDp, right = 0.dp, bottom = verticalPaddingDp)
 
-            if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
+            if (playerDesign.fillsScreen && !showInlineLyrics) {
                 FullArtBackground(
-                    thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                    song = mediaMetadata,
+                    design = playerDesign,
                     modifier = Modifier
                         .fillMaxSize()
                         .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
@@ -3005,7 +2966,7 @@ private fun BoxScope.LandscapePlayer(
 
                                 // Full art covers the whole screen behind this Row, so its
                                 // half is left to the artwork itself.
-                                PlayerDesign.FULL_ART -> Box(Modifier.fillMaxSize())
+                                PlayerDesign.FULL_ART, PlayerDesign.VIDEO -> Box(Modifier.fillMaxSize())
 
                                 PlayerDesign.CLASSIC ->
                                     Thumbnail(
@@ -3541,10 +3502,132 @@ private fun RingIconButton(
     }
 }
 
-/** FULL_ART design: album art fills the stage behind a bottom scrim. */
+/**
+ * FULL_ART and VIDEO standing up.
+ *
+ * Full Art lays the artwork over the whole screen, controls on a dark scrim at the bottom. Video
+ * stands the song's video right above the controls, whole and across the full width, on a plain
+ * background that goes dark or light with the app — so nothing of the picture is cut away and
+ * the black bands many videos carry have nothing to stand out against.
+ */
+@Composable
+private fun FullArtPortrait(
+    design: PlayerDesign,
+    mediaMetadata: MediaMetadata?,
+    playerConnection: PlayerConnection,
+    playerSeeker: PlayerSeeker,
+    isRtlLayout: Boolean,
+    isListenTogetherGuest: Boolean,
+    textColor: Color,
+    bottomPadding: Dp,
+    controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit,
+) {
+    val video = design == PlayerDesign.VIDEO
+    val stage = MaterialTheme.colorScheme.background
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .animateContentSize()
+                .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
+    ) {
+        if (video) {
+            // A touch of the artwork's colour at the top, settling into the plain background.
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0f to lerp(stage, MaterialTheme.colorScheme.primary, 0.16f),
+                            0.5f to stage,
+                        ),
+                    ),
+            )
+        } else {
+            FullArtBackground(song = mediaMetadata, design = design, modifier = Modifier.fillMaxSize())
+        }
+        SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
+        // "Now Playing" + source header centred at the top (same as the classic ThumbnailHeader,
+        // with shadows for readability over the artwork).
+        val queueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
+        val headerStyle =
+            if (video) {
+                MaterialTheme.typography.titleMedium
+            } else {
+                MaterialTheme.typography.titleMedium.copy(shadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f))
+            }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                    .padding(top = 14.dp, start = 48.dp, end = 48.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.now_playing),
+                style = headerStyle,
+                fontWeight = FontWeight.Bold,
+                color = textColor,
+            )
+            val playingFrom = queueTitle ?: mediaMetadata?.album?.title
+            if (!playingFrom.isNullOrBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = playingFrom,
+                    style = headerStyle,
+                    color = textColor.copy(alpha = 0.8f),
+                    maxLines = 1,
+                    modifier = Modifier.basicMarquee(),
+                )
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .then(if (video) Modifier.fillMaxHeight() else Modifier)
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                    .padding(bottom = bottomPadding),
+        ) {
+            if (video) {
+                // Everything between the header and the controls is the picture's, and it sits
+                // at the bottom of that, right on top of the song's name.
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                            .padding(top = VideoHeaderSpace),
+                ) {
+                    VideoPanel(song = mediaMetadata, playerConnection = playerConnection, background = stage)
+                }
+                Spacer(Modifier.height(20.dp))
+            }
+            mediaMetadata?.let {
+                controlsContent(it)
+            }
+            Spacer(Modifier.height(30.dp))
+        }
+    }
+}
+
+/** Room left at the top of the Video design for the "Now Playing" header. */
+private val VideoHeaderSpace = 72.dp
+
+/**
+ * FULL_ART and VIDEO backgrounds over the whole screen: album art behind a scrim. In VIDEO —
+ * sideways — the song's video plays over the artwork once one is found; until then, or when there
+ * is none, it looks just like Full Art.
+ */
 @Composable
 private fun FullArtBackground(
-    thumbnailUrl: String?,
+    song: MediaMetadata?,
+    design: PlayerDesign,
     modifier: Modifier = Modifier,
     // Sideways the controls stand on the right, so the artwork is darkened towards that side
     // instead of towards the bottom.
@@ -3552,11 +3635,20 @@ private fun FullArtBackground(
 ) {
     Box(modifier = modifier) {
         AsyncImage(
-            model = thumbnailUrl,
+            model = song?.thumbnailUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
+        if (design == PlayerDesign.VIDEO) {
+            val video = rememberSongVideo(song)
+            val playerConnection = LocalPlayerConnection.current
+            if (video != null && playerConnection != null) {
+                key(video.streamUrl) {
+                    VideoArt(video, playerConnection, Modifier.fillMaxSize())
+                }
+            }
+        }
         val stops = arrayOf(
             0.0f to Color.Black.copy(alpha = 0.40f),
             0.35f to Color.Transparent,

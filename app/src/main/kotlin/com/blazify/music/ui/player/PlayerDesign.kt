@@ -20,7 +20,11 @@ enum class PlayerDesign(
     FULL_ART("full_art", R.string.player_design_full_art),
     RECORD("record", R.string.player_design_record),
     CASSETTE("cassette", R.string.player_design_cassette),
+    VIDEO("video", R.string.player_design_video),
     ;
+
+    /** Full Art and Video put the picture behind everything, with the controls over it. */
+    val fillsScreen: Boolean get() = this == FULL_ART || this == VIDEO
 
     companion object {
         fun fromId(id: String?): PlayerDesign = entries.firstOrNull { it.id == id } ?: CLASSIC

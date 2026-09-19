@@ -34,6 +34,7 @@ import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.ui.player.CassetteTape
 import com.blazify.music.ui.player.SeekableAlbumRing
+import com.blazify.music.ui.player.VideoPanel
 import com.blazify.music.ui.player.VinylTurntable
 import com.blazify.music.ui.theme.PlayerColorExtractor
 import com.blazify.music.constants.SliderStyle
@@ -95,6 +96,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -411,7 +413,7 @@ internal fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
         else -> Color.White
     }
     Box(Modifier.fillMaxSize()) {
-        if (design != PlayerDesign.FULL_ART) {
+        if (!design.fillsScreen) {
             PreviewBackground(bgStyle, meta?.thumbnailUrl, gradient)
         }
         when (design) {
@@ -420,6 +422,7 @@ internal fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
             PlayerDesign.FULL_ART -> FullArtPreview(meta, pc)
             PlayerDesign.RECORD -> RecordPreview(meta, pc, textColor)
             PlayerDesign.CASSETTE -> CassettePreview(meta, pc, textColor)
+            PlayerDesign.VIDEO -> VideoPreview(meta, pc)
         }
     }
 }
@@ -1068,6 +1071,52 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
             PreviewTransport(pc, Color.White)
             Spacer(Modifier.height(12.dp))
             PreviewQueuePeek(Color.White)
+        }
+    }
+}
+
+/* ---------- VIDEO ---------- */
+
+/**
+ * The real thing, small: the playing song's video across the width, right above the controls, on
+ * the plain page the Video design stands on.
+ */
+@Composable
+private fun VideoPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
+    val cs = MaterialTheme.colorScheme
+    val stage = cs.background
+    val ink = cs.onBackground
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(0f to lerp(stage, cs.primary, 0.16f), 0.5f to stage))
+                .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(Modifier.padding(horizontal = 16.dp)) { PreviewHeader(meta, ink) }
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp),
+        ) {
+            if (pc != null) {
+                VideoPanel(song = meta, playerConnection = pc, background = stage)
+            } else {
+                PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxWidth().aspectRatio(1f))
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Column(Modifier.padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { PreviewTitle(meta, ink) }
+                PreviewTitleActions(pc, ink)
+            }
+            Spacer(Modifier.height(10.dp))
+            PreviewSlider(pc, cs.primary, ink.copy(alpha = 0.22f), ink)
+            Spacer(Modifier.height(10.dp))
+            PreviewTransport(pc, ink)
+            Spacer(Modifier.height(12.dp))
+            PreviewQueuePeek(ink)
         }
     }
 }
