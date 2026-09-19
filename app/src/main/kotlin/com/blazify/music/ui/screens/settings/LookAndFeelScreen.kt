@@ -75,8 +75,6 @@ import com.blazify.music.constants.DynamicThemeKey
 import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.LyricsTextPositionKey
-import com.blazify.music.constants.MiniPlayerBackgroundStyle
-import com.blazify.music.constants.MiniPlayerBackgroundStyleKey
 import com.blazify.music.constants.MiniPlayerDesignKey
 import com.blazify.music.constants.NavBarStyle
 import com.blazify.music.constants.NavBarStyleKey
@@ -153,10 +151,6 @@ fun LookAndFeelScreen(
                 MiniPlayerDesign.fromId(miniPlayerDesignId)
             }
         }
-    val miniPlayerUsesArtBackground = selectedMiniPlayerDesign != MiniPlayerDesign.FLAT
-    val (miniPlayerBackground, onMiniPlayerBackgroundChange) =
-        rememberEnumPreference(MiniPlayerBackgroundStyleKey, MiniPlayerBackgroundStyle.GRADIENT)
-    var showMiniPlayerBackgroundDialog by rememberSaveable { mutableStateOf(false) }
 
     // ── Player state ──
     val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
@@ -306,30 +300,6 @@ fun LookAndFeelScreen(
                                 selected = selectedMiniPlayerDesign,
                                 onSelect = { onMiniPlayerDesignChange(it.id) },
                             )
-                            Spacer(Modifier.height(8.dp))
-                            Box(Modifier.padding(horizontal = 16.dp)) {
-                                Material3SettingsGroup(
-                                    items = listOf(
-                                        Material3SettingsItem(
-                                            icon = painterResource(R.drawable.gradient),
-                                            enabled = miniPlayerUsesArtBackground,
-                                            title = { Text(stringResource(R.string.mini_player_background_style)) },
-                                            description = {
-                                                Text(
-                                                    if (!miniPlayerUsesArtBackground) {
-                                                        stringResource(R.string.mini_player_background_not_available)
-                                                    } else {
-                                                        miniPlayerBackground.label()
-                                                    },
-                                                )
-                                            },
-                                            onClick = {
-                                                if (miniPlayerUsesArtBackground) showMiniPlayerBackgroundDialog = true
-                                            },
-                                        ),
-                                    ),
-                                )
-                            }
                         }
                 }
             }
@@ -433,24 +403,6 @@ fun LookAndFeelScreen(
             }
         },
     )
-
-    if (showMiniPlayerBackgroundDialog) {
-        val values = MiniPlayerBackgroundStyle.entries.filter {
-            it != MiniPlayerBackgroundStyle.BLUR ||
-                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
-        }
-        EnumDialog(
-            onDismiss = { showMiniPlayerBackgroundDialog = false },
-            onSelect = {
-                onMiniPlayerBackgroundChange(it)
-                showMiniPlayerBackgroundDialog = false
-            },
-            title = stringResource(R.string.mini_player_background_style),
-            current = miniPlayerBackground,
-            values = values,
-            valueText = { it.label() },
-        )
-    }
 
     if (showSliderStyleDialog) {
         SliderStyleDialog(
@@ -705,15 +657,6 @@ internal fun LyricsSampleInterior(
             Spacer(Modifier.height(4.dp))
         }
     }
-}
-
-@Composable
-private fun MiniPlayerBackgroundStyle.label(): String = when (this) {
-    MiniPlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
-    MiniPlayerBackgroundStyle.TRANSPARENT -> stringResource(R.string.transparent)
-    MiniPlayerBackgroundStyle.BLUR -> stringResource(R.string.player_background_blur)
-    MiniPlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
-    MiniPlayerBackgroundStyle.PURE_BLACK -> stringResource(R.string.pure_black)
 }
 
 /** Amber pill tab strip; horizontally scrollable so it scales to any number of tabs. */
