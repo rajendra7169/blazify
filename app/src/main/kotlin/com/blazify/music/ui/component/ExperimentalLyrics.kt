@@ -39,6 +39,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -331,6 +332,7 @@ fun ExperimentalLyrics(
     var previousScrollActiveIndices by remember { mutableStateOf(emptySet<Int>()) }
     
     var currentPositionState by remember { mutableLongStateOf(0L) }
+    val sponsorSkipped by playerConnection.sponsorSkippedMs.collectAsState()
     var deferredCurrentLineIndex by rememberSaveable { mutableIntStateOf(0) }
     var lastPreviewTime by rememberSaveable { mutableLongStateOf(0L) }
     var isSeeking by remember { mutableStateOf(false) }
@@ -682,7 +684,7 @@ fun ExperimentalLyrics(
                     target =
                         findActiveLineIndices(
                             lines,
-                            currentPositionState + (currentSong?.song?.lyricsOffset ?: 0),
+                            currentPositionState + (currentSong?.song?.lyricsOffset ?: 0) - sponsorSkipped,
                         ).maxOrNull() ?: -1
                 }
                 if (target != -1) {
@@ -769,7 +771,8 @@ fun ExperimentalLyrics(
                     }
             ) {
                 val lyricsOffsetVal = (currentSong?.song?.lyricsOffset ?: 0).toLong()
-                val currentEffectivePosition = currentPositionState + lyricsOffsetVal
+                // Whatever SponsorBlock jumped past is not in the words' timeline.
+                val currentEffectivePosition = currentPositionState + lyricsOffsetVal - sponsorSkipped
                 
                 if (isLyricsProviderShown) {
                     val targetProviderBase = anchorY + (positions[0] ?: 0f) - with(density) { 32.dp.toPx() }

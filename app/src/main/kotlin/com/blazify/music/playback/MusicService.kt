@@ -529,6 +529,14 @@ class MusicService :
     private var sponsorSegments = emptyList<SponsorBlock.Segment>()
     private var sponsorFetchJob: Job? = null
 
+    /**
+     * How much of this song has been jumped past.
+     *
+     * Lyrics are timed to the released track, which has none of the talking a video puts in front
+     * of it, so the words have to be moved back by however much was skipped or they run ahead.
+     */
+    val sponsorSkippedMs = MutableStateFlow(0L)
+
     // Cached preferences to avoid runBlocking DataStore reads in hot paths
     @Volatile
     private var cachedPersistentQueue = true
@@ -2838,6 +2846,7 @@ class MusicService :
     private fun refreshSponsorSegments(mediaItem: MediaItem?) {
         sponsorFetchJob?.cancel()
         sponsorSegments = emptyList()
+        sponsorSkippedMs.value = 0L
         val mediaId = mediaItem?.mediaId ?: return
         if (LocalMusic.isLocal(mediaId) || mediaId in liveBroadcasts.value) return
 
@@ -2866,6 +2875,7 @@ class MusicService :
         if (sponsorSegments.isEmpty()) return
         val segment = SponsorBlock.segmentAt(sponsorSegments, player.currentPosition) ?: return
         Timber.tag(TAG).i("SponsorBlock: skipping ${segment.category.id} to ${segment.endMs}ms")
+        sponsorSkippedMs.value += segment.endMs - player.currentPosition
         player.seekTo(segment.endMs)
     }
 
