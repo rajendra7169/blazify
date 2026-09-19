@@ -358,7 +358,8 @@ fun LookAndFeelScreen(
                 LookFeelTabRow(selected = tab, onSelect = { tab = it })
                 Spacer(Modifier.height(16.dp))
                 controls()
-                Spacer(Modifier.height(24.dp))
+                // Room to scroll the last card clear of the mini player.
+                Spacer(Modifier.height(96.dp))
             }
         }
     } else {
