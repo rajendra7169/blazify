@@ -264,6 +264,8 @@
     <string name="import_spotify">Import from Spotify</string>
     <string name="sponsorblock">Skip the parts that are not the song</string>
     <string name="listenbrainz_integration">ListenBrainz</string>
+    <string name="animated_covers">Moving album covers</string>
+    <string name="animated_covers_desc">In the Full art player, songs whose album has a moving cover show it instead of the still one. Follows \"save data on mobile\".</string>
     <string name="repeat_times">Play this a few times</string>
     <string name="repeat_times_hint">Repeat the song a set number of times, then carry on</string>
     <string name="repeat_times_left">%1$d more to go</string>

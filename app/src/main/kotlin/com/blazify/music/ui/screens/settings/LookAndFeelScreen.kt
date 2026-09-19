@@ -69,6 +69,7 @@ import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.AnimatedCoversKey
 import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.DefaultOpenTabKey
@@ -177,6 +178,7 @@ fun LookAndFeelScreen(
         rememberEnumPreference(GridItemsSizeKey, GridItemSize.SMALL)
     var showGridSizeDialog by rememberSaveable { mutableStateOf(false) }
     val (slimNavBar, onSlimNavBarChange) = rememberPreference(SlimNavBarKey, defaultValue = false)
+    val (animatedCovers, onAnimatedCoversChange) = rememberPreference(AnimatedCoversKey, defaultValue = true)
     val (navBarStyle, onNavBarStyleChange) = rememberEnumPreference(NavBarStyleKey, NavBarStyle.PILL)
     var showNavBarStyleDialog by rememberSaveable { mutableStateOf(false) }
     val (showHomeGreeting, onShowHomeGreetingChange) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
@@ -224,6 +226,18 @@ fun LookAndFeelScreen(
                                         title = { Text(stringResource(R.string.player_slider_style)) },
                                         description = { Text(sliderStyle.label(squigglySlider)) },
                                         onClick = { showSliderStyleDialog = true },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.play),
+                                        title = { Text(stringResource(R.string.animated_covers)) },
+                                        description = { Text(stringResource(R.string.animated_covers_desc)) },
+                                        trailingContent = {
+                                            Switch(
+                                                checked = animatedCovers,
+                                                onCheckedChange = onAnimatedCoversChange,
+                                            )
+                                        },
+                                        onClick = { onAnimatedCoversChange(!animatedCovers) },
                                     ),
                                 ),
                             )
