@@ -113,6 +113,10 @@ import com.blazify.music.R
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.playback.PlayerConnection
+import com.blazify.music.constants.SquigglySliderKey
+import com.blazify.music.ui.component.SquigglySlider
+import com.blazify.music.ui.component.WavySlider
+import com.blazify.music.utils.rememberPreference
 import com.blazify.music.ui.component.CapsuleSeekBar
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.player.PlayerDesign
@@ -584,6 +588,42 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
             // bar swallows the track here just as it did in the picker tiles.
             compact = true,
         )
+        return
+    }
+
+    // Wavy and squiggly are just as distinctive, and the preview used to show a plain bar for
+    // both, so picking either in Look & Feel looked like it did nothing.
+    if (sliderStyle == SliderStyle.WAVY) {
+        val squiggly by rememberPreference(SquigglySliderKey, defaultValue = false)
+        val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+        val frac = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
+        val colors = SliderDefaults.colors(
+            activeTrackColor = activeColor,
+            inactiveTrackColor = inactiveColor,
+            thumbColor = activeColor,
+        )
+        val onValue: (Float) -> Unit = { f -> if (dur > 0) pc?.player?.seekTo((f * dur).toLong()) }
+        if (squiggly) {
+            SquigglySlider(
+                value = frac,
+                valueRange = 0f..1f,
+                onValueChange = onValue,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = pc != null,
+                colors = colors,
+                isPlaying = isPlaying,
+            )
+        } else {
+            WavySlider(
+                value = frac,
+                valueRange = 0f..1f,
+                onValueChange = onValue,
+                colors = colors,
+                modifier = Modifier.fillMaxWidth(),
+                isPlaying = isPlaying,
+                enabled = pc != null,
+            )
+        }
         return
     }
 
