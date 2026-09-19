@@ -67,6 +67,13 @@ import com.blazify.music.ui.component.SpotifyImportDialog
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
@@ -136,12 +143,15 @@ fun NavGraphBuilder.navigationBuilder(
             navController,
             R.string.playlists,
             actions = {
-                IconButton(onClick = { showSpotifyImport = true }) {
+                TextButton(onClick = { showSpotifyImport = true }) {
                     Icon(
                         painter = painterResource(R.drawable.spotify),
-                        contentDescription = stringResource(R.string.import_spotify),
+                        contentDescription = null,
                         tint = Color.Unspecified,
+                        modifier = Modifier.size(20.dp),
                     )
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.import_spotify))
                 }
             },
         ) {

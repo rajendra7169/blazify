@@ -1188,27 +1188,32 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         actions = {
-                                            // Bringing a Spotify playlist over belongs beside the
-                                            // rest of the library, not buried a screen deeper.
+                                            // In the library, bringing a playlist over is the
+                                            // thing people come here to do; Blaze Together keeps
+                                            // its place on every other screen.
                                             if (currentRoute == Screens.Library.route) {
-                                                IconButton(onClick = { showSpotifyImportDialog = true }) {
+                                                TextButton(onClick = { showSpotifyImportDialog = true }) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.spotify),
-                                                        contentDescription = stringResource(R.string.import_spotify),
+                                                        contentDescription = null,
                                                         tint = Color.Unspecified,
+                                                        modifier = Modifier.size(20.dp),
                                                     )
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(stringResource(R.string.import_spotify))
                                                 }
-                                            }
-                                            TextButton(
-                                                onClick = { navController.navigate("listen_together_from_topbar") },
-                                            ) {
-                                                Image(
-                                                    painter = painterResource(R.drawable.blaze_logo),
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(20.dp),
-                                                )
-                                                Spacer(Modifier.width(6.dp))
-                                                Text(stringResource(R.string.blaze_together))
+                                            } else {
+                                                TextButton(
+                                                    onClick = { navController.navigate("listen_together_from_topbar") },
+                                                ) {
+                                                    Image(
+                                                        painter = painterResource(R.drawable.blaze_logo),
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(20.dp),
+                                                    )
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Text(stringResource(R.string.blaze_together))
+                                                }
                                             }
                                             IconButton(onClick = { showAccountDialog = true }) {
                                                 BadgedBox(badge = {
