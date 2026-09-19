@@ -595,7 +595,6 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
     // both, so picking either in Look & Feel looked like it did nothing.
     if (sliderStyle == SliderStyle.WAVY) {
         val squiggly by rememberPreference(SquigglySliderKey, defaultValue = false)
-        val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
         val frac = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
         val colors = SliderDefaults.colors(
             activeTrackColor = activeColor,
@@ -611,7 +610,8 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
                 modifier = Modifier.fillMaxWidth(),
                 enabled = pc != null,
                 colors = colors,
-                isPlaying = isPlaying,
+                // Always waving, even with the music paused: this is a preview of the style.
+                isPlaying = true,
             )
         } else {
             WavySlider(
@@ -620,7 +620,7 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
                 onValueChange = onValue,
                 colors = colors,
                 modifier = Modifier.fillMaxWidth(),
-                isPlaying = isPlaying,
+                isPlaying = true,
                 enabled = pc != null,
             )
         }
