@@ -73,14 +73,13 @@ object SpotifyImport {
 
         return withContext(Dispatchers.IO) {
             runCatching {
-                database.query {
-                    insert(entity)
-                    found.filterNotNull().forEach { insert(it.toMediaMetadata()) }
-                }
+                // Written straight through rather than through database.query{}, which hands the
+                // work to a background executor and returns before any of it has happened — the
+                // playlist is read back on the next line.
+                database.insert(entity)
+                found.filterNotNull().forEach { database.insert(it.toMediaMetadata()) }
                 val stored = database.playlistBlocking(entity.id) ?: throw IllegalStateException("playlist vanished")
-                database.query {
-                    addSongToPlaylist(stored, found.filterNotNull().map { it.id })
-                }
+                database.addSongToPlaylist(stored, found.filterNotNull().map { it.id })
 
                 val missing =
                     playlist.tracks
@@ -98,7 +97,7 @@ object SpotifyImport {
                     missing = missing,
                     mayHaveMore = playlist.mayHaveMore,
                 )
-            }
+            }.onFailure { Timber.tag("SpotifyImport").w(it, "import failed") }
         }
     }
 
