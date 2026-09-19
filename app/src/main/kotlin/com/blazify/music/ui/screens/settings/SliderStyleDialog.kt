@@ -8,6 +8,8 @@ package com.blazify.music.ui.screens.settings
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 import com.blazify.music.R
 import com.blazify.music.constants.PlayerBackgroundStyle
@@ -70,9 +76,24 @@ fun SliderStyleDialog(
             isSystemInDarkTheme(),
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Sideways there is width to spare and little height, so the tiles are kept short
+        // instead of square, which pushed their names and Cancel off the screen.
+        val tileHeight =
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                88.dp
+            } else {
+                null
+            }
+
+        // Scrollable so the tiles never push Cancel off a short screen.
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            // weight(fill = false) leaves the Cancel row its space instead of being pushed out.
+            modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StyleTile(
+                    height = tileHeight,
                     label = stringResource(R.string.slider_style_capsule),
                     selected = current == SliderStyle.DEFAULT,
                     onClick = { onSelect(SliderStyle.DEFAULT, false) },
@@ -90,6 +111,7 @@ fun SliderStyleDialog(
                     }
                 }
                 StyleTile(
+                    height = tileHeight,
                     label = stringResource(R.string.wavy),
                     selected = current == SliderStyle.WAVY && !squiggly,
                     onClick = { onSelect(SliderStyle.WAVY, false) },
@@ -107,6 +129,7 @@ fun SliderStyleDialog(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StyleTile(
+                    height = tileHeight,
                     label = stringResource(R.string.slim),
                     selected = current == SliderStyle.SLIM,
                     onClick = { onSelect(SliderStyle.SLIM, false) },
@@ -125,6 +148,7 @@ fun SliderStyleDialog(
                     )
                 }
                 StyleTile(
+                    height = tileHeight,
                     label = stringResource(R.string.squiggly),
                     selected = current == SliderStyle.WAVY && squiggly,
                     onClick = { onSelect(SliderStyle.WAVY, true) },
@@ -150,13 +174,14 @@ private fun RowScope.StyleTile(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
+    height: Dp? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-            .aspectRatio(1f)
+            .then(if (height != null) Modifier.height(height) else Modifier.aspectRatio(1f))
             .weight(1f)
             .clip(RoundedCornerShape(16.dp))
             .border(
