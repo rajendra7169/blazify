@@ -23,11 +23,13 @@ class ServerClockTest {
         )
 
         assertEquals(10_065L, clock.now())
-        assertEquals(565L, clock.positionAt(500L, 10_000L, isPlaying = true))
+        // 500 played + 65 since the server saw the update + 55 for the host's own leg to the
+        // server, which the server's receive time does not include and which guests trail by.
+        assertEquals(620L, clock.positionAt(500L, 10_000L, isPlaying = true))
 
         elapsedRealtime += 100L
         assertEquals(10_165L, clock.now())
-        assertEquals(665L, clock.positionAt(500L, 10_000L, isPlaying = true))
+        assertEquals(720L, clock.positionAt(500L, 10_000L, isPlaying = true))
         assertEquals(500L, clock.positionAt(500L, 10_000L, isPlaying = false))
     }
 
