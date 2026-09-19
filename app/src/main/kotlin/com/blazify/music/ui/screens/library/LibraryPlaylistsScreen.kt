@@ -87,6 +87,7 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.constants.MiniPlayerHeight
 import com.blazify.music.db.entities.Song
 import com.blazify.music.ui.component.CreatePlaylistDialog
+import com.blazify.music.ui.component.SpotifyImportDialog
 import com.blazify.music.ui.menu.AddToPlaylistDialogOnline
 import com.blazify.music.ui.menu.LoadingScreen
 import com.blazify.music.viewmodels.BackupRestoreViewModel
@@ -331,6 +332,17 @@ fun LibraryPlaylistsScreen(
     }
 
     var showCreatePlaylistDialog by rememberSaveable { mutableStateOf(false) }
+    var showSpotifyImportDialog by rememberSaveable { mutableStateOf(false) }
+
+    if (showSpotifyImportDialog) {
+        SpotifyImportDialog(
+            onDismiss = { showSpotifyImportDialog = false },
+            onImported = { playlistId ->
+                showSpotifyImportDialog = false
+                navController.navigate("local_playlist/$playlistId")
+            },
+        )
+    }
 
     if (showCreatePlaylistDialog) {
         CreatePlaylistDialog(
@@ -637,6 +649,14 @@ fun LibraryPlaylistsScreen(
                     onClick = {
                         showFabMenu = false
                         importM3uLauncher.launch(arrayOf("audio/*"))
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.import_spotify)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.playlist_add), null) },
+                    onClick = {
+                        showFabMenu = false
+                        showSpotifyImportDialog = true
                     },
                 )
                 DropdownMenuItem(

@@ -261,6 +261,17 @@
 
     <string name="import_online">Import an M3U playlist</string>
     <string name="import_csv">Import a CSV playlist</string>
+    <string name="import_spotify">Import from Spotify</string>
+    <string name="import_action">Import</string>
+    <string name="open_playlist">Open playlist</string>
+    <string name="import_spotify_link">Spotify playlist link</string>
+    <string name="import_spotify_hint">Open the playlist in Spotify, tap Share, then Copy link. The playlist has to be public.</string>
+    <string name="import_spotify_reading">Reading the playlist…</string>
+    <string name="import_spotify_progress">Looking for song %1$d of %2$d…</string>
+    <string name="import_spotify_done">Found %1$d of %2$d songs.</string>
+    <string name="import_spotify_missing">Not found: %1$s</string>
+    <string name="import_spotify_only_hundred">Spotify only shares the first 100 songs of a playlist, so anything after that was not imported.</string>
+    <string name="import_spotify_failed">Could not read that playlist. Check the link, and that the playlist is public.</string>
     <string name="playlist_add_local_to_synced_note">NOTE: Adding local songs to synced or remote playlists is not supported. Any other combination is valid</string>
     <string name="export_playlist">Export playlist</string>
     <string name="export_as_csv">Export as CSV</string>

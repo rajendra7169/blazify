@@ -11,6 +11,7 @@
 package com.blazify.music.ui.screens
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -448,6 +449,7 @@ fun YoursPlaylistsGrid(
 fun YoursCategoryScreen(
     navController: NavController,
     titleRes: Int,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     Box(Modifier.fillMaxSize()) {
@@ -462,6 +464,7 @@ fun YoursCategoryScreen(
                     )
                 }
             },
+            actions = actions,
         )
     }
 }

@@ -6,6 +6,7 @@
 package com.blazify.music.ui.screens
 
 import android.app.Activity
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,6 +63,14 @@ import com.blazify.music.ui.screens.settings.HiddenSongsSettings
 import com.blazify.music.ui.screens.settings.RomanizationSettings
 import com.blazify.music.ui.screens.settings.SettingsScreen
 import com.blazify.music.ui.screens.settings.StorageSettings
+import com.blazify.music.ui.component.SpotifyImportDialog
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.blazify.music.ui.screens.settings.PlayerDesignScreen
 import com.blazify.music.ui.screens.settings.UpdaterScreen
 import com.blazify.music.ui.screens.settings.integrations.DiscordSettings
@@ -112,7 +121,28 @@ fun NavGraphBuilder.navigationBuilder(
     }
 
     composable("yours/playlists") {
-        YoursCategoryScreen(navController, R.string.playlists) {
+        var showSpotifyImport by rememberSaveable { mutableStateOf(false) }
+        if (showSpotifyImport) {
+            SpotifyImportDialog(
+                onDismiss = { showSpotifyImport = false },
+                onImported = { playlistId ->
+                    showSpotifyImport = false
+                    navController.navigate("local_playlist/$playlistId")
+                },
+            )
+        }
+        YoursCategoryScreen(
+            navController,
+            R.string.playlists,
+            actions = {
+                IconButton(onClick = { showSpotifyImport = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.playlist_add),
+                        contentDescription = stringResource(R.string.import_spotify),
+                    )
+                }
+            },
+        ) {
             YoursPlaylistsGrid(navController)
         }
     }
