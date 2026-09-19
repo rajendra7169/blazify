@@ -301,6 +301,9 @@ fun BottomSheetPlayer(
     val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
     val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
     val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
+    // Sideways the screen is split in two, so the bottom buttons move into the right half
+    // instead of running across the artwork.
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     // Height reserved at the bottom of the RING layout for its overlay: the button row, plus the
     // synced lines when the song has any. A song without lyrics gets only the row, and the rest of
     // the layout settles into the room instead of leaving a blank or a "no lyrics" note.
@@ -2107,6 +2110,71 @@ fun BottomSheetPlayer(
                             controlsContent(it)
                         }
 
+                        // Queue · Cast · Sleep timer · Lyrics, under this half's controls rather
+                        // than across the whole screen, where they covered the artwork.
+                        if (!isFullScreen && !showInlineLyrics) {
+                            Spacer(Modifier.height(10.dp))
+                            if (playerDesign == PlayerDesign.CASSETTE) {
+                                RetroBottomRow(
+                                    lyricsOpen = showInlineLyrics,
+                                    sleepTimerEnabled = sleepTimerEnabled,
+                                    sleepTimerTimeLeft = sleepTimerTimeLeft,
+                                    sleepEnabled = !isListenTogetherGuest,
+                                    accent = MaterialTheme.colorScheme.primary,
+                                    onLyrics = { showInlineLyrics = !showInlineLyrics },
+                                    onQueue = { queueSheetState.expandSoft() },
+                                    onSleep = { showSleepTimerDialog = true },
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                                )
+                            } else {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                                ) {
+                                    PlayerBottomButton(
+                                        icon = R.drawable.queue_music,
+                                        label = stringResource(R.string.queue),
+                                        active = false,
+                                        tint = TextBackgroundColor,
+                                        activeTint = BlazeThemeColor,
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { queueSheetState.expandSoft() },
+                                    )
+                                    CastButton(
+                                        modifier = Modifier.weight(1f),
+                                        tintColor = TextBackgroundColor,
+                                        label = stringResource(R.string.cast),
+                                        activeTint = BlazeThemeColor,
+                                    )
+                                    PlayerBottomButton(
+                                        icon = R.drawable.bedtime,
+                                        label =
+                                            if (sleepTimerEnabled) {
+                                                makeTimeString(sleepTimerTimeLeft)
+                                            } else {
+                                                stringResource(R.string.sleep_timer)
+                                            },
+                                        active = sleepTimerEnabled,
+                                        tint = TextBackgroundColor,
+                                        activeTint = BlazeThemeColor,
+                                        enabled = !isListenTogetherGuest,
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { showSleepTimerDialog = true },
+                                    )
+                                    PlayerBottomButton(
+                                        icon = R.drawable.lyrics,
+                                        label = stringResource(R.string.lyrics),
+                                        active = showInlineLyrics,
+                                        tint = TextBackgroundColor,
+                                        activeTint = BlazeThemeColor,
+                                        modifier = Modifier.weight(1f),
+                                        onClick = { showInlineLyrics = !showInlineLyrics },
+                                    )
+                                }
+                            }
+                        }
+
                         Spacer(Modifier.weight(1f))
                     }
                 }
@@ -2577,7 +2645,7 @@ fun BottomSheetPlayer(
                 // Hide the collapsed queue peek on the RING front player (its lyrics card
                 // owns the bottom) and on CASSETTE (its retro bottom row replaces it).
                 // The full lyrics page keeps the peek as usual.
-                showCollapsedContent = !(
+                showCollapsedContent = !isLandscape && !(
                     (playerDesign == PlayerDesign.RING && !showInlineLyrics) ||
                         playerDesign == PlayerDesign.CASSETTE
                 ),
@@ -2622,7 +2690,7 @@ fun BottomSheetPlayer(
         // RING design: bottom overlay, drawn over the queue peek: the synced lines, fading in from
         // above and out below, then the standard button row at the very bottom, where the other
         // designs keep it. Fades out as the queue is dragged open so it doesn't cover the queue.
-        if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics &&
+        if (playerDesign == PlayerDesign.RING && !isFullScreen && !showInlineLyrics && !isLandscape &&
             queueSheetState.progress < 0.999f
         ) {
             val overlayLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
@@ -2714,7 +2782,7 @@ fun BottomSheetPlayer(
         // hidden queue peek still takes up (78dp above the navigation bar). The queue sheet
         // keeps handling taps and drags there, so the row is drawn over it, the same way as
         // RING's overlay, and fades out as the queue is dragged open.
-        if (playerDesign == PlayerDesign.CASSETTE && !isFullScreen &&
+        if (playerDesign == PlayerDesign.CASSETTE && !isFullScreen && !isLandscape &&
             queueSheetState.progress < 0.999f
         ) {
             mediaMetadata?.let { meta ->
