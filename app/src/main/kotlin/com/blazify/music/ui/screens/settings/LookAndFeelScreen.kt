@@ -349,17 +349,21 @@ fun LookAndFeelScreen(
                 preview((maxHeight - 8.dp).coerceAtMost(frameHeight))
             }
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // The tabs stay put; only what is under them scrolls, so they cannot be
+                // scrolled out of reach and a card is never chopped off at the top.
                 LookFeelTabRow(selected = tab, onSelect = { tab = it })
                 Spacer(Modifier.height(16.dp))
-                controls()
-                // Room to scroll the last card clear of the mini player.
-                Spacer(Modifier.height(96.dp))
+                Column(
+                    modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    controls()
+                    // Room to scroll the last card clear of the mini player.
+                    Spacer(Modifier.height(96.dp))
+                }
             }
         }
     } else {
