@@ -191,6 +191,7 @@ import com.blazify.music.ui.component.BottomSheetPage
 import com.blazify.music.ui.component.LocalBottomSheetPageState
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.component.BottomSheetState
+import com.blazify.music.ui.component.SpotifyImportDialog
 import com.blazify.music.ui.component.rememberBottomSheetState
 import com.blazify.music.ui.player.PLAYER_DESIGN_GALLERY_ROUTE
 import com.blazify.music.ui.component.shimmer.ShimmerTheme
@@ -1115,6 +1116,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                 var showAccountDialog by remember { mutableStateOf(false) }
+                var showSpotifyImportDialog by remember { mutableStateOf(false) }
 
                 val pauseListenHistory by rememberPreference(PauseListenHistoryKey, defaultValue = false)
                 val eventCount by database.eventCount().collectAsStateWithLifecycle(initialValue = 0)
@@ -1186,6 +1188,17 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         actions = {
+                                            // Bringing a Spotify playlist over belongs beside the
+                                            // rest of the library, not buried a screen deeper.
+                                            if (currentRoute == Screens.Library.route) {
+                                                IconButton(onClick = { showSpotifyImportDialog = true }) {
+                                                    Icon(
+                                                        painter = painterResource(R.drawable.spotify),
+                                                        contentDescription = stringResource(R.string.import_spotify),
+                                                        tint = Color.Unspecified,
+                                                    )
+                                                }
+                                            }
                                             TextButton(
                                                 onClick = { navController.navigate("listen_together_from_topbar") },
                                             ) {
@@ -1530,6 +1543,16 @@ class MainActivity : ComponentActivity() {
                         state = LocalBottomSheetPageState.current,
                         modifier = Modifier.align(Alignment.BottomCenter),
                     )
+
+                    if (showSpotifyImportDialog) {
+                        SpotifyImportDialog(
+                            onDismiss = { showSpotifyImportDialog = false },
+                            onImported = { playlistId ->
+                                showSpotifyImportDialog = false
+                                navController.navigate("local_playlist/$playlistId")
+                            },
+                        )
+                    }
 
                     if (showAccountDialog) {
                         AccountSettingsDialog(
