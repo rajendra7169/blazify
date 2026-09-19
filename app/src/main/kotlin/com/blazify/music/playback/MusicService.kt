@@ -530,6 +530,16 @@ class MusicService :
     private var sponsorFetchJob: Job? = null
 
     /**
+     * How many more times the song playing now should come round again.
+     *
+     * Zero is the ordinary state. While it is counting the player repeats one song; when it runs
+     * out the queue carries on from where it was, in whatever repeat mode was set before.
+     */
+    val repeatTimesLeft = MutableStateFlow(0)
+
+    private var repeatModeBeforeCount = Player.REPEAT_MODE_OFF
+
+    /**
      * How much of this song has been jumped past.
      *
      * Lyrics are timed to the released track, which has none of the talking a video puts in front
@@ -2843,6 +2853,30 @@ class MusicService :
      * Only for songs that came from YouTube: a file on the phone is not in anybody's database,
      * and a broadcast has no fixed timeline to mark up.
      */
+    /**
+     * Play this song [times] more times before moving on, or stop counting when [times] is zero.
+     */
+    fun repeatCurrentSong(times: Int) {
+        if (times <= 0) {
+            if (repeatTimesLeft.value > 0) player.repeatMode = repeatModeBeforeCount
+            repeatTimesLeft.value = 0
+            return
+        }
+        if (repeatTimesLeft.value == 0) repeatModeBeforeCount = player.repeatMode
+        repeatTimesLeft.value = times
+        player.repeatMode = Player.REPEAT_MODE_ONE
+    }
+
+    /** One more time round: count it, and let the queue go on once there are none left. */
+    private fun countRepeat() {
+        if (repeatTimesLeft.value <= 0) return
+        val left = repeatTimesLeft.value - 1
+        repeatTimesLeft.value = left
+        if (left == 0) {
+            player.repeatMode = repeatModeBeforeCount
+        }
+    }
+
     private fun refreshSponsorSegments(mediaItem: MediaItem?) {
         sponsorFetchJob?.cancel()
         sponsorSegments = emptyList()
@@ -2883,6 +2917,12 @@ class MusicService :
         mediaItem: MediaItem?,
         reason: Int,
     ) {
+        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+            countRepeat()
+        } else if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+            // Moved on by hand: the count belonged to the song that was playing.
+            repeatCurrentSong(0)
+        }
         refreshSponsorSegments(mediaItem)
         // The track that was playing before this transition only gets marked as
         // "fully cached" if it advanced AUTOmatically (i.e. it actually finished),

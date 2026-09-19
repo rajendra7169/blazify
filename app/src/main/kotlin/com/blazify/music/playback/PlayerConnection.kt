@@ -190,6 +190,9 @@ class PlayerConnection(
     /** The items that turned out to be broadcasts on air, so the screens can mark them. */
     val liveBroadcasts = service.liveBroadcasts
     val sponsorSkippedMs = service.sponsorSkippedMs
+    val repeatTimesLeft = service.repeatTimesLeft
+
+    fun repeatCurrentSong(times: Int) = service.repeatCurrentSong(times)
     val isMuted = service.isMuted
     val currentStreamClient = service.currentStreamClient
 
