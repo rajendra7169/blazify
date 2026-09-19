@@ -48,6 +48,7 @@ import com.blazify.music.db.entities.LyricsEntity
 import com.blazify.music.lyrics.LyricsUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -174,63 +177,7 @@ fun PlayerDesignScreen(navController: NavController) {
             )
         },
     ) { pad ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(pad)
-                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom)),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 62.dp),
-                pageSpacing = 16.dp,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            ) { page ->
-                val design = designs[page]
-                val focused = page == pagerState.currentPage
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(vertical = 18.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    PhoneFrame(
-                        modifier = Modifier
-                            .fillMaxHeight(if (focused) 0.94f else 0.82f),
-                    ) {
-                        LivePreview(design, playerConnection)
-                    }
-                }
-            }
-
-            Text(
-                text = stringResource(designs[pagerState.currentPage].nameRes),
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 14.dp, bottom = 2.dp),
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.padding(top = 10.dp),
-            ) {
-                designs.indices.forEach { i ->
-                    val on = i == pagerState.currentPage
-                    Box(
-                        modifier = Modifier
-                            .size(if (on) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (on) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
-                            ),
-                    )
-                }
-            }
-
+        val applyButton: @Composable () -> Unit = {
             val currentId = designs[pagerState.currentPage].id
             val applied = currentId == activeId
             Button(
@@ -261,6 +208,128 @@ fun PlayerDesignScreen(navController: NavController) {
                     Text(stringResource(R.string.apply), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 }
             }
+        }
+
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(pad)
+                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom)),
+        ) {
+            // Held sideways there is no height for a standing phone, so the carousel takes the
+            // left half and the name, dots and button the right.
+            val sideBySide = maxWidth > maxHeight
+
+            // Sideways there is no room for a phone at its own size, and simply squeezing the
+            // frame left the preview inside it cut off. So it is laid out at a full phone's size
+            // and the whole thing scaled down to the height there is.
+            val previewWidth = 250.dp
+            val previewHeight = previewWidth * 19.3f / 9f
+            val landscapeScale = ((maxHeight - 24.dp) / previewHeight).coerceIn(0.3f, 1f)
+
+            val carousel: @Composable (Modifier) -> Unit = { carouselModifier ->
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(horizontal = if (sideBySide) 24.dp else 62.dp),
+                    pageSpacing = 16.dp,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = carouselModifier,
+                ) { page ->
+                    val design = designs[page]
+                    val focused = page == pagerState.currentPage
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(vertical = if (sideBySide) 8.dp else 18.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (sideBySide) {
+                            val scale = landscapeScale * if (focused) 1f else 0.88f
+                            Box(
+                                modifier = Modifier.size(previewWidth * scale, previewHeight * scale),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .requiredSize(previewWidth, previewHeight)
+                                        .graphicsLayer {
+                                            scaleX = scale
+                                            scaleY = scale
+                                        },
+                                ) {
+                                    PhoneFrame(modifier = Modifier.fillMaxSize()) {
+                                        LivePreview(design, playerConnection)
+                                    }
+                                }
+                            }
+                        } else {
+                            PhoneFrame(
+                                modifier = Modifier
+                                    .fillMaxHeight(if (focused) 0.94f else 0.82f),
+                            ) {
+                                LivePreview(design, playerConnection)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (sideBySide) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    carousel(Modifier.weight(1f).fillMaxHeight())
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.weight(1f).fillMaxHeight().padding(end = 8.dp),
+                    ) {
+                        DesignName(designs[pagerState.currentPage].nameRes)
+                        DesignDots(designs.size, pagerState.currentPage)
+                        applyButton()
+                    }
+                }
+                return@BoxWithConstraints
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                carousel(Modifier.weight(1f).fillMaxWidth())
+
+                DesignName(designs[pagerState.currentPage].nameRes)
+                DesignDots(designs.size, pagerState.currentPage)
+                applyButton()
+            }
+        }
+    }
+}
+
+@Composable
+private fun DesignName(nameRes: Int) {
+    Text(
+        text = stringResource(nameRes),
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier.padding(top = 14.dp, bottom = 2.dp),
+    )
+}
+
+@Composable
+private fun DesignDots(count: Int, current: Int) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.padding(top = 10.dp),
+    ) {
+        repeat(count) { i ->
+            val on = i == current
+            Box(
+                modifier = Modifier
+                    .size(if (on) 8.dp else 6.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (on) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
+                    ),
+            )
         }
     }
 }
