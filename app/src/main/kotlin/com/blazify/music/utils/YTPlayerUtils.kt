@@ -394,7 +394,7 @@ object YTPlayerUtils {
             for (client in arrayOf(VISIONOS, ANDROID_VR_NO_AUTH, IOS)) {
                 val response =
                     YouTube.player(videoId, null, client, null, null)
-                        .onFailure { Timber.tag(logTag).d("video: ${client.clientName} refused") }
+                        .onFailure { Timber.tag(logTag).d("video: ${client.clientName} refused: ${it.message}") }
                         .getOrNull()
                         ?: continue
                 if (response.playabilityStatus.status != "OK") continue
