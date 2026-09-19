@@ -56,6 +56,8 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -1915,6 +1917,16 @@ fun BottomSheetPlayer(
                 val verticalPaddingDp = with(density) { verticalPadding.toDp() }
                 val verticalWindowInsets = WindowInsets(left = 0.dp, top = verticalPaddingDp, right = 0.dp, bottom = verticalPaddingDp)
 
+                if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
+                    FullArtBackground(
+                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
+                        horizontal = true,
+                    )
+                }
+
                 Row(
                     modifier =
                         Modifier
@@ -1946,13 +1958,137 @@ fun BottomSheetPlayer(
                                     positionProvider = { effectivePosition },
                                 )
                             } else {
-                                Thumbnail(
-                                    sliderPositionProvider = sliderPositionProvider,
-                                    modifier = Modifier.animateContentSize(),
-                                    isPlayerExpanded = isExpandedProvider,
-                                    isLandscape = true,
-                                    isListenTogetherGuest = isListenTogetherGuest,
-                                )
+                                // Each design keeps its own artwork sideways: the ring, the
+                                // turntable, the tape — not everything falling back to a square.
+                                val landscapeProgress =
+                                    if (duration > 0) {
+                                        ((sliderPosition ?: effectivePosition).toFloat() / duration).coerceIn(0f, 1f)
+                                    } else {
+                                        0f
+                                    }
+                                when (playerDesign) {
+                                    PlayerDesign.RING ->
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                                        ) {
+                                            SeekableAlbumRing(
+                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                                progress = landscapeProgress,
+                                                ringColor = MaterialTheme.colorScheme.primary,
+                                                trackColor = TextBackgroundColor.copy(alpha = 0.16f),
+                                                onSeek = { f ->
+                                                    if (duration > 0 && !isLive) {
+                                                        val to = (f * duration).toLong()
+                                                        playerConnection.player.seekTo(to)
+                                                        position = to
+                                                    }
+                                                },
+                                                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                                ringStrokeDp = 7f,
+                                                artPaddingDp = 18f,
+                                                thumbColor = MaterialTheme.colorScheme.primary,
+                                                onDoubleTapArt =
+                                                    if (isListenTogetherGuest) {
+                                                        null
+                                                    } else {
+                                                        { forward: Boolean -> playerSeeker.seek(forward) }
+                                                    },
+                                                rtl = isRtlLayout,
+                                                topLabel = {
+                                                    if (isLive) {
+                                                        LiveBadge()
+                                                    } else {
+                                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                                            Text(
+                                                                text = makeTimeString(sliderPosition ?: effectivePosition),
+                                                                style = MaterialTheme.typography.labelLarge,
+                                                                fontWeight = FontWeight.SemiBold,
+                                                                color = MaterialTheme.colorScheme.primary,
+                                                            )
+                                                            Text(
+                                                                text = "  —  ",
+                                                                style = MaterialTheme.typography.labelLarge,
+                                                                color = TextBackgroundColor.copy(alpha = 0.5f),
+                                                            )
+                                                            Text(
+                                                                text =
+                                                                    if (duration != C.TIME_UNSET && duration > 0) {
+                                                                        makeTimeString(duration)
+                                                                    } else {
+                                                                        "--:--"
+                                                                    },
+                                                                style = MaterialTheme.typography.labelLarge,
+                                                                color = TextBackgroundColor.copy(alpha = 0.7f),
+                                                            )
+                                                        }
+                                                    }
+                                                },
+                                            )
+                                            SeekMessage(playerSeeker)
+                                        }
+
+                                    PlayerDesign.RECORD ->
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize().padding(12.dp),
+                                        ) {
+                                            VinylTurntable(
+                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                                isPlaying = effectiveIsPlaying,
+                                                onTurn =
+                                                    if (isListenTogetherGuest) {
+                                                        null
+                                                    } else {
+                                                        { forward -> playerSeeker.seek(forward) }
+                                                    },
+                                                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                                fallbackBrush = Brush.linearGradient(
+                                                    listOf(
+                                                        MaterialTheme.colorScheme.primary,
+                                                        MaterialTheme.colorScheme.tertiary,
+                                                    ),
+                                                ),
+                                                progress = landscapeProgress,
+                                            )
+                                            SeekMessage(playerSeeker)
+                                        }
+
+                                    PlayerDesign.CASSETTE ->
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(horizontal = 16.dp)
+                                                .doubleTapToSeek(
+                                                    playerSeeker,
+                                                    isRtlLayout,
+                                                    enabled = !isListenTogetherGuest,
+                                                ),
+                                        ) {
+                                            CassetteTape(
+                                                isPlaying = effectiveIsPlaying,
+                                                progress = landscapeProgress,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                accent = MaterialTheme.colorScheme.primary,
+                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                            )
+                                            SeekMessage(playerSeeker)
+                                        }
+
+                                    // Full art covers the whole screen behind this Row, so its
+                                    // half is left to the artwork itself.
+                                    PlayerDesign.FULL_ART -> Box(Modifier.fillMaxSize())
+
+                                    PlayerDesign.CLASSIC ->
+                                        Thumbnail(
+                                            sliderPositionProvider = sliderPositionProvider,
+                                            modifier = Modifier.animateContentSize(),
+                                            isPlayerExpanded = isExpandedProvider,
+                                            isLandscape = true,
+                                            isListenTogetherGuest = isListenTogetherGuest,
+                                        )
+                                }
                             }
                         }
                     }
@@ -3280,6 +3416,9 @@ private fun RingIconButton(
 private fun FullArtBackground(
     thumbnailUrl: String?,
     modifier: Modifier = Modifier,
+    // Sideways the controls stand on the right, so the artwork is darkened towards that side
+    // instead of towards the bottom.
+    horizontal: Boolean = false,
 ) {
     Box(modifier = modifier) {
         AsyncImage(
@@ -3288,20 +3427,23 @@ private fun FullArtBackground(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
+        val stops = arrayOf(
+            0.0f to Color.Black.copy(alpha = 0.40f),
+            0.35f to Color.Transparent,
+            0.60f to Color.Black.copy(alpha = 0.55f),
+            0.80f to Color.Black.copy(alpha = 0.80f),
+            1.0f to Color.Black.copy(alpha = 0.95f),
+        )
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .background(
-                        Brush.verticalGradient(
-                            colorStops = arrayOf(
-                                0.0f to Color.Black.copy(alpha = 0.40f),
-                                0.35f to Color.Transparent,
-                                0.60f to Color.Black.copy(alpha = 0.55f),
-                                0.80f to Color.Black.copy(alpha = 0.80f),
-                                1.0f to Color.Black.copy(alpha = 0.95f),
-                            ),
-                        ),
+                        if (horizontal) {
+                            Brush.horizontalGradient(colorStops = stops)
+                        } else {
+                            Brush.verticalGradient(colorStops = stops)
+                        },
                     ),
         )
     }
