@@ -30,7 +30,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -188,14 +189,16 @@ fun SpotifyImportDialog(
                 }
 
                 else -> {
-                    OutlinedTextField(
+                    TextField(
                         value = link,
                         onValueChange = {
                             link = it
                             failed = false
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        // The same field the app's other dialogs use.
+                        colors = OutlinedTextFieldDefaults.colors(),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.link),
@@ -249,7 +252,6 @@ private fun TravellingSongs(
 ) {
     val base = if (compact) 40.dp else 56.dp
     val accent = MaterialTheme.colorScheme.primary
-    val trail = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f)
 
     // Spotify leads at the start and Blazify by the end, where it stays once the songs are here.
     val shift by animateFloatAsState(
@@ -312,13 +314,7 @@ private fun TravellingSongs(
                 .padding(horizontal = 6.dp),
         ) {
             val y = size.height / 2f
-            // The line they travel along, drawn faintly so the notes have a road.
-            drawLine(
-                color = trail,
-                start = Offset(0f, y),
-                end = Offset(size.width, y),
-                strokeWidth = 2f,
-            )
+            // Nothing is drawn between the two marks but the songs on their way across.
             if (!running) return@Canvas
 
             val notes = 5
