@@ -253,14 +253,15 @@ private fun TravellingSongs(
     val base = if (compact) 40.dp else 56.dp
     val accent = MaterialTheme.colorScheme.primary
 
-    // Spotify leads at the start and Blazify by the end, where it stays once the songs are here.
+    // They start level. As songs arrive the weight shifts across: Blazify grows, Spotify
+    // settles back, and it stays that way once everything is here.
     val shift by animateFloatAsState(
         targetValue = if (finished) 1f else fraction,
         animationSpec = tween(durationMillis = 600),
         label = "shift",
     )
-    val spotifySize = base * lerp(1.18f, 0.84f, shift)
-    val blazifySize = base * lerp(0.84f, 1.18f, shift)
+    val spotifySize = base * lerp(1f, 0.82f, shift)
+    val blazifySize = base * lerp(1f, 1.2f, shift)
 
     val pulse by rememberInfiniteTransition(label = "import").animateFloat(
         initialValue = 0f,
@@ -295,7 +296,6 @@ private fun TravellingSongs(
     ) {
         Badge(
             size = spotifySize,
-            background = Color.Black,
             glow = glow * (0.45f + 0.55f * pulse),
             glowColor = SpotifyGreen,
         ) {
@@ -303,7 +303,7 @@ private fun TravellingSongs(
                 painter = painterResource(R.drawable.spotify),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(spotifySize * 0.66f),
+                modifier = Modifier.size(spotifySize),
             )
         }
 
@@ -336,14 +336,15 @@ private fun TravellingSongs(
 
         Badge(
             size = blazifySize,
-            background = MaterialTheme.colorScheme.surfaceContainerHighest,
             glow = glow * (0.45f + 0.55f * (1f - pulse)),
             glowColor = accent,
         ) {
             Image(
                 painter = painterResource(R.drawable.blaze_logo),
                 contentDescription = null,
-                modifier = Modifier.size(blazifySize * 0.7f),
+                // The flame sits inside its own margin, so it is drawn a little larger to
+                // stand level with Spotify's mark rather than looking smaller than it.
+                modifier = Modifier.size(blazifySize * 1.22f),
             )
         }
     }
@@ -355,7 +356,6 @@ private fun seed(index: Int) = Random(index).nextFloat() * 0.8f + 0.6f
 @Composable
 private fun Badge(
     size: Dp,
-    background: Color,
     glow: Float,
     glowColor: Color,
     content: @Composable () -> Unit,
@@ -375,10 +375,7 @@ private fun Badge(
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(size)
-                .clip(CircleShape)
-                .background(background),
+            modifier = Modifier.size(size),
         ) {
             content()
         }
