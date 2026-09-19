@@ -2076,8 +2076,6 @@ fun BottomSheetPlayer(
                         FullArtBackground(
                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                             modifier = Modifier.fillMaxSize(),
-                            song = mediaMetadata,
-                            active = state.isExpanded,
                         )
                         SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
                         // "Now Playing" + source header centred at the top, over the artwork
@@ -2853,8 +2851,6 @@ private fun BoxScope.LandscapePlayer(
                         .fillMaxSize()
                         .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
                     horizontal = true,
-                    song = mediaMetadata,
-                    active = state.isExpanded,
                 )
             }
 
@@ -3553,12 +3549,7 @@ private fun FullArtBackground(
     // Sideways the controls stand on the right, so the artwork is darkened towards that side
     // instead of towards the bottom.
     horizontal: Boolean = false,
-    // The song, so its moving cover can be looked for; and whether the player is on screen,
-    // since a cover out of sight should not be playing.
-    song: MediaMetadata? = null,
-    active: Boolean = true,
 ) {
-    val motionCover = rememberMotionCover(song)
     Box(modifier = modifier) {
         AsyncImage(
             model = thumbnailUrl,
@@ -3566,11 +3557,6 @@ private fun FullArtBackground(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
-        // When the album has a moving cover it plays over the still one, fading in once it is
-        // ready; when it has none, or it will not load, the still cover is all there is.
-        motionCover?.let { url ->
-            MotionCoverVideo(url = url, active = active, modifier = Modifier.fillMaxSize())
-        }
         val stops = arrayOf(
             0.0f to Color.Black.copy(alpha = 0.40f),
             0.35f to Color.Transparent,
