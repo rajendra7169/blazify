@@ -337,12 +337,11 @@ fun LookAndFeelScreen(
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
                 // Keep clear of the mini player and the navigation bar at the bottom.
                 .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
-                .padding(bottom = 8.dp),
+                // The title bar floats over this screen, so everything starts below it.
+                .padding(top = 56.dp, bottom = 8.dp),
         ) {
             BoxWithConstraints(
-                // The title bar floats over the right half only, so the phone may use the
-                // whole height of this one.
-                modifier = Modifier.weight(1f).fillMaxHeight().padding(top = 8.dp),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 contentAlignment = Alignment.Center,
             ) {
                 // Whatever height this half really has, minus a little air — so the phone always
@@ -353,7 +352,6 @@ fun LookAndFeelScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(top = 56.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
