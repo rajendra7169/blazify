@@ -47,6 +47,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.pluralStringResource
+import com.blazify.music.ui.component.DefaultDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -134,6 +137,20 @@ fun PlayerMenu(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
+    val repeatTimesLeft by playerConnection.repeatTimesLeft.collectAsState()
+    var showRepeatTimes by rememberSaveable { mutableStateOf(false) }
+
+    if (showRepeatTimes) {
+        RepeatTimesDialog(
+            timesLeft = repeatTimesLeft,
+            onChoose = { times ->
+                playerConnection.repeatCurrentSong(times)
+                showRepeatTimes = false
+                onDismiss()
+            },
+            onDismiss = { showRepeatTimes = false },
+        )
+    }
     val liveBroadcasts by playerConnection.liveBroadcasts.collectAsStateWithLifecycle()
     val isLive = mediaMetadata.id in liveBroadcasts
     val playerVolume = playerConnection.service.playerVolume.collectAsStateWithLifecycle()
@@ -508,6 +525,28 @@ fun PlayerMenu(
                                         playerConnection.player.seekToNext()
                                     }
                                 },
+                            ),
+                        )
+                        add(
+                            Material3MenuItemData(
+                                title = { Text(text = stringResource(R.string.repeat_times)) },
+                                description = {
+                                    Text(
+                                        text =
+                                            if (repeatTimesLeft > 0) {
+                                                stringResource(R.string.repeat_times_left, repeatTimesLeft)
+                                            } else {
+                                                stringResource(R.string.repeat_times_hint)
+                                            },
+                                    )
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.repeat_one),
+                                        contentDescription = null,
+                                    )
+                                },
+                                onClick = { showRepeatTimes = true },
                             ),
                         )
                         // Don't show "View Artist" for podcasts - only show "View Podcast"
@@ -2261,6 +2300,44 @@ fun ListenTogetherDialog(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+/**
+ * How many more times to hear this one.
+ *
+ * A handful of counts rather than a number to type: nobody sets a song to repeat forty-three
+ * times, and the queue is one tap away from carrying on.
+ */
+@Composable
+private fun RepeatTimesDialog(
+    timesLeft: Int,
+    onChoose: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    DefaultDialog(
+        onDismiss = onDismiss,
+        icon = { Icon(painterResource(R.drawable.repeat_one), contentDescription = null) },
+        title = { Text(stringResource(R.string.repeat_times_choose)) },
+        buttons = {
+            if (timesLeft > 0) {
+                TextButton(onClick = { onChoose(0) }) { Text(stringResource(R.string.repeat_times_stop)) }
+            }
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+        },
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            listOf(1, 2, 3, 5, 10).forEach { times ->
+                Text(
+                    text = pluralStringResource(R.plurals.repeat_times_count, times, times),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onChoose(times) }
+                        .padding(horizontal = 12.dp, vertical = 14.dp),
+                )
             }
         }
     }

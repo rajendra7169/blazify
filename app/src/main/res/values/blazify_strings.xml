@@ -264,6 +264,15 @@
     <string name="import_spotify">Import from Spotify</string>
     <string name="sponsorblock">Skip the parts that are not the song</string>
     <string name="listenbrainz_integration">ListenBrainz</string>
+    <string name="repeat_times">Play this a few times</string>
+    <string name="repeat_times_hint">Repeat the song a set number of times, then carry on</string>
+    <string name="repeat_times_left">%1$d more to go</string>
+    <string name="repeat_times_choose">How many more times?</string>
+    <string name="repeat_times_stop">Stop repeating</string>
+    <plurals name="repeat_times_count">
+        <item quantity="one">%1$d time</item>
+        <item quantity="other">%1$d times</item>
+    </plurals>
     <string name="listenbrainz_scrobbling">Send my listens to ListenBrainz</string>
     <string name="listenbrainz_desc">An open listening history you own and can take with you, run by the MusicBrainz people.</string>
     <string name="listenbrainz_signed_in">Sending as %1$s</string>
