@@ -25,8 +25,17 @@ really do change the order.
 
 ## 🚧 Coming in the next release
 
-Nothing built yet. The next update picks from **Planned** below, in the order
-the votes and the [poll](https://github.com/rajendra7169/blazify/discussions/17) decide.
+Built and waiting for the next release:
+
+- **Import playlists from Spotify** — paste a playlist or album link and Blazify
+  looks each song up and builds the playlist here, telling you what it could not find.
+- **Skip the parts that are not the song** — SponsorBlock's community marks, so
+  talking intros, credits and sponsor breaks in music videos are jumped. Off until
+  you turn it on, and it asks without telling the server what you are playing.
+- **Scrobble to ListenBrainz** — the open listening history, alongside Last.fm.
+- **Play a song a set number of times** before the queue carries on.
+- **Sideways screens and tablets** — the player designs, the theme gallery and
+  Look & Feel all lay themselves out for a screen held wide.
 
 ---
 
@@ -77,16 +86,14 @@ or update from **Settings › Updater**.
 
 ## 📋 Planned
 
-Decided, and waiting their turn. Votes decide the order.
+Decided, and waiting their turn, in the order the
+[poll](https://github.com/rajendra7169/blazify/discussions/17) put them.
 
 | Idea | What it means | |
 | --- | --- | --- |
-| **Search inside the lyrics** | Find a word or line in the lyrics and jump straight to it | [Vote](https://github.com/rajendra7169/blazify/discussions/14) |
-| **Import playlists from Spotify** | Bring your playlists over instead of rebuilding them by hand | [Vote](https://github.com/rajendra7169/blazify/discussions/13) |
-| **Skip the talking in music videos (SponsorBlock)** | Jump past intros, sponsor messages and non-music parts | [Vote](https://github.com/rajendra7169/blazify/discussions/12) |
-| **More than one Google account** | Switch between accounts without signing out | [Vote](https://github.com/rajendra7169/blazify/discussions/11) |
-| **Scrobble to ListenBrainz** | An open alternative to Last.fm for your listening history | [Vote](https://github.com/rajendra7169/blazify/discussions/10) |
 | **New release alerts** | A notification when an artist you follow releases something new | [Vote](https://github.com/rajendra7169/blazify/discussions/9) |
+| **More than one Google account** | Switch between accounts without signing out | [Vote](https://github.com/rajendra7169/blazify/discussions/11) |
+| **Search inside the lyrics** | Find a word or line in the lyrics and jump straight to it | [Vote](https://github.com/rajendra7169/blazify/discussions/14) |
 
 ---
 
