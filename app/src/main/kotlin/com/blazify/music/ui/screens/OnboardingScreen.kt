@@ -21,6 +21,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -64,6 +68,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.blazify.music.R
 import androidx.compose.ui.graphics.lerp
@@ -109,7 +114,60 @@ fun OnboardingScreen(onFinish: () -> Unit) {
     val scope = rememberCoroutineScope()
     val isLast = pagerState.currentPage == pages.lastIndex
 
-    Box(
+    val skip: @Composable () -> Unit = {
+        TextButton(onClick = onFinish) {
+            Text(stringResource(R.string.onboard_skip), color = Color.White.copy(alpha = 0.7f))
+        }
+    }
+    val dots: @Composable (Modifier) -> Unit = { modifier ->
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
+            pages.indices.forEach { i ->
+                val active = i == pagerState.currentPage
+                val width by animateDpAsState(if (active) 22.dp else 7.dp, label = "dot")
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 3.dp)
+                        .width(width)
+                        .height(7.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (active) {
+                                Brush.horizontalGradient(listOf(BlazeThemeColor, BlazeGradientEnd))
+                            } else {
+                                Brush.horizontalGradient(
+                                    listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.22f)),
+                                )
+                            },
+                        ),
+                )
+            }
+        }
+    }
+    val nextButton: @Composable (Modifier) -> Unit = { modifier ->
+        Button(
+            onClick = {
+                if (isLast) {
+                    onFinish()
+                } else {
+                    scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                }
+            },
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = BlazeThemeColor,
+                contentColor = Color.Black,
+            ),
+            modifier = modifier.height(54.dp),
+        ) {
+            Text(
+                text = stringResource(if (isLast) R.string.onboard_start else R.string.onboard_next),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             // Fully opaque: an alpha stop here let the app behind show through.
@@ -123,13 +181,55 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 ),
             ),
     ) {
-        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-            // Skip
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onFinish) {
-                    Text(stringResource(R.string.onboard_skip), color = Color.White.copy(alpha = 0.7f))
+        // Held sideways, or on a tablet, there is width to spare and no height: the phones go on
+        // one side and the words and buttons on the other, instead of everything squeezing into a
+        // column too short for it.
+        val sideBySide = maxWidth > maxHeight && maxHeight < 600.dp || maxWidth >= 840.dp
+
+        if (sideBySide) {
+            Row(
+                // On a wide tablet the two halves would drift to opposite edges; keep them together
+                // in the middle.
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxHeight()
+                    .width(min(maxWidth, 1100.dp))
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                ) { page ->
+                    OnboardPhones(page = pages[page], modifier = Modifier.fillMaxSize())
+                }
+
+                Spacer(Modifier.width(24.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { skip() }
+                    Spacer(Modifier.weight(1f))
+                    // The words follow the phones, which are the thing being swiped.
+                    AnimatedContent(
+                        targetState = pagerState.currentPage,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        label = "onboardText",
+                    ) { page ->
+                        OnboardWords(page = pages[page])
+                    }
+                    Spacer(Modifier.weight(1f))
+                    dots(Modifier.fillMaxWidth().padding(vertical = 16.dp))
+                    nextButton(Modifier.fillMaxWidth())
                 }
             }
+            return@BoxWithConstraints
+        }
+
+        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+            // Skip
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { skip() }
 
             HorizontalPager(
                 state = pagerState,
@@ -138,54 +238,9 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 OnboardPageContent(page = pages[page], index = page)
             }
 
-            // Dots
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                pages.indices.forEach { i ->
-                    val active = i == pagerState.currentPage
-                    val width by animateDpAsState(if (active) 22.dp else 7.dp, label = "dot")
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                            .width(width)
-                            .height(7.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (active) {
-                                    Brush.horizontalGradient(listOf(BlazeThemeColor, BlazeGradientEnd))
-                                } else {
-                                    Brush.horizontalGradient(
-                                        listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.22f)),
-                                    )
-                                },
-                            ),
-                    )
-                }
-            }
+            dots(Modifier.fillMaxWidth().padding(vertical = 20.dp))
 
-            Button(
-                onClick = {
-                    if (isLast) {
-                        onFinish()
-                    } else {
-                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-                    }
-                },
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BlazeThemeColor,
-                    contentColor = Color.Black,
-                ),
-                modifier = Modifier.fillMaxWidth().height(54.dp),
-            ) {
-                Text(
-                    text = stringResource(if (isLast) R.string.onboard_start else R.string.onboard_next),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+            nextButton(Modifier.fillMaxWidth())
         }
     }
 }
@@ -197,32 +252,44 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // A pair of phone frames — the back one tilted behind, the front one holding
-        // a simple mock of the feature being described.
-        Box(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Back frame: a second, different screen, tilted away behind.
-            ThemePhoneFrame(
-                modifier = Modifier
-                    .fillMaxHeight(0.66f)
-                    .graphicsLayer {
-                        rotationZ = -9f
-                        translationX = -70f
-                        alpha = 0.55f
-                    },
-            ) {
-                OnboardInterior(screen = page.back)
-            }
-            // Front frame: the screen this page is about.
-            ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.78f)) {
-                OnboardInterior(screen = page.front)
-            }
-        }
+        OnboardPhones(page = page, modifier = Modifier.fillMaxWidth().weight(1f))
 
         Spacer(Modifier.height(28.dp))
 
+        OnboardWords(page = page)
+    }
+}
+
+/**
+ * A pair of phone frames — the back one tilted behind, the front one holding a simple mock of the
+ * feature being described.
+ */
+@Composable
+private fun OnboardPhones(page: OnboardPage, modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        // Back frame: a second, different screen, tilted away behind.
+        ThemePhoneFrame(
+            modifier = Modifier
+                .fillMaxHeight(0.66f)
+                .graphicsLayer {
+                    rotationZ = -9f
+                    translationX = -70f
+                    alpha = 0.55f
+                },
+        ) {
+            OnboardInterior(screen = page.back)
+        }
+        // Front frame: the screen this page is about.
+        ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.78f)) {
+            OnboardInterior(screen = page.front)
+        }
+    }
+}
+
+/** The page's heading and its sentence. */
+@Composable
+private fun OnboardWords(page: OnboardPage) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(page.titleRes),
             color = Color.White,
