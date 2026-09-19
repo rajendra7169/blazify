@@ -21,9 +21,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonArray
 import timber.log.Timber
 import java.net.URLEncoder
 import java.util.Locale
@@ -183,90 +180,6 @@ object Paxsenix {
             }
         }
     }
-
-    /**
-     * An album's moving cover, when Apple made one for it.
-     *
-     * [tall] is the portrait cut Apple shows full-screen; [square] the one that sits where a cover
-     * would. Either can be missing. Both are short looping videos, served as HLS playlists.
-     */
-    data class MotionCover(val tall: String?, val square: String?)
-
-    /**
-     * The moving cover for a song, or null when its album has none.
-     *
-     * The song is found the same way its lyrics are, and only trusted when the length agrees too:
-     * a moving cover from the wrong record is worse than the still one.
-     */
-    suspend fun motionCover(
-        title: String,
-        artist: String,
-        durationSeconds: Int,
-    ): MotionCover? = runCatching {
-        val results = search("${cleanTitle(title)} ${cleanArtist(artist)}")
-        val song =
-            results
-                .filter { durationSeconds <= 0 || it.duration == null || kotlin.math.abs(it.duration - durationSeconds) <= 5 }
-                .firstOrNull()
-                ?: return@runCatching null
-        withToken { token -> motionCoverForSong(token, song.id) }
-    }.onFailure { Timber.w(it, "motion cover lookup failed") }.getOrNull()
-
-    /** Runs [block] with Apple's token, fetching a new one once if the old one has run out. */
-    private suspend fun <T> withToken(block: suspend (String) -> T): T =
-        try {
-            block(tokenManager.getToken())
-        } catch (e: ClientRequestException) {
-            if (e.response.status.value != 401) throw e
-            tokenManager.clearToken()
-            block(tokenManager.getToken())
-        }
-
-    private suspend fun motionCoverForSong(token: String, songId: String): MotionCover? {
-        val song =
-            appleJson.parseToJsonElement(
-                appleGet(token, "$APPLE_MUSIC_API_BASE/songs/$songId?include=albums"),
-            )
-        val albumId =
-            song.jsonObject["data"]?.jsonArray?.firstOrNull()?.jsonObject
-                ?.get("relationships")?.jsonObject
-                ?.get("albums")?.jsonObject
-                ?.get("data")?.jsonArray?.firstOrNull()?.jsonObject
-                ?.get("id")?.jsonPrimitive?.content
-                ?: return null
-
-        val album =
-            appleJson.parseToJsonElement(
-                appleGet(token, "$APPLE_MUSIC_API_BASE/albums/$albumId?extend=editorialVideo"),
-            )
-        val videos =
-            album.jsonObject["data"]?.jsonArray?.firstOrNull()?.jsonObject
-                ?.get("attributes")?.jsonObject
-                ?.get("editorialVideo")?.jsonObject
-                ?: return null
-
-        fun video(vararg keys: String): String? =
-            keys.firstNotNullOfOrNull { key ->
-                videos[key]?.jsonObject?.get("video")?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
-            }
-
-        val cover =
-            MotionCover(
-                tall = video("motionTallVideo3x4", "motionDetailTall"),
-                square = video("motionSquareVideo1x1", "motionDetailSquare"),
-            )
-        return cover.takeIf { it.tall != null || it.square != null }
-    }
-
-    private suspend fun appleGet(token: String, url: String): String =
-        httpClient
-            .get(url) {
-                header("Authorization", "Bearer $token")
-                header("Origin", "https://music.apple.com")
-                header("Referer", "https://music.apple.com/")
-                header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0")
-                header("Accept", "application/json")
-            }.bodyAsText()
 
     suspend fun getLyrics(
         title: String,
