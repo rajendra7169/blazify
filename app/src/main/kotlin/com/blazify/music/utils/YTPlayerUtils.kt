@@ -375,6 +375,48 @@ object YTPlayerUtils {
      * once more, which is the difference between a library that mends itself
      * and one somebody has to reinstall.
      */
+    /**
+     * A picture-only stream of a video, for showing behind the player while the song plays.
+     *
+     * Kept apart from [playerResponseForPlayback] on purpose: the song's own sound goes through
+     * that path untouched, and nothing here can slow it down or make it fail. Only clients that
+     * hand out finished addresses are asked — no signature to work out, no token to attach — so a
+     * video that cannot be had that way simply is not shown.
+     *
+     * Kept to [maxHeight] lines, since it plays muted in the background: sharp enough for a
+     * phone screen, without the data of a full-size stream.
+     */
+    suspend fun videoStreamUrl(
+        videoId: String,
+        maxHeight: Int = 720,
+    ): String? =
+        withContext(Dispatchers.IO) {
+            for (client in arrayOf(VISIONOS, ANDROID_VR_NO_AUTH, IOS)) {
+                val response =
+                    YouTube.player(videoId, null, client, null, null)
+                        .onFailure { Timber.tag(logTag).d("video: ${client.clientName} refused") }
+                        .getOrNull()
+                        ?: continue
+                if (response.playabilityStatus.status != "OK") continue
+
+                // H.264 in MP4: every phone that runs this app can decode it in hardware.
+                val format =
+                    response.streamingData
+                        ?.adaptiveFormats
+                        ?.filter { format ->
+                            !format.isAudio &&
+                                format.mimeType.startsWith("video/mp4") &&
+                                "avc1" in format.mimeType &&
+                                (format.height ?: 0) in 1..maxHeight
+                        }?.maxByOrNull { it.height ?: 0 }
+                        ?: continue
+                val url = format.url?.takeIf { it.isNotBlank() } ?: continue
+                Timber.tag(logTag).d("video: ${format.height}p from ${client.clientName}")
+                return@withContext url
+            }
+            null
+        }
+
     suspend fun playerResponseForPlayback(
         videoId: String,
         playlistId: String? = null,
