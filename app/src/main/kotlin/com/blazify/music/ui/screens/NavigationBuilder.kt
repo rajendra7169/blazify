@@ -74,6 +74,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
@@ -143,15 +149,27 @@ fun NavGraphBuilder.navigationBuilder(
             navController,
             R.string.playlists,
             actions = {
-                TextButton(onClick = { showSpotifyImport = true }) {
+                TextButton(
+                    onClick = { showSpotifyImport = true },
+                    shape = CircleShape,
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07f),
+                        ),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = Modifier.height(34.dp).padding(end = 4.dp),
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.spotify),
                         contentDescription = null,
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.import_spotify))
+                    Text(
+                        text = stringResource(R.string.import_spotify),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             },
         ) {

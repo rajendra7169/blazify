@@ -56,6 +56,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -1192,15 +1194,30 @@ class MainActivity : ComponentActivity() {
                                             // thing people come here to do; Blaze Together keeps
                                             // its place on every other screen.
                                             if (currentRoute == Screens.Library.route) {
-                                                TextButton(onClick = { showSpotifyImportDialog = true }) {
+                                                TextButton(
+                                                    onClick = { showSpotifyImportDialog = true },
+                                                    shape = CircleShape,
+                                                    // A quiet capsule behind it, so it reads as
+                                                    // something to press rather than a label.
+                                                    colors =
+                                                        ButtonDefaults.textButtonColors(
+                                                            containerColor =
+                                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07f),
+                                                        ),
+                                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                                    modifier = Modifier.height(34.dp),
+                                                ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.spotify),
                                                         contentDescription = null,
                                                         tint = Color.Unspecified,
-                                                        modifier = Modifier.size(20.dp),
+                                                        modifier = Modifier.size(18.dp),
                                                     )
                                                     Spacer(Modifier.width(6.dp))
-                                                    Text(stringResource(R.string.import_spotify))
+                                                    Text(
+                                                        text = stringResource(R.string.import_spotify),
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                    )
                                                 }
                                             } else {
                                                 TextButton(
