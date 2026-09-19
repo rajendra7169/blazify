@@ -85,6 +85,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.blazify.music.ui.screens.settings.integrations.ListenBrainzSettings
 import com.blazify.music.ui.screens.settings.PlayerDesignScreen
 import com.blazify.music.ui.screens.settings.UpdaterScreen
 import com.blazify.music.ui.screens.settings.integrations.DiscordSettings
@@ -508,6 +509,9 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/integrations/lastfm") {
         LastFMSettings(navController)
+    }
+    composable("settings/integrations/listenbrainz") {
+        ListenBrainzSettings(navController)
     }
 
     composable(route = "settings/integrations/listen_together") {
