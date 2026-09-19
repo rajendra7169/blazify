@@ -73,6 +73,20 @@ constructor(
         /** Album art has lived at this address since long before MediaStore grew a thumbnail API. */
         private val ALBUM_ART = Uri.parse("content://media/external/audio/albumart")
 
+        /**
+         * Names the download sites stamp onto the files they hand out. Matched
+         * whole, never as a fragment: "Pagal" on its own is a real song title.
+         */
+        private val DOWNLOAD_SITES =
+            listOf(
+                "pagalnew", "pagalworld", "pagalsongs", "pagalfree", "paglasongs",
+                "songspk", "songs\\.pk", "djpunjab", "djjohal", "djmaza", "mr-?jatt",
+                "webmusic", "wapking", "masstamilan", "pendujatt", "riskyjatt",
+                "downloadming", "sensongsmp3", "likewap", "naasongs", "isongs",
+                "bestwap", "freshmaza", "raagsong", "mymp3song", "songsmp3",
+                "mp3juices", "musicpleer", "mp3\\.pm", "mp3pm", "y2mate", "ytmp3", "tubidy",
+            ).joinToString("|")
+
         fun isLocal(id: String) = id.startsWith(SONG_PREFIX)
 
         /** The one permission that matters, which Android 13 split out by media type. */
@@ -246,6 +260,7 @@ constructor(
     suspend fun fetchMissingArtwork(): Int =
         withContext(Dispatchers.IO) {
             var filled = 0
+            var albums = 0
             // Rows still on MediaStore's album-art fallback, plus any picture
             // fetched before this asked for a full-size one. A file's own cover
             // is a file: URL and is never touched.
@@ -253,7 +268,11 @@ constructor(
                 database.localSongsBlocking().filter {
                     val art = it.song.thumbnailUrl
                     val artless = it.artists.isEmpty()
+                    // A file with no album tag has a blank line where the record it
+                    // came from should be, which the same search can answer.
+                    val albumless = it.song.albumName.isNullOrBlank()
                     artless ||
+                        albumless ||
                         art == null ||
                         art.startsWith(ALBUM_ART.toString()) ||
                         (art.contains("googleusercontent.com") && !art.contains("=w1080"))
@@ -284,10 +303,11 @@ constructor(
                 // Everything else in the app asks for 1080 the same way.
                 database.updateLocalArtwork(song.song.id, match.thumbnail.resize(1080, 1080))
                 attachArtistIfMissing(song, match)
+                if (attachAlbumIfMissing(song, match)) albums++
                 filled++
             }
 
-            Timber.tag("LocalMusic").i("artwork filled for $filled of ${needing.size}")
+            Timber.tag("LocalMusic").i("artwork filled for $filled of ${needing.size}, album for $albums")
             filled
         }
 
@@ -316,6 +336,22 @@ constructor(
             database.insert(artist)
             database.insert(SongArtistMap(songId = song.id, artistId = artist.id, position = 0))
         }.onFailure { Timber.tag("LocalMusic").w(it, "could not attach artist for ${song.id}") }
+    }
+
+    /**
+     * Give a song the record it came from when the file never said.
+     *
+     * Same rules as the artist above: only where the file is silent, never
+     * over a name somebody typed in themselves, and only from the match that
+     * already agreed on the title and the length.
+     */
+    private fun attachAlbumIfMissing(song: Song, match: SongItem): Boolean {
+        if (!song.song.albumName.isNullOrBlank()) return false
+        if (database.localTagOverride(song.id)?.albumName?.isNotBlank() == true) return false
+        val name = match.album?.name?.takeIf { it.isNotBlank() } ?: return false
+        return runCatching { database.updateLocalAlbumName(song.id, name); true }
+            .onFailure { Timber.tag("LocalMusic").w(it, "could not attach album for ${song.id}") }
+            .getOrDefault(false)
     }
 
     /**
@@ -594,6 +630,8 @@ constructor(
         val candidate = tidy(name.take(at))
         // "01 - Song" is a track number, not a person.
         if (candidate.isBlank() || candidate.all { it.isDigit() }) return null
+        // Neither is the download site that put its name in front of the song.
+        if (candidate.matches(Regex("(?i)(?:www\\.)?(?:$DOWNLOAD_SITES)[a-z0-9.\\-]*"))) return null
         if (candidate.length > 60) return null
         return candidate
     }
@@ -626,6 +664,19 @@ constructor(
         t = t.replace('_', ' ')
         t = t.replace(Regex("\\s*[(\\[][^)\\]]*(?:kbps|k|bit|hq|hd|official|audio|video|lyrics?)[^)\\]]*[)\\]]", RegexOption.IGNORE_CASE), " ")
         t = t.replace(Regex("\\s*\\b\\d{2,3}\\s?kbps\\b", RegexOption.IGNORE_CASE), " ")
+        // Songs downloaded from the usual sites arrive stamped with the site's
+        // name — "Fake A Smile - PagalNew", "Perfect (mp3.pm)". It is not part
+        // of the song, it looks wrong in the list, and it is also what stops
+        // the cover lookup from recognising the track.
+        t = t.replace(
+            Regex("\\s*[(\\[][^)\\]]*(?:$DOWNLOAD_SITES|\\.(?:com|net|in|pm|info|me|co|org|cc|to|ws))[^)\\]]*[)\\]]", RegexOption.IGNORE_CASE),
+            " ",
+        )
+        t = t.replace(
+            Regex("\\s*[-\u2013\u2014|~]+\\s*(?:www\\.)?(?:$DOWNLOAD_SITES)[a-z0-9.\\-]*\\s*$", RegexOption.IGNORE_CASE),
+            "",
+        )
+        t = t.replace(Regex("\\b(?:www\\.)?[a-z0-9-]{2,}\\.(?:com|net|in|pm|info|me|co|org|cc|to|ws)\\b", RegexOption.IGNORE_CASE), " ")
         t = t.replace(Regex("\\s{2,}"), " ").trim(' ', '-', '\u2013', '\u2014', '_')
         return t.ifBlank { raw }
     }

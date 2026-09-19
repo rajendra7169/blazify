@@ -753,6 +753,9 @@ interface DatabaseDao {
     @Query("UPDATE song SET thumbnailUrl = :thumbnailUrl WHERE id = :id AND isLocal = 1")
     fun updateLocalArtwork(id: String, thumbnailUrl: String)
 
+    @Query("UPDATE song SET albumName = :albumName WHERE id = :id AND isLocal = 1")
+    fun updateLocalAlbumName(id: String, albumName: String)
+
     @Transaction
     @Query("SELECT * FROM song WHERE isLocal = 1 ORDER BY dateModified")
     fun localSongsByCreateDateAsc(): Flow<List<Song>>
