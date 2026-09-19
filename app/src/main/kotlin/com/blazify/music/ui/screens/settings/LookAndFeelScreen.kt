@@ -363,8 +363,7 @@ fun LookAndFeelScreen(
                 Spacer(Modifier.height(24.dp))
             }
         }
-        return
-    }
+    } else {
 
     Column(
         modifier = Modifier
@@ -390,6 +389,7 @@ fun LookAndFeelScreen(
         // Clear the now-playing mini-player + nav bar.
         Spacer(Modifier.windowInsetsBottomHeight(LocalPlayerAwareWindowInsets.current))
         Spacer(Modifier.height(24.dp))
+    }
     }
 
     TopAppBar(
