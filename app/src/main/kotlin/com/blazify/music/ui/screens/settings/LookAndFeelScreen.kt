@@ -353,9 +353,18 @@ fun LookAndFeelScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // The tabs stay put; only what is under them scrolls, so they cannot be
-                // scrolled out of reach and a card is never chopped off at the top.
-                LookFeelTabRow(selected = tab, onSelect = { tab = it })
-                Spacer(Modifier.height(16.dp))
+                // scrolled out of reach and a card is never chopped off at the top. The strip
+                // gets the page's own background, or the cards would show through the gaps
+                // between the pills as they pass behind it.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(bottom = 8.dp),
+                ) {
+                    LookFeelTabRow(selected = tab, onSelect = { tab = it })
+                }
+                Spacer(Modifier.height(8.dp))
                 Column(
                     modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
