@@ -549,22 +549,42 @@ fun PaletteItem(
 
 /** The size a phone mock-up is laid out at before being scaled down to fit. */
 internal val MockPhoneWidth = 300.dp
+
+/**
+ * The width the home, lyrics and mini-player mock-ups are drawn for. Below this they are scaled
+ * rather than squeezed, which used to clip their titles and rows.
+ */
+internal val SmallMockWidth = 200.dp
 internal val MockPhoneHeight = MockPhoneWidth * 19.3f / 9f
 
 /**
- * A phone mock-up of the given height: the screen inside is laid out at a real phone's size and
- * the whole thing scaled down, so its text and rows keep their proportions at any size.
+ * A phone mock-up of the given height.
+ *
+ * [baseWidth] is the width the screen inside was drawn for. Give it for a mock-up whose parts are
+ * sized for a full phone (the player previews): it is then laid out at that size and the whole
+ * thing scaled down, keeping its proportions. Leave it out for the mock-ups that draw themselves
+ * to whatever size they are given — scaling those would only make their text smaller.
  */
 @Composable
-internal fun ThemePhoneMock(height: Dp, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val scale = (height / MockPhoneHeight).coerceIn(0.15f, 1f)
+internal fun ThemePhoneMock(
+    height: Dp,
+    modifier: Modifier = Modifier,
+    baseWidth: Dp? = null,
+    content: @Composable () -> Unit,
+) {
+    if (baseWidth == null) {
+        ThemePhoneFrame(modifier = modifier.height(height)) { content() }
+        return
+    }
+    val baseHeight = baseWidth * 19.3f / 9f
+    val scale = (height / baseHeight).coerceIn(0.15f, 1f)
     Box(
-        modifier = modifier.size(MockPhoneWidth * scale, MockPhoneHeight * scale),
+        modifier = modifier.size(baseWidth * scale, baseHeight * scale),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
-                .requiredSize(MockPhoneWidth, MockPhoneHeight)
+                .requiredSize(baseWidth, baseHeight)
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale

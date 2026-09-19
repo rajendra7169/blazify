@@ -76,6 +76,7 @@ import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.screens.settings.LyricsPosition
 import com.blazify.music.ui.screens.settings.LyricsSampleInterior
 import com.blazify.music.ui.screens.settings.ThemePhoneFrame
+import com.blazify.music.ui.screens.settings.SmallMockWidth
 import com.blazify.music.ui.screens.settings.ThemePhoneMock
 import com.blazify.music.ui.screens.settings.MockPhoneWidth
 import com.blazify.music.ui.screens.settings.MockPhoneHeight
@@ -307,7 +308,12 @@ private fun OnboardPhones(page: OnboardPage, modifier: Modifier = Modifier) {
 /** One phone mock-up at a share of a real phone's size. */
 @Composable
 private fun PhoneMock(scale: Float, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    ThemePhoneMock(height = OnboardPhoneHeight * scale, modifier = modifier, content = content)
+    ThemePhoneMock(
+        height = OnboardPhoneHeight * scale,
+        modifier = modifier,
+        baseWidth = SmallMockWidth,
+        content = content,
+    )
 }
 
 /** The page's heading and its sentence. */
