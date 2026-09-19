@@ -262,6 +262,14 @@
     <string name="import_online">Import an M3U playlist</string>
     <string name="import_csv">Import a CSV playlist</string>
     <string name="import_spotify">Import from Spotify</string>
+    <string name="sponsorblock">Skip the parts that are not the song</string>
+    <string name="sponsorblock_desc">Uses SponsorBlock\'s community marks to jump talking, credits and sponsor breaks in music videos. Blazify asks by a few characters of a code, so the server is never told what you are playing.</string>
+    <string name="sponsorblock_categories">What to skip</string>
+    <string name="sponsorblock_non_music">Anything that is not music</string>
+    <string name="sponsorblock_sponsor">Sponsor breaks</string>
+    <string name="sponsorblock_self_promotion">Self-promotion</string>
+    <string name="sponsorblock_intro">Intros</string>
+    <string name="sponsorblock_outro">Outros and credits</string>
     <string name="import_action">Import</string>
     <string name="open_playlist">Open playlist</string>
     <string name="import_spotify_link">Spotify playlist link</string>

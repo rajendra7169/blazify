@@ -19,6 +19,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -69,6 +77,9 @@ import com.blazify.music.constants.SeekExtraSeconds
 import com.blazify.music.constants.ShufflePlaylistFirstKey
 import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
+import com.blazify.music.constants.SponsorBlockCategoriesKey
+import com.blazify.music.constants.SponsorBlockEnabledKey
+import com.blazify.music.utils.SponsorBlock
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.constants.VarispeedKey
@@ -124,6 +135,31 @@ fun PlayerSettings(
         SkipSilenceKey,
         defaultValue = false
     )
+    val (sponsorBlock, onSponsorBlockChange) = rememberPreference(
+        SponsorBlockEnabledKey,
+        defaultValue = false
+    )
+    // Off by default, and "anything that is not music" is what a music player is for.
+    val (sponsorCategories, onSponsorCategoriesChange) =
+        rememberPreference(
+            SponsorBlockCategoriesKey,
+            defaultValue = setOf(SponsorBlock.Category.NON_MUSIC.id),
+        )
+    var showSponsorCategories by rememberSaveable { mutableStateOf(false) }
+    val sponsorChosenLabels = mutableListOf<String>()
+    SponsorBlock.Category.entries.forEach { category ->
+        if (category.id in sponsorCategories) sponsorChosenLabels += stringResource(sponsorLabel(category))
+    }
+    val sponsorCategorySummary = sponsorChosenLabels.joinToString().ifEmpty { stringResource(R.string.none) }
+
+    if (showSponsorCategories) {
+        SponsorCategoryDialog(
+            chosen = sponsorCategories,
+            onChosen = onSponsorCategoriesChange,
+            onDismiss = { showSponsorCategories = false },
+        )
+    }
+
     val (skipSilenceInstant, onSkipSilenceInstantChange) = rememberPreference(
         SkipSilenceInstantKey,
         defaultValue = false
@@ -464,6 +500,35 @@ fun PlayerSettings(
                     },
                     onClick = { if (skipSilence) onSkipSilenceInstantChange(!skipSilenceInstant) }
                 ))
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.fast_forward),
+                    title = { Text(stringResource(R.string.sponsorblock)) },
+                    description = { Text(stringResource(R.string.sponsorblock_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = sponsorBlock,
+                            onCheckedChange = onSponsorBlockChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (sponsorBlock) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onSponsorBlockChange(!sponsorBlock) }
+                ))
+                if (sponsorBlock) {
+                    add(Material3SettingsItem(
+                        icon = painterResource(R.drawable.list),
+                        title = { Text(stringResource(R.string.sponsorblock_categories)) },
+                        description = { Text(sponsorCategorySummary) },
+                        onClick = { showSponsorCategories = true }
+                    ))
+                }
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.volume_up),
                     title = { Text(stringResource(R.string.audio_normalization)) },
@@ -1179,3 +1244,45 @@ fun PlayerSettings(
         }
     )
 }
+
+@Composable
+private fun SponsorCategoryDialog(
+    chosen: Set<String>,
+    onChosen: (Set<String>) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    DefaultDialog(
+        onDismiss = onDismiss,
+        title = { Text(stringResource(R.string.sponsorblock_categories)) },
+        buttons = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+        },
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            SponsorBlock.Category.entries.forEach { category ->
+                val on = category.id in chosen
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onChosen(if (on) chosen - category.id else chosen + category.id)
+                        }.padding(horizontal = 8.dp, vertical = 10.dp),
+                ) {
+                    Checkbox(checked = on, onCheckedChange = null)
+                    Spacer(Modifier.width(12.dp))
+                    Text(stringResource(sponsorLabel(category)))
+                }
+            }
+        }
+    }
+}
+
+private fun sponsorLabel(category: SponsorBlock.Category): Int =
+    when (category) {
+        SponsorBlock.Category.NON_MUSIC -> R.string.sponsorblock_non_music
+        SponsorBlock.Category.SPONSOR -> R.string.sponsorblock_sponsor
+        SponsorBlock.Category.SELF_PROMOTION -> R.string.sponsorblock_self_promotion
+        SponsorBlock.Category.INTRO -> R.string.sponsorblock_intro
+        SponsorBlock.Category.OUTRO -> R.string.sponsorblock_outro
+    }
