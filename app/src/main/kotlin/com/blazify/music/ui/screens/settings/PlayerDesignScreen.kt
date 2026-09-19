@@ -34,7 +34,8 @@ import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.ui.player.CassetteTape
 import com.blazify.music.ui.player.SeekableAlbumRing
-import com.blazify.music.ui.player.VideoPanel
+import com.blazify.music.ui.player.VideoStage
+import com.blazify.music.ui.player.VideoStageShare
 import com.blazify.music.ui.player.VinylTurntable
 import com.blazify.music.ui.theme.PlayerColorExtractor
 import com.blazify.music.constants.SliderStyle
@@ -96,7 +97,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -1078,35 +1078,26 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
 /* ---------- VIDEO ---------- */
 
 /**
- * The real thing, small: the playing song's video across the width, right above the controls, on
- * the plain page the Video design stands on.
+ * The real thing, small: the playing song's video filling the top of the screen and fading into
+ * the plain page where the controls stand.
  */
 @Composable
 private fun VideoPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     val cs = MaterialTheme.colorScheme
-    val stage = cs.background
+    val page = cs.background
     val ink = cs.onBackground
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Brush.verticalGradient(0f to lerp(stage, cs.primary, 0.16f), 0.5f to stage))
-                .padding(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(Modifier.padding(horizontal = 16.dp)) { PreviewHeader(meta, ink) }
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp),
-        ) {
-            if (pc != null) {
-                VideoPanel(song = meta, playerConnection = pc, background = stage)
-            } else {
-                PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxWidth().aspectRatio(1f))
-            }
+    Box(Modifier.fillMaxSize().background(page)) {
+        val stage = Modifier.fillMaxWidth().fillMaxHeight(VideoStageShare)
+        if (pc != null) {
+            VideoStage(song = meta, playerConnection = pc, background = page, modifier = stage)
+        } else {
+            PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), stage)
         }
-        Spacer(Modifier.height(12.dp))
-        Column(Modifier.padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(Modifier.padding(16.dp)) { PreviewHeader(meta, Color.White) }
+        Column(
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { PreviewTitle(meta, ink) }
                 PreviewTitleActions(pc, ink)

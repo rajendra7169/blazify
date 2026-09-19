@@ -11,9 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -25,7 +23,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +46,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import coil3.compose.AsyncImage
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.SongItem
+import com.blazify.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_OMV
 import com.blazify.music.constants.SaveDataOnMobileKey
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.playback.PlayerConnection
@@ -68,16 +66,12 @@ import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * The video that goes behind a song in the Video player.
- *
- * [synced] says whether it can follow the song second by second: true when the song is the video
- * itself, or when the music video is the same length as the song. Otherwise it is usually a
- * different cut — a longer intro, a shorter edit — and it loops on its own as a moving backdrop.
+ * The video that goes behind a song in the Video player: always one that follows the song second
+ * by second, so what is seen matches what is heard.
  */
 data class SongVideo(
     val videoId: String,
     val streamUrl: String,
-    val synced: Boolean,
 )
 
 /** Looked up once per song and remembered, a song with no video included. */
@@ -94,6 +88,9 @@ private object SongVideos {
 
     /** How far apart a song and its video may be in length and still be the same cut. */
     private const val SAME_CUT_SECONDS = 3
+
+    /** How many search results are looked through for the song's own music video. */
+    private const val CANDIDATES = 5
 
     /**
      * Lookups run on their own, not on the screen asking: the player lays itself out again as it
@@ -124,12 +121,15 @@ private object SongVideos {
     }
 
     private suspend fun find(song: MediaMetadata, maxHeight: Int): SongVideo? {
-        // A song that is itself a music video already is the picture to show.
+        // A song that is itself a video already is the picture to show, and its own sound.
         if (song.isVideoSong) {
             val url = YTPlayerUtils.videoStreamUrl(song.id, maxHeight) ?: return null
-            return SongVideo(song.id, url, synced = true)
+            return SongVideo(song.id, url)
         }
 
+        // Otherwise only the artist's official video, and only the same cut as the song: a video
+        // with a longer opening or a shorter edit would move out of time with the music, and a
+        // fan upload or lyric video is not the song's picture at all. Without one, the artwork.
         if (song.title.isBlank()) return null
         val artist = song.artists.joinToString { it.name }
         val candidate =
@@ -138,17 +138,18 @@ private object SongVideos {
                 .getOrNull()
                 ?.items
                 ?.filterIsInstance<SongItem>()
-                ?.firstOrNull { it.isVideoSong }
+                ?.take(CANDIDATES)
+                ?.firstOrNull { it.isOfficialCutOf(song) }
                 ?: return null
         val url = YTPlayerUtils.videoStreamUrl(candidate.id, maxHeight) ?: return null
-        val sameCut = candidate.duration?.let { abs(it - song.duration) <= SAME_CUT_SECONDS } == true
-        Timber.tag("VideoArt").d("video for ${song.id}: ${candidate.id}, ${if (sameCut) "in step" else "looping"}")
-        return SongVideo(candidate.id, url, synced = sameCut)
+        Timber.tag("VideoArt").d("video for ${song.id}: ${candidate.id}")
+        return SongVideo(candidate.id, url)
     }
-}
 
-/** What is known about a song's video: still looking, or the answer — null when it has none. */
-class VideoLookup(val done: Boolean, val video: SongVideo?)
+    private fun SongItem.isOfficialCutOf(song: MediaMetadata) =
+        musicVideoType == MUSIC_VIDEO_TYPE_OMV &&
+            duration?.let { abs(it - song.duration) <= SAME_CUT_SECONDS } == true
+}
 
 /**
  * The song's video, when there is one and it is worth the data.
@@ -157,78 +158,48 @@ class VideoLookup(val done: Boolean, val video: SongVideo?)
  * while "save data on mobile" is on — the still artwork shows instead.
  */
 @Composable
-fun rememberVideoLookup(song: MediaMetadata?): VideoLookup {
+fun rememberSongVideo(song: MediaMetadata?): SongVideo? {
     val context = LocalContext.current
-    return produceState(initialValue = VideoLookup(done = false, video = null), song?.id) {
-        value = VideoLookup(done = false, video = null)
+    return produceState<SongVideo?>(initialValue = null, song?.id) {
+        value = null
         song ?: return@produceState
         val metered =
             (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).isActiveNetworkMetered
-        val video =
-            if (metered && context.dataStore.data.first()[SaveDataOnMobileKey] == true) {
-                null
-            } else {
-                SongVideos.forSong(song, maxHeight = if (metered) 360 else 720)
-            }
-        value = VideoLookup(done = true, video = video)
+        if (metered && context.dataStore.data.first()[SaveDataOnMobileKey] == true) return@produceState
+        value = SongVideos.forSong(song, maxHeight = if (metered) 360 else 720)
     }.value
 }
 
-@Composable
-fun rememberSongVideo(song: MediaMetadata?): SongVideo? = rememberVideoLookup(song).video
-
 /**
- * The Video design's picture, standing up: the whole video across the width of the screen, none
- * of it cut away at the sides, its top and bottom edges fading into [background]. Until the video
- * is moving — and for a song without one — the artwork stands there instead, square.
+ * The Video design's picture, standing up: the song's video filling the top of the screen, fading
+ * at its foot into [background], where the controls are. Until the video is moving — and for a
+ * song without one — the artwork fills the same place.
  */
 @Composable
-fun VideoPanel(
+fun VideoStage(
     song: MediaMetadata?,
     playerConnection: PlayerConnection,
     background: Color,
     modifier: Modifier = Modifier,
 ) {
-    val lookup = rememberVideoLookup(song)
-    // Kept from one song to the next, so a run of videos does not keep changing shape while each
-    // one loads; only a song found to have no video goes back to the square.
-    var videoShape by remember { mutableStateOf(lastPanelShape) }
-    LaunchedEffect(lookup) {
-        if (lookup.done && lookup.video == null) videoShape = null
-    }
-    LaunchedEffect(videoShape) { lastPanelShape = videoShape }
-    val shape by animateFloatAsState(
-        targetValue = videoShape ?: 1f,
-        animationSpec = tween(durationMillis = 600),
-        label = "videoPanel",
-    )
-
-    Box(modifier.fillMaxWidth().aspectRatio(shape).clipToBounds()) {
+    val video = rememberSongVideo(song)
+    Box(modifier.clipToBounds()) {
         AsyncImage(
             model = song?.thumbnailUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
-        lookup.video?.let { video ->
-            key(video.streamUrl) {
-                VideoArt(
-                    video = video,
-                    playerConnection = playerConnection,
-                    modifier = Modifier.fillMaxSize(),
-                    wholeWidth = true,
-                    onShape = { videoShape = it },
-                )
-            }
+        video?.let {
+            key(it.streamUrl) { VideoArt(it, playerConnection, Modifier.fillMaxSize()) }
         }
         Box(
             Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        0f to background,
-                        PANEL_EDGE to Color.Transparent,
-                        1f - PANEL_EDGE to Color.Transparent,
+                        STAGE_FADE_FROM to Color.Transparent,
+                        0.85f to background.copy(alpha = 0.85f),
                         1f to background,
                     ),
                 ),
@@ -236,21 +207,15 @@ fun VideoPanel(
     }
 }
 
-/** The shape the Video design's picture last had, for the next time the player opens. */
-private var lastPanelShape: Float? = null
-
-/** How much of the picture's height, at the top and again at the bottom, fades into the page. */
-private const val PANEL_EDGE = 0.1f
+/** Where, down the picture, it starts fading into the page below. */
+private const val STAGE_FADE_FROM = 0.5f
 
 /**
- * The video, muted, faded in over the still artwork once it is moving. It fills the space the way
- * the artwork does, or with [wholeWidth] spans the width with nothing cut at the sides, telling
- * [onShape] the width-to-height of the part worth showing. The sound is always the song's own,
- * from the player; this is only the picture, and it stops whenever the app is out of sight.
+ * The video, muted, filling the space the way the still artwork does and faded in over it once it
+ * is on screen. The sound is always the song's own, from the player; this is only the picture, and
+ * it stops whenever the app is out of sight.
  *
- * When [SongVideo.synced], it is kept to the song's position and follows every pause and seek.
- * Otherwise it starts about as far in as the song is, past the opening titles, and goes round
- * again for as long as the song plays.
+ * It is kept to the song's position and follows every pause and seek.
  */
 @OptIn(UnstableApi::class)
 @Composable
@@ -258,24 +223,19 @@ fun VideoArt(
     video: SongVideo,
     playerConnection: PlayerConnection,
     modifier: Modifier = Modifier,
-    wholeWidth: Boolean = false,
-    onShape: (Float) -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycle by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val inSight = lifecycle.isAtLeast(Lifecycle.State.STARTED)
-    var firstFrame by remember { mutableStateOf(false) }
-    var hasPlayed by remember { mutableStateOf(false) }
-    // A video that has not played yet may be sitting on a black opening frame, so a paused song
-    // keeps its artwork until then; a video in step is paused on the song's own moment instead.
-    val onFrame = firstFrame && (video.synced || hasPlayed)
+    // The first frame drawn is already the song's own moment, so a paused song shows it too.
+    var onFrame by remember { mutableStateOf(false) }
     var videoSize by remember { mutableStateOf<VideoSize?>(null) }
     var surface by remember { mutableStateOf<TextureView?>(null) }
     var bands by remember { mutableFloatStateOf(0f) }
     var bandsLooked by remember { mutableStateOf(false) }
-    // Across the width the bands would show against the page, so the picture waits for the first
-    // look at them.
-    val shown = onFrame && (!wholeWidth || bandsLooked)
+    // Bands would flash at the top before the picture is brought in past them, so it waits for
+    // the first look at them.
+    val shown = onFrame && bandsLooked
 
     val player =
         remember {
@@ -295,11 +255,7 @@ fun VideoArt(
         val listener =
             object : Player.Listener {
                 override fun onRenderedFirstFrame() {
-                    firstFrame = true
-                }
-
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    if (isPlaying) hasPlayed = true
+                    onFrame = true
                 }
 
                 override fun onVideoSizeChanged(size: VideoSize) {
@@ -313,30 +269,19 @@ fun VideoArt(
         }
     }
 
-    // Follow the song: play when it plays, and — for a video of the same cut — stay on its second.
-    // A jump in the video takes a moment to load while the song carries on, so it aims a little
-    // ahead, learning from each jump how far; small differences are made up by running the
-    // picture slightly faster or slower, which nobody notices without the sound.
+    // Follow the song: play when it plays, and stay on its second. A jump in the video takes a
+    // moment to load while the song carries on, so it aims a little ahead, learning from each jump
+    // how far; small differences are made up by running the picture slightly faster or slower,
+    // which nobody notices without the sound.
     LaunchedEffect(player, inSight) {
         val song = playerConnection.player
         var lead = 800L
         var justJumped = false
-        var placed = video.synced
-        if (video.synced) player.seekTo(song.currentPosition + lead)
+        player.seekTo(song.currentPosition + lead)
         while (isActive) {
             val playing = inSight && song.isPlaying
             player.playWhenReady = playing
-            if (!video.synced) {
-                val length = player.duration
-                if (!placed && player.playbackState == Player.STATE_READY && length > 0) {
-                    val along = if (song.duration > 0) song.currentPosition.toDouble() / song.duration else 0.0
-                    player.seekTo(max((along * length).toLong(), OPENING_TITLES_MS.coerceAtMost(length / 4)))
-                    placed = true
-                } else if (player.playbackState == Player.STATE_ENDED) {
-                    player.seekTo(OPENING_TITLES_MS.coerceAtMost(length / 4))
-                }
-            }
-            if (video.synced && playing && player.playbackState == Player.STATE_READY) {
+            if (playing && player.playbackState == Player.STATE_READY) {
                 val drift = song.currentPosition - player.currentPosition
                 if (justJumped) {
                     // Half the miss, so one slow answer does not throw the next jump far off.
@@ -359,9 +304,9 @@ fun VideoArt(
     }
 
     // Some videos carry black bands above and below the picture — a cinema-shaped film inside a
-    // TV-shaped frame. They are left outside: filling the screen, the picture is brought in close
-    // enough; across the width, the space is made that much shorter. A few frames are looked at,
-    // apart, and the thinnest bands seen are kept, so one dark scene is not taken for bands.
+    // TV-shaped frame. The picture is brought in close enough to leave them outside. A few frames
+    // are looked at, apart, and the thinnest bands seen are kept, so one dark scene is not taken
+    // for bands.
     LaunchedEffect(surface, onFrame) {
         val view = surface ?: return@LaunchedEffect
         if (!onFrame) return@LaunchedEffect
@@ -371,9 +316,12 @@ fun VideoArt(
             val frame = view.getBitmap(BAND_SAMPLE_WIDTH, BAND_SAMPLE_HEIGHT) ?: continue
             val pixels = IntArray(frame.width * frame.height)
             frame.getPixels(pixels, 0, frame.width, 0, 0, frame.width, frame.height)
-            least = minOf(least, letterboxShare(pixels, frame.width, frame.height))
+            val share = letterboxShare(pixels, frame.width, frame.height)
             frame.recycle()
-            bands = if (least in MIN_BANDS..MAX_BANDS) least else 0f
+            if (share != null) {
+                least = minOf(least, share)
+                bands = if (least >= MIN_BANDS) least else 0f
+            }
             bandsLooked = true
         }
         bandsLooked = true
@@ -391,30 +339,20 @@ fun VideoArt(
         label = "videoArt",
     )
 
-    val reportShape by rememberUpdatedState(onShape)
-    LaunchedEffect(shown, videoSize, bands) {
-        val size = videoSize ?: return@LaunchedEffect
-        if (shown) reportShape(size.width * size.pixelWidthHeightRatio / size.height * (1f / (1f - 2f * bands)))
-    }
-
     BoxWithConstraints(
         modifier = modifier.clipToBounds().alpha(alpha),
         contentAlignment = Alignment.Center,
     ) {
-        // Across the width, or cut to fill like the artwork: scaled until both sides are covered,
-        // overflow trimmed evenly.
+        // Cut to fill, like the artwork: scaled until the picture inside any bands covers both
+        // sides, overflow trimmed evenly.
         val size = videoSize
         val drawModifier =
             if (size == null) {
                 Modifier.requiredSize(maxWidth, maxHeight)
             } else {
                 val aspect = size.width * size.pixelWidthHeightRatio / size.height
-                if (wholeWidth) {
-                    Modifier.requiredSize(maxWidth, (maxWidth.value / aspect).dp)
-                } else {
-                    val height = max(maxWidth.value / aspect, maxHeight.value) * zoom
-                    Modifier.requiredSize((height * aspect).dp, height.dp)
-                }
+                val height = max(maxWidth.value / aspect, maxHeight.value * zoom)
+                Modifier.requiredSize((height * aspect).dp, height.dp)
             }
         AndroidView(
             factory = {
@@ -431,9 +369,9 @@ fun VideoArt(
 /**
  * How much of a frame's height, [pixels] being [width] by [height], is black band at the top and
  * again at the bottom, going by the thinner of the two. A label's logo or name printed in a band
- * leaves it a band. A frame dark almost all over says nothing either way, so it counts as none.
+ * leaves it a band. A frame dark almost all over says nothing either way, so it gives null.
  */
-internal fun letterboxShare(pixels: IntArray, width: Int, height: Int): Float {
+internal fun letterboxShare(pixels: IntArray, width: Int, height: Int): Float? {
     fun dark(row: Int) =
         (0 until width).count { x ->
             val colour = pixels[row * width + x]
@@ -447,7 +385,7 @@ internal fun letterboxShare(pixels: IntArray, width: Int, height: Int): Float {
     var bottom = 0
     while (bottom < height / 2 && dark(height - 1 - bottom)) bottom++
     val share = minOf(top, bottom).toFloat() / height
-    return if (share > MAX_BANDS) 0f else share
+    return if (share > MAX_BANDS) null else share
 }
 
 /** Size of the frame taken to look for bands: plenty to find a band, cheap to read. */
@@ -461,14 +399,11 @@ private const val BAND_BRIGHTNESS = 24
 private const val BAND_PRINT_SHARE = 0.25f
 
 /** When the frames are looked at, each wait after the one before. */
-private val BAND_LOOKS_MS = longArrayOf(300, 1200, 2000)
+private val BAND_LOOKS_MS = longArrayOf(300, 1200, 2000, 4000, 8000)
 
 /** Bands thinner than this are left alone, and more than this is a dark scene, not a band. */
 private const val MIN_BANDS = 0.04f
 private const val MAX_BANDS = 0.22f
-
-/** Label logos and title cards at the start of a video, skipped when it is only a backdrop. */
-private const val OPENING_TITLES_MS = 6000L
 
 /** Close enough to the sound that nobody could tell. */
 private const val IN_STEP_MS = 80L

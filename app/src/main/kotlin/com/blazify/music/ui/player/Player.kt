@@ -113,7 +113,6 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -364,7 +363,7 @@ fun BottomSheetPlayer(
     val isKeepScreenOn by rememberPreference(KeepScreenOn, false)
     val keepScreenOn = isPlaying && isKeepScreenOn
 
-    DisposableEffect(playerBackground, state.isExpanded, useDarkTheme, keepScreenOn, isFullScreen, hideStatusBarOnFullscreen) {
+    DisposableEffect(playerBackground, playerDesign, state.isExpanded, useDarkTheme, keepScreenOn, isFullScreen, hideStatusBarOnFullscreen) {
         val window = (context as? android.app.Activity)?.window
         if (window != null && state.isExpanded) {
             val insetsController = WindowCompat.getInsetsController(window, window.decorView)
@@ -375,7 +374,8 @@ fun BottomSheetPlayer(
                 }
 
                 PlayerBackgroundStyle.DEFAULT -> {
-                    insetsController.isAppearanceLightStatusBars = !useDarkTheme
+                    // The Video design's status bar sits over its video, so it stays light.
+                    insetsController.isAppearanceLightStatusBars = !useDarkTheme && playerDesign != PlayerDesign.VIDEO
                 }
             }
 
@@ -2377,7 +2377,8 @@ fun BottomSheetPlayer(
         ) {
             RingIconButton(
                 res = R.drawable.expand_more,
-                tint = TextBackgroundColor,
+                // The Video design's video is under it, whatever the page colour below.
+                tint = if (playerDesign == PlayerDesign.VIDEO) Color.White else TextBackgroundColor,
                 size = 28,
                 modifier =
                     Modifier
@@ -3506,9 +3507,8 @@ private fun RingIconButton(
  * FULL_ART and VIDEO standing up.
  *
  * Full Art lays the artwork over the whole screen, controls on a dark scrim at the bottom. Video
- * stands the song's video right above the controls, whole and across the full width, on a plain
- * background that goes dark or light with the app — so nothing of the picture is cut away and
- * the black bands many videos carry have nothing to stand out against.
+ * fills the top of the screen with the song's video, fading at its foot into a plain page — dark
+ * or light with the app — where the controls stand.
  */
 @Composable
 private fun FullArtPortrait(
@@ -3523,7 +3523,6 @@ private fun FullArtPortrait(
     controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit,
 ) {
     val video = design == PlayerDesign.VIDEO
-    val stage = MaterialTheme.colorScheme.background
     Box(
         modifier =
             Modifier
@@ -3532,30 +3531,23 @@ private fun FullArtPortrait(
                 .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
     ) {
         if (video) {
-            // A touch of the artwork's colour at the top, settling into the plain background.
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0f to lerp(stage, MaterialTheme.colorScheme.primary, 0.16f),
-                            0.5f to stage,
-                        ),
-                    ),
+            val page = MaterialTheme.colorScheme.background
+            Box(Modifier.fillMaxSize().background(page))
+            VideoStage(
+                song = mediaMetadata,
+                playerConnection = playerConnection,
+                background = page,
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(VideoStageShare),
             )
         } else {
             FullArtBackground(song = mediaMetadata, design = design, modifier = Modifier.fillMaxSize())
         }
         SeekMessage(playerSeeker, Modifier.align(Alignment.Center))
-        // "Now Playing" + source header centred at the top (same as the classic ThumbnailHeader,
-        // with shadows for readability over the artwork).
+        // "Now Playing" + source header centred at the top, over the picture (same as the classic
+        // ThumbnailHeader, white with shadows for readability).
         val queueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
-        val headerStyle =
-            if (video) {
-                MaterialTheme.typography.titleMedium
-            } else {
-                MaterialTheme.typography.titleMedium.copy(shadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f))
-            }
+        val headerStyle = MaterialTheme.typography.titleMedium.copy(shadow = Shadow(Color.Black.copy(alpha = 0.7f), Offset(0f, 2f), 6f))
+        val headerColor = if (video) Color.White else textColor
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier =
@@ -3568,7 +3560,7 @@ private fun FullArtPortrait(
                 text = stringResource(R.string.now_playing),
                 style = headerStyle,
                 fontWeight = FontWeight.Bold,
-                color = textColor,
+                color = headerColor,
             )
             val playingFrom = queueTitle ?: mediaMetadata?.album?.title
             if (!playingFrom.isNullOrBlank()) {
@@ -3576,7 +3568,7 @@ private fun FullArtPortrait(
                 Text(
                     text = playingFrom,
                     style = headerStyle,
-                    color = textColor.copy(alpha = 0.8f),
+                    color = headerColor.copy(alpha = 0.8f),
                     maxLines = 1,
                     modifier = Modifier.basicMarquee(),
                 )
@@ -3588,26 +3580,9 @@ private fun FullArtPortrait(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .then(if (video) Modifier.fillMaxHeight() else Modifier)
                     .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
                     .padding(bottom = bottomPadding),
         ) {
-            if (video) {
-                // Everything between the header and the controls is the picture's, and it sits
-                // at the bottom of that, right on top of the song's name.
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-                            .padding(top = VideoHeaderSpace),
-                ) {
-                    VideoPanel(song = mediaMetadata, playerConnection = playerConnection, background = stage)
-                }
-                Spacer(Modifier.height(20.dp))
-            }
             mediaMetadata?.let {
                 controlsContent(it)
             }
@@ -3616,8 +3591,8 @@ private fun FullArtPortrait(
     }
 }
 
-/** Room left at the top of the Video design for the "Now Playing" header. */
-private val VideoHeaderSpace = 72.dp
+/** How much of the screen, from the top, the Video design's picture fills standing up. */
+internal const val VideoStageShare = 0.65f
 
 /**
  * FULL_ART and VIDEO backgrounds over the whole screen: album art behind a scrim. In VIDEO —
