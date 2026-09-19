@@ -3592,7 +3592,7 @@ private fun FullArtPortrait(
 }
 
 /** How much of the screen, from the top, the Video design's picture fills standing up. */
-internal const val VideoStageShare = 0.65f
+internal const val VideoStageShare = 0.70f
 
 /**
  * FULL_ART and VIDEO backgrounds over the whole screen: album art behind a scrim. In VIDEO —

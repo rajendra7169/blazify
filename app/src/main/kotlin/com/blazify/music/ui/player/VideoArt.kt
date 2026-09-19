@@ -66,12 +66,16 @@ import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * The video that goes behind a song in the Video player: always one that follows the song second
- * by second, so what is seen matches what is heard.
+ * The video that goes behind a song in the Video player.
+ *
+ * [synced] when it follows the song second by second: the song is the video itself, or the
+ * official video is the same length. Otherwise it is a different cut — a longer opening, a
+ * shorter edit — and it runs on its own as a moving picture for the song.
  */
 data class SongVideo(
     val videoId: String,
     val streamUrl: String,
+    val synced: Boolean,
 )
 
 /** Looked up once per song and remembered, a song with no video included. */
@@ -124,31 +128,28 @@ private object SongVideos {
         // A song that is itself a video already is the picture to show, and its own sound.
         if (song.isVideoSong) {
             val url = YTPlayerUtils.videoStreamUrl(song.id, maxHeight) ?: return null
-            return SongVideo(song.id, url)
+            return SongVideo(song.id, url, synced = true)
         }
 
-        // Otherwise only the artist's official video, and only the same cut as the song: a video
-        // with a longer opening or a shorter edit would move out of time with the music, and a
-        // fan upload or lyric video is not the song's picture at all. Without one, the artwork.
+        // Otherwise the artist's official video — a fan upload or lyric video is not the song's
+        // picture. The same cut as the song follows it in step; a different cut runs on its own.
         if (song.title.isBlank()) return null
         val artist = song.artists.joinToString { it.name }
-        val candidate =
+        val official =
             YouTube
                 .search("${song.title} $artist", YouTube.SearchFilter.FILTER_VIDEO)
                 .getOrNull()
                 ?.items
                 ?.filterIsInstance<SongItem>()
                 ?.take(CANDIDATES)
-                ?.firstOrNull { it.isOfficialCutOf(song) }
-                ?: return null
+                ?.filter { it.musicVideoType == MUSIC_VIDEO_TYPE_OMV }
+                .orEmpty()
+        val sameCut = official.firstOrNull { it.duration?.let { d -> abs(d - song.duration) <= SAME_CUT_SECONDS } == true }
+        val candidate = sameCut ?: official.firstOrNull() ?: return null
         val url = YTPlayerUtils.videoStreamUrl(candidate.id, maxHeight) ?: return null
-        Timber.tag("VideoArt").d("video for ${song.id}: ${candidate.id}")
-        return SongVideo(candidate.id, url)
+        Timber.tag("VideoArt").d("video for ${song.id}: ${candidate.id}, ${if (sameCut != null) "in step" else "on its own"}")
+        return SongVideo(candidate.id, url, synced = sameCut != null)
     }
-
-    private fun SongItem.isOfficialCutOf(song: MediaMetadata) =
-        musicVideoType == MUSIC_VIDEO_TYPE_OMV &&
-            duration?.let { abs(it - song.duration) <= SAME_CUT_SECONDS } == true
 }
 
 /**
@@ -215,7 +216,9 @@ private const val STAGE_FADE_FROM = 0.5f
  * is on screen. The sound is always the song's own, from the player; this is only the picture, and
  * it stops whenever the app is out of sight.
  *
- * It is kept to the song's position and follows every pause and seek.
+ * When [SongVideo.synced] it is kept to the song's position and follows every pause and seek.
+ * Otherwise it starts about as far in as the song is, past the opening titles, and goes round
+ * again for as long as the song plays.
  */
 @OptIn(UnstableApi::class)
 @Composable
@@ -227,8 +230,11 @@ fun VideoArt(
     val context = LocalContext.current
     val lifecycle by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val inSight = lifecycle.isAtLeast(Lifecycle.State.STARTED)
-    // The first frame drawn is already the song's own moment, so a paused song shows it too.
-    var onFrame by remember { mutableStateOf(false) }
+    // A video in step draws the song's own moment first, so a paused song shows it too; one on
+    // its own may be on a black opening frame until it has started playing.
+    var firstFrame by remember { mutableStateOf(false) }
+    var hasPlayed by remember { mutableStateOf(false) }
+    val onFrame = firstFrame && (video.synced || hasPlayed)
     var videoSize by remember { mutableStateOf<VideoSize?>(null) }
     var surface by remember { mutableStateOf<TextureView?>(null) }
     var bands by remember { mutableFloatStateOf(0f) }
@@ -255,7 +261,11 @@ fun VideoArt(
         val listener =
             object : Player.Listener {
                 override fun onRenderedFirstFrame() {
-                    onFrame = true
+                    firstFrame = true
+                }
+
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    if (isPlaying) hasPlayed = true
                 }
 
                 override fun onVideoSizeChanged(size: VideoSize) {
@@ -277,11 +287,22 @@ fun VideoArt(
         val song = playerConnection.player
         var lead = 800L
         var justJumped = false
-        player.seekTo(song.currentPosition + lead)
+        var placed = video.synced
+        if (video.synced) player.seekTo(song.currentPosition + lead)
         while (isActive) {
             val playing = inSight && song.isPlaying
             player.playWhenReady = playing
-            if (playing && player.playbackState == Player.STATE_READY) {
+            if (!video.synced) {
+                val length = player.duration
+                if (!placed && player.playbackState == Player.STATE_READY && length > 0) {
+                    val along = if (song.duration > 0) song.currentPosition.toDouble() / song.duration else 0.0
+                    player.seekTo(max((along * length).toLong(), OPENING_TITLES_MS.coerceAtMost(length / 4)))
+                    placed = true
+                } else if (player.playbackState == Player.STATE_ENDED) {
+                    player.seekTo(OPENING_TITLES_MS.coerceAtMost(length / 4))
+                }
+            }
+            if (video.synced && playing && player.playbackState == Player.STATE_READY) {
                 val drift = song.currentPosition - player.currentPosition
                 if (justJumped) {
                     // Half the miss, so one slow answer does not throw the next jump far off.
@@ -404,6 +425,9 @@ private val BAND_LOOKS_MS = longArrayOf(300, 1200, 2000, 4000, 8000)
 /** Bands thinner than this are left alone, and more than this is a dark scene, not a band. */
 private const val MIN_BANDS = 0.04f
 private const val MAX_BANDS = 0.22f
+
+/** Label logos and title cards at the start of a video, skipped when it runs on its own. */
+private const val OPENING_TITLES_MS = 6000L
 
 /** Close enough to the sound that nobody could tell. */
 private const val IN_STEP_MS = 80L
