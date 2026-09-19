@@ -137,6 +137,8 @@ enum class AudioQuality {
 
 // On mobile data, Auto quality streams at 128 kbps unless this is turned off.
 val SaveDataOnMobileKey = booleanPreferencesKey("saveDataOnMobile")
+// The moving album covers Apple makes for some releases, shown in the Full art player.
+val AnimatedCoversKey = booleanPreferencesKey("animatedCovers")
 // Downloads wait for Wi-Fi (an unmetered network) when this is on.
 val DownloadOnWifiOnlyKey = booleanPreferencesKey("downloadOnWifiOnly")
 // Playback speed chosen for each podcast show, as "showId=speed;showId=speed".
