@@ -21,6 +21,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.Dp
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -544,49 +547,83 @@ fun PaletteItem(
     }
 }
 
+/** The size a phone mock-up is laid out at before being scaled down to fit. */
+internal val MockPhoneWidth = 300.dp
+internal val MockPhoneHeight = MockPhoneWidth * 19.3f / 9f
+
+/**
+ * A phone mock-up of the given height: the screen inside is laid out at a real phone's size and
+ * the whole thing scaled down, so its text and rows keep their proportions at any size.
+ */
+@Composable
+internal fun ThemePhoneMock(height: Dp, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val scale = (height / MockPhoneHeight).coerceIn(0.15f, 1f)
+    Box(
+        modifier = modifier.size(MockPhoneWidth * scale, MockPhoneHeight * scale),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .requiredSize(MockPhoneWidth, MockPhoneHeight)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                },
+        ) {
+            ThemePhoneFrame(modifier = Modifier.fillMaxSize()) { content() }
+        }
+    }
+}
+
 /** Metallic phone bezel with a soft drop shadow — same look as the player-theme screen. */
 @Composable
 internal fun ThemePhoneFrame(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val frameShape = RoundedCornerShape(38.dp)
-    Box(
-        modifier = modifier
-            .aspectRatio(9f / 19.3f)
-            .shadow(
-                elevation = 24.dp,
-                shape = frameShape,
-                clip = false,
-                ambientColor = Color.White.copy(alpha = 0.30f),
-                spotColor = Color.White.copy(alpha = 0.50f),
-            )
-            .clip(frameShape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF44454A), Color(0xFF26272B), Color(0xFF1A1B1E)),
-                ),
-            )
-            .border(
-                width = 1.5.dp,
-                brush = Brush.verticalGradient(
-                    listOf(
-                        Color.White.copy(alpha = 0.45f),
-                        Color.White.copy(alpha = 0.10f),
-                        Color.White.copy(alpha = 0.28f),
-                    ),
-                ),
-                shape = frameShape,
-            )
-            .padding(6.dp)
-            .clip(RoundedCornerShape(32.dp)),
-    ) {
-        content()
+    BoxWithConstraints(modifier = modifier.aspectRatio(9f / 19.3f)) {
+        // Everything about the bezel is a share of the phone's width, so a small mock-up looks
+        // like the same phone shrunk rather than a rounded pill with a fixed 38dp corner.
+        val width = maxWidth
+        val frameShape = RoundedCornerShape(width * 0.115f)
+        val bezel = width * 0.018f
         Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 6.dp)
-                .size(width = 36.dp, height = 4.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.14f)),
-        )
+                .fillMaxSize()
+                .shadow(
+                    elevation = width * 0.07f,
+                    shape = frameShape,
+                    clip = false,
+                    ambientColor = Color.White.copy(alpha = 0.30f),
+                    spotColor = Color.White.copy(alpha = 0.50f),
+                )
+                .clip(frameShape)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF44454A), Color(0xFF26272B), Color(0xFF1A1B1E)),
+                    ),
+                )
+                .border(
+                    width = (width * 0.0045f).coerceAtLeast(0.7.dp),
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Color.White.copy(alpha = 0.45f),
+                            Color.White.copy(alpha = 0.10f),
+                            Color.White.copy(alpha = 0.28f),
+                        ),
+                    ),
+                    shape = frameShape,
+                )
+                .padding(bezel)
+                .clip(RoundedCornerShape(width * 0.097f)),
+        ) {
+            content()
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = width * 0.018f)
+                    .size(width = width * 0.11f, height = width * 0.012f)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.14f)),
+            )
+        }
     }
 }
 

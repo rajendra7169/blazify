@@ -76,6 +76,9 @@ import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.screens.settings.LyricsPosition
 import com.blazify.music.ui.screens.settings.LyricsSampleInterior
 import com.blazify.music.ui.screens.settings.ThemePhoneFrame
+import com.blazify.music.ui.screens.settings.ThemePhoneMock
+import com.blazify.music.ui.screens.settings.MockPhoneWidth
+import com.blazify.music.ui.screens.settings.MockPhoneHeight
 import com.blazify.music.ui.screens.settings.ThemePhonePreview
 import com.blazify.music.ui.theme.BlazifyTheme
 import com.blazify.music.ui.theme.BlazeGradientEnd
@@ -264,26 +267,47 @@ private fun OnboardPageContent(page: OnboardPage, index: Int) {
  * A pair of phone frames — the back one tilted behind, the front one holding a simple mock of the
  * feature being described.
  */
+/** The size a mock-up is drawn at before it is scaled to fit; a real phone's proportions. */
+private val OnboardPhoneWidth = MockPhoneWidth
+private val OnboardPhoneHeight = MockPhoneHeight
+
 @Composable
 private fun OnboardPhones(page: OnboardPage, modifier: Modifier = Modifier) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        // Back frame: a second, different screen, tilted away behind.
-        ThemePhoneFrame(
-            modifier = Modifier
-                .fillMaxHeight(0.66f)
-                .graphicsLayer {
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        // The mock-ups are laid out at a full phone's size and the whole thing scaled down, so
+        // their text and rows keep their proportions instead of being squeezed.
+        val scale = minOf(
+            maxHeight / OnboardPhoneHeight,
+            maxWidth / (OnboardPhoneWidth * 1.25f),
+        ).coerceIn(0.2f, 1f)
+
+        Box(
+            modifier = Modifier.size(OnboardPhoneWidth * scale * 1.25f, OnboardPhoneHeight * scale),
+            contentAlignment = Alignment.Center,
+        ) {
+            // Back frame: a second, different screen, tilted away behind.
+            PhoneMock(
+                scale = scale * 0.84f,
+                modifier = Modifier.graphicsLayer {
                     rotationZ = -9f
-                    translationX = -70f
+                    translationX = -70f * scale
                     alpha = 0.55f
                 },
-        ) {
-            OnboardInterior(screen = page.back)
-        }
-        // Front frame: the screen this page is about.
-        ThemePhoneFrame(modifier = Modifier.fillMaxHeight(0.78f)) {
-            OnboardInterior(screen = page.front)
+            ) {
+                OnboardInterior(screen = page.back)
+            }
+            // Front frame: the screen this page is about.
+            PhoneMock(scale = scale) {
+                OnboardInterior(screen = page.front)
+            }
         }
     }
+}
+
+/** One phone mock-up at a share of a real phone's size. */
+@Composable
+private fun PhoneMock(scale: Float, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    ThemePhoneMock(height = OnboardPhoneHeight * scale, modifier = modifier, content = content)
 }
 
 /** The page's heading and its sentence. */
