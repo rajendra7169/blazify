@@ -188,21 +188,153 @@ fun LookAndFeelScreen(
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
 
     // Preview frame scales with the screen (responsive) and leaves room for the tabs + controls.
-    val screenHeightDp = LocalConfiguration.current.screenHeightDp.toFloat()
-    val frameHeight = (screenHeightDp * 0.48f).coerceIn(260f, 480f).dp
+    val configuration = LocalConfiguration.current
+    val screenHeightDp = configuration.screenHeightDp.toFloat()
+    // Sideways the preview stands beside the controls, so it may use the whole height.
+    val sideBySide = configuration.screenWidthDp > configuration.screenHeightDp
+    val frameHeight =
+        if (sideBySide) {
+            (screenHeightDp * 0.70f).coerceIn(180f, 460f).dp
+        } else {
+            (screenHeightDp * 0.48f).coerceIn(260f, 480f).dp
+        }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
-            .padding(top = 56.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(Modifier.height(12.dp))
+    val controls: @Composable () -> Unit = {
+            Crossfade(targetState = tab, label = "lookfeel-controls") { active ->
+                when (active) {
+                    LookFeelTab.THEME ->
+                        ThemeControls(
+                            darkMode = darkMode,
+                            onDarkModeChange = onDarkModeChange,
+                            pureBlack = pureBlack,
+                            onPureBlackChange = onPureBlackChange,
+                            selectedThemeColor = selectedThemeColor,
+                            onSelectedThemeColorChange = handleColorSelection,
+                        )
 
-        // ── Pinned live preview (interior switches with the active tab) ──
-        ThemePhoneFrame(modifier = Modifier.height(frameHeight)) {
+                    LookFeelTab.PLAYER ->
+                        Box(Modifier.padding(horizontal = 16.dp)) {
+                            Material3SettingsGroup(
+                                items = listOf(
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.palette),
+                                        title = { Text(stringResource(R.string.player_theme)) },
+                                        description = { Text(stringResource(playerDesign.nameRes)) },
+                                        onClick = { navController.navigate("settings/appearance/player_design") },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.sliders),
+                                        title = { Text(stringResource(R.string.player_slider_style)) },
+                                        description = { Text(sliderStyle.label(squigglySlider)) },
+                                        onClick = { showSliderStyleDialog = true },
+                                    ),
+                                ),
+                            )
+                        }
+
+                    LookFeelTab.LYRICS ->
+                        Box(Modifier.padding(horizontal = 16.dp)) {
+                            Material3SettingsGroup(
+                                items = listOf(
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.lyrics),
+                                        title = { Text(stringResource(R.string.lyrics_text_position)) },
+                                        description = { Text(lyricsPosition.label()) },
+                                        onClick = { showLyricsPositionDialog = true },
+                                    ),
+                                ),
+                            )
+                        }
+
+                    LookFeelTab.HOME ->
+                        Box(Modifier.padding(horizontal = 16.dp)) {
+                            Material3SettingsGroup(
+                                items = listOf(
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.home_outlined),
+                                        title = { Text(stringResource(R.string.default_open_tab)) },
+                                        description = { Text(defaultOpenTab.label()) },
+                                        onClick = { showDefaultOpenTabDialog = true },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.grid_view),
+                                        title = { Text(stringResource(R.string.grid_cell_size)) },
+                                        description = { Text(gridItemSize.label()) },
+                                        onClick = { showGridSizeDialog = true },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.nav_bar),
+                                        title = { Text(stringResource(R.string.nav_bar_style)) },
+                                        description = { Text(navBarStyle.label()) },
+                                        onClick = { showNavBarStyleDialog = true },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.nav_bar),
+                                        title = { Text(stringResource(R.string.slim_navbar)) },
+                                        trailingContent = {
+                                            Switch(checked = slimNavBar, onCheckedChange = onSlimNavBarChange)
+                                        },
+                                        onClick = { onSlimNavBarChange(!slimNavBar) },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.home_outlined),
+                                        title = { Text(stringResource(R.string.show_home_greeting)) },
+                                        description = { Text(stringResource(R.string.show_home_greeting_desc)) },
+                                        trailingContent = {
+                                            Switch(checked = showHomeGreeting, onCheckedChange = onShowHomeGreetingChange)
+                                        },
+                                        onClick = { onShowHomeGreetingChange(!showHomeGreeting) },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.search),
+                                        title = { Text(stringResource(R.string.show_home_search_bar)) },
+                                        description = { Text(stringResource(R.string.show_home_search_bar_desc)) },
+                                        trailingContent = {
+                                            Switch(checked = showHomeSearchBar, onCheckedChange = onShowHomeSearchBarChange)
+                                        },
+                                        onClick = { onShowHomeSearchBarChange(!showHomeSearchBar) },
+                                    ),
+                                ),
+                            )
+                        }
+
+                    LookFeelTab.MINI ->
+                        Column(Modifier.fillMaxWidth()) {
+                            MiniPlayerDesignPicker(
+                                selected = selectedMiniPlayerDesign,
+                                onSelect = { onMiniPlayerDesignChange(it.id) },
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Box(Modifier.padding(horizontal = 16.dp)) {
+                                Material3SettingsGroup(
+                                    items = listOf(
+                                        Material3SettingsItem(
+                                            icon = painterResource(R.drawable.gradient),
+                                            enabled = miniPlayerUsesArtBackground,
+                                            title = { Text(stringResource(R.string.mini_player_background_style)) },
+                                            description = {
+                                                Text(
+                                                    if (!miniPlayerUsesArtBackground) {
+                                                        stringResource(R.string.mini_player_background_not_available)
+                                                    } else {
+                                                        miniPlayerBackground.label()
+                                                    },
+                                                )
+                                            },
+                                            onClick = {
+                                                if (miniPlayerUsesArtBackground) showMiniPlayerBackgroundDialog = true
+                                            },
+                                        ),
+                                    ),
+                                )
+                            }
+                        }
+                }
+            }
+    }
+
+    val preview: @Composable () -> Unit = {
+        ThemePhoneMock(height = frameHeight) {
             when (tab) {
                 LookFeelTab.PLAYER -> LivePreview(playerDesign, playerConnection)
                 LookFeelTab.LYRICS -> LyricsSampleInterior(
@@ -218,6 +350,52 @@ fun LookAndFeelScreen(
                 )
             }
         }
+    }
+
+    // Sideways: the phone on the left, the tabs and their controls scrolling on the right.
+    if (sideBySide) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+                // Keep clear of the mini player and the navigation bar at the bottom.
+                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
+                .padding(top = 56.dp, bottom = 8.dp),
+        ) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                contentAlignment = Alignment.Center,
+            ) {
+                preview()
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                LookFeelTabRow(selected = tab, onSelect = { tab = it })
+                Spacer(Modifier.height(16.dp))
+                controls()
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+        return
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+            .padding(top = 56.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(12.dp))
+
+        // ── Pinned live preview (interior switches with the active tab) ──
+        preview()
         Spacer(Modifier.height(18.dp))
 
         // ── Tab strip ──
@@ -225,137 +403,7 @@ fun LookAndFeelScreen(
         Spacer(Modifier.height(16.dp))
 
         // ── Controls for the active tab ──
-        Crossfade(targetState = tab, label = "lookfeel-controls") { active ->
-            when (active) {
-                LookFeelTab.THEME ->
-                    ThemeControls(
-                        darkMode = darkMode,
-                        onDarkModeChange = onDarkModeChange,
-                        pureBlack = pureBlack,
-                        onPureBlackChange = onPureBlackChange,
-                        selectedThemeColor = selectedThemeColor,
-                        onSelectedThemeColorChange = handleColorSelection,
-                    )
-
-                LookFeelTab.PLAYER ->
-                    Box(Modifier.padding(horizontal = 16.dp)) {
-                        Material3SettingsGroup(
-                            items = listOf(
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.palette),
-                                    title = { Text(stringResource(R.string.player_theme)) },
-                                    description = { Text(stringResource(playerDesign.nameRes)) },
-                                    onClick = { navController.navigate("settings/appearance/player_design") },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.sliders),
-                                    title = { Text(stringResource(R.string.player_slider_style)) },
-                                    description = { Text(sliderStyle.label(squigglySlider)) },
-                                    onClick = { showSliderStyleDialog = true },
-                                ),
-                            ),
-                        )
-                    }
-
-                LookFeelTab.LYRICS ->
-                    Box(Modifier.padding(horizontal = 16.dp)) {
-                        Material3SettingsGroup(
-                            items = listOf(
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.lyrics),
-                                    title = { Text(stringResource(R.string.lyrics_text_position)) },
-                                    description = { Text(lyricsPosition.label()) },
-                                    onClick = { showLyricsPositionDialog = true },
-                                ),
-                            ),
-                        )
-                    }
-
-                LookFeelTab.HOME ->
-                    Box(Modifier.padding(horizontal = 16.dp)) {
-                        Material3SettingsGroup(
-                            items = listOf(
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.home_outlined),
-                                    title = { Text(stringResource(R.string.default_open_tab)) },
-                                    description = { Text(defaultOpenTab.label()) },
-                                    onClick = { showDefaultOpenTabDialog = true },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.grid_view),
-                                    title = { Text(stringResource(R.string.grid_cell_size)) },
-                                    description = { Text(gridItemSize.label()) },
-                                    onClick = { showGridSizeDialog = true },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.nav_bar),
-                                    title = { Text(stringResource(R.string.nav_bar_style)) },
-                                    description = { Text(navBarStyle.label()) },
-                                    onClick = { showNavBarStyleDialog = true },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.nav_bar),
-                                    title = { Text(stringResource(R.string.slim_navbar)) },
-                                    trailingContent = {
-                                        Switch(checked = slimNavBar, onCheckedChange = onSlimNavBarChange)
-                                    },
-                                    onClick = { onSlimNavBarChange(!slimNavBar) },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.home_outlined),
-                                    title = { Text(stringResource(R.string.show_home_greeting)) },
-                                    description = { Text(stringResource(R.string.show_home_greeting_desc)) },
-                                    trailingContent = {
-                                        Switch(checked = showHomeGreeting, onCheckedChange = onShowHomeGreetingChange)
-                                    },
-                                    onClick = { onShowHomeGreetingChange(!showHomeGreeting) },
-                                ),
-                                Material3SettingsItem(
-                                    icon = painterResource(R.drawable.search),
-                                    title = { Text(stringResource(R.string.show_home_search_bar)) },
-                                    description = { Text(stringResource(R.string.show_home_search_bar_desc)) },
-                                    trailingContent = {
-                                        Switch(checked = showHomeSearchBar, onCheckedChange = onShowHomeSearchBarChange)
-                                    },
-                                    onClick = { onShowHomeSearchBarChange(!showHomeSearchBar) },
-                                ),
-                            ),
-                        )
-                    }
-
-                LookFeelTab.MINI ->
-                    Column(Modifier.fillMaxWidth()) {
-                        MiniPlayerDesignPicker(
-                            selected = selectedMiniPlayerDesign,
-                            onSelect = { onMiniPlayerDesignChange(it.id) },
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Box(Modifier.padding(horizontal = 16.dp)) {
-                            Material3SettingsGroup(
-                                items = listOf(
-                                    Material3SettingsItem(
-                                        icon = painterResource(R.drawable.gradient),
-                                        enabled = miniPlayerUsesArtBackground,
-                                        title = { Text(stringResource(R.string.mini_player_background_style)) },
-                                        description = {
-                                            Text(
-                                                if (!miniPlayerUsesArtBackground) {
-                                                    stringResource(R.string.mini_player_background_not_available)
-                                                } else {
-                                                    miniPlayerBackground.label()
-                                                },
-                                            )
-                                        },
-                                        onClick = {
-                                            if (miniPlayerUsesArtBackground) showMiniPlayerBackgroundDialog = true
-                                        },
-                                    ),
-                                ),
-                            )
-                        }
-                    }
-            }
-        }
+        controls()
 
         // Clear the now-playing mini-player + nav bar.
         Spacer(Modifier.windowInsetsBottomHeight(LocalPlayerAwareWindowInsets.current))
