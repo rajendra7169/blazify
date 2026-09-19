@@ -168,6 +168,9 @@ import com.blazify.music.constants.SimilarContent
 import com.blazify.music.constants.SkipSilenceInstantKey
 import com.blazify.music.constants.LyricsCacheCleanupV9Key
 import com.blazify.music.constants.LyricsCacheCleanupV10Key
+import com.blazify.music.constants.SponsorBlockCategoriesKey
+import com.blazify.music.constants.SponsorBlockEnabledKey
+import com.blazify.music.utils.SponsorBlock
 import com.blazify.music.constants.SkipSilenceKey
 import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.db.MusicDatabase
@@ -521,6 +524,10 @@ class MusicService :
     // leaving the player "prepared but paused" forever.
     private var pausedDueToNetworkError = false
     private var silenceSkipJob: Job? = null
+
+    // What SponsorBlock says is not music in whatever is playing, and the job that fetches it.
+    private var sponsorSegments = emptyList<SponsorBlock.Segment>()
+    private var sponsorFetchJob: Job? = null
 
     // Cached preferences to avoid runBlocking DataStore reads in hot paths
     @Volatile
@@ -1250,6 +1257,18 @@ class MusicService :
                 delay(5_000)
                 Timber.tag("DiscordSvc").v("polling: periodic syncDiscordState tick")
                 syncDiscordState()
+            }
+        }
+
+        // Watch the clock against whatever SponsorBlock marked, so a talking intro or a set of
+        // end credits is jumped the moment playback reaches it. Runs on the player's own thread,
+        // and does nothing at all while there is nothing marked.
+        scope.launch {
+            while (isActive) {
+                delay(300)
+                if (sponsorSegments.isNotEmpty() && player.isPlaying) {
+                    skipSponsorSegmentIfInside()
+                }
             }
         }
 
@@ -2810,10 +2829,51 @@ class MusicService :
         }
     }
 
+    /**
+     * Ask what to skip in the song that just started.
+     *
+     * Only for songs that came from YouTube: a file on the phone is not in anybody's database,
+     * and a broadcast has no fixed timeline to mark up.
+     */
+    private fun refreshSponsorSegments(mediaItem: MediaItem?) {
+        sponsorFetchJob?.cancel()
+        sponsorSegments = emptyList()
+        val mediaId = mediaItem?.mediaId ?: return
+        if (LocalMusic.isLocal(mediaId) || mediaId in liveBroadcasts.value) return
+
+        sponsorFetchJob =
+            scope.launch(Dispatchers.IO) {
+                val prefs = dataStore.data.first()
+                if (prefs[SponsorBlockEnabledKey] != true) return@launch
+                val chosen =
+                    prefs[SponsorBlockCategoriesKey]
+                        ?.mapNotNull { SponsorBlock.Category.byId(it) }
+                        ?.toSet()
+                        ?: setOf(SponsorBlock.Category.NON_MUSIC)
+                val found = SponsorBlock.segments(mediaId, chosen)
+                if (found.isNotEmpty()) {
+                    Timber.tag(TAG).i("SponsorBlock: ${found.size} segment(s) to skip in this one")
+                }
+                withContext(Dispatchers.Main) {
+                    // Still the same song by the time the answer arrives?
+                    if (player.currentMediaItem?.mediaId == mediaId) sponsorSegments = found
+                }
+            }
+    }
+
+    /** Jump past a marked stretch the moment playback reaches it. */
+    private fun skipSponsorSegmentIfInside() {
+        if (sponsorSegments.isEmpty()) return
+        val segment = SponsorBlock.segmentAt(sponsorSegments, player.currentPosition) ?: return
+        Timber.tag(TAG).i("SponsorBlock: skipping ${segment.category.id} to ${segment.endMs}ms")
+        player.seekTo(segment.endMs)
+    }
+
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
         reason: Int,
     ) {
+        refreshSponsorSegments(mediaItem)
         // The track that was playing before this transition only gets marked as
         // "fully cached" if it advanced AUTOmatically (i.e. it actually finished),
         // never on a manual skip/seek. lastTransitionedMediaId must be read BEFORE

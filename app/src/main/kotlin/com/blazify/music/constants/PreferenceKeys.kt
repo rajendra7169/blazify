@@ -152,6 +152,10 @@ val PersistentShuffleAcrossQueuesKey = booleanPreferencesKey("persistentShuffleA
 val RememberShuffleAndRepeatKey = booleanPreferencesKey("rememberShuffleAndRepeat")
 val ShuffleModeKey = booleanPreferencesKey("shuffleMode")
 val SkipSilenceKey = booleanPreferencesKey("skipSilence")
+
+// Skipping the parts of a video that are not the song, using SponsorBlock's community marks.
+val SponsorBlockEnabledKey = booleanPreferencesKey("sponsorBlockEnabled")
+val SponsorBlockCategoriesKey = stringSetPreferencesKey("sponsorBlockCategories")
 val SkipSilenceInstantKey = booleanPreferencesKey("skipSilenceInstant")
 val AudioNormalizationKey = booleanPreferencesKey("audioNormalization")
 
