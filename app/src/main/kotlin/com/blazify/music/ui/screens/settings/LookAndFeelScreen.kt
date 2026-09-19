@@ -12,6 +12,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.Dp
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -194,7 +196,7 @@ fun LookAndFeelScreen(
     val sideBySide = configuration.screenWidthDp > configuration.screenHeightDp
     val frameHeight =
         if (sideBySide) {
-            (screenHeightDp * 0.70f).coerceIn(180f, 460f).dp
+            (screenHeightDp * 0.92f).coerceIn(180f, 460f).dp
         } else {
             (screenHeightDp * 0.48f).coerceIn(260f, 480f).dp
         }
@@ -333,8 +335,13 @@ fun LookAndFeelScreen(
             }
     }
 
-    val preview: @Composable () -> Unit = {
-        ThemePhoneMock(height = frameHeight) {
+    val preview: @Composable (Dp) -> Unit = { height ->
+        ThemePhoneMock(
+            height = height,
+            // The player preview is drawn at a full phone's size, the others at their own
+            // smaller one; either way the mock-up is scaled, never squeezed.
+            baseWidth = if (tab == LookFeelTab.PLAYER) MockPhoneWidth else SmallMockWidth,
+        ) {
             when (tab) {
                 LookFeelTab.PLAYER -> LivePreview(playerDesign, playerConnection)
                 LookFeelTab.LYRICS -> LyricsSampleInterior(
@@ -360,18 +367,23 @@ fun LookAndFeelScreen(
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
                 // Keep clear of the mini player and the navigation bar at the bottom.
                 .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom))
-                .padding(top = 56.dp, bottom = 8.dp),
+                .padding(bottom = 8.dp),
         ) {
-            Box(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
+            BoxWithConstraints(
+                // The title bar floats over the right half only, so the phone may use the
+                // whole height of this one.
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(top = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                preview()
+                // Whatever height this half really has, minus a little air — so the phone always
+                // sits above the mini player instead of running behind it.
+                preview((maxHeight - 8.dp).coerceAtMost(frameHeight))
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
+                    .padding(top = 56.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -395,7 +407,7 @@ fun LookAndFeelScreen(
         Spacer(Modifier.height(12.dp))
 
         // ── Pinned live preview (interior switches with the active tab) ──
-        preview()
+        preview(frameHeight)
         Spacer(Modifier.height(18.dp))
 
         // ── Tab strip ──
