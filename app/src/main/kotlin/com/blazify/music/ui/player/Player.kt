@@ -47,6 +47,8 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import com.blazify.music.playback.PlayerConnection
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -1910,276 +1912,32 @@ fun BottomSheetPlayer(
 
         when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
-                // Calculate vertical padding like OuterTune
-                val density = LocalDensity.current
-                val verticalPadding =
-                    max(
-                        WindowInsets.systemBars.getTop(density),
-                        WindowInsets.systemBars.getBottom(density),
-                    )
-                val verticalPaddingDp = with(density) { verticalPadding.toDp() }
-                val verticalWindowInsets = WindowInsets(left = 0.dp, top = verticalPaddingDp, right = 0.dp, bottom = verticalPaddingDp)
-
-                if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
-                    FullArtBackground(
-                        thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
-                        horizontal = true,
-                    )
-                }
-
-                Row(
-                    modifier =
-                        Modifier
-                            .windowInsetsPadding(
-                                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal).add(verticalWindowInsets),
-                            ).padding(bottom = 24.dp)
-                            .fillMaxSize(),
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .nestedScroll(state.preUpPostDownNestedScrollConnection),
-                    ) {
-                        // Remember lambdas to prevent unnecessary recomposition
-                        val currentSliderPosition by rememberUpdatedState(sliderPosition)
-                        val sliderPositionProvider = remember { { currentSliderPosition } }
-                        val isExpandedProvider = remember(state) { { state.isExpanded } }
-                        AnimatedContent(
-                            targetState = showInlineLyrics,
-                            label = "Lyrics",
-                            transitionSpec = { fadeIn() togetherWith fadeOut() },
-                        ) { showLyrics ->
-                            if (showLyrics) {
-                                InlineLyricsView(
-                                    mediaMetadata = mediaMetadata,
-                                    showLyrics = showLyrics,
-                                    positionProvider = { effectivePosition },
-                                )
-                            } else {
-                                // Each design keeps its own artwork sideways: the ring, the
-                                // turntable, the tape — not everything falling back to a square.
-                                val landscapeProgress =
-                                    if (duration > 0) {
-                                        ((sliderPosition ?: effectivePosition).toFloat() / duration).coerceIn(0f, 1f)
-                                    } else {
-                                        0f
-                                    }
-                                when (playerDesign) {
-                                    PlayerDesign.RING ->
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier.fillMaxSize().padding(16.dp),
-                                        ) {
-                                            SeekableAlbumRing(
-                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                                                progress = landscapeProgress,
-                                                ringColor = MaterialTheme.colorScheme.primary,
-                                                trackColor = TextBackgroundColor.copy(alpha = 0.16f),
-                                                onSeek = { f ->
-                                                    if (duration > 0 && !isLive) {
-                                                        val to = (f * duration).toLong()
-                                                        playerConnection.player.seekTo(to)
-                                                        position = to
-                                                    }
-                                                },
-                                                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
-                                                ringStrokeDp = 7f,
-                                                artPaddingDp = 18f,
-                                                thumbColor = MaterialTheme.colorScheme.primary,
-                                                onDoubleTapArt =
-                                                    if (isListenTogetherGuest) {
-                                                        null
-                                                    } else {
-                                                        { forward: Boolean -> playerSeeker.seek(forward) }
-                                                    },
-                                                rtl = isRtlLayout,
-                                                topLabel = {
-                                                    if (isLive) {
-                                                        LiveBadge()
-                                                    } else {
-                                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                                            Text(
-                                                                text = makeTimeString(sliderPosition ?: effectivePosition),
-                                                                style = MaterialTheme.typography.labelLarge,
-                                                                fontWeight = FontWeight.SemiBold,
-                                                                color = MaterialTheme.colorScheme.primary,
-                                                            )
-                                                            Text(
-                                                                text = "  —  ",
-                                                                style = MaterialTheme.typography.labelLarge,
-                                                                color = TextBackgroundColor.copy(alpha = 0.5f),
-                                                            )
-                                                            Text(
-                                                                text =
-                                                                    if (duration != C.TIME_UNSET && duration > 0) {
-                                                                        makeTimeString(duration)
-                                                                    } else {
-                                                                        "--:--"
-                                                                    },
-                                                                style = MaterialTheme.typography.labelLarge,
-                                                                color = TextBackgroundColor.copy(alpha = 0.7f),
-                                                            )
-                                                        }
-                                                    }
-                                                },
-                                            )
-                                            SeekMessage(playerSeeker)
-                                        }
-
-                                    PlayerDesign.RECORD ->
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier.fillMaxSize().padding(12.dp),
-                                        ) {
-                                            VinylTurntable(
-                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                                                isPlaying = effectiveIsPlaying,
-                                                onTurn =
-                                                    if (isListenTogetherGuest) {
-                                                        null
-                                                    } else {
-                                                        { forward -> playerSeeker.seek(forward) }
-                                                    },
-                                                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
-                                                fallbackBrush = Brush.linearGradient(
-                                                    listOf(
-                                                        MaterialTheme.colorScheme.primary,
-                                                        MaterialTheme.colorScheme.tertiary,
-                                                    ),
-                                                ),
-                                                progress = landscapeProgress,
-                                            )
-                                            SeekMessage(playerSeeker)
-                                        }
-
-                                    PlayerDesign.CASSETTE ->
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(horizontal = 16.dp)
-                                                .doubleTapToSeek(
-                                                    playerSeeker,
-                                                    isRtlLayout,
-                                                    enabled = !isListenTogetherGuest,
-                                                ),
-                                        ) {
-                                            CassetteTape(
-                                                isPlaying = effectiveIsPlaying,
-                                                progress = landscapeProgress,
-                                                modifier = Modifier.fillMaxWidth(),
-                                                accent = MaterialTheme.colorScheme.primary,
-                                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
-                                            )
-                                            SeekMessage(playerSeeker)
-                                        }
-
-                                    // Full art covers the whole screen behind this Row, so its
-                                    // half is left to the artwork itself.
-                                    PlayerDesign.FULL_ART -> Box(Modifier.fillMaxSize())
-
-                                    PlayerDesign.CLASSIC ->
-                                        Thumbnail(
-                                            sliderPositionProvider = sliderPositionProvider,
-                                            modifier = Modifier.animateContentSize(),
-                                            isPlayerExpanded = isExpandedProvider,
-                                            isLandscape = true,
-                                            isListenTogetherGuest = isListenTogetherGuest,
-                                        )
-                                }
-                            }
-                        }
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier =
-                            Modifier
-                                .weight(if (showInlineLyrics) 0.65f else 1f, false)
-                                .animateContentSize()
-                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
-                    ) {
-                        Spacer(Modifier.weight(1f))
-
-                        mediaMetadata?.let {
-                            controlsContent(it)
-                        }
-
-                        // Queue · Cast · Sleep timer · Lyrics, under this half's controls rather
-                        // than across the whole screen, where they covered the artwork.
-                        if (!isFullScreen && !showInlineLyrics) {
-                            Spacer(Modifier.height(10.dp))
-                            if (playerDesign == PlayerDesign.CASSETTE) {
-                                RetroBottomRow(
-                                    lyricsOpen = showInlineLyrics,
-                                    sleepTimerEnabled = sleepTimerEnabled,
-                                    sleepTimerTimeLeft = sleepTimerTimeLeft,
-                                    sleepEnabled = !isListenTogetherGuest,
-                                    accent = MaterialTheme.colorScheme.primary,
-                                    onLyrics = { showInlineLyrics = !showInlineLyrics },
-                                    onQueue = { queueSheetState.expandSoft() },
-                                    onSleep = { showSleepTimerDialog = true },
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                                )
-                            } else {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                                ) {
-                                    PlayerBottomButton(
-                                        icon = R.drawable.queue_music,
-                                        label = stringResource(R.string.queue),
-                                        active = false,
-                                        tint = TextBackgroundColor,
-                                        activeTint = BlazeThemeColor,
-                                        modifier = Modifier.weight(1f),
-                                        onClick = { queueSheetState.expandSoft() },
-                                    )
-                                    CastButton(
-                                        modifier = Modifier.weight(1f),
-                                        tintColor = TextBackgroundColor,
-                                        label = stringResource(R.string.cast),
-                                        activeTint = BlazeThemeColor,
-                                    )
-                                    PlayerBottomButton(
-                                        icon = R.drawable.bedtime,
-                                        label =
-                                            if (sleepTimerEnabled) {
-                                                makeTimeString(sleepTimerTimeLeft)
-                                            } else {
-                                                stringResource(R.string.sleep_timer)
-                                            },
-                                        active = sleepTimerEnabled,
-                                        tint = TextBackgroundColor,
-                                        activeTint = BlazeThemeColor,
-                                        enabled = !isListenTogetherGuest,
-                                        modifier = Modifier.weight(1f),
-                                        onClick = { showSleepTimerDialog = true },
-                                    )
-                                    PlayerBottomButton(
-                                        icon = R.drawable.lyrics,
-                                        label = stringResource(R.string.lyrics),
-                                        active = showInlineLyrics,
-                                        tint = TextBackgroundColor,
-                                        activeTint = BlazeThemeColor,
-                                        modifier = Modifier.weight(1f),
-                                        onClick = { showInlineLyrics = !showInlineLyrics },
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.weight(1f))
-                    }
-                }
+                LandscapePlayer(
+                    state = state,
+                    queueSheetState = queueSheetState,
+                    playerDesign = playerDesign,
+                    mediaMetadata = mediaMetadata,
+                    showInlineLyrics = showInlineLyrics,
+                    isFullScreen = isFullScreen,
+                    isLive = isLive,
+                    isRtlLayout = isRtlLayout,
+                    isListenTogetherGuest = isListenTogetherGuest,
+                    effectiveIsPlaying = effectiveIsPlaying,
+                    effectivePosition = effectivePosition,
+                    sliderPosition = sliderPosition,
+                    duration = duration,
+                    playerSeeker = playerSeeker,
+                    playerConnection = playerConnection,
+                    sleepTimerEnabled = sleepTimerEnabled,
+                    sleepTimerTimeLeft = sleepTimerTimeLeft,
+                    textBackgroundColor = TextBackgroundColor,
+                    onPosition = { position = it },
+                    onShowLyrics = { showInlineLyrics = true },
+                    onToggleLyrics = { showInlineLyrics = !showInlineLyrics },
+                    onSleepTimer = { showSleepTimerDialog = true },
+                    controlsContent = controlsContent,
+                )
             }
-
             else -> {
                 val bottomPadding by animateDpAsState(
                     targetValue = if (isFullScreen) 0.dp else queueSheetState.collapsedBound,
@@ -3042,6 +2800,310 @@ fun MoreActionsButton(
  * transport, a left-aligned sleep-timer icon, and a partial synced-lyrics card
  * that expands to full lyrics on tap. Colours stay album-art dynamic.
  */
+/**
+ * The player laid out for a screen held sideways: the artwork of whichever design is in use on
+ * one side, its controls on the other.
+ *
+ * Its own function rather than a branch inside the player's body: that body had grown into a
+ * lambda with sixty parameters, and the device's verifier rejected the class outright
+ * ("register v11 has type Modifier but expected TweenSpec") — the app would not start.
+ */
+@Composable
+private fun BoxScope.LandscapePlayer(
+    state: BottomSheetState,
+    queueSheetState: BottomSheetState,
+    playerDesign: PlayerDesign,
+    mediaMetadata: MediaMetadata?,
+    showInlineLyrics: Boolean,
+    isFullScreen: Boolean,
+    isLive: Boolean,
+    isRtlLayout: Boolean,
+    isListenTogetherGuest: Boolean,
+    effectiveIsPlaying: Boolean,
+    effectivePosition: Long,
+    sliderPosition: Long?,
+    duration: Long,
+    playerSeeker: PlayerSeeker,
+    playerConnection: PlayerConnection,
+    sleepTimerEnabled: Boolean,
+    sleepTimerTimeLeft: Long,
+    textBackgroundColor: Color,
+    onPosition: (Long) -> Unit,
+    onShowLyrics: () -> Unit,
+    onToggleLyrics: () -> Unit,
+    onSleepTimer: () -> Unit,
+    controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit,
+) {
+            // Calculate vertical padding like OuterTune
+            val density = LocalDensity.current
+            val verticalPadding =
+                max(
+                    WindowInsets.systemBars.getTop(density),
+                    WindowInsets.systemBars.getBottom(density),
+                )
+            val verticalPaddingDp = with(density) { verticalPadding.toDp() }
+            val verticalWindowInsets = WindowInsets(left = 0.dp, top = verticalPaddingDp, right = 0.dp, bottom = verticalPaddingDp)
+
+            if (playerDesign == PlayerDesign.FULL_ART && !showInlineLyrics) {
+                FullArtBackground(
+                    thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
+                    horizontal = true,
+                )
+            }
+
+            Row(
+                modifier =
+                    Modifier
+                        .windowInsetsPadding(
+                            WindowInsets.systemBars.only(WindowInsetsSides.Horizontal).add(verticalWindowInsets),
+                        ).padding(bottom = 24.dp)
+                        .fillMaxSize(),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .nestedScroll(state.preUpPostDownNestedScrollConnection),
+                ) {
+                    // Remember lambdas to prevent unnecessary recomposition
+                    val currentSliderPosition by rememberUpdatedState(sliderPosition)
+                    val sliderPositionProvider = remember { { currentSliderPosition } }
+                    val isExpandedProvider = remember(state) { { state.isExpanded } }
+                    AnimatedContent(
+                        targetState = showInlineLyrics,
+                        label = "Lyrics",
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    ) { showLyrics ->
+                        if (showLyrics) {
+                            InlineLyricsView(
+                                mediaMetadata = mediaMetadata,
+                                showLyrics = showLyrics,
+                                positionProvider = { effectivePosition },
+                            )
+                        } else {
+                            // Each design keeps its own artwork sideways: the ring, the
+                            // turntable, the tape — not everything falling back to a square.
+                            val landscapeProgress =
+                                if (duration > 0) {
+                                    ((sliderPosition ?: effectivePosition).toFloat() / duration).coerceIn(0f, 1f)
+                                } else {
+                                    0f
+                                }
+                            when (playerDesign) {
+                                PlayerDesign.RING ->
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                                    ) {
+                                        SeekableAlbumRing(
+                                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                            progress = landscapeProgress,
+                                            ringColor = MaterialTheme.colorScheme.primary,
+                                            trackColor = textBackgroundColor.copy(alpha = 0.16f),
+                                            onSeek = { f ->
+                                                if (duration > 0 && !isLive) {
+                                                    val to = (f * duration).toLong()
+                                                    playerConnection.player.seekTo(to)
+                                                    onPosition(to)
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                            ringStrokeDp = 7f,
+                                            artPaddingDp = 18f,
+                                            thumbColor = MaterialTheme.colorScheme.primary,
+                                            onDoubleTapArt =
+                                                if (isListenTogetherGuest) {
+                                                    null
+                                                } else {
+                                                    { forward: Boolean -> playerSeeker.seek(forward) }
+                                                },
+                                            rtl = isRtlLayout,
+                                            topLabel = {
+                                                if (isLive) {
+                                                    LiveBadge()
+                                                } else {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        Text(
+                                                            text = makeTimeString(sliderPosition ?: effectivePosition),
+                                                            style = MaterialTheme.typography.labelLarge,
+                                                            fontWeight = FontWeight.SemiBold,
+                                                            color = MaterialTheme.colorScheme.primary,
+                                                        )
+                                                        Text(
+                                                            text = "  —  ",
+                                                            style = MaterialTheme.typography.labelLarge,
+                                                            color = textBackgroundColor.copy(alpha = 0.5f),
+                                                        )
+                                                        Text(
+                                                            text =
+                                                                if (duration != C.TIME_UNSET && duration > 0) {
+                                                                    makeTimeString(duration)
+                                                                } else {
+                                                                    "--:--"
+                                                                },
+                                                            style = MaterialTheme.typography.labelLarge,
+                                                            color = textBackgroundColor.copy(alpha = 0.7f),
+                                                        )
+                                                    }
+                                                }
+                                            },
+                                        )
+                                        SeekMessage(playerSeeker)
+                                    }
+
+                                PlayerDesign.RECORD ->
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize().padding(12.dp),
+                                    ) {
+                                        VinylTurntable(
+                                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                            isPlaying = effectiveIsPlaying,
+                                            onTurn =
+                                                if (isListenTogetherGuest) {
+                                                    null
+                                                } else {
+                                                    { forward -> playerSeeker.seek(forward) }
+                                                },
+                                            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                            fallbackBrush = Brush.linearGradient(
+                                                listOf(
+                                                    MaterialTheme.colorScheme.primary,
+                                                    MaterialTheme.colorScheme.tertiary,
+                                                ),
+                                            ),
+                                            progress = landscapeProgress,
+                                        )
+                                        SeekMessage(playerSeeker)
+                                    }
+
+                                PlayerDesign.CASSETTE ->
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 16.dp)
+                                            .doubleTapToSeek(
+                                                playerSeeker,
+                                                isRtlLayout,
+                                                enabled = !isListenTogetherGuest,
+                                            ),
+                                    ) {
+                                        CassetteTape(
+                                            isPlaying = effectiveIsPlaying,
+                                            progress = landscapeProgress,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            accent = MaterialTheme.colorScheme.primary,
+                                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                        )
+                                        SeekMessage(playerSeeker)
+                                    }
+
+                                // Full art covers the whole screen behind this Row, so its
+                                // half is left to the artwork itself.
+                                PlayerDesign.FULL_ART -> Box(Modifier.fillMaxSize())
+
+                                PlayerDesign.CLASSIC ->
+                                    Thumbnail(
+                                        sliderPositionProvider = sliderPositionProvider,
+                                        modifier = Modifier.animateContentSize(),
+                                        isPlayerExpanded = isExpandedProvider,
+                                        isLandscape = true,
+                                        isListenTogetherGuest = isListenTogetherGuest,
+                                    )
+                            }
+                        }
+                    }
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier =
+                        Modifier
+                            .weight(if (showInlineLyrics) 0.65f else 1f, false)
+                            .animateContentSize()
+                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+                ) {
+                    Spacer(Modifier.weight(1f))
+
+                    mediaMetadata?.let {
+                        controlsContent(it)
+                    }
+
+                    // Queue · Cast · Sleep timer · Lyrics, under this half's controls rather
+                    // than across the whole screen, where they covered the artwork.
+                    if (!isFullScreen && !showInlineLyrics) {
+                        Spacer(Modifier.height(10.dp))
+                        if (playerDesign == PlayerDesign.CASSETTE) {
+                            RetroBottomRow(
+                                lyricsOpen = showInlineLyrics,
+                                sleepTimerEnabled = sleepTimerEnabled,
+                                sleepTimerTimeLeft = sleepTimerTimeLeft,
+                                sleepEnabled = !isListenTogetherGuest,
+                                accent = MaterialTheme.colorScheme.primary,
+                                onLyrics = { onToggleLyrics() },
+                                onQueue = { queueSheetState.expandSoft() },
+                                onSleep = { onSleepTimer() },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                            )
+                        } else {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                            ) {
+                                PlayerBottomButton(
+                                    icon = R.drawable.queue_music,
+                                    label = stringResource(R.string.queue),
+                                    active = false,
+                                    tint = textBackgroundColor,
+                                    activeTint = BlazeThemeColor,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { queueSheetState.expandSoft() },
+                                )
+                                CastButton(
+                                    modifier = Modifier.weight(1f),
+                                    tintColor = textBackgroundColor,
+                                    label = stringResource(R.string.cast),
+                                    activeTint = BlazeThemeColor,
+                                )
+                                PlayerBottomButton(
+                                    icon = R.drawable.bedtime,
+                                    label =
+                                        if (sleepTimerEnabled) {
+                                            makeTimeString(sleepTimerTimeLeft)
+                                        } else {
+                                            stringResource(R.string.sleep_timer)
+                                        },
+                                    active = sleepTimerEnabled,
+                                    tint = textBackgroundColor,
+                                    activeTint = BlazeThemeColor,
+                                    enabled = !isListenTogetherGuest,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { onSleepTimer() },
+                                )
+                                PlayerBottomButton(
+                                    icon = R.drawable.lyrics,
+                                    label = stringResource(R.string.lyrics),
+                                    active = showInlineLyrics,
+                                    tint = textBackgroundColor,
+                                    activeTint = BlazeThemeColor,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { onToggleLyrics() },
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+}
+
 @Composable
 private fun RingPlayerLayout(
     mediaMetadata: MediaMetadata?,
