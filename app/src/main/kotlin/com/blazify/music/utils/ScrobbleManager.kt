@@ -107,25 +107,52 @@ class ScrobbleManager(
     }
 
     private fun scrobbleSong(metadata: MediaMetadata) {
+        val artist = metadata.artists.joinToString { it.name }
         scope.launch {
             LastFM.scrobble(
-                artist = metadata.artists.joinToString { it.name },
+                artist = artist,
                 track = metadata.title,
                 duration = metadata.duration,
                 timestamp = songStartedAt,
                 album = metadata.album?.title,
             )
         }
+        // The same play, to whichever other history the listener keeps. Sent separately so a
+        // service that is down or turned off cannot hold up the other.
+        if (ListenBrainz.worthSending(artist, metadata.title)) {
+            scope.launch {
+                ListenBrainz.scrobble(
+                    artist = artist,
+                    track = metadata.title,
+                    album = metadata.album?.title,
+                    durationSeconds = metadata.duration,
+                    videoId = metadata.id,
+                    listenedAt = songStartedAt,
+                )
+            }
+        }
     }
 
     private fun updateNowPlaying(metadata: MediaMetadata) {
+        val artist = metadata.artists.joinToString { it.name }
         scope.launch {
             LastFM.updateNowPlaying(
-                artist = metadata.artists.joinToString { it.name },
+                artist = artist,
                 track = metadata.title,
                 album = metadata.album?.title,
                 duration = metadata.duration
             )
+        }
+        if (ListenBrainz.worthSending(artist, metadata.title)) {
+            scope.launch {
+                ListenBrainz.updateNowPlaying(
+                    artist = artist,
+                    track = metadata.title,
+                    album = metadata.album?.title,
+                    durationSeconds = metadata.duration,
+                    videoId = metadata.id,
+                )
+            }
         }
     }
 

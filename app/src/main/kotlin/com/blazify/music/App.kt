@@ -26,6 +26,7 @@ import com.blazify.innertube.models.YouTubeLocale
 import com.blazify.kugou.KuGou
 import com.blazify.lastfm.LastFM
 import com.blazify.music.BuildConfig
+import com.blazify.music.utils.ListenBrainz
 import com.blazify.music.constants.*
 import com.blazify.music.di.ApplicationScope
 import com.blazify.music.extensions.toEnum
@@ -292,6 +293,17 @@ class App :
                     } catch (e: Exception) {
                         Timber.e("Error while loading last.fm session key. %s", e.message)
                     }
+                }
+        }
+
+        applicationScope.launch(Dispatchers.IO) {
+            dataStore.data
+                .map { prefs ->
+                    // No token, or switched off, means nothing is sent at all.
+                    if (prefs[EnableListenBrainzKey] == true) prefs[ListenBrainzTokenKey] else null
+                }.distinctUntilChanged()
+                .collect { token ->
+                    ListenBrainz.token = token
                 }
         }
 

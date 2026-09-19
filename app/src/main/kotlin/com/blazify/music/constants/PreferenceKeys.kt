@@ -237,6 +237,11 @@ val LastFMUseNowPlaying = booleanPreferencesKey("lastfmUseNowPlaying")
 
 val LastFMUseSendLikes = booleanPreferencesKey("lastfmUseSendLikes")
 
+// ListenBrainz: the open history, kept by whoever is listening.
+val ListenBrainzTokenKey = stringPreferencesKey("listenBrainzToken")
+val ListenBrainzUsernameKey = stringPreferencesKey("listenBrainzUsername")
+val EnableListenBrainzKey = booleanPreferencesKey("listenBrainzEnabled")
+
 val ScrobbleDelayPercentKey = floatPreferencesKey("scrobbleDelayPercent")
 val ScrobbleMinSongDurationKey = intPreferencesKey("scrobbleMinSongDuration")
 val ScrobbleDelaySecondsKey = intPreferencesKey("scrobbleDelaySeconds")
