@@ -215,6 +215,14 @@ constructor(
             // A whole playlist at once can meet a few refusals in a row before YouTube settles;
             // each retry waits a little longer than the one before.
             minRetryCount = 10
+            // A download that fails says so, rather than quietly not being there later.
+            addListener(
+                ExoDownloadService.TerminalStateNotificationHelper(
+                    context,
+                    downloadNotificationHelper,
+                    ExoDownloadService.NOTIFICATION_ID + 1,
+                ),
+            )
             addListener(
                 object : DownloadManager.Listener {
                     override fun onDownloadChanged(
@@ -295,10 +303,21 @@ constructor(
 
         val result = mutableMapOf<String, Download>()
         val cursor = downloadManager.downloadIndex.getDownloads()
+        val unfinished = mutableListOf<Download>()
         while (cursor.moveToNext()) {
             result[cursor.download.request.id] = cursor.download
+            if (cursor.download.state == Download.STATE_FAILED) unfinished += cursor.download
         }
         downloads.value = result
+
+        // Downloads the phone gave up on — the app was closed, the service was stopped, the
+        // connection went — are asked for again. Someone who sent a playlist to download should
+        // find it downloaded, not half of it with nothing said.
+        if (unfinished.isNotEmpty()) {
+            Timber.tag(TAG).i("Asking again for ${unfinished.size} download(s) that did not finish")
+            unfinished.forEach { downloadManager.addDownload(it.request) }
+        }
+        downloadManager.resumeDownloads()
     }
 
     fun getDownload(songId: String): Flow<Download?> = downloads.map { it[songId] }
