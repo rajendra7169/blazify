@@ -66,7 +66,6 @@ import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.Renderer
@@ -1542,13 +1541,10 @@ class MusicService :
                 .setMediaSourceFactory(createMediaSourceFactory())
                 .setRenderersFactory(createRenderersFactory(normalizationProcessor, eqProcessor, silenceProcessor, useAudioTrackPlaybackParams))
                 .setLoadControl(
-                    // Start playback once ~750ms is buffered (media3's default is 1000ms) so first
-                    // audio is audible a touch sooner. min/max/after-rebuffer match the media3 1.x
-                    // defaults (50s / 50s / 2000ms) so buffering and post-stall recovery are unchanged.
-                    DefaultLoadControl
-                        .Builder()
-                        .setBufferDurationsMs(50_000, 50_000, 750, 2_000)
-                        .build(),
+                    // Minutes of the song are fetched ahead on a connection that costs nothing, so
+                    // a lift, a tunnel or a bad room passes without the music stopping; on mobile
+                    // data it holds little, since anything fetched past a skip is data wasted.
+                    BufferAhead.create { connectivityManager.isActiveNetworkMetered },
                 )
                 .setHandleAudioBecomingNoisy(true)
                 .setWakeMode(C.WAKE_MODE_NETWORK)
