@@ -254,6 +254,25 @@ svg.mark{
 }
 .dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,140,50,.34)}
 .dl.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400}
+.two{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.two .dl{width:100%;justify-content:center}
+.pick{color:var(--dim);font-size:13.5px;line-height:1.45;margin:0 0 10px;display:block}
+.beta{
+  border:1px solid rgba(255,167,38,.38);border-radius:22px;padding:30px;
+  background:linear-gradient(180deg,rgba(255,167,38,.09),rgba(255,167,38,.02));
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;align-items:start;
+}
+.beta h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:22px;margin:0 0 8px}
+.beta p{color:var(--dim);font-size:15.5px;margin:0 0 14px}
+.beta .tag{
+  /* The page already has a .tag that pins itself to a corner; this one sits in the text. */
+  position:static;
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:12px;padding:5px 12px;border-radius:99px;
+  background:rgba(255,167,38,.16);color:var(--amber);font-size:12.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+}
+.beta .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.beta .links a{color:var(--amber);font-size:14.5px;text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
+.beta .links a:hover{border-bottom-color:var(--amber)}
 .dl.ghost:hover{border-color:var(--amber);color:var(--amber);box-shadow:none}
 .soon{
   position:absolute;top:20px;right:20px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
@@ -1024,7 +1043,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <h3>Android</h3>
         <div class="ver" id="verAndroid">Version 9.14.0 · 26 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
-        <a class="dl" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Download APK</a>
+        <div class="two">
+          <a class="dl" id="dlAndroidCast" href="https://github.com/rajendra7169/blazify/releases/latest">Download · plays to TVs</a>
+          <small class="pick">Sends your music to a Chromecast, a smart speaker or a TV. To do that it carries one small piece of Google's software.</small>
+          <a class="dl ghost" id="dlAndroidFoss" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Download · no Google</a>
+          <small class="pick">Not a line of Google code inside. Everything works the same, except playing to a TV.</small>
+        </div>
       </article>
 
       <article class="card rise">
@@ -1071,6 +1095,32 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <p>Search, library, playlists and synced lyrics, sideloaded with SideStore or AltStore. No App Store needed.</p>
         <a class="dl" href="https://github.com/rajendra7169/blazify-ios/releases/latest/download/Blazify.ipa">Download IPA</a>
       </article>
+  </div>
+
+  <!-- The beta, for people who would rather find the bugs than wait for them to
+       be found. Hidden until there is a beta newer than the stable release. -->
+  <div class="beta rise" id="betaCard" hidden>
+    <div>
+      <span class="tag">Early access</span>
+      <h3>Try the next version first</h3>
+      <p id="betaVer">The beta carries what is coming to Android next. It is tested, but not yet
+        lived with, so keep the stable version if you would rather nothing surprised you.</p>
+      <p>Found something wrong, or something missing? Tell us and it gets fixed before the stable
+        release. That is what a beta is for.</p>
+      <div class="links">
+        <a href="https://github.com/rajendra7169/blazify/issues/new?template=bug_report.yml">Report a problem</a>
+        <a href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml">Ask for a feature</a>
+        <a href="https://github.com/rajendra7169/blazify/discussions">Say what you think</a>
+      </div>
+    </div>
+    <div class="two">
+      <a class="dl" id="dlBetaCast" href="https://github.com/rajendra7169/blazify/releases">Beta · plays to TVs</a>
+      <small class="pick">The beta, with casting to a Chromecast, speaker or TV.</small>
+      <a class="dl ghost" id="dlBetaFoss" href="https://github.com/rajendra7169/blazify/releases">Beta · no Google</a>
+      <small class="pick">The beta, with no Google code inside.</small>
+      <small class="pick">Already have Blazify? Turn on <b>Settings › About › Updater › Get beta
+        updates</b> and it will offer each beta by itself. Turn it off to go back to stable.</small>
+    </div>
   </div>
 </section>
 
@@ -1906,7 +1956,41 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     }
   };
 
+  /* Two builds of the same release: the one that can cast, and the one with no
+     Google code in it. Their file names carry the version, so the addresses are
+     taken from the release itself rather than guessed. */
+  const setHref = (id, url) => { const el = document.getElementById(id); if (el && url) el.href = url; };
+  const assetLike = (rel, test) => ((rel && rel.assets) || []).find(a => test(a.name));
+  const isGms = n => /-gms/i.test(n) && /\.apk$/i.test(n);
+  const isPlain = n => /\.apk$/i.test(n) && !/-gms|-izzy/i.test(n);
+
+  const buildsOf = rel => {
+    const gms = assetLike(rel, isGms), plain = assetLike(rel, isPlain);
+    return {
+      cast: gms && gms.browser_download_url,
+      plain: plain && plain.browser_download_url,
+    };
+  };
+
+  /* The beta card only makes sense while a beta is ahead of the stable release. */
+  const applyBeta = beta => {
+    const card = document.getElementById('betaCard');
+    if (!card || !beta || !beta.tag || (!beta.cast && !beta.plain)) return;
+    setHref('dlBetaCast', beta.cast || beta.plain);
+    setHref('dlBetaFoss', beta.plain || beta.cast);
+    const line = document.getElementById('betaVer');
+    if (line) {
+      line.textContent = 'Beta ' + beta.tag.replace(/^v/, '') + ' carries what is coming to '
+        + 'Android next. It is tested, but not yet lived with, so keep the stable version if you '
+        + 'would rather nothing surprised you.';
+    }
+    card.hidden = false;
+  };
+
   const applyVersions = v => {
+    setHref('dlAndroidCast', v.androidCast);
+    setHref('dlAndroidFoss', v.androidPlain);
+    applyBeta(v.beta);
     if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
     if (v.desktop) {
       setText('verWindows', 'Version ' + v.desktop + (v.winSize ? ' · ' + v.winSize : '') + ' · installer');
@@ -1918,9 +2002,17 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   const readVersions = sets => {
     const a = newest(sets[0]), d = newest(sets[1]), i = newest(sets[2]);
     const apk = asset(a, 'Blazify.apk'), exe = asset(d, 'Blazify-setup.exe'), ipa = asset(i, 'Blazify.ipa');
+    const android = buildsOf(a);
+    // The newest release of any kind: a beta only when it is ahead of the stable one.
+    const first = (sets[0] || []).find(r => !r.draft);
+    const ahead = first && a && first.tag_name !== a.tag_name ? first : null;
+    const betaBuilds = ahead ? buildsOf(ahead) : {};
     return {
       android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
       androidSize: mb(apk && apk.size),
+      androidCast: android.cast,
+      androidPlain: android.plain,
+      beta: ahead ? { tag: ahead.tag_name, cast: betaBuilds.cast, plain: betaBuilds.plain } : null,
       desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
       winSize: mb(exe && exe.size),
       ios: i && i.tag_name ? i.tag_name.replace(/^v/, '') : null,
