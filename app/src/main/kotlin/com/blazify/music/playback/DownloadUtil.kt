@@ -28,6 +28,7 @@ import com.blazify.music.di.DownloadCache
 import com.blazify.music.di.PlayerCache
 import com.blazify.music.lyrics.LyricsHelper
 import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.utils.OfflineCovers
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.enumPreference
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -51,6 +52,7 @@ import androidx.media3.exoplayer.scheduler.Requirements
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import timber.log.Timber
+import java.io.IOException
 import java.time.LocalDateTime
 import java.util.concurrent.Executor
 import javax.inject.Inject
@@ -60,7 +62,7 @@ import javax.inject.Singleton
 class DownloadUtil
 @Inject
 constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
     val database: MusicDatabase,
     val databaseProvider: DatabaseProvider,
     @DownloadCache val downloadCache: Cache,
@@ -97,9 +99,16 @@ constructor(
                 ),
         ) { dataSpec ->
             val mediaId = dataSpec.key ?: error("No media id")
-            val length = if (dataSpec.length >= 0) dataSpec.length else 1
 
-            if (playerCache.isCached(mediaId, dataSpec.position, length)) {
+            // Only a song already whole in the cache can be copied without an address. One played
+            // part of the way through is cached only that far, and the rest still has to come from
+            // YouTube — checking just its first byte sent those downloads out with no address for
+            // the rest, and they failed. That is most of a playlist someone has been listening to.
+            val knownLength = runBlocking(Dispatchers.IO) { database.format(mediaId).first()?.contentLength }
+            if (knownLength != null &&
+                knownLength > dataSpec.position &&
+                playerCache.isCached(mediaId, dataSpec.position, knownLength - dataSpec.position)
+            ) {
                 return@Factory dataSpec
             }
 
@@ -114,11 +123,19 @@ constructor(
                     audioQuality = if (audioQuality == AudioQuality.AUTO) AudioQuality.HIGH else audioQuality,
                     connectivityManager = connectivityManager,
                 )
-            }.getOrThrow()
+            }.getOrElse { error ->
+                // Only a song YouTube will not play at all is given up on. Anything else — a busy
+                // moment with a whole playlist asked for at once, a check that clears, a dropped
+                // connection — goes back as a network error, which the download waits out and
+                // tries again instead of failing for good at the first refusal.
+                if (YTPlayerUtils.isSongUnavailable(error)) throw error
+                throw IOException("Could not look up $mediaId", error)
+            }
             val format = playbackData.format
 
-            val actualContentLength = format.contentLength ?: run {
-                var length: Long? = null
+            // Some songs, uploads above all, arrive without a length. Asking the file itself is
+            // worth a try, but not knowing is no reason to give up on the download.
+            val actualContentLength = format.contentLength ?: runCatching {
                 val client = OkHttpClient.Builder()
                     .proxy(YouTube.proxy)
                     .proxyAuthenticator { _, response ->
@@ -134,26 +151,27 @@ constructor(
                     .url(playbackData.streamUrl)
                     .build()
                 client.newCall(request).execute().use { response ->
-                    length = response.header("Content-Length")?.toLongOrNull()
+                    response.header("Content-Length")?.toLongOrNull()
                 }
-                length ?: error("Failed to retrieve content length")
-            }
+            }.getOrNull()
 
             database.query {
-                upsert(
-                    FormatEntity(
-                        id = mediaId,
-                        itag = format.itag,
-                        mimeType = format.mimeType.split(";")[0],
-                        codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
-                        bitrate = format.bitrate,
-                        sampleRate = format.audioSampleRate,
-                        contentLength = actualContentLength,
-                        loudnessDb = playbackData.audioConfig?.loudnessDb,
-                        perceptualLoudnessDb = playbackData.audioConfig?.perceptualLoudnessDb,
-                        playbackUrl = playbackData.playbackTracking?.videostatsPlaybackUrl?.baseUrl
-                    ),
-                )
+                if (actualContentLength != null) {
+                    upsert(
+                        FormatEntity(
+                            id = mediaId,
+                            itag = format.itag,
+                            mimeType = format.mimeType.split(";")[0],
+                            codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
+                            bitrate = format.bitrate,
+                            sampleRate = format.audioSampleRate,
+                            contentLength = actualContentLength,
+                            loudnessDb = playbackData.audioConfig?.loudnessDb,
+                            perceptualLoudnessDb = playbackData.audioConfig?.perceptualLoudnessDb,
+                            playbackUrl = playbackData.playbackTracking?.videostatsPlaybackUrl?.baseUrl
+                        ),
+                    )
+                }
 
                 // Metadata registration only — dateDownload is intentionally NOT set here.
                 // It belongs solely to onDownloadChanged()'s STATE_COMPLETED branch below,
@@ -174,7 +192,7 @@ constructor(
             }
 
             val streamUrl = playbackData.streamUrl.let {
-                "${it}&range=0-${actualContentLength}"
+                if (actualContentLength != null) "${it}&range=0-${actualContentLength}" else it
             }
 
             songUrlCache[mediaId] = streamUrl to (System.currentTimeMillis() + playbackData.streamExpiresInSeconds * 1000L)
@@ -194,6 +212,9 @@ constructor(
             Executor(Runnable::run)
         ).apply {
             maxParallelDownloads = 3
+            // A whole playlist at once can meet a few refusals in a row before YouTube settles;
+            // each retry waits a little longer than the one before.
+            minRetryCount = 10
             addListener(
                 object : DownloadManager.Listener {
                     override fun onDownloadChanged(
@@ -211,6 +232,8 @@ constructor(
                             when (download.state) {
                                 Download.STATE_COMPLETED -> {
                                     database.updateDownloadedInfo(download.request.id, true, LocalDateTime.now())
+                                    // Its cover too, or it plays offline as a blank square.
+                                    OfflineCovers.save(context, database.song(download.request.id).first()?.song?.thumbnailUrl)
                                     // A downloaded song should work fully offline —
                                     // fetch and store its lyrics now, while we still
                                     // have network.
@@ -261,6 +284,13 @@ constructor(
                         Requirements(if (wifiOnly) Requirements.NETWORK_UNMETERED else Requirements.NETWORK)
                     withContext(Dispatchers.Main) { downloadManager.requirements = requirements }
                 }
+        }
+
+        // Songs downloaded before covers were kept get theirs the next time there is a connection.
+        scope.launch {
+            database.downloadedSongsByCreateDateAsc().first().forEach { song ->
+                OfflineCovers.save(context, song.song.thumbnailUrl)
+            }
         }
 
         val result = mutableMapOf<String, Download>()

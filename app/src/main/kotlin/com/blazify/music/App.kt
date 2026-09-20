@@ -34,6 +34,7 @@ import com.blazify.music.extensions.toInetSocketAddress
 import com.blazify.music.utils.CrashHandler
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.cipher.CipherDeobfuscator
+import com.blazify.music.utils.OfflineCovers
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.safeDataStoreEdit
 import com.blazify.music.utils.reportException
@@ -348,6 +349,8 @@ class App :
             .apply {
                 crossfade(true)
                 allowHardware(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                // Downloaded songs keep their covers on the phone, for use offline and online.
+                components { add(OfflineCovers.Serve(this@App)) }
                 // Memory cache for fast image loading (prevents network requests on recomposition)
                 memoryCache {
                     MemoryCache
