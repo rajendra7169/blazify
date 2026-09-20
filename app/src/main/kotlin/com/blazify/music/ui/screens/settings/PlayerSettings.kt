@@ -53,6 +53,7 @@ import com.blazify.music.constants.AudioQualityKey
 import com.blazify.music.constants.AutoDownloadOnLikeKey
 import com.blazify.music.constants.DownloadOnWifiOnlyKey
 import com.blazify.music.constants.SaveDataOnMobileKey
+import com.blazify.music.constants.VideoOnMobileKey
 import com.blazify.music.constants.CrossfadeDurationKey
 import com.blazify.music.constants.CrossfadeEnabledKey
 import com.blazify.music.constants.CrossfadeGaplessKey
@@ -115,6 +116,7 @@ fun PlayerSettings(
         defaultValue = AudioQuality.AUTO
     )
     val (saveDataOnMobile, onSaveDataOnMobileChange) = rememberPreference(SaveDataOnMobileKey, defaultValue = true)
+    val (videoOnMobile, onVideoOnMobileChange) = rememberPreference(VideoOnMobileKey, defaultValue = false)
     val (crossfadeEnabled, onCrossfadeEnabledChange) = rememberPreference(
         CrossfadeEnabledKey,
         defaultValue = false
@@ -382,6 +384,29 @@ fun PlayerSettings(
                         )
                     },
                     onClick = { onSaveDataOnMobileChange(!saveDataOnMobile) }
+                )
+                )
+                add(
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.slow_motion_video),
+                    title = { Text(stringResource(R.string.video_on_mobile_switch)) },
+                    description = { Text(stringResource(R.string.video_on_mobile_switch_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = videoOnMobile,
+                            onCheckedChange = onVideoOnMobileChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (videoOnMobile) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onVideoOnMobileChange(!videoOnMobile) }
                 )
                 )
                 add(Material3SettingsItem(

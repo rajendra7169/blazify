@@ -137,6 +137,12 @@ enum class AudioQuality {
 
 // On mobile data, Auto quality streams at 128 kbps unless this is turned off.
 val SaveDataOnMobileKey = booleanPreferencesKey("saveDataOnMobile")
+
+/** Whether the Video Art player may play videos when the phone is on mobile data. */
+val VideoOnMobileKey = booleanPreferencesKey("videoOnMobile")
+
+/** Whether the offer to play videos on mobile data has been made once already. */
+val VideoOnMobileAskedKey = booleanPreferencesKey("videoOnMobileAsked")
 // Downloads wait for Wi-Fi (an unmetered network) when this is on.
 val DownloadOnWifiOnlyKey = booleanPreferencesKey("downloadOnWifiOnly")
 // Playback speed chosen for each podcast show, as "showId=speed;showId=speed".

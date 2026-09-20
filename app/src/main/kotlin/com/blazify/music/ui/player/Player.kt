@@ -187,6 +187,8 @@ import com.blazify.music.constants.HideStatusBarOnFullscreenKey
 import com.blazify.music.constants.KeepScreenOn
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
+import com.blazify.music.constants.VideoOnMobileAskedKey
+import com.blazify.music.constants.VideoOnMobileKey
 import com.blazify.music.constants.PlayerButtonsStyle
 import com.blazify.music.constants.PlayerButtonsStyleKey
 import com.blazify.music.constants.PlayerHorizontalPadding
@@ -3539,6 +3541,14 @@ private fun FullArtPortrait(
                 background = page,
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(VideoStageShare),
             )
+            // On mobile data the artwork stands in for the video, and the listener is told once
+            // that they can have the video anyway.
+            val onMobile = rememberOnMobileData()
+            val (videoOnMobile) = rememberPreference(VideoOnMobileKey, defaultValue = false)
+            val (asked, setAsked) = rememberPreference(VideoOnMobileAskedKey, defaultValue = false)
+            if (onMobile && !videoOnMobile && !asked) {
+                MobileDataVideoDialog(onDismiss = { setAsked(true) })
+            }
         } else {
             FullArtBackground(song = mediaMetadata, design = design, modifier = Modifier.fillMaxSize())
         }

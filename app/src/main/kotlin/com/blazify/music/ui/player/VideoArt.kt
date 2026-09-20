@@ -2,6 +2,8 @@ package com.blazify.music.ui.player
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.SystemClock
 import android.util.LruCache
 import android.view.TextureView
@@ -11,8 +13,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -47,11 +58,14 @@ import coil3.compose.AsyncImage
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.SongItem
 import com.blazify.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_OMV
-import com.blazify.music.constants.SaveDataOnMobileKey
+import com.blazify.music.R
+import com.blazify.music.constants.VideoOnMobileKey
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.playback.PlayerConnection
+import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.dataStore
+import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -160,15 +174,81 @@ private object SongVideos {
  */
 @Composable
 fun rememberSongVideo(song: MediaMetadata?): SongVideo? {
-    val context = LocalContext.current
-    return produceState<SongVideo?>(initialValue = null, song?.id) {
+    val onMobile = rememberOnMobileData()
+    val (videoOnMobile) = rememberPreference(VideoOnMobileKey, defaultValue = false)
+    val allowed = !onMobile || videoOnMobile
+    return produceState<SongVideo?>(initialValue = null, song?.id, allowed, onMobile) {
+        // Leaving Wi-Fi puts this back to nothing, which takes the video off the screen and
+        // leaves the artwork — the song itself carries on either way.
         value = null
+        if (!allowed) return@produceState
         song ?: return@produceState
-        val metered =
-            (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).isActiveNetworkMetered
-        if (metered && context.dataStore.data.first()[SaveDataOnMobileKey] == true) return@produceState
-        value = SongVideos.forSong(song, maxHeight = if (metered) 360 else 720)
+        value = SongVideos.forSong(song, maxHeight = if (onMobile) MOBILE_HEIGHT else WIFI_HEIGHT)
     }.value
+}
+
+/** How tall a video is asked for: smaller on mobile data, where every megabyte is the listener's. */
+private const val MOBILE_HEIGHT = 360
+private const val WIFI_HEIGHT = 720
+
+/** Whether the phone is on a connection that charges by the megabyte, as it changes. */
+@Composable
+fun rememberOnMobileData(): Boolean {
+    val context = LocalContext.current
+    val manager = remember(context) { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+    var onMobile by remember { mutableStateOf(manager.isActiveNetworkMetered) }
+    DisposableEffect(manager) {
+        val watcher =
+            object : ConnectivityManager.NetworkCallback() {
+                private fun refresh() {
+                    onMobile = manager.isActiveNetworkMetered
+                }
+
+                override fun onAvailable(network: Network) = refresh()
+
+                override fun onLost(network: Network) = refresh()
+
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) = refresh()
+            }
+        runCatching { manager.registerDefaultNetworkCallback(watcher) }
+        onDispose { runCatching { manager.unregisterNetworkCallback(watcher) } }
+    }
+    return onMobile
+}
+
+/**
+ * Offered once, the first time the Video Art player meets mobile data: the artwork is showing
+ * instead of the video, and this is where to say that videos may play on data after all. Closed
+ * without turning it on, it is not offered again — the switch stays in Look and feel.
+ */
+@Composable
+fun MobileDataVideoDialog(onDismiss: () -> Unit) {
+    val (videoOnMobile, setVideoOnMobile) = rememberPreference(VideoOnMobileKey, defaultValue = false)
+    DefaultDialog(
+        onDismiss = onDismiss,
+        buttons = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+        },
+        title = { Text(stringResource(R.string.video_on_mobile_title)) },
+    ) {
+        Text(
+            text = stringResource(R.string.video_on_mobile_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(16.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.video_on_mobile_switch),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            Switch(checked = videoOnMobile, onCheckedChange = setVideoOnMobile)
+        }
+    }
 }
 
 /**
