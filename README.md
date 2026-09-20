@@ -151,7 +151,9 @@ What is planned, what has been asked for, and what is deliberately not being don
 
 ## Install
 
-Download the latest APK from **[Releases](https://github.com/rajendra7169/blazify/releases/latest)**.
+Download **[the APK](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify-gms.apk)** — the everyday build, casting to a television included.
+On a phone with no Google services, take **[the build without Google](https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk)** instead.
+Every build lives on the **[Releases](https://github.com/rajendra7169/blazify/releases/latest)** page.
 
 Requires **Android 8.0 (API 26)** or newer. New install? Just open the APK, nothing else to do.
 It runs on ARM phones and tablets, and on Intel and AMD devices too, such as Waydroid and Android emulators.

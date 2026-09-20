@@ -46,7 +46,8 @@ signed out.
 
 ## Availability
 
-- Android: https://github.com/rajendra7169/blazify/releases/latest
+- Android: https://github.com/rajendra7169/blazify/releases/latest/download/Blazify-gms.apk (the everyday build, casting included)
+- Android without Google services (de-Googled, LineageOS, Huawei): https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk
 - Windows and Linux: https://github.com/rajendra7169/blazify-desktop/releases/latest
 - iPhone: https://github.com/rajendra7169/blazify-ios/releases/latest (sideloaded IPA)
 - Not on the Google Play Store, because apps that stream audio from YouTube are
