@@ -254,6 +254,9 @@ svg.mark{
 }
 .dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,140,50,.34)}
 .dl.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400}
+.alt{color:var(--dim);font-size:13px;line-height:1.5;margin:10px 0 0}
+.alt a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
+.alt a:hover{border-bottom-color:var(--amber)}
 .betaget{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
 .betaget .dl{width:100%;justify-content:center}
 .betaget p{color:var(--dim);font-size:13.5px;line-height:1.5;margin:0}
@@ -1044,9 +1047,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <h3>Android</h3>
         <div class="ver" id="verAndroid">Version 9.14.0 · 26 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
-        <button class="dl" type="button" data-pick="android">Download APK</button>
-        <a id="dlAndroidCast" hidden href="https://github.com/rajendra7169/blazify/releases/latest"></a>
-        <a id="dlAndroidFoss" hidden href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk"></a>
+        <a class="dl" id="dlAndroidCast" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify-gms.apk">Download APK</a>
+        <p class="alt">No Google services on your phone?
+          <a id="dlAndroidFoss" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Take the build without Google</a></p>
       </article>
 
       <article class="card rise">
@@ -1112,9 +1115,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       </div>
     </div>
     <div class="betaget">
-      <button class="dl" type="button" data-pick="beta">Download the beta</button>
-      <a id="dlBetaCast" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
-      <a id="dlBetaFoss" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
+      <a class="dl" id="dlBetaCast" href="https://github.com/rajendra7169/blazify/releases">Download the beta</a>
+      <p class="alt">No Google services on your phone?
+        <a id="dlBetaFoss" href="https://github.com/rajendra7169/blazify/releases">Take the beta without Google</a></p>
       <p>Already have Blazify? Turn on <b>Settings › About › Updater › Get beta updates</b> and it
         will offer each beta by itself. Turn it off to go back to stable.</p>
     </div>
@@ -1872,54 +1875,6 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   const title = document.getElementById('guideTitle');
   const body = document.getElementById('guideBody');
   if (!dlg || !title || !body) return;
-
-  const href = id => {
-    const el = document.getElementById(id);
-    return el ? el.getAttribute('href') : '#';
-  };
-
-  /* The two Android builds, worded for somebody who has never heard of Google
-     Play services. Casting comes first: it is the one people go looking for. */
-  const sizeOf = id => {
-    const el = document.getElementById(id);
-    const size = el && el.getAttribute('data-size');
-    return size ? `<em>${size}</em>` : '';
-  };
-
-  const androidChoices = (castId, plainId) => `
-      <div class="pick">
-        <a href="${href(castId)}"><span style="flex:1"><b>The usual one</b>
-          <span>For any ordinary phone. Plays your music to a Chromecast, a smart
-          speaker or a television, and carries one small piece of Google's software
-          to do it.</span></span>${sizeOf(castId)}</a>
-        <a href="${href(plainId)}"><span style="flex:1"><b>Without Google</b>
-          <span>For a phone with no Google services — de-Googled, LineageOS, a Huawei.
-          The same app, without playing to a television.</span></span>${sizeOf(plainId)}</a>
-      </div>
-      <p class="guide-note">Not sure? Take <b>the usual one</b>. Take <b>Without Google</b> only if
-      your phone has no Google services, or you would rather keep them out of it.</p>`;
-
-  const openPicker = (btn, heading, html) => {
-    title.textContent = heading;
-    const card = btn.closest('.card');
-    const src = card && card.querySelector('svg.mark');
-    const mk = document.getElementById('guideMark');
-    if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
-    body.innerHTML = html;
-    dlg.showModal();
-  };
-
-  const android = document.querySelector('[data-pick="android"]');
-  if (android) {
-    android.addEventListener('click', () =>
-      openPicker(android, 'Which Android build?', androidChoices('dlAndroidCast', 'dlAndroidFoss')));
-  }
-
-  const beta = document.querySelector('[data-pick="beta"]');
-  if (beta) {
-    beta.addEventListener('click', () =>
-      openPicker(beta, 'Which beta build?', androidChoices('dlBetaCast', 'dlBetaFoss')));
-  }
 
   const btn = document.querySelector('[data-pick="linux"]');
   if (!btn) return;
