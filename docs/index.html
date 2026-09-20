@@ -1888,15 +1888,16 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
 
   const androidChoices = (castId, plainId) => `
       <div class="pick">
-        <a href="${href(castId)}"><span style="flex:1"><b>Plays to TVs</b>
-          <span>Sends your music to a Chromecast, a smart speaker or a television.
-          To do that it carries one small piece of Google's software.</span></span>${sizeOf(castId)}</a>
-        <a href="${href(plainId)}"><span style="flex:1"><b>No Google</b>
-          <span>Not a line of Google code inside. Everything works the same,
-          except playing to a television.</span></span>${sizeOf(plainId)}</a>
+        <a href="${href(castId)}"><span style="flex:1"><b>The usual one</b>
+          <span>For any ordinary phone. Plays your music to a Chromecast, a smart
+          speaker or a television, and carries one small piece of Google's software
+          to do it.</span></span>${sizeOf(castId)}</a>
+        <a href="${href(plainId)}"><span style="flex:1"><b>Without Google</b>
+          <span>For a phone with no Google services — de-Googled, LineageOS, a Huawei.
+          The same app, without playing to a television.</span></span>${sizeOf(plainId)}</a>
       </div>
-      <p class="guide-note">Not sure? Take <b>Plays to TVs</b> if you have a Chromecast or a smart
-      TV, and <b>No Google</b> if you would rather keep Google off your phone.</p>`;
+      <p class="guide-note">Not sure? Take <b>the usual one</b>. Take <b>Without Google</b> only if
+      your phone has no Google services, or you would rather keep them out of it.</p>`;
 
   const openPicker = (btn, heading, html) => {
     title.textContent = heading;
@@ -2065,7 +2066,7 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     const betaBuilds = ahead ? buildsOf(ahead) : {};
     return {
       android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
-      androidSize: mb(apk && apk.size),
+      androidSize: mb((assetLike(a, isGms) || apk)?.size),
       androidCast: android.cast,
       androidCastSize: android.castSize,
       androidPlain: android.plain,
