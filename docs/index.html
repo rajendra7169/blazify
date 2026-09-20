@@ -254,10 +254,11 @@ svg.mark{
 }
 .dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,140,50,.34)}
 .dl.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400}
-.two{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.two .dl{width:100%;justify-content:center}
-.pick{color:var(--dim);font-size:13.5px;line-height:1.45;margin:0 0 10px;display:block}
+.betaget{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.betaget .dl{width:100%;justify-content:center}
+.betaget p{color:var(--dim);font-size:13.5px;line-height:1.5;margin:0}
 .beta{
+  margin-top:26px;
   border:1px solid rgba(255,167,38,.38);border-radius:22px;padding:30px;
   background:linear-gradient(180deg,rgba(255,167,38,.09),rgba(255,167,38,.02));
   display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;align-items:start;
@@ -1043,12 +1044,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <h3>Android</h3>
         <div class="ver" id="verAndroid">Version 9.14.0 · 26 MB · Android 8+</div>
         <p>Streaming, offline downloads, synced lyrics, equalizer, Android Auto and home-screen widgets.</p>
-        <div class="two">
-          <a class="dl" id="dlAndroidCast" href="https://github.com/rajendra7169/blazify/releases/latest">Download · plays to TVs</a>
-          <small class="pick">Sends your music to a Chromecast, a smart speaker or a TV. To do that it carries one small piece of Google's software.</small>
-          <a class="dl ghost" id="dlAndroidFoss" href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk">Download · no Google</a>
-          <small class="pick">Not a line of Google code inside. Everything works the same, except playing to a TV.</small>
-        </div>
+        <button class="dl" type="button" data-pick="android">Download APK</button>
+        <a id="dlAndroidCast" hidden href="https://github.com/rajendra7169/blazify/releases/latest"></a>
+        <a id="dlAndroidFoss" hidden href="https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk"></a>
       </article>
 
       <article class="card rise">
@@ -1113,13 +1111,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <a href="https://github.com/rajendra7169/blazify/discussions">Say what you think</a>
       </div>
     </div>
-    <div class="two">
-      <a class="dl" id="dlBetaCast" href="https://github.com/rajendra7169/blazify/releases">Beta · plays to TVs</a>
-      <small class="pick">The beta, with casting to a Chromecast, speaker or TV.</small>
-      <a class="dl ghost" id="dlBetaFoss" href="https://github.com/rajendra7169/blazify/releases">Beta · no Google</a>
-      <small class="pick">The beta, with no Google code inside.</small>
-      <small class="pick">Already have Blazify? Turn on <b>Settings › About › Updater › Get beta
-        updates</b> and it will offer each beta by itself. Turn it off to go back to stable.</small>
+    <div class="betaget">
+      <button class="dl" type="button" data-pick="beta">Download the beta</button>
+      <a id="dlBetaCast" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
+      <a id="dlBetaFoss" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
+      <p>Already have Blazify? Turn on <b>Settings › About › Updater › Get beta updates</b> and it
+        will offer each beta by itself. Turn it off to go back to stable.</p>
     </div>
   </div>
 </section>
@@ -1866,13 +1863,65 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
 })();
 
 
-/* Linux ships three packages and there is no sensible default, so the
-   button asks rather than guessing. Android, Windows and iPhone each have
-   one file and go straight to it. */
+/* Where there is more than one file and no sensible default, the button asks
+   rather than guessing: Linux has three package shapes, and Android has the
+   build that can cast to a television and the build with no Google code in it.
+   Windows and iPhone each have one file and go straight to it. */
 (function () {
   const dlg = document.getElementById('guide');
+  const title = document.getElementById('guideTitle');
+  const body = document.getElementById('guideBody');
+  if (!dlg || !title || !body) return;
+
+  const href = id => {
+    const el = document.getElementById(id);
+    return el ? el.getAttribute('href') : '#';
+  };
+
+  /* The two Android builds, worded for somebody who has never heard of Google
+     Play services. Casting comes first: it is the one people go looking for. */
+  const sizeOf = id => {
+    const el = document.getElementById(id);
+    const size = el && el.getAttribute('data-size');
+    return size ? `<em>${size}</em>` : '';
+  };
+
+  const androidChoices = (castId, plainId) => `
+      <div class="pick">
+        <a href="${href(castId)}"><span style="flex:1"><b>Plays to TVs</b>
+          <span>Sends your music to a Chromecast, a smart speaker or a television.
+          To do that it carries one small piece of Google's software.</span></span>${sizeOf(castId)}</a>
+        <a href="${href(plainId)}"><span style="flex:1"><b>No Google</b>
+          <span>Not a line of Google code inside. Everything works the same,
+          except playing to a television.</span></span>${sizeOf(plainId)}</a>
+      </div>
+      <p class="guide-note">Not sure? Take <b>Plays to TVs</b> if you have a Chromecast or a smart
+      TV, and <b>No Google</b> if you would rather keep Google off your phone.</p>`;
+
+  const openPicker = (btn, heading, html) => {
+    title.textContent = heading;
+    const card = btn.closest('.card');
+    const src = card && card.querySelector('svg.mark');
+    const mk = document.getElementById('guideMark');
+    if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
+    body.innerHTML = html;
+    dlg.showModal();
+  };
+
+  const android = document.querySelector('[data-pick="android"]');
+  if (android) {
+    android.addEventListener('click', () =>
+      openPicker(android, 'Which Android build?', androidChoices('dlAndroidCast', 'dlAndroidFoss')));
+  }
+
+  const beta = document.querySelector('[data-pick="beta"]');
+  if (beta) {
+    beta.addEventListener('click', () =>
+      openPicker(beta, 'Which beta build?', androidChoices('dlBetaCast', 'dlBetaFoss')));
+  }
+
   const btn = document.querySelector('[data-pick="linux"]');
-  if (!dlg || !btn) return;
+  if (!btn) return;
 
   btn.addEventListener('click', () => {
     const card = btn.closest('.card');
@@ -1959,7 +2008,12 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   /* Two builds of the same release: the one that can cast, and the one with no
      Google code in it. Their file names carry the version, so the addresses are
      taken from the release itself rather than guessed. */
-  const setHref = (id, url) => { const el = document.getElementById(id); if (el && url) el.href = url; };
+  const setHref = (id, url, size) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url) el.href = url;
+    if (size) el.setAttribute('data-size', size);
+  };
   const assetLike = (rel, test) => ((rel && rel.assets) || []).find(a => test(a.name));
   const isGms = n => /-gms/i.test(n) && /\.apk$/i.test(n);
   const isPlain = n => /\.apk$/i.test(n) && !/-gms|-izzy/i.test(n);
@@ -1968,7 +2022,9 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     const gms = assetLike(rel, isGms), plain = assetLike(rel, isPlain);
     return {
       cast: gms && gms.browser_download_url,
+      castSize: mb(gms && gms.size),
       plain: plain && plain.browser_download_url,
+      plainSize: mb(plain && plain.size),
     };
   };
 
@@ -1976,8 +2032,8 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   const applyBeta = beta => {
     const card = document.getElementById('betaCard');
     if (!card || !beta || !beta.tag || (!beta.cast && !beta.plain)) return;
-    setHref('dlBetaCast', beta.cast || beta.plain);
-    setHref('dlBetaFoss', beta.plain || beta.cast);
+    setHref('dlBetaCast', beta.cast || beta.plain, beta.castSize);
+    setHref('dlBetaFoss', beta.plain || beta.cast, beta.plainSize);
     const line = document.getElementById('betaVer');
     if (line) {
       line.textContent = 'Beta ' + beta.tag.replace(/^v/, '') + ' carries what is coming to '
@@ -1988,8 +2044,8 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   };
 
   const applyVersions = v => {
-    setHref('dlAndroidCast', v.androidCast);
-    setHref('dlAndroidFoss', v.androidPlain);
+    setHref('dlAndroidCast', v.androidCast, v.androidCastSize);
+    setHref('dlAndroidFoss', v.androidPlain, v.androidPlainSize);
     applyBeta(v.beta);
     if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
     if (v.desktop) {
@@ -2011,8 +2067,18 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
       android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
       androidSize: mb(apk && apk.size),
       androidCast: android.cast,
+      androidCastSize: android.castSize,
       androidPlain: android.plain,
-      beta: ahead ? { tag: ahead.tag_name, cast: betaBuilds.cast, plain: betaBuilds.plain } : null,
+      androidPlainSize: android.plainSize,
+      beta: ahead
+        ? {
+            tag: ahead.tag_name,
+            cast: betaBuilds.cast,
+            castSize: betaBuilds.castSize,
+            plain: betaBuilds.plain,
+            plainSize: betaBuilds.plainSize,
+          }
+        : null,
       desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
       winSize: mb(exe && exe.size),
       ios: i && i.tag_name ? i.tag_name.replace(/^v/, '') : null,
