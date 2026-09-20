@@ -1345,7 +1345,11 @@
     <string name="player_design_full_art">Full Art</string>
     <string name="player_design_record">Record</string>
     <string name="player_design_cassette">Cassette</string>
-    <string name="player_design_video">Video</string>
+    <string name="player_design_video">Video Art</string>
+    <string name="video_on_mobile_title">You are on mobile data</string>
+    <string name="video_on_mobile_desc">Videos use far more data than artwork, so the artwork is showing instead. The song keeps playing either way.</string>
+    <string name="video_on_mobile_switch">Play videos on mobile data</string>
+    <string name="video_on_mobile_switch_desc">In the Video Art player. Videos use far more data than artwork</string>
     <string name="show_lyrics">Show Lyrics</string>
 
     <!-- Mini-player design picker -->
@@ -1376,6 +1380,7 @@
     </plurals>
 
     <string name="local_music_cannot_play">This file could not be played. Its format may not be supported.</string>
+    <string name="local_music_reason">Reason: %1$s</string>
 
     <!-- Search -->
     <string name="browse">Browse</string>

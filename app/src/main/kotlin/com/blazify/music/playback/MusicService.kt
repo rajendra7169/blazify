@@ -3523,10 +3523,12 @@ class MusicService :
         if (mediaId != null && LocalMusic.isLocal(mediaId)) {
             Timber.tag(TAG).w("Local file would not play ($mediaId): ${error.errorCodeName}")
             scope.launch {
+                // The reason goes with it, so someone reporting it can say which it was.
                 Toast
                     .makeText(
                         this@MusicService,
-                        getString(R.string.local_music_cannot_play),
+                        getString(R.string.local_music_cannot_play) + "\n" +
+                            getString(R.string.local_music_reason, error.errorCodeName.removePrefix("ERROR_CODE_")),
                         Toast.LENGTH_LONG,
                     ).show()
             }
@@ -4609,6 +4611,25 @@ class MusicService :
         // it is gone as soon as it has played.
         val broadcasts = HlsMediaSource.Factory(createNetworkDataSource())
 
+        // A song on the phone is read straight off the phone. It used to go the streams' way,
+        // through both caches — copying the file into the player's cache as it played — and past
+        // the network, none of which a file needs and any of which can fail it.
+        val onPhone =
+            DefaultMediaSourceFactory(
+                ResolvingDataSource.Factory(DefaultDataSource.Factory(this)) { dataSpec ->
+                    val mediaId = dataSpec.key ?: error("No media id")
+                    val path =
+                        runBlocking(Dispatchers.IO) { database.getSongByIdBlocking(mediaId)?.song?.localPath }
+                            ?: throw PlaybackException(
+                                getString(R.string.error_unknown),
+                                null,
+                                PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+                            )
+                    dataSpec.withUri(path.toUri())
+                },
+                DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true),
+            )
+
         // A song arrives as one file; a broadcast arrives as a playlist of segments that keeps
         // growing, and the two are read in completely different ways. An ordinary song's address
         // is only its id until the moment it is played, so nothing can be told from it; a
@@ -4620,20 +4641,23 @@ class MusicService :
             override fun setDrmSessionManagerProvider(provider: DrmSessionManagerProvider): MediaSource.Factory {
                 files.setDrmSessionManagerProvider(provider)
                 broadcasts.setDrmSessionManagerProvider(provider)
+                onPhone.setDrmSessionManagerProvider(provider)
                 return this
             }
 
             override fun setLoadErrorHandlingPolicy(policy: LoadErrorHandlingPolicy): MediaSource.Factory {
                 files.setLoadErrorHandlingPolicy(policy)
                 broadcasts.setLoadErrorHandlingPolicy(policy)
+                onPhone.setLoadErrorHandlingPolicy(policy)
                 return this
             }
 
             override fun createMediaSource(mediaItem: MediaItem): MediaSource =
-                if (mediaItem.localConfiguration?.mimeType == MimeTypes.APPLICATION_M3U8) {
-                    broadcasts.createMediaSource(mediaItem)
-                } else {
-                    files.createMediaSource(mediaItem)
+                when {
+                    mediaItem.localConfiguration?.mimeType == MimeTypes.APPLICATION_M3U8 ->
+                        broadcasts.createMediaSource(mediaItem)
+                    LocalMusic.isLocal(mediaItem.mediaId) -> onPhone.createMediaSource(mediaItem)
+                    else -> files.createMediaSource(mediaItem)
                 }
         }
     }
