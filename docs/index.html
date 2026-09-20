@@ -254,9 +254,10 @@ svg.mark{
 }
 .dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,140,50,.34)}
 .dl.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400}
-.betaget{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
-.betaget .dl{width:100%;justify-content:center}
-.betaget p{color:var(--dim);font-size:13.5px;line-height:1.5;margin:0}
+.betaget{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.betaget .dl{width:100%;justify-content:center;margin-top:8px}
+.betaget small{color:var(--dim);font-size:12.5px;line-height:1.45}
+.betaget p{color:var(--dim);font-size:13.5px;line-height:1.5;margin:14px 0 0}
 .beta{
   margin-top:26px;
   border:1px solid rgba(255,167,38,.38);border-radius:22px;padding:30px;
@@ -274,6 +275,10 @@ svg.mark{
 .beta .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 .beta .links a{color:var(--amber);font-size:14.5px;text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
 .beta .links a:hover{border-bottom-color:var(--amber)}
+.notes-head{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--amber);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+.notes-head:first-child{margin-top:0}
+ul.notes{margin:0;padding-left:18px}
+ul.notes li{color:var(--dim);font-size:14.5px;line-height:1.5;margin-bottom:6px}
 .dl.ghost:hover{border-color:var(--amber);color:var(--amber);box-shadow:none}
 .soon{
   position:absolute;top:20px;right:20px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
@@ -1112,9 +1117,11 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       </div>
     </div>
     <div class="betaget">
-      <button class="dl" type="button" data-pick="beta">Download the beta</button>
-      <a id="dlBetaCast" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
-      <a id="dlBetaFoss" hidden href="https://github.com/rajendra7169/blazify/releases"></a>
+      <a class="dl" id="dlBetaCast" href="https://github.com/rajendra7169/blazify/releases">Download the beta</a>
+      <small>For any ordinary phone. Plays to a Chromecast, a smart speaker or a television.</small>
+      <a class="dl ghost" id="dlBetaFoss" href="https://github.com/rajendra7169/blazify/releases">Beta without Google</a>
+      <small>For a phone with no Google services — de-Googled, LineageOS, a Huawei. No casting.</small>
+      <button class="dl ghost" type="button" data-pick="betanotes">What has changed</button>
       <p>Already have Blazify? Turn on <b>Settings › About › Updater › Get beta updates</b> and it
         will offer each beta by itself. Turn it off to go back to stable.</p>
     </div>
@@ -1915,10 +1922,26 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
       openPicker(android, 'Which Android build?', androidChoices('dlAndroidCast', 'dlAndroidFoss')));
   }
 
-  const beta = document.querySelector('[data-pick="beta"]');
-  if (beta) {
-    beta.addEventListener('click', () =>
-      openPicker(beta, 'Which beta build?', androidChoices('dlBetaCast', 'dlBetaFoss')));
+  /* What is in this beta, taken from the release itself rather than typed here, so the page can
+     never describe a beta that has been replaced. The headings are the release's own. */
+  const betaNotes = document.querySelector('[data-pick="betanotes"]');
+  if (betaNotes) {
+    betaNotes.addEventListener('click', () => {
+      const notes = window.__blazifyBetaNotes;
+      const heading = window.__blazifyBetaName || 'the beta';
+      openPicker(
+        betaNotes,
+        'What has changed',
+        notes && notes.length
+          ? notes.map(part =>
+              `<h4 class="notes-head">${part.title}</h4><ul class="notes">` +
+              part.points.map(point => `<li>${point}</li>`).join('') + '</ul>').join('') +
+            `<p class="guide-note">All of it is coming to the next stable release. ` +
+            `<a href="https://github.com/rajendra7169/blazify/releases/tag/${heading}">Read the full notes</a>.</p>`
+          : `<p class="guide-note">The list lives with the release: ` +
+            `<a href="https://github.com/rajendra7169/blazify/releases">see what has changed</a>.</p>`,
+      );
+    });
   }
 
   const btn = document.querySelector('[data-pick="linux"]');
@@ -2030,11 +2053,63 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   };
 
   /* The beta card only makes sense while a beta is ahead of the stable release. */
+  /* The release notes are written for the release page — headings, bold, links. This keeps the
+     bullets under the headings that list things, and leaves the words plain. */
+  const readNotes = body => {
+    if (!body) return [];
+    const parts = [];
+    let current = null;
+    const raw = [];
+    // A bullet in the release notes can run over several lines; the lines after it belong to it.
+    body.split('\n').forEach(line => {
+      const text = line.trim();
+      if (/^##\s+/.test(text) || /^[-*]\s+/.test(text) || !text) {
+        raw.push(text);
+      } else if (raw.length && /^[-*]\s+/.test(raw[raw.length - 1])) {
+        raw[raw.length - 1] += ' ' + text;
+      } else {
+        raw.push(text);
+      }
+    });
+
+    const plain = text =>
+      text
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/`/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    raw.forEach(line => {
+      const heading = line.match(/^##\s+(.*)$/);
+      if (heading) {
+        const title = heading[1].trim();
+        current = /new|fix|highlight|change/i.test(title) ? { title, points: [] } : null;
+        if (current) parts.push(current);
+        return;
+      }
+      const bullet = line.match(/^[-*]\s+(.*)$/);
+      if (!bullet || !current) return;
+      // One line each: the first sentence, which in these notes is the point itself.
+      const short = plain(bullet[1]).split(/\.\s/)[0].replace(/[.,;:]\s*$/, '').trim();
+      if (!short) return;
+      // Long ones stop at a word, not in the middle of one.
+      const clipped =
+        short.length <= 150
+          ? short
+          : short.slice(0, short.lastIndexOf(' ', 150)).replace(/[.,;:]$/, '') + '…';
+      current.points.push(clipped);
+    });
+    return parts.filter(part => part.points.length);
+  };
+
   const applyBeta = beta => {
     const card = document.getElementById('betaCard');
     if (!card || !beta || !beta.tag || (!beta.cast && !beta.plain)) return;
     setHref('dlBetaCast', beta.cast || beta.plain, beta.castSize);
     setHref('dlBetaFoss', beta.plain || beta.cast, beta.plainSize);
+    window.__blazifyBetaNotes = beta.notes || [];
+    window.__blazifyBetaName = beta.tag;
     const line = document.getElementById('betaVer');
     if (line) {
       line.textContent = 'Beta ' + beta.tag.replace(/^v/, '') + ' carries what is coming to '
@@ -2078,6 +2153,7 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
             castSize: betaBuilds.castSize,
             plain: betaBuilds.plain,
             plainSize: betaBuilds.plainSize,
+            notes: readNotes(ahead.body),
           }
         : null,
       desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
