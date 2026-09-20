@@ -1723,18 +1723,20 @@ class MusicService :
         retryJob?.cancel()
         retryJob =
             scope.launch {
-                // Exponential backoff: 3s, 6s, 12s, 24s... max 30s
-                val delayMs = minOf(3000L * (1 shl retryCount), 30000L)
-                Timber.tag(TAG).d("Waiting ${delayMs}ms before retry attempt ${retryCount + 1}/$MAX_RETRY_COUNT")
-                delay(delayMs)
-
-                if (isNetworkConnected.value && waitingForNetworkConnection.value) {
-                    retryCount++
-                    triggerRetry()
+                // Look again every few seconds for as long as the wait lasts, asking the system
+                // itself as well as the remembered answer. Leaving it to the connectivity callback
+                // alone meant a song could sit stopped with the connection long since back.
+                var wait = 3000L
+                while (waitingForNetworkConnection.value) {
+                    delay(wait)
+                    if (isNetworkConnected.value || hasUsableNetwork()) {
+                        Timber.tag(TAG).d("Connection is back — picking the song up where it stopped")
+                        retryCount++
+                        triggerRetry()
+                        return@launch
+                    }
+                    wait = minOf(wait * 2, 15000L)
                 }
-                // If still offline when the timer fires, just let the job end — we stay
-                // "waiting" and the connectivityObserver listener (not this job) is what
-                // will catch the eventual reconnection and call triggerRetry().
             }
     }
 
@@ -3447,12 +3449,40 @@ class MusicService :
         if (isExpiredUrlError(error) || isRangeNotSatisfiableError(error) || isPageReloadError(error)) {
             return false
         }
-        return error.errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED ||
-            error.errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT ||
-            error.errorCode == PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE ||
-            error.cause is java.net.ConnectException ||
-            error.cause is java.net.UnknownHostException ||
-            (error.cause as? PlaybackException)?.errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
+        if (error.errorCode == PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE) return true
+
+        // The reason is often buried: the player wraps what the loader threw, which wraps what the
+        // stream lookup threw. Reading only the top two left "no network connection" looking like
+        // an ordinary IO error, so a song that stopped in a tunnel was retried three times in three
+        // seconds and then skipped — and the place in it was lost.
+        var cause: Throwable? = error
+        repeat(CAUSE_DEPTH) {
+            when {
+                cause == null -> return false
+                cause is java.net.ConnectException || cause is java.net.UnknownHostException -> return true
+                cause is java.net.SocketTimeoutException -> return true
+                (cause as? PlaybackException)?.errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> return true
+                (cause as? PlaybackException)?.errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> return true
+            }
+            cause = cause?.cause
+        }
+        return false
+    }
+
+    /** How far down a chain of causes the real reason is looked for. */
+    private val CAUSE_DEPTH = 6
+
+    /**
+     * Whether there is a connection worth retrying on, asked of the system rather than remembered.
+     *
+     * The remembered answer is fed by a callback that can arrive late, and a song that stopped
+     * because the connection had gone was being told, on the strength of it, that the connection
+     * was fine — so it counted the stop against the song and skipped it.
+     */
+    private fun hasUsableNetwork(): Boolean {
+        val active = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(active) ?: return false
+        return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     /**
@@ -3543,6 +3573,15 @@ class MusicService :
             return
         }
 
+        // A song that stops because the connection went is not a song at fault: it keeps its place
+        // in the queue and its place in itself, and waits. This is checked before anything that
+        // counts a failure against it, or a walk through a tunnel would cost you the song.
+        if (!hasUsableNetwork() || isNetworkRelatedError(error)) {
+            Timber.tag(TAG).d("Nothing to play from: waiting for the connection to come back")
+            waitOnNetworkError()
+            return
+        }
+
         if (mediaId != null && hasExceededRetryLimit(mediaId)) {
             Timber.tag(TAG).w("Song $mediaId has exceeded retry limit, skipping")
             markSongAsFailed(mediaId)
@@ -3591,17 +3630,6 @@ class MusicService :
                 return
             }
 
-            !isNetworkConnected.value -> {
-                Timber.tag(TAG).d("No internet connection, waiting for connection")
-                waitOnNetworkError()
-                return
-            }
-
-            isNetworkRelatedError(error) -> {
-                Timber.tag(TAG).d("Network-related error detected while connected, attempting recovery")
-                handleGenericIOError(mediaId)
-                return
-            }
         }
 
         // For IO_UNSPECIFIED and IO_BAD_HTTP_STATUS, try recovery first
