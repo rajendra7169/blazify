@@ -1,0 +1,5 @@
+First beta of 9.15.0, for early testers.
+
+New: Video Art player theme, live radio stations in Listen together, Spotify playlist import, SponsorBlock skipping, ListenBrainz scrobbling, repeat a song a set number of times, and sideways and tablet layouts for the players and previews.
+
+Fixed: a whole playlist downloads instead of only part of it, covers are kept for offline, songs on the phone play straight from the phone, the Ring and Cassette players follow the reported issues, and the app speaks 14 more languages.
