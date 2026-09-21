@@ -1,0 +1,5 @@
+Second beta of 9.15.0, fixing what the first one got wrong.
+
+The Video Art player no longer takes the connection the song needs, so the music does not stop on a weak line; it no longer flips between artwork and video when the connection changes; and a video that will not play leaves the artwork instead of a stuck frame.
+
+Songs also carry on through a short loss of connection now, and one that stops because the connection went waits and picks up where it stopped instead of being skipped.
