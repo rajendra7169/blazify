@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -85,6 +86,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import okhttp3.OkHttpClient
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -398,11 +400,32 @@ fun VideoArt(
     var surface by remember { mutableStateOf<TextureView?>(null) }
     var bands by remember { mutableFloatStateOf(0f) }
     var bandsLooked by remember { mutableStateOf(false) }
-    // A picture that will not play is simply not shown; the artwork is already behind it.
-    var failed by remember { mutableStateOf(false) }
+    // A picture that will not play is simply not shown; the artwork is already behind it. A
+    // connection that came and went gets another go first — giving up for the rest of the song
+    // over one dropped moment is how a video "sometimes does not load".
+    var stumbles by remember { mutableIntStateOf(0) }
+    val failed = stumbles > VIDEO_TRIES
     // Bands would flash at the top before the picture is brought in past them, so it waits for
     // the first look at them.
     val shown = onFrame && bandsLooked && !failed
+
+    /**
+     * How much music is in hand, in milliseconds. Read only where the song's player may be read —
+     * on the main thread.
+     */
+    val songSpare = {
+        val song = playerConnection.player
+        if (song.playbackState == Player.STATE_BUFFERING) 0L else song.bufferedPosition - song.currentPosition
+    }
+
+    /**
+     * The same figure, written down for the picture's load control to read.
+     *
+     * That control is asked on the player's own thread, and the song's player may only be touched
+     * on the main one — asking it there threw on every decision, which the picture then took for
+     * a fault of its own. This is kept up to date from the loop below, which runs where it may.
+     */
+    val songSpareNow = remember { AtomicLong(Long.MAX_VALUE) }
 
     val player =
         remember {
@@ -410,22 +433,39 @@ fun VideoArt(
             ExoPlayer
                 .Builder(context)
                 .setMediaSourceFactory(DefaultMediaSourceFactory(OkHttpDataSource.Factory(http)))
-                // A short leash on the picture. Left to itself it fetches as far ahead as it can,
-                // over the same connection the song is coming down, and the song is what the
-                // listener came for: on a weak line the music stalled while the video raced on.
-                .setLoadControl(
-                    DefaultLoadControl
-                        .Builder()
-                        .setBufferDurationsMs(VIDEO_MIN_MS, VIDEO_MAX_MS, VIDEO_START_MS, VIDEO_RESUME_MS)
-                        .setTargetBufferBytes(VIDEO_MAX_BYTES)
-                        .build(),
-                ).build()
+                // The picture holds seconds, not minutes, and fetches nothing at all while the
+                // song is short of music. Telling it merely to stop playing was not enough: a
+                // paused player keeps filling its buffer, so it went on taking the line the song
+                // needed and the song stopped anyway.
+                .setLoadControl(PictureBuffer { songSpareNow.get() < SONG_SAFETY_MS })
+                .build()
                 .apply {
                     volume = 0f
                     setMediaItem(MediaItem.fromUri(video.streamUrl))
-                    prepare()
                 }
         }
+
+    // One more go after a stumble, once the song is comfortable again.
+    LaunchedEffect(stumbles) {
+        if (stumbles in 1..VIDEO_TRIES) {
+            delay(VIDEO_RETRY_MS)
+            if (songSpare() >= SONG_READY_MS) player.prepare()
+        }
+    }
+
+    // Nothing is fetched for the picture until the song is comfortable. Starting both at once is
+    // what emptied the song's buffer in the first seconds, when it can least afford it.
+    var started by remember { mutableStateOf(false) }
+    LaunchedEffect(player) {
+        while (!started) {
+            if (songSpare() >= SONG_READY_MS) {
+                player.prepare()
+                started = true
+            } else {
+                delay(1000)
+            }
+        }
+    }
 
     DisposableEffect(player) {
         val listener =
@@ -443,10 +483,10 @@ fun VideoArt(
                 }
 
                 override fun onPlayerError(error: PlaybackException) {
-                    // The picture is decoration: when it cannot be played there is nothing to say
-                    // and nothing to retry. The artwork comes back and the song carries on.
-                    Timber.tag("VideoArt").d("video gave up (${error.errorCodeName}); keeping the artwork")
-                    failed = true
+                    // Decoration: nobody is told either way, the artwork is already behind it and
+                    // the song is untouched.
+                    stumbles++
+                    Timber.tag("VideoArt").d("video stumbled (${error.errorCodeName}), that is $stumbles")
                 }
             }
         player.addListener(listener)
@@ -470,8 +510,9 @@ fun VideoArt(
             // The song comes first. While it is still filling — or has little in hand — the
             // picture stops, so the whole of the connection goes to the music. A listener whose
             // song stops has lost the thing they came for; a picture that pauses is nothing.
-            val songBuffer = song.bufferedPosition - song.currentPosition
-            val songIsThin = song.playbackState == Player.STATE_BUFFERING || songBuffer < SONG_SAFETY_MS
+            val songBuffer = songSpare()
+            songSpareNow.set(songBuffer)
+            val songIsThin = songBuffer < SONG_SAFETY_MS
             val playing = inSight && song.isPlaying && !songIsThin
             player.playWhenReady = playing
             if (!video.synced) {
@@ -617,6 +658,12 @@ private const val MAX_BANDS = 0.22f
  * and the picture lives on what is left over.
  */
 private const val SONG_SAFETY_MS = 45_000
+
+/** How many stumbles the picture is allowed before the artwork simply stays. */
+private const val VIDEO_TRIES = 2
+
+/** How long a stumbling picture is left alone before it is given another go. */
+private const val VIDEO_RETRY_MS = 6_000L
 
 /** How much music must be in hand before the picture is fetched at all. */
 private const val SONG_READY_MS = 30_000
