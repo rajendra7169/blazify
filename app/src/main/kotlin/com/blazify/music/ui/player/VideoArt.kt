@@ -48,12 +48,21 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.LoadControl
+import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.TrackGroupArray
+import androidx.media3.exoplayer.trackselection.ExoTrackSelection
+import androidx.media3.exoplayer.upstream.Allocator
 import coil3.compose.AsyncImage
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.SongItem
@@ -177,9 +186,12 @@ fun rememberSongVideo(song: MediaMetadata?): SongVideo? {
     val onMobile = rememberOnMobileData()
     val (videoOnMobile) = rememberPreference(VideoOnMobileKey, defaultValue = false)
     val allowed = !onMobile || videoOnMobile
-    return produceState<SongVideo?>(initialValue = null, song?.id, allowed, onMobile) {
-        // Leaving Wi-Fi puts this back to nothing, which takes the video off the screen and
-        // leaves the artwork — the song itself carries on either way.
+    // The size is settled when the video is looked up and then left alone. Asking again at a new
+    // size every time the connection changed fetched a different address for the same song, which
+    // put the picture back to the artwork and started it over.
+    return produceState<SongVideo?>(initialValue = null, song?.id, allowed) {
+        // Leaving Wi-Fi without the switch on puts this back to nothing, which takes the video off
+        // the screen and leaves the artwork — the song itself carries on either way.
         value = null
         if (!allowed) return@produceState
         song ?: return@produceState
@@ -187,21 +199,25 @@ fun rememberSongVideo(song: MediaMetadata?): SongVideo? {
     }.value
 }
 
-/** How tall a video is asked for: smaller on mobile data, where every megabyte is the listener's. */
+/**
+ * How tall a video is asked for. Well below what a phone can show: the picture rides on the same
+ * connection as the song, and a taller one buys detail nobody asked for at the song's expense.
+ */
 private const val MOBILE_HEIGHT = 360
-private const val WIFI_HEIGHT = 720
+private const val WIFI_HEIGHT = 480
 
 /** Whether the phone is on a connection that charges by the megabyte, as it changes. */
 @Composable
 fun rememberOnMobileData(): Boolean {
     val context = LocalContext.current
     val manager = remember(context) { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
-    var onMobile by remember { mutableStateOf(manager.isActiveNetworkMetered) }
+    var reported by remember { mutableStateOf(manager.isActiveNetworkMetered) }
+    var settled by remember { mutableStateOf(reported) }
     DisposableEffect(manager) {
         val watcher =
             object : ConnectivityManager.NetworkCallback() {
                 private fun refresh() {
-                    onMobile = manager.isActiveNetworkMetered
+                    reported = manager.isActiveNetworkMetered
                 }
 
                 override fun onAvailable(network: Network) = refresh()
@@ -213,8 +229,19 @@ fun rememberOnMobileData(): Boolean {
         runCatching { manager.registerDefaultNetworkCallback(watcher) }
         onDispose { runCatching { manager.unregisterNetworkCallback(watcher) } }
     }
-    return onMobile
+    // Android reports a connection changing far more often than it really changes — a signal
+    // dipping, a network being checked. Acting on each one took the video off the screen and put
+    // it back, so a change has to hold for a moment before it counts.
+    LaunchedEffect(reported) {
+        if (reported == settled) return@LaunchedEffect
+        delay(NETWORK_SETTLE_MS)
+        settled = reported
+    }
+    return settled
 }
+
+/** How long a change of connection must hold before the picture reacts to it. */
+private const val NETWORK_SETTLE_MS = 4_000L
 
 /**
  * Offered once, the first time the Video Art player meets mobile data: the artwork is showing
@@ -249,6 +276,58 @@ fun MobileDataVideoDialog(onDismiss: () -> Unit) {
             Switch(checked = videoOnMobile, onCheckedChange = setVideoOnMobile)
         }
     }
+}
+
+/**
+ * What the picture is allowed to fetch.
+ *
+ * Telling the video to stop playing was not enough: a player that is paused keeps filling its
+ * buffer, so the picture went on pulling data down the same line the song needed, and the song
+ * stopped anyway. This refuses to load at all while the song is short of music, which is the only
+ * thing that actually hands the connection back.
+ */
+@OptIn(UnstableApi::class)
+private class PictureBuffer(
+    private val songIsShort: () -> Boolean,
+) : LoadControl {
+    private val inner =
+        DefaultLoadControl
+            .Builder()
+            .setBufferDurationsMs(VIDEO_MIN_MS, VIDEO_MAX_MS, VIDEO_START_MS, VIDEO_RESUME_MS)
+            .setTargetBufferBytes(VIDEO_MAX_BYTES)
+            .build()
+
+    override fun shouldContinueLoading(parameters: LoadControl.Parameters): Boolean =
+        !songIsShort() && inner.shouldContinueLoading(parameters)
+
+    override fun shouldContinuePreloading(
+        playerId: PlayerId,
+        timeline: Timeline,
+        mediaPeriodId: MediaSource.MediaPeriodId,
+        bufferedDurationUs: Long,
+    ): Boolean = false
+
+    override fun onPrepared(playerId: PlayerId) = inner.onPrepared(playerId)
+
+    override fun onTracksSelected(
+        parameters: LoadControl.Parameters,
+        trackGroups: TrackGroupArray,
+        trackSelections: Array<out ExoTrackSelection>,
+    ) = inner.onTracksSelected(parameters, trackGroups, trackSelections)
+
+    override fun onStopped(playerId: PlayerId) = inner.onStopped(playerId)
+
+    override fun onReleased(playerId: PlayerId) = inner.onReleased(playerId)
+
+    override fun getAllocator(playerId: PlayerId): Allocator = inner.getAllocator(playerId)
+
+    override fun getBackBufferDurationUs(playerId: PlayerId): Long = inner.getBackBufferDurationUs(playerId)
+
+    override fun retainBackBufferFromKeyframe(playerId: PlayerId): Boolean =
+        inner.retainBackBufferFromKeyframe(playerId)
+
+    override fun shouldStartPlayback(parameters: LoadControl.Parameters): Boolean =
+        inner.shouldStartPlayback(parameters)
 }
 
 /**
@@ -319,9 +398,11 @@ fun VideoArt(
     var surface by remember { mutableStateOf<TextureView?>(null) }
     var bands by remember { mutableFloatStateOf(0f) }
     var bandsLooked by remember { mutableStateOf(false) }
+    // A picture that will not play is simply not shown; the artwork is already behind it.
+    var failed by remember { mutableStateOf(false) }
     // Bands would flash at the top before the picture is brought in past them, so it waits for
     // the first look at them.
-    val shown = onFrame && bandsLooked
+    val shown = onFrame && bandsLooked && !failed
 
     val player =
         remember {
@@ -329,7 +410,16 @@ fun VideoArt(
             ExoPlayer
                 .Builder(context)
                 .setMediaSourceFactory(DefaultMediaSourceFactory(OkHttpDataSource.Factory(http)))
-                .build()
+                // A short leash on the picture. Left to itself it fetches as far ahead as it can,
+                // over the same connection the song is coming down, and the song is what the
+                // listener came for: on a weak line the music stalled while the video raced on.
+                .setLoadControl(
+                    DefaultLoadControl
+                        .Builder()
+                        .setBufferDurationsMs(VIDEO_MIN_MS, VIDEO_MAX_MS, VIDEO_START_MS, VIDEO_RESUME_MS)
+                        .setTargetBufferBytes(VIDEO_MAX_BYTES)
+                        .build(),
+                ).build()
                 .apply {
                     volume = 0f
                     setMediaItem(MediaItem.fromUri(video.streamUrl))
@@ -351,6 +441,13 @@ fun VideoArt(
                 override fun onVideoSizeChanged(size: VideoSize) {
                     if (size.width > 0 && size.height > 0) videoSize = size
                 }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    // The picture is decoration: when it cannot be played there is nothing to say
+                    // and nothing to retry. The artwork comes back and the song carries on.
+                    Timber.tag("VideoArt").d("video gave up (${error.errorCodeName}); keeping the artwork")
+                    failed = true
+                }
             }
         player.addListener(listener)
         onDispose {
@@ -370,7 +467,12 @@ fun VideoArt(
         var placed = video.synced
         if (video.synced) player.seekTo(song.currentPosition + lead)
         while (isActive) {
-            val playing = inSight && song.isPlaying
+            // The song comes first. While it is still filling — or has little in hand — the
+            // picture stops, so the whole of the connection goes to the music. A listener whose
+            // song stops has lost the thing they came for; a picture that pauses is nothing.
+            val songBuffer = song.bufferedPosition - song.currentPosition
+            val songIsThin = song.playbackState == Player.STATE_BUFFERING || songBuffer < SONG_SAFETY_MS
+            val playing = inSight && song.isPlaying && !songIsThin
             player.playWhenReady = playing
             if (!video.synced) {
                 val length = player.duration
@@ -505,6 +607,26 @@ private val BAND_LOOKS_MS = longArrayOf(300, 1200, 2000, 4000, 8000)
 /** Bands thinner than this are left alone, and more than this is a dark scene, not a band. */
 private const val MIN_BANDS = 0.04f
 private const val MAX_BANDS = 0.22f
+
+/**
+ * How much of the song must be in hand before the picture may fetch anything at all. Below this
+ * the video stops fetching and the connection is the music's.
+ *
+ * Generous on purpose. On a weak line the two together are more than the line can carry, so the
+ * song's buffer drains while both are fetching; keeping this reserve means the song refills first
+ * and the picture lives on what is left over.
+ */
+private const val SONG_SAFETY_MS = 45_000
+
+/** How much music must be in hand before the picture is fetched at all. */
+private const val SONG_READY_MS = 30_000
+
+/** The picture holds seconds, not minutes: it must never be the reason a song runs dry. */
+private const val VIDEO_MIN_MS = 5_000
+private const val VIDEO_MAX_MS = 15_000
+private const val VIDEO_START_MS = 500
+private const val VIDEO_RESUME_MS = 1_500
+private const val VIDEO_MAX_BYTES = 4 * 1024 * 1024
 
 /** Label logos and title cards at the start of a video, skipped when it runs on its own. */
 private const val OPENING_TITLES_MS = 6000L
