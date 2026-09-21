@@ -718,7 +718,7 @@ internal fun ThemePhonePreview(
             // UN-clipped sibling of an un-clipped outer box, so the hero spills out of
             // the card and a little over the wordmark — exactly like the real home.
             val onCard = cs.onPrimary
-            if (showGreetingCard) Box(modifier = Modifier.fillMaxWidth().height(68.dp)) {
+            if (showGreetingCard) Box(modifier = Modifier.fillMaxWidth().height(53.dp)) {
                 // Card background (rounded, clipped).
                 Box(
                     modifier = Modifier
@@ -737,23 +737,19 @@ internal fun ThemePhonePreview(
                         .align(Alignment.BottomEnd)
                         .requiredWidth(78.dp)
                         .requiredHeight(92.dp)
-                        // requiredHeight overflow is centred (12dp above AND below the
-                        // 68dp card) — shift up by exactly that half so the bottom edge
-                        // is flush inside the card and only the top spills out.
-                        .offset(y = (-12).dp),
+                        // Hung from the top like the real one, so the shorter card takes the
+                        // difference off the picture's foot rather than moving it.
+                        .offset(y = (-19).dp),
                 )
-                // Greeting text — centered-left, tight (so the greeting sits a touch
-                // lower and 'Enjoy the music' a touch higher, with padding around it).
+                // Greeting text — centred-left and tight, with padding around it.
                 Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                     modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.58f).padding(start = 11.dp),
                 ) {
-                    // Explicit lineHeights kill the inherited tall line-boxes, compressing
-                    // the block: the greeting sits lower, 'Enjoy the music' higher, with
-                    // even padding above and below.
+                    // Explicit lineHeights kill the inherited tall line-boxes, so the block sits
+                    // evenly padded above and below.
                     Text(stringResource(greetingLineRes()), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
                     Text(stringResource(R.string.blaze_greeting_default_name), color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(stringResource(R.string.home_enjoy_music), color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Spacer(Modifier.height(9.dp))
