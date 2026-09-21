@@ -199,6 +199,9 @@ fun BlazeHomeHeader(
                     ),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
+                    // Cropping from the top keeps the top of her hair, which the middle-cropped
+                    // frame was cutting off.
+                    alignment = Alignment.TopCenter,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .requiredWidth(200.dp)
@@ -257,7 +260,7 @@ fun BlazeHomeHeader(
 private val GreetingCardHeight = 124.dp
 
 /** How far the hero picture rises above the card. */
-private val GreetingHeroSpill = 80.dp
+private val GreetingHeroSpill = 44.dp
 
 private fun greetingRes(): Int {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
