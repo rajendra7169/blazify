@@ -2013,6 +2013,37 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
   const setText = (id, text) => { const n = document.getElementById(id); if (n) n.textContent = text; };
   const mb = bytes => bytes ? Math.round(bytes / 1048576) + ' MB' : null;
   const newest = set => (set || []).find(r => !r.draft && !r.prerelease) || (set || [])[0];
+
+  /**
+   * Whether tag a is newer than tag b, counting 9.15.0 above 9.15.0-beta.2 and beta.2 above
+   * beta.1 — the order the app itself uses when it decides what to offer.
+   */
+  const newerTag = (a, b) => {
+    const split = tag => {
+      const clean = String(tag || '').trim().replace(/^v/, '');
+      const dash = clean.indexOf('-');
+      const core = (dash >= 0 ? clean.slice(0, dash) : clean).split('.').map(n => parseInt(n, 10) || 0);
+      return [core, dash >= 0 ? clean.slice(dash + 1) : null];
+    };
+    const [coreA, preA] = split(a), [coreB, preB] = split(b);
+    for (let i = 0; i < Math.max(coreA.length, coreB.length); i++) {
+      const x = coreA[i] || 0, y = coreB[i] || 0;
+      if (x !== y) return x > y;
+    }
+    if (!preA && !preB) return false;
+    if (!preA) return true;
+    if (!preB) return false;
+    const partsA = preA.split('.'), partsB = preB.split('.');
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      const x = partsA[i], y = partsB[i];
+      if (x === undefined) return false;
+      if (y === undefined) return true;
+      const nx = parseInt(x, 10), ny = parseInt(y, 10);
+      const same = !isNaN(nx) && !isNaN(ny) ? nx === ny : x === y;
+      if (!same) return !isNaN(nx) && !isNaN(ny) ? nx > ny : x > y;
+    }
+    return false;
+  };
   const asset = (rel, name) => ((rel && rel.assets) || []).find(a => a.name === name);
 
   /* The count is the whole point of the button: "Star" alone is an ask,
@@ -2136,8 +2167,13 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     const apk = asset(a, 'Blazify.apk'), exe = asset(d, 'Blazify-setup.exe'), ipa = asset(i, 'Blazify.ipa');
     const android = buildsOf(a);
     // The newest release of any kind: a beta only when it is ahead of the stable one.
-    const first = (sets[0] || []).find(r => !r.draft);
-    const ahead = first && a && first.tag_name !== a.tag_name ? first : null;
+    // The newest beta by its version, not by where it happens to sit in the list: a release that
+    // is published again — as beta 1 was, after being taken down — comes back with a new date and
+    // would otherwise look like the newest thing there is.
+    const ahead = (sets[0] || [])
+      .filter(r => !r.draft && r.prerelease)
+      .filter(r => !a || newerTag(r.tag_name, a.tag_name))
+      .sort((x, y) => (newerTag(x.tag_name, y.tag_name) ? -1 : 1))[0] || null;
     const betaBuilds = ahead ? buildsOf(ahead) : {};
     return {
       android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
