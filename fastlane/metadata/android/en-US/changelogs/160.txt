@@ -1,0 +1,5 @@
+The first beta of 9.16.0, for early testers.
+
+New: the Video Art player, live radio stations in Listen together, Spotify playlist import, SponsorBlock skipping, ListenBrainz scrobbling, repeating a song a set number of times, sideways and tablet layouts, and 14 more languages.
+
+Fixed: whole playlists download instead of only some of it, covers are kept for offline, songs on the phone play straight off the phone, songs carry on through a short loss of connection, and a song that stops because the connection went waits and picks up where it stopped.
