@@ -718,7 +718,7 @@ internal fun ThemePhonePreview(
             // UN-clipped sibling of an un-clipped outer box, so the hero spills out of
             // the card and a little over the wordmark — exactly like the real home.
             val onCard = cs.onPrimary
-            if (showGreetingCard) Box(modifier = Modifier.fillMaxWidth().height(53.dp)) {
+            if (showGreetingCard) Box(modifier = Modifier.fillMaxWidth().height(68.dp)) {
                 // Card background (rounded, clipped).
                 Box(
                     modifier = Modifier
@@ -737,9 +737,9 @@ internal fun ThemePhonePreview(
                         .align(Alignment.BottomEnd)
                         .requiredWidth(78.dp)
                         .requiredHeight(92.dp)
-                        // Hung from the top like the real one, so the shorter card takes the
-                        // difference off the picture's foot rather than moving it.
-                        .offset(y = (-19).dp),
+                        // The overflow is centred, so this shift puts the picture's foot flush
+                        // inside the card with only its head spilling out.
+                        .offset(y = (-12).dp),
                 )
                 // Greeting text — centred-left and tight, with padding around it.
                 Column(

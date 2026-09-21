@@ -256,8 +256,8 @@ fun BlazeHomeHeader(
     }
 }
 
-/** The greeting card's height. Kept short: the home screen is for songs. */
-private val GreetingCardHeight = 124.dp
+/** The greeting card's height. */
+private val GreetingCardHeight = 160.dp
 
 /** How far the hero picture rises above the card. */
 private val GreetingHeroSpill = 44.dp
