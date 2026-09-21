@@ -32,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.lerp
@@ -141,12 +140,12 @@ fun BlazeHomeHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(GreetingCardHeight),
+                .height(160.dp),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(GreetingCardHeight)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(
                         Brush.linearGradient(listOf(cardStart, cardEnd)),
@@ -178,37 +177,32 @@ fun BlazeHomeHeader(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.home_enjoy_music),
+                    color = onCard.copy(alpha = 0.85f),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.2.sp,
+                )
             }
 
-            // Hero image: 200 wide, its top spilling above the card as before. It is hung from
-            // the top rather than the bottom, so shortening the card takes the difference off its
-            // foot instead of sliding the whole picture up the screen.
-            Box(
+            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it
+            Image(
+                painter = painterResource(
+                    if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
+                ),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .requiredWidth(200.dp)
-                    // requiredHeight overflows the card evenly, so the same shift as before puts
-                    // this window's foot flush with the card and its head GreetingHeroSpill above.
-                    .requiredHeight(GreetingCardHeight + GreetingHeroSpill)
-                    .offset(y = -(GreetingHeroSpill / 2))
-                    .clipToBounds(),
-            ) {
-                Image(
-                    painter = painterResource(
-                        if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
-                    ),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    // Cropping from the top keeps the top of her hair, which the middle-cropped
-                    // frame was cutting off.
-                    alignment = Alignment.TopCenter,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .requiredWidth(200.dp)
-                        .requiredHeight(240.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                )
-            }
+                    .requiredHeight(240.dp)
+                    // requiredHeight overflows evenly (40dp top and bottom);
+                    // shift up so the bottom edge sits flush with the card
+                    .offset(y = (-40).dp)
+                    .clip(RoundedCornerShape(12.dp)),
+            )
         }
 
         Spacer(Modifier.height(8.dp))
@@ -255,12 +249,6 @@ fun BlazeHomeHeader(
         Spacer(Modifier.height(8.dp))
     }
 }
-
-/** The greeting card's height. */
-private val GreetingCardHeight = 160.dp
-
-/** How far the hero picture rises above the card. */
-private val GreetingHeroSpill = 44.dp
 
 private fun greetingRes(): Int {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
