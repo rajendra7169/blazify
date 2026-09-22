@@ -88,6 +88,7 @@ import com.blazify.music.LocalDatabase
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.CropAlbumArtDefault
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.MiniPlayerHeight
@@ -1078,7 +1079,7 @@ private fun LegacyMiniMediaInfo(
     modifier: Modifier = Modifier,
 ) {
     val error by LocalPlayerConnection.current?.error?.collectAsState() ?: remember { mutableStateOf(null) }
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

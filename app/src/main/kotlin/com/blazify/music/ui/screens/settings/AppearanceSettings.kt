@@ -61,6 +61,7 @@ import androidx.core.content.edit
 import androidx.navigation.NavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.R
+import com.blazify.music.constants.CropAlbumArtDefault
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DensityScale
 import com.blazify.music.constants.DensityScaleKey
@@ -136,7 +137,7 @@ fun AppearanceSettings(
     val (cropAlbumArt, onCropAlbumArtChange) =
         rememberPreference(
             CropAlbumArtKey,
-            defaultValue = false,
+            defaultValue = CropAlbumArtDefault,
         )
     val (playerBackground, onPlayerBackgroundChange) =
         rememberEnumPreference(

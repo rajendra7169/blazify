@@ -164,6 +164,7 @@ import com.blazify.music.LocalDownloadUtil
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.CropAlbumArtDefault
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.DarkModeKey
 import androidx.compose.foundation.Canvas
@@ -303,7 +304,7 @@ fun BottomSheetPlayer(
         )
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) = rememberPreference(HidePlayerThumbnailKey, false)
     val (hideStatusBarOnFullscreen) = rememberPreference(HideStatusBarOnFullscreenKey, false)
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
     val (playerDesignId) = rememberPreference(PlayerDesignKey, PlayerDesign.CLASSIC.id)
     val playerDesign = remember(playerDesignId) { PlayerDesign.fromId(playerDesignId) }
     // Sideways the screen is split in two, so the bottom buttons move into the right half

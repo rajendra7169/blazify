@@ -79,6 +79,11 @@ val UseNewMiniPlayerDesignKey = booleanPreferencesKey("useNewMiniPlayerDesign")
 val MiniPlayerDesignKey = stringPreferencesKey("miniPlayerDesign")
 val HidePlayerThumbnailKey = booleanPreferencesKey("hidePlayerThumbnail")
 val CropAlbumArtKey = booleanPreferencesKey("cropAlbumArt")
+
+// On unless someone turns it off: a song whose cover is a video frame otherwise sits
+// in the middle of a square with empty bands above and below it.
+const val CropAlbumArtDefault = true
+
 val SeekExtraSeconds = booleanPreferencesKey("seekExtraSeconds")
 val SeekAmountSecondsKey = intPreferencesKey("seekAmountSeconds")
 val PauseOnMute = booleanPreferencesKey("pauseOnMute")

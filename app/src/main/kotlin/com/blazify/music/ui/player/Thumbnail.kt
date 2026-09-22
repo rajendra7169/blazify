@@ -71,6 +71,7 @@ import coil3.request.ImageRequest
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.CropAlbumArtDefault
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.HidePlayerThumbnailKey
 import com.blazify.music.constants.PlayerBackgroundStyle
@@ -216,7 +217,7 @@ fun Thumbnail(
     val swipeThumbnailPref by rememberPreference(SwipeThumbnailKey, true)
     val swipeThumbnail = swipeThumbnailPref && !isListenTogetherGuest
     val hidePlayerThumbnail by rememberPreference(HidePlayerThumbnailKey, false)
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
     val playerBackground by rememberEnumPreference(
         key = PlayerBackgroundStyleKey,
         defaultValue = PlayerBackgroundStyle.GRADIENT

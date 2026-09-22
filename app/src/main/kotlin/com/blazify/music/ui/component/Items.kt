@@ -102,6 +102,7 @@ import com.blazify.music.LocalDownloadUtil
 import com.blazify.music.LocalNavController
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.CropAlbumArtDefault
 import com.blazify.music.constants.CropAlbumArtKey
 import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
@@ -1468,7 +1469,7 @@ fun ItemThumbnail(
     isSelected: Boolean = false,
     thumbnailRatio: Float = 1f
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
     
     Box(
         contentAlignment = Alignment.Center,
@@ -1555,7 +1556,7 @@ fun LocalThumbnail(
     playButtonVisible: Boolean = false,
     thumbnailRatio: Float = 1f
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
     
     Box(
         contentAlignment = Alignment.Center,
@@ -1661,7 +1662,7 @@ fun PlaylistThumbnail(
     shape: Shape,
     cacheKey: String? = null
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, CropAlbumArtDefault)
     
     when (thumbnails.size) {
         0 -> Box(
