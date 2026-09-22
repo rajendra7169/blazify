@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,6 +68,10 @@ fun BlazeHomeHeader(
     onSettingsClick: () -> Unit = {},
     onSearchClick: () -> Unit = {},
     onMicClick: () -> Unit = {},
+    // Two ways to start music from the card itself. Null hides the button; with
+    // neither, the card keeps its old "Enjoy the music" line instead.
+    onSpeedDialClick: (() -> Unit)? = null,
+    onForYouClick: (() -> Unit)? = null,
 ) {
     val darkMode by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
     val isDark = if (darkMode == DarkMode.AUTO) isSystemInDarkTheme() else darkMode == DarkMode.ON
@@ -152,6 +157,25 @@ fun BlazeHomeHeader(
                     ),
             )
 
+            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it.
+            // Drawn before the text so the buttons sit on top of her, never under:
+            // on a phone under ~420dp wide the second button reaches her.
+            Image(
+                painter = painterResource(
+                    if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
+                ),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .requiredWidth(200.dp)
+                    .requiredHeight(240.dp)
+                    // requiredHeight overflows evenly (40dp top and bottom);
+                    // shift up so the bottom edge sits flush with the card
+                    .offset(y = (-40).dp)
+                    .clip(RoundedCornerShape(12.dp)),
+            )
+
             Column(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
@@ -177,32 +201,32 @@ fun BlazeHomeHeader(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = stringResource(R.string.home_enjoy_music),
-                    color = onCard.copy(alpha = 0.85f),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.2.sp,
-                )
+                if (onSpeedDialClick == null && onForYouClick == null) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.home_enjoy_music),
+                        color = onCard.copy(alpha = 0.85f),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = 0.2.sp,
+                    )
+                } else {
+                    Spacer(Modifier.height(10.dp))
+                    // Wider than the text column on purpose: the pair needs about 190dp,
+                    // and the column's 62% is less than that on a small phone.
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
+                    ) {
+                        onSpeedDialClick?.let {
+                            CardButton(R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it)
+                        }
+                        onForYouClick?.let {
+                            CardButton(R.drawable.star, stringResource(R.string.home_for_you), onCard, it)
+                        }
+                    }
+                }
             }
-
-            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it
-            Image(
-                painter = painterResource(
-                    if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .requiredWidth(200.dp)
-                    .requiredHeight(240.dp)
-                    // requiredHeight overflows evenly (40dp top and bottom);
-                    // shift up so the bottom edge sits flush with the card
-                    .offset(y = (-40).dp)
-                    .clip(RoundedCornerShape(12.dp)),
-            )
         }
 
         Spacer(Modifier.height(8.dp))
@@ -247,6 +271,45 @@ fun BlazeHomeHeader(
         }
 
         Spacer(Modifier.height(8.dp))
+    }
+}
+
+/**
+ * A small pill on the greeting card that starts music. Its fill darkens whatever is
+ * behind it rather than lightening it, so the label stays readable on the card's
+ * colour and on the photo alike: white on a pale yellow sweater is unreadable.
+ */
+@Composable
+private fun CardButton(
+    icon: Int,
+    label: String,
+    onCard: Color,
+    onClick: () -> Unit,
+) {
+    val fill = if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.35f)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .height(30.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(fill)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp),
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = onCard,
+            modifier = Modifier.size(14.dp),
+        )
+        Spacer(Modifier.width(5.dp))
+        Text(
+            text = label,
+            color = onCard,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+        )
     }
 }
 

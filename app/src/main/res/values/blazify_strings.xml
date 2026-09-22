@@ -506,6 +506,7 @@
     <string name="home_greeting_evening">Good\nEvening 🌆</string>
     <string name="home_greeting_night">Good\nNight 🌙</string>
     <string name="home_enjoy_music">Enjoy the music 🎵</string>
+    <string name="home_for_you">For you</string>
     <string name="home_search_hint">Search songs, albums, artists…</string>
     <string name="reconnect">Reconnect</string>
     <string name="no_recognition_history">No recognition history</string>

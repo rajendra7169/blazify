@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -753,7 +754,29 @@ internal fun ThemePhonePreview(
                     // even padding above and below.
                     Text(stringResource(greetingLineRes()), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
                     Text(stringResource(R.string.blaze_greeting_default_name), color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(stringResource(R.string.home_enjoy_music), color = onCard.copy(alpha = 0.85f), fontSize = 5.5.sp, fontWeight = FontWeight.Medium, lineHeight = 6.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    // The card's two buttons, in miniature: Speed dial and For you.
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
+                        modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
+                    ) {
+                        listOf(
+                            R.drawable.grid_view to R.string.speed_dial,
+                            R.drawable.star to R.string.home_for_you,
+                        ).forEach { (icon, label) ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .height(10.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.35f))
+                                    .padding(horizontal = 4.dp),
+                            ) {
+                                Icon(painterResource(icon), null, tint = onCard, modifier = Modifier.size(5.dp))
+                                Spacer(Modifier.width(2.dp))
+                                Text(stringResource(label), color = onCard, fontSize = 5.sp, fontWeight = FontWeight.SemiBold, lineHeight = 5.5.sp, maxLines = 1)
+                            }
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(9.dp))
