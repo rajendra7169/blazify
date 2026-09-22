@@ -176,6 +176,15 @@ import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.random.Random
 
+/**
+ * YouTube Music's "My Supermix": the one mix drawn from all of a person's listening
+ * at once, so Hindi, English and Nepali favourites play side by side instead of one
+ * corner of their taste. The id is not the person's own: YouTube fills it from
+ * whoever is signed in. Signed out, the same id plays a general mix and a signed-in
+ * person's Nepali "My Mix" id plays film scores, which is how we know.
+ */
+private const val SUPERMIX_PLAYLIST_ID = "RDTMAK5uy_kset8DisdE7LSD4TNjEVvrKRTmG7a56sY"
+
 sealed class HomeSection(
     val id: String,
     val baseWeight: Int,
@@ -1223,6 +1232,9 @@ fun HomeScreen(
                 // Blazify header: account | logo + wordmark | settings,
                 // greeting card with overflowing hero image, and search bar
                 item(key = "blaze_header") {
+                    val speedDialTitle = stringResource(R.string.speed_dial)
+                    val forYouTitle = stringResource(R.string.home_for_you)
+                    val speedDialSongs = speedDialItems.filterIsInstance<SongItem>()
                     BlazeHomeHeader(
                         // Asked for by a user: greet the person, not "Music Lover",
                         // once we actually know who they are.
@@ -1237,6 +1249,40 @@ fun HomeScreen(
                         onSettingsClick = { navController.navigate("settings") },
                         onSearchClick = { navController.navigate(Screens.Search.route) },
                         onMicClick = { navController.navigate("recognition") },
+                        // The songs in the Speed dial grid, shuffled so the button is not
+                        // the same first song every time. Albums, artists and playlists
+                        // in the grid open a page when tapped and are left out here.
+                        onSpeedDialClick =
+                            if (!isListenTogetherGuest && speedDialSongs.isNotEmpty()) {
+                                {
+                                    playerConnection.playQueue(
+                                        ListQueue(
+                                            title = speedDialTitle,
+                                            items = speedDialSongs.shuffled().map { it.toMediaItem() },
+                                        ),
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                        // Signed in, YouTube's own Supermix, built from everything the person
+                        // has played. Signed out there is no such mix, so Quick picks, and
+                        // the Supermix after all on a fresh install with nothing played yet.
+                        onForYouClick =
+                            if (!isListenTogetherGuest) {
+                                {
+                                    val picks = quickPicks.orEmpty().distinctBy { it.id }
+                                    playerConnection.playQueue(
+                                        if (isLoggedIn || picks.isEmpty()) {
+                                            YouTubeQueue(WatchEndpoint(playlistId = SUPERMIX_PLAYLIST_ID))
+                                        } else {
+                                            ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
+                                        },
+                                    )
+                                }
+                            } else {
+                                null
+                            },
                     )
                 }
 
