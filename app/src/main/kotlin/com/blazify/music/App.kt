@@ -36,6 +36,8 @@ import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.cipher.CipherDeobfuscator
 import com.blazify.music.utils.OfflineCovers
 import com.blazify.music.utils.dataStore
+import com.blazify.innertube.models.looksLikeArtistName
+import com.blazify.music.db.MusicDatabase
 import com.blazify.music.utils.safeDataStoreEdit
 import com.blazify.music.utils.reportException
 import dagger.hilt.android.HiltAndroidApp
@@ -66,6 +68,38 @@ class App :
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
+    @Inject
+    lateinit var database: MusicDatabase
+
+    /**
+     * Once per install. Songs saved before artist names were read properly carry the ", "
+     * and " & " between names as artists of their own, so they show as "Pritam, , , Neeraj
+     * Shridhar" in the library, history and on Home. Those made-up artists are removed,
+     * which unlinks them from every song. Only artists the app made an id for and whose name
+     * has no letter in it (or is just "and") go: a real artist has a letter or YouTube's id.
+     */
+    private suspend fun removeNonArtists() {
+        if (dataStore.data.map { it[NonArtistsRemovedKey] ?: false }.first()) return
+        val fake =
+            runCatching { database.artistsWithMadeUpIds() }.getOrElse { return }
+                .filterNot { looksLikeArtistName(it.name) }
+                .map { it.id }
+        // Done here, not in database.transaction {}, which only queues the work: the flag must
+        // not be set before the deletes have happened, or a failure would never be retried.
+        runCatching {
+            fake.chunked(500).forEach { ids ->
+                database.deleteSongArtistMaps(ids)
+                database.deleteAlbumArtistMaps(ids)
+                database.deleteArtistsByIds(ids)
+            }
+        }.onFailure {
+            reportException(it)
+            return
+        }
+        Timber.i("Removed %d made-up artists", fake.size)
+        safeDataStoreEdit { it[NonArtistsRemovedKey] = true }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -89,6 +123,8 @@ class App :
         // Initialize cipher deobfuscator for WEB_REMIX streaming
         CipherDeobfuscator.initialize(this)
         YTPlayerUtils.initialize(this)
+
+        applicationScope.launch(Dispatchers.IO) { removeNonArtists() }
 
         // Pre-read Coil cache size on background to avoid runBlocking in newImageLoader
         applicationScope.launch(Dispatchers.IO) {

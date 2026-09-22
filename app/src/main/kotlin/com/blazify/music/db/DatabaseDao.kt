@@ -1688,6 +1688,19 @@ interface DatabaseDao {
     @Query("SELECT * FROM artist WHERE name = :name")
     fun artistByName(name: String): ArtistEntity?
 
+    // Artists the app made up an id for ("LA..." or none at all), as opposed to YouTube's own.
+    @Query("SELECT * FROM artist WHERE id LIKE 'LA%' OR id = ''")
+    fun artistsWithMadeUpIds(): List<ArtistEntity>
+
+    @Query("DELETE FROM song_artist_map WHERE artistId IN (:ids)")
+    fun deleteSongArtistMaps(ids: List<String>)
+
+    @Query("DELETE FROM album_artist_map WHERE artistId IN (:ids)")
+    fun deleteAlbumArtistMaps(ids: List<String>)
+
+    @Query("DELETE FROM artist WHERE id IN (:ids)")
+    fun deleteArtistsByIds(ids: List<String>)
+
     @Query("SELECT * FROM artist WHERE id = :id LIMIT 1")
     fun getArtistById(id: String): ArtistEntity?
 

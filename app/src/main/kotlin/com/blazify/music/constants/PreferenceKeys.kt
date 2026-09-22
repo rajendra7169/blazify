@@ -200,6 +200,9 @@ val MaxSongCacheSizeKey = intPreferencesKey("maxSongCacheSize")
 val EnableSongCacheKey = booleanPreferencesKey("enableSongCache")
 
 val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
+
+// Set once the made-up artists saved before names were read properly (", ", " & ") are removed.
+val NonArtistsRemovedKey = booleanPreferencesKey("nonArtistsRemoved")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
 val DisableScreenshotKey = booleanPreferencesKey("disableScreenshot")
 
