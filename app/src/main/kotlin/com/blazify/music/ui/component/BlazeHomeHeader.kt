@@ -285,7 +285,7 @@ fun BlazeHomeHeader(
 
 /**
  * A small button on the greeting card that starts music: the cover of the song it
- * plays first, with a play mark on it, then the label. A cover says "this plays"
+ * plays first, with a play mark on it, then the label, or the bare cover alone. A cover says "this plays"
  * where a text-only pill read as a label nobody would think to tap. Its fill darkens
  * whatever is behind it, so the label stays readable on the card and on the photo.
  */
@@ -322,7 +322,9 @@ private fun CardButton(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize(),
                 )
-                Box(
+                // The play mark belongs to the labelled button; a cover on its own
+                // stays a clean picture.
+                if (showLabel) Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(18.dp)

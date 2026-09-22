@@ -66,6 +66,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -88,6 +89,31 @@ data class CommunityPlaylistItem(
  * person's Nepali "My Mix" id plays film scores, which is how we know.
  */
 const val SUPERMIX_PLAYLIST_ID = "RDTMAK5uy_kset8DisdE7LSD4TNjEVvrKRTmG7a56sY"
+
+/**
+ * Which song a greeting-card button starts with. Every song is given a fixed random
+ * place the first time it is seen, so the order holds when its list reloads; a step
+ * moves the cover to the next song in that order. Every song gets a turn before any
+ * repeats, and a step always changes the cover, where reshuffling often did not.
+ */
+private class CardPick {
+    private val places = ConcurrentHashMap<String, Double>()
+    val cover = MutableStateFlow<String?>(null)
+
+    private fun place(id: String) = places.getOrPut(id) { Random.nextDouble() }
+
+    /** [items] in their fixed order, starting from the cover song, or from where it was. */
+    fun <T> order(items: List<T>, id: (T) -> String): List<T> {
+        val sorted = items.sortedBy { place(id(it)) }
+        val coverPlace = cover.value?.let(::place) ?: return sorted
+        val start = sorted.indexOfFirst { place(id(it)) >= coverPlace }.takeIf { it >= 0 } ?: 0
+        return sorted.drop(start) + sorted.take(start)
+    }
+
+    fun stepTo(next: String?) {
+        if (next != null) cover.value = next
+    }
+}
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -266,9 +292,50 @@ class HomeViewModel @Inject constructor(
     val accountName = MutableStateFlow("Guest")
     val accountImageUrl = MutableStateFlow<String?>(null)
 
-    // The song "My Supermix" starts with, fetched ahead so the For you button on the
-    // greeting card can show its cover and start the mix on exactly that song.
-    val forYouFirstSong = MutableStateFlow<SongItem?>(null)
+    // The songs of "My Supermix", fetched ahead so the For you button on the greeting
+    // card can show a cover and start the mix on exactly that song.
+    private val forYouMix = MutableStateFlow<List<SongItem>>(emptyList())
+
+    // Each greeting-card button starts from the song on its cover. After a tap it moves
+    // on to the next song, and both move on when Home is refreshed.
+    private val speedDialPick = CardPick()
+    private val forYouMixPick = CardPick()
+    private val forYouPicksPick = CardPick()
+
+    /** The songs of the Speed dial grid, starting from the one on the button's cover. */
+    val speedDialOrder: StateFlow<List<SongItem>> =
+        combine(speedDialItems, speedDialPick.cover) { items, _ ->
+            speedDialPick.order(items.filterIsInstance<SongItem>()) { it.id }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    /** My Supermix, starting from the song on the For you cover (signed in). */
+    val forYouMixOrder: StateFlow<List<SongItem>> =
+        combine(forYouMix, forYouMixPick.cover) { items, _ ->
+            forYouMixPick.order(items) { it.id }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    /** Quick picks, starting from the song on the For you cover (signed out). */
+    val forYouPicksOrder: StateFlow<List<Song>> =
+        combine(quickPicks, forYouPicksPick.cover) { items, _ ->
+            forYouPicksPick.order(items.orEmpty().distinctBy { it.id }) { it.id }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun speedDialPlayed() {
+        speedDialPick.stepTo(speedDialOrder.value.getOrNull(1)?.id)
+    }
+
+    fun forYouPlayed() {
+        forYouMixPick.stepTo(forYouMixOrder.value.getOrNull(1)?.id)
+        forYouPicksPick.stepTo(forYouPicksOrder.value.getOrNull(1)?.id)
+    }
+
+    private suspend fun loadForYouMix() {
+        YouTube.next(WatchEndpoint(playlistId = SUPERMIX_PLAYLIST_ID)).onSuccess {
+            forYouMix.value = it.items
+        }.onFailure {
+            reportException(it)
+        }
+    }
 
     // Offered in December and January for the year Wrapped looks back on. Seen is kept per
     // year, so having opened last year's Wrapped doesn't hide this year's.
@@ -729,7 +796,10 @@ class HomeViewModel @Inject constructor(
     fun refresh() {
         if (isRefreshing.value) return
         isRefreshing.value = true
+        speedDialPlayed()
+        forYouPlayed()
         viewModelScope.launch(Dispatchers.IO) {
+            if (YouTube.cookie != null) loadForYouMix()
             // If a chip is selected, reload the chip's content instead of the default home
             val currentChip = selectedChip.value
             if (currentChip != null) {
@@ -823,16 +893,12 @@ class HomeViewModel @Inject constructor(
                             }.onFailure {
                                 reportException(it)
                             }
-                            YouTube.next(WatchEndpoint(playlistId = SUPERMIX_PLAYLIST_ID)).onSuccess {
-                                forYouFirstSong.value = it.items.firstOrNull()
-                            }.onFailure {
-                                reportException(it)
-                            }
+                            loadForYouMix()
                         } else {
                             accountName.value = "Guest"
                             accountImageUrl.value = null
                             accountPlaylists.value = null
-                            forYouFirstSong.value = null
+                            forYouMix.value = emptyList()
                         }
                     } finally {
                         isProcessingAccountData = false

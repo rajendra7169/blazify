@@ -661,7 +661,9 @@ fun HomeScreen(
     val allLocalItems by viewModel.allLocalItems.collectAsStateWithLifecycle()
     val allYtItems by viewModel.allYtItems.collectAsStateWithLifecycle()
     val speedDialItems by viewModel.speedDialItems.collectAsStateWithLifecycle()
-    val forYouFirstSong by viewModel.forYouFirstSong.collectAsStateWithLifecycle()
+    val speedDialOrder by viewModel.speedDialOrder.collectAsStateWithLifecycle()
+    val forYouMixOrder by viewModel.forYouMixOrder.collectAsStateWithLifecycle()
+    val forYouPicksOrder by viewModel.forYouPicksOrder.collectAsStateWithLifecycle()
     val pinnedSpeedDialItems by viewModel.pinnedSpeedDialItems.collectAsStateWithLifecycle()
     val selectedChip by viewModel.selectedChip.collectAsStateWithLifecycle()
 
@@ -1227,12 +1229,11 @@ fun HomeScreen(
                 item(key = "blaze_header") {
                     val speedDialTitle = stringResource(R.string.speed_dial)
                     val forYouTitle = stringResource(R.string.home_for_you)
-                    val speedDialSongs = speedDialItems.filterIsInstance<SongItem>()
-                    // Each button shows the cover of the song it starts with, so both are
-                    // decided before the tap: Speed dial's shuffle, and For you's first song.
-                    val speedDialOrder = remember(speedDialSongs.map { it.id }) { speedDialSongs.shuffled() }
-                    val picks = quickPicks.orEmpty().distinctBy { it.id }
+                    // Each button shows the cover of the song it starts with; the view
+                    // model keeps each list in order from that song.
+                    val picks = forYouPicksOrder
                     val forYouFromMix = isLoggedIn || picks.isEmpty()
+                    val forYouSong = forYouMixOrder.firstOrNull()
                     BlazeHomeHeader(
                         // Asked for by a user: greet the person, not "Music Lover",
                         // once we actually know who they are.
@@ -1252,7 +1253,7 @@ fun HomeScreen(
                         // Signed out there is no such mix, so Quick picks, and the Supermix
                         // after all on a fresh install with nothing played yet.
                         forYouArt =
-                            if (forYouFromMix) forYouFirstSong?.thumbnail else picks.firstOrNull()?.thumbnailUrl,
+                            if (forYouFromMix) forYouSong?.thumbnail else picks.firstOrNull()?.thumbnailUrl,
                         onForYouClick =
                             if (!isListenTogetherGuest) {
                                 {
@@ -1260,15 +1261,16 @@ fun HomeScreen(
                                         if (forYouFromMix) {
                                             YouTubeQueue(
                                                 WatchEndpoint(
-                                                    videoId = forYouFirstSong?.id,
+                                                    videoId = forYouSong?.id,
                                                     playlistId = SUPERMIX_PLAYLIST_ID,
                                                 ),
-                                                forYouFirstSong?.toMediaMetadata(),
+                                                forYouSong?.toMediaMetadata(),
                                             )
                                         } else {
                                             ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
                                         },
                                     )
+                                    viewModel.forYouPlayed()
                                 }
                             } else {
                                 null
@@ -1286,6 +1288,7 @@ fun HomeScreen(
                                             items = speedDialOrder.map { it.toMediaItem() },
                                         ),
                                     )
+                                    viewModel.speedDialPlayed()
                                 }
                             } else {
                                 null
