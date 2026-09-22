@@ -197,6 +197,7 @@ object YouTube {
                                             ?.text
                                             ?: YouTubeConstants.DEFAULT_TOP_RESULT,
                                     items = items,
+                                    isTopResult = true,
                                 ),
                             )
                         }
@@ -244,6 +245,7 @@ object YouTube {
                         SearchSummary(
                             title = title,
                             items = sections.flatMap { it.items }.distinctBy { it.id },
+                            isTopResult = sections.any { it.isTopResult },
                         )
                     }
                     // Reorder to maintain logical order

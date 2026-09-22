@@ -17,6 +17,9 @@ import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.filterExplicit
 import com.blazify.innertube.models.filterVideoSongs
 import com.blazify.innertube.models.filterYoutubeShorts
+import com.blazify.innertube.models.EpisodeItem
+import com.blazify.innertube.models.SongItem
+import com.blazify.innertube.models.YTItem
 import com.blazify.innertube.pages.SearchSummaryPage
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
@@ -53,7 +56,7 @@ constructor(
                 val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
                 val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
                 val shown =
-                    page
+                    page.songOnTop()
                         .filterExplicit(hideExplicit)
                         .filterVideoSongs(hideVideoSongs)
                         .filterYoutubeShorts(hideYoutubeShorts)
@@ -164,3 +167,22 @@ constructor(
     }
 }
 
+/**
+ * In a music app the top result should be a song. When YouTube ranks a video or a podcast
+ * episode first ("Shape of You" gives the official video; "Tum Hi Ho" gave a podcast
+ * episode), the first song YouTube found moves to the top and its pick stays right below.
+ * An artist, album or playlist on top is left alone: that is usually what was searched for.
+ */
+private fun SearchSummaryPage.songOnTop(): SearchSummaryPage {
+    fun YTItem.isSong() = this is SongItem && !isVideoSong && !isEpisode
+    val top = summaries.firstOrNull { it.isTopResult } ?: return this
+    val lead = top.items.firstOrNull() ?: return this
+    val leadIsVideoOrEpisode = (lead is SongItem && (lead.isVideoSong || lead.isEpisode)) || lead is EpisodeItem
+    if (!leadIsVideoOrEpisode) return this
+    val song =
+        summaries.firstOrNull { !it.isTopResult && it.items.firstOrNull()?.isSong() == true }
+            ?.items?.first()
+            ?: return this
+    val topItems = listOf(song) + top.items.filterNot { it.id == song.id }
+    return copy(summaries = summaries.map { if (it === top) it.copy(items = topItems) else it })
+}

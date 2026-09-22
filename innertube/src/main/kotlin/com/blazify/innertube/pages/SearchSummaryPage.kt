@@ -26,6 +26,8 @@ import com.blazify.innertube.utils.parseTime
 data class SearchSummary(
     val title: String,
     val items: List<YTItem>,
+    // The "Top result" card. Its title is in the user's language, so it is told apart by this.
+    val isTopResult: Boolean = false,
 )
 
 data class SearchSummaryPage(
@@ -35,8 +37,8 @@ data class SearchSummaryPage(
         if (enabled) {
             SearchSummaryPage(
                 summaries.mapNotNull { s ->
-                    SearchSummary(
-                        title = s.title,
+                    // A copy, so the section keeps everything but its items (the Top result mark too).
+                    s.copy(
                         items =
                             s.items.filterExplicit().ifEmpty {
                                 return@mapNotNull null
@@ -52,8 +54,8 @@ data class SearchSummaryPage(
         if (disableVideos) {
             SearchSummaryPage(
                 summaries.mapNotNull { s ->
-                    SearchSummary(
-                        title = s.title,
+                    // A copy, so the section keeps everything but its items (the Top result mark too).
+                    s.copy(
                         items =
                             s.items.filterVideoSongs(true).ifEmpty {
                                 return@mapNotNull null
@@ -69,8 +71,8 @@ data class SearchSummaryPage(
         if (enabled) {
             SearchSummaryPage(
                 summaries.mapNotNull { s ->
-                    SearchSummary(
-                        title = s.title,
+                    // A copy, so the section keeps everything but its items (the Top result mark too).
+                    s.copy(
                         items =
                             s.items.filterYoutubeShorts(true).ifEmpty {
                                 return@mapNotNull null
