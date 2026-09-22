@@ -469,7 +469,7 @@ fun OnlineSearchScreen(
                     BrowseTile(
                         title = stringResource(R.string.charts),
                         stripeColor = 0xFFFFA726,
-                        art = browseArt[BrowseArt.CHARTS],
+                        art = browseArt[BrowseArt.CHARTS].orEmpty(),
                         onClick = {
                             onDismiss()
                             navController.navigate("charts_screen")
@@ -479,7 +479,7 @@ fun OnlineSearchScreen(
                     BrowseTile(
                         title = stringResource(R.string.new_release_albums),
                         stripeColor = 0xFFFF7043,
-                        art = browseArt[BrowseArt.NEW_RELEASES],
+                        art = browseArt[BrowseArt.NEW_RELEASES].orEmpty(),
                         onClick = {
                             onDismiss()
                             navController.navigate("new_release")
@@ -508,7 +508,7 @@ fun OnlineSearchScreen(
                             BrowseTile(
                                 title = mood.title,
                                 stripeColor = mood.stripeColor,
-                                art = browseArt[BrowseArt.keyOf(mood.endpoint)],
+                                art = browseArt[BrowseArt.keyOf(mood.endpoint)].orEmpty(),
                                 onClick = {
                                     onDismiss()
                                     navController.navigate(
@@ -864,14 +864,14 @@ fun RecentSearchesRail(
 /**
  * One tile of the Browse grid, coloured by the stripe YouTube ships with each
  * mood — the same colour its own apps use, so the grid is recognisable rather
- * than twelve identical grey rectangles. A cover from inside the mood leans in
- * the corner once it has been found; until then the colour carries the tile.
+ * than twelve identical grey rectangles. Covers from inside the mood fan out in
+ * the corner once they have been found; until then the colour carries the tile.
  */
 @Composable
 private fun BrowseTile(
     title: String,
     stripeColor: Long,
-    art: String?,
+    art: List<String>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -890,19 +890,21 @@ private fun BrowseTile(
                 )
                 .clickable(onClick = onClick),
     ) {
-        if (art != null) {
+        // Up to three covers fanned like a hand of cards, the first in front and leaning
+        // off the corner, the others spread behind it. Drawn back to front.
+        art.take(FAN.size).withIndex().reversed().forEach { (index, cover) ->
+            val place = FAN[index]
             AsyncImage(
-                model = art,
+                model = cover,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
                         .align(Alignment.BottomEnd)
-                        // Tilted and half off the corner, the way a record leans in a crate.
-                        .offset(x = 16.dp, y = 10.dp)
-                        .size(68.dp)
-                        .rotate(24f)
-                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(6.dp))
+                        .offset(x = place.x, y = place.y)
+                        .size(56.dp)
+                        .rotate(place.angle)
+                        .shadow(elevation = 6.dp, shape = RoundedCornerShape(6.dp))
                         .clip(RoundedCornerShape(6.dp)),
             )
         }
@@ -917,11 +919,21 @@ private fun BrowseTile(
                 Modifier
                     .align(Alignment.TopStart)
                     .padding(14.dp)
-                    // Clear of the cover in the corner.
-                    .fillMaxWidth(if (art != null) 0.7f else 1f),
+                    // Clear of the covers in the corner.
+                    .fillMaxWidth(if (art.isNotEmpty()) 0.64f else 1f),
         )
     }
 }
+
+/** Where each cover sits in a Browse tile's fan, measured from the bottom-right corner. */
+private class FanPlace(val x: androidx.compose.ui.unit.Dp, val y: androidx.compose.ui.unit.Dp, val angle: Float)
+
+private val FAN =
+    listOf(
+        FanPlace(x = 14.dp, y = 14.dp, angle = 16f),
+        FanPlace(x = (-14).dp, y = 10.dp, angle = 2f),
+        FanPlace(x = (-40).dp, y = 16.dp, angle = -12f),
+    )
 
 /** Mixes a colour towards black, for the far corner of a Browse tile's gradient. */
 private fun Color.darken(amount: Float) =

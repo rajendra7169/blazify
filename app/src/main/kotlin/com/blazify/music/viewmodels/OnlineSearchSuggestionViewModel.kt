@@ -61,8 +61,8 @@ class OnlineSearchSuggestionViewModel
          */
         val moods = MutableStateFlow<List<MoodAndGenres.Item>>(emptyList())
 
-        /** The picture for each Browse tile, by [BrowseArt] key; tiles without one show just their colour. */
-        val browseArt = MutableStateFlow<Map<String, String>>(emptyMap())
+        /** The covers for each Browse tile, by [BrowseArt] key; tiles without any show just their colour. */
+        val browseArt = MutableStateFlow<Map<String, List<String>>>(emptyMap())
 
         init {
             viewModelScope.launch {
@@ -151,27 +151,30 @@ class OnlineSearchSuggestionViewModel
             coroutineScope {
                 missing.forEach { key ->
                     launch {
-                        val picture = gate.withPermit { findBrowseArt(key, shown) } ?: return@launch
-                        browseArt.value = browseArt.value + (key to picture)
+                        val covers = gate.withPermit { findBrowseArt(key, shown) }
+                        if (covers.isNotEmpty()) browseArt.value = browseArt.value + (key to covers)
                     }
                 }
             }
             if (browseArt.value.size > saved.size) BrowseArt.save(context, browseArt.value, savedAt)
         }
 
-        private suspend fun findBrowseArt(key: String, shown: List<MoodAndGenres.Item>): String? =
-            when (key) {
-                BrowseArt.CHARTS ->
-                    YouTube.getChartsPage().getOrNull()
-                        ?.sections?.firstNotNullOfOrNull { section -> section.items.firstOrNull()?.thumbnail }
-                BrowseArt.NEW_RELEASES ->
-                    YouTube.newReleaseAlbums().getOrNull()?.firstOrNull()?.thumbnail
-                else ->
-                    shown.firstOrNull { BrowseArt.keyOf(it.endpoint) == key }?.let { mood ->
-                        YouTube.browse(mood.endpoint.browseId, mood.endpoint.params).getOrNull()
-                            ?.items?.firstNotNullOfOrNull { section -> section.items.firstNotNullOfOrNull { it.thumbnail } }
-                    }
-            }
+        /** The first few covers a tile leads to, all from the one page it opens. */
+        private suspend fun findBrowseArt(key: String, shown: List<MoodAndGenres.Item>): List<String> {
+            val items =
+                when (key) {
+                    BrowseArt.CHARTS ->
+                        YouTube.getChartsPage().getOrNull()?.sections?.flatMap { it.items }
+                    BrowseArt.NEW_RELEASES ->
+                        YouTube.newReleaseAlbums().getOrNull()
+                    else ->
+                        shown.firstOrNull { BrowseArt.keyOf(it.endpoint) == key }?.let { mood ->
+                            YouTube.browse(mood.endpoint.browseId, mood.endpoint.params).getOrNull()
+                                ?.items?.flatMap { it.items }
+                        }
+                }
+            return items.orEmpty().mapNotNull { it.thumbnail }.distinct().take(BrowseArt.COVERS)
+        }
 
         private suspend fun fetchParsedUrlItem(parsedUrl: YouTubeUrlParser.ParsedUrl): YTItem? =
             when (parsedUrl) {
