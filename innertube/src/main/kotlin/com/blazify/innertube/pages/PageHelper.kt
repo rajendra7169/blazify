@@ -4,6 +4,7 @@ import com.blazify.innertube.models.Artist
 import com.blazify.innertube.models.Menu
 import com.blazify.innertube.models.MusicResponsiveListItemRenderer.FlexColumn
 import com.blazify.innertube.models.Run
+import com.blazify.innertube.models.isArtistName
 import timber.log.Timber
 
 object PageHelper {
@@ -178,8 +179,10 @@ object PageHelper {
             Timber.v("  run[$idx]: text='${run.text}', hasEndpoint=${run.navigationEndpoint != null}, browseId=${run.navigationEndpoint?.browseEndpoint?.browseId}")
         }
         
+        // Names only: the ", " and " & " between them used to come through as artists,
+        // and a song showed as "Pritam, , , Neeraj Shridhar" everywhere it was saved.
         val filtered = runs.filter { run ->
-            run.text.trim().isNotBlank() && run.text != " • "
+            run.text != " • " && run.isArtistName()
         }
         Timber.d("extractArtists: after separator filter count=${filtered.size}")
         

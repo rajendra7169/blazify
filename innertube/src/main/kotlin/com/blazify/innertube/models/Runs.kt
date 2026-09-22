@@ -53,7 +53,9 @@ fun List<Run>.splitArtistsByConjunction(): List<Run> {
             result.add(run)
         }
     }
-    return result
+    // Names only: a ", " between names, or a line holding just a song's length ("Song • 4:41")
+    // under a top search result, came through as artists called "," or "4:41".
+    return result.filter { it.isArtistName() }
 }
 
 object ArtistConjunctions {
@@ -70,7 +72,28 @@ fun List<List<Run>>.clean(): List<List<Run>> {
     return if (hasArtistSignals) this else drop(1)
 }
 
+/**
+ * Whether [name] can be an artist's name rather than what YouTube puts between or after
+ * names: a comma, an "&", an "and", a song's length ("4:41") or a year ("2026"). A name
+ * has a letter in it, and it is not the word that joins the last two names.
+ */
+fun looksLikeArtistName(name: String): Boolean {
+    val trimmed = name.trim()
+    return trimmed.any { it.isLetter() } &&
+        ArtistConjunctions.conjunctions.none { trimmed.equals(it, ignoreCase = true) }
+}
+
+/** An artist run: a name, or anything linking to an artist's page, as a band called "112" does. */
+fun Run.isArtistName(): Boolean =
+    navigationEndpoint?.browseEndpoint != null || looksLikeArtistName(text)
+
+/**
+ * The artists in a line where names and separators take turns (name, ", ", name, " & ", name).
+ * Every other piece is a name, and anything that is not one is left out: a line holding only
+ * a length, as a song under a top search result does ("Song • 5:00"), gives no artist at all
+ * instead of an artist called "5:00".
+ */
 fun List<Run>.oddElements() =
     filterIndexed { index, _ ->
         index % 2 == 0
-    }
+    }.filter { it.isArtistName() }
