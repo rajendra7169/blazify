@@ -33,9 +33,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.coroutineScope
+import com.blazify.music.utils.BrowseArt
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
+/** How many moods and genres Search > Browse shows. */
+const val BROWSE_MOODS = 12
+
 @HiltViewModel
 class OnlineSearchSuggestionViewModel
     @Inject
@@ -54,6 +61,9 @@ class OnlineSearchSuggestionViewModel
          */
         val moods = MutableStateFlow<List<MoodAndGenres.Item>>(emptyList())
 
+        /** The picture for each Browse tile, by [BrowseArt] key; tiles without one show just their colour. */
+        val browseArt = MutableStateFlow<Map<String, String>>(emptyMap())
+
         init {
             viewModelScope.launch {
                 YouTube.moodAndGenres().onSuccess { sections ->
@@ -61,6 +71,7 @@ class OnlineSearchSuggestionViewModel
                     // sits in both moods and activities — and a grid with it in
                     // twice looks like a bug.
                     moods.value = sections.flatMap { it.items }.distinctBy { it.title }
+                    loadBrowseArt(moods.value.take(BROWSE_MOODS))
                 }
             }
 
@@ -124,6 +135,43 @@ class OnlineSearchSuggestionViewModel
                     }
             }
         }
+
+        /**
+         * Shows the kept pictures at once and finds the missing ones, two at a time so they
+         * never crowd out a song that is loading. Each arrives on its tile as it is found.
+         */
+        private suspend fun loadBrowseArt(shown: List<MoodAndGenres.Item>) {
+            val (saved, savedAt) = BrowseArt.saved(context)
+            browseArt.value = saved
+            val missing =
+                (listOf(BrowseArt.CHARTS, BrowseArt.NEW_RELEASES) + shown.map { BrowseArt.keyOf(it.endpoint) })
+                    .filterNot { it in saved }
+            if (missing.isEmpty()) return
+            val gate = Semaphore(2)
+            coroutineScope {
+                missing.forEach { key ->
+                    launch {
+                        val picture = gate.withPermit { findBrowseArt(key, shown) } ?: return@launch
+                        browseArt.value = browseArt.value + (key to picture)
+                    }
+                }
+            }
+            if (browseArt.value.size > saved.size) BrowseArt.save(context, browseArt.value, savedAt)
+        }
+
+        private suspend fun findBrowseArt(key: String, shown: List<MoodAndGenres.Item>): String? =
+            when (key) {
+                BrowseArt.CHARTS ->
+                    YouTube.getChartsPage().getOrNull()
+                        ?.sections?.firstNotNullOfOrNull { section -> section.items.firstOrNull()?.thumbnail }
+                BrowseArt.NEW_RELEASES ->
+                    YouTube.newReleaseAlbums().getOrNull()?.firstOrNull()?.thumbnail
+                else ->
+                    shown.firstOrNull { BrowseArt.keyOf(it.endpoint) == key }?.let { mood ->
+                        YouTube.browse(mood.endpoint.browseId, mood.endpoint.params).getOrNull()
+                            ?.items?.firstNotNullOfOrNull { section -> section.items.firstNotNullOfOrNull { it.thumbnail } }
+                    }
+            }
 
         private suspend fun fetchParsedUrlItem(parsedUrl: YouTubeUrlParser.ParsedUrl): YTItem? =
             when (parsedUrl) {

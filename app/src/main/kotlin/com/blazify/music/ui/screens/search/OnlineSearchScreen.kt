@@ -5,6 +5,13 @@
 
 package com.blazify.music.ui.screens.search
 
+import coil3.compose.AsyncImage
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.layout.offset
+import com.blazify.music.utils.BrowseArt
+import com.blazify.music.viewmodels.BROWSE_MOODS
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -126,6 +133,7 @@ fun OnlineSearchScreen(
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val moods by viewModel.moods.collectAsStateWithLifecycle()
+    val browseArt by viewModel.browseArt.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
 
@@ -461,6 +469,7 @@ fun OnlineSearchScreen(
                     BrowseTile(
                         title = stringResource(R.string.charts),
                         stripeColor = 0xFFFFA726,
+                        art = browseArt[BrowseArt.CHARTS],
                         onClick = {
                             onDismiss()
                             navController.navigate("charts_screen")
@@ -470,6 +479,7 @@ fun OnlineSearchScreen(
                     BrowseTile(
                         title = stringResource(R.string.new_release_albums),
                         stripeColor = 0xFFFF7043,
+                        art = browseArt[BrowseArt.NEW_RELEASES],
                         onClick = {
                             onDismiss()
                             navController.navigate("new_release")
@@ -480,7 +490,7 @@ fun OnlineSearchScreen(
             }
             if (moods.isNotEmpty()) {
                 items(
-                    items = moods.take(12).chunked(2),
+                    items = moods.take(BROWSE_MOODS).chunked(2),
                     key = { row -> "browse_${row.first().title}" },
                 ) { row ->
                     Row(
@@ -498,6 +508,7 @@ fun OnlineSearchScreen(
                             BrowseTile(
                                 title = mood.title,
                                 stripeColor = mood.stripeColor,
+                                art = browseArt[BrowseArt.keyOf(mood.endpoint)],
                                 onClick = {
                                     onDismiss()
                                     navController.navigate(
@@ -853,12 +864,14 @@ fun RecentSearchesRail(
 /**
  * One tile of the Browse grid, coloured by the stripe YouTube ships with each
  * mood — the same colour its own apps use, so the grid is recognisable rather
- * than twelve identical grey rectangles.
+ * than twelve identical grey rectangles. A cover from inside the mood leans in
+ * the corner once it has been found; until then the colour carries the tile.
  */
 @Composable
 private fun BrowseTile(
     title: String,
     stripeColor: Long,
+    art: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -866,19 +879,33 @@ private fun BrowseTile(
     // Light tiles need dark type on them; the rest take white.
     val onSeed = if (seed.luminance() > 0.5f) Color.Black else Color.White
     Box(
-        contentAlignment = Alignment.BottomStart,
         modifier =
             modifier
-                .heightIn(min = 84.dp)
+                .heightIn(min = 92.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(
-                    Brush.verticalGradient(
-                        listOf(seed.copy(alpha = 1f).lighten(0.24f), seed),
+                    Brush.linearGradient(
+                        listOf(seed.copy(alpha = 1f).lighten(0.24f), seed, seed.darken(0.18f)),
                     ),
                 )
-                .clickable(onClick = onClick)
-                .padding(14.dp),
+                .clickable(onClick = onClick),
     ) {
+        if (art != null) {
+            AsyncImage(
+                model = art,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        // Tilted and half off the corner, the way a record leans in a crate.
+                        .offset(x = 16.dp, y = 10.dp)
+                        .size(68.dp)
+                        .rotate(24f)
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(6.dp)),
+            )
+        }
         Text(
             text = title,
             fontSize = 14.sp,
@@ -886,9 +913,24 @@ private fun BrowseTile(
             color = onSeed,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(14.dp)
+                    // Clear of the cover in the corner.
+                    .fillMaxWidth(if (art != null) 0.7f else 1f),
         )
     }
 }
+
+/** Mixes a colour towards black, for the far corner of a Browse tile's gradient. */
+private fun Color.darken(amount: Float) =
+    Color(
+        red = red * (1f - amount),
+        green = green * (1f - amount),
+        blue = blue * (1f - amount),
+        alpha = alpha,
+    )
 
 /** Mixes a colour towards white, as the iPhone's browse tiles do. */
 private fun Color.lighten(amount: Float) =

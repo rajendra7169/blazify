@@ -203,6 +203,10 @@ val PauseListenHistoryKey = booleanPreferencesKey("pauseListenHistory")
 
 // Set once the made-up artists saved before names were read properly (", ", " & ") are removed.
 val NonArtistsRemovedKey = booleanPreferencesKey("nonArtistsRemoved")
+
+// The picture chosen for each Search > Browse tile, and when they were chosen (see BrowseArt).
+val BrowseArtKey = stringPreferencesKey("browseArt")
+val BrowseArtSavedAtKey = longPreferencesKey("browseArtSavedAt")
 val PauseSearchHistoryKey = booleanPreferencesKey("pauseSearchHistory")
 val DisableScreenshotKey = booleanPreferencesKey("disableScreenshot")
 
