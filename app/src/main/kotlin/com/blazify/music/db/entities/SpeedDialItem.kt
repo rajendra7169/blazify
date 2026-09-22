@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.blazify.innertube.models.AlbumItem
 import com.blazify.innertube.models.Artist
+import com.blazify.innertube.models.looksLikeArtistName
 import com.blazify.innertube.models.ArtistItem
 import com.blazify.innertube.models.EpisodeItem
 import com.blazify.innertube.models.PlaylistItem
@@ -25,14 +26,25 @@ data class SpeedDialItem(
     val albumId: String? = null,
     val albumName: String? = null
 ) {
+    /**
+     * The artists saved with this tile, rebuilt from their names and ids. Tiles pinned before
+     * artist names were read properly saved the separators too (", ", " & "), so anything
+     * that is not a name is left out here instead of showing as ", , &" beside the song.
+     */
+    private fun savedArtists(): List<Artist>? {
+        val ids = subtitleIds?.split(", ")
+        return subtitle?.split(", ")
+            ?.mapIndexed { index, name -> Artist(name = name, id = ids?.getOrNull(index)?.ifEmpty { null }) }
+            // A YouTube artist id ("UC...") vouches for a name; ids the app made up ("LA...") do not.
+            ?.filter { it.id?.startsWith("UC") == true || looksLikeArtistName(it.name) }
+    }
+
     fun toYTItem(): YTItem {
         return when (type) {
             "SONG" -> SongItem(
                 id = id,
                 title = title,
-                artists = subtitle?.split(", ")?.mapIndexed { index, name ->
-                    Artist(name = name, id = subtitleIds?.split(", ")?.getOrNull(index))
-                } ?: emptyList(),
+                artists = savedArtists() ?: emptyList(),
                 album = if (albumId != null && albumName != null) com.blazify.innertube.models.Album(name = albumName, id = albumId) else null,
                 thumbnail = thumbnailUrl ?: "",
                 explicit = explicit
@@ -41,9 +53,7 @@ data class SpeedDialItem(
                 browseId = id,
                 playlistId = secondaryId ?: "",
                 title = title,
-                artists = subtitle?.split(", ")?.mapIndexed { index, name ->
-                    Artist(name = name, id = subtitleIds?.split(", ")?.getOrNull(index))
-                },
+                artists = savedArtists(),
                 thumbnail = thumbnailUrl ?: "",
                 explicit = explicit
             )
