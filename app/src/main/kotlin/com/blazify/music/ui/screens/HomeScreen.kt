@@ -168,6 +168,7 @@ import com.blazify.music.utils.makeTimeString
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.CommunityPlaylistItem
+import com.blazify.music.ui.screens.search.SEARCH_FOCUS_ON_OPEN
 import com.blazify.music.viewmodels.HomeViewModel
 import com.blazify.music.viewmodels.SUPERMIX_PLAYLIST_ID
 import kotlinx.coroutines.Dispatchers
@@ -1246,7 +1247,14 @@ fun HomeScreen(
                         // all of that behind a step nobody asked for.
                         onAccountClick = { showAccountDialog = true },
                         onSettingsClick = { navController.navigate("settings") },
-                        onSearchClick = { navController.navigate(Screens.Search.route) },
+                        onSearchClick = {
+                            navController.navigate(Screens.Search.route)
+                            // A search bar is for typing, so Search opens with the keyboard up.
+                            runCatching {
+                                navController.getBackStackEntry(Screens.Search.route)
+                                    .savedStateHandle[SEARCH_FOCUS_ON_OPEN] = true
+                            }
+                        },
                         onMicClick = { navController.navigate("recognition") },
                         // Signed in, YouTube's own Supermix, built from everything the person
                         // has played, started on the song whose cover the button shows.

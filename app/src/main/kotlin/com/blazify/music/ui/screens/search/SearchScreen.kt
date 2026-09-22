@@ -80,6 +80,12 @@ import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Set to true on Search's back stack entry to open it with the keyboard already up.
+ * The search bar on Home does this: tapping a search bar means wanting to type.
+ */
+const val SEARCH_FOCUS_ON_OPEN = "focusOnOpen"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
@@ -124,6 +130,28 @@ fun SearchScreen(
 
             kotlinx.coroutines.delay(500)
             isHandlingScrollToTop = false
+        }
+    }
+
+    // Opened from the search bar on Home, the keyboard comes up straight away; opened
+    // from the Search tab it waits, as above. The field may not be laid out yet while
+    // the screen slides in, so asking for focus is tried a few times.
+    val focusOnOpen by savedStateHandle.getStateFlow(SEARCH_FOCUS_ON_OPEN, false).collectAsStateWithLifecycle()
+    LaunchedEffect(focusOnOpen) {
+        if (!focusOnOpen) return@LaunchedEffect
+        // Cleared only once done: clearing it first changes the key this effect runs
+        // on, which cancels the effect before it has asked for focus.
+        try {
+            repeat(5) {
+                kotlinx.coroutines.delay(100)
+                if (isPlayerExpanded) return@LaunchedEffect
+                if (runCatching { focusRequester.requestFocus() }.isSuccess) {
+                    keyboardController?.show()
+                    return@LaunchedEffect
+                }
+            }
+        } finally {
+            savedStateHandle[SEARCH_FOCUS_ON_OPEN] = false
         }
     }
 
