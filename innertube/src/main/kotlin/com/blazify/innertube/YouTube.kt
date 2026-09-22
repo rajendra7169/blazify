@@ -3625,13 +3625,18 @@ object YouTube {
 
     suspend fun resolveArtistIds(items: List<YTItem>): List<YTItem> {
         val missingNames = mutableSetOf<String>()
+        // A name with no letters in it is a duration, a year or a stray comma that was read
+        // as an artist ("4:41", "2026", ","). No artist search can find it, so none is made.
+        fun miss(name: String) {
+            if (name.any { it.isLetter() }) missingNames.add(name)
+        }
         for (item in items) {
             when (item) {
-                is SongItem -> item.artists.filter { it.id == null }.forEach { missingNames.add(it.name) }
-                is AlbumItem -> item.artists?.filter { it.id == null }?.forEach { missingNames.add(it.name) }
-                is PlaylistItem -> item.author?.let { if (it.id == null) missingNames.add(it.name) }
-                is EpisodeItem -> item.author?.let { if (it.id == null) missingNames.add(it.name) }
-                is PodcastItem -> item.author?.let { if (it.id == null) missingNames.add(it.name) }
+                is SongItem -> item.artists.filter { it.id == null }.forEach { miss(it.name) }
+                is AlbumItem -> item.artists?.filter { it.id == null }?.forEach { miss(it.name) }
+                is PlaylistItem -> item.author?.let { if (it.id == null) miss(it.name) }
+                is EpisodeItem -> item.author?.let { if (it.id == null) miss(it.name) }
+                is PodcastItem -> item.author?.let { if (it.id == null) miss(it.name) }
                 else -> {}
             }
         }
