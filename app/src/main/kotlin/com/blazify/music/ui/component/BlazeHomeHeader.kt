@@ -45,6 +45,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import coil3.compose.AsyncImage
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
@@ -216,8 +219,8 @@ fun BlazeHomeHeader(
                     )
                 } else {
                     Spacer(Modifier.height(8.dp))
-                    // Wider than the text column on purpose: the pair needs about 215dp,
-                    // and the column's 62% is less than that on a small phone.
+                    // Allowed wider than the text column, for large text sizes and long
+                    // translations of "For you" on a small phone.
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
@@ -225,8 +228,10 @@ fun BlazeHomeHeader(
                         onForYouClick?.let {
                             CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, it)
                         }
+                        // Just the cover: the label would crowd the photo, and a cover with
+                        // a play mark next to For you already says what it does.
                         onSpeedDialClick?.let {
-                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it)
+                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it, showLabel = false)
                         }
                     }
                 }
@@ -291,6 +296,7 @@ private fun CardButton(
     label: String,
     onCard: Color,
     onClick: () -> Unit,
+    showLabel: Boolean = true,
 ) {
     val fill = if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.40f)
     Row(
@@ -299,7 +305,9 @@ private fun CardButton(
             .height(32.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(fill)
-            .clickable(onClick = onClick),
+            .clickable(onClickLabel = label, role = Role.Button, onClick = onClick)
+            // A cover alone has no words, so a screen reader is given the label instead.
+            .then(if (showLabel) Modifier else Modifier.semantics { contentDescription = label }),
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -338,14 +346,16 @@ private fun CardButton(
                 )
             }
         }
-        Text(
-            text = label,
-            color = onCard,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            modifier = Modifier.padding(start = 8.dp, end = 12.dp),
-        )
+        if (showLabel) {
+            Text(
+                text = label,
+                color = onCard,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 8.dp, end = 12.dp),
+            )
+        }
     }
 }
 

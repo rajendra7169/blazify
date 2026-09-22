@@ -754,8 +754,8 @@ internal fun ThemePhonePreview(
                     // even padding above and below.
                     Text(stringResource(greetingLineRes()), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
                     Text(stringResource(R.string.blaze_greeting_default_name), color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    // The card's two buttons, in miniature: For you and Speed dial, each a
-                    // cover square then a label (the real ones show song covers).
+                    // The card's two buttons, in miniature: For you (cover square and label)
+                    // and Speed dial (cover square only). The real ones show song covers.
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(3.dp),
                         modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
@@ -777,7 +777,10 @@ internal fun ThemePhonePreview(
                                 ) {
                                     Icon(painterResource(icon), null, tint = onCard, modifier = Modifier.size(6.dp))
                                 }
-                                Text(stringResource(label), color = onCard, fontSize = 5.sp, fontWeight = FontWeight.SemiBold, lineHeight = 5.5.sp, maxLines = 1, modifier = Modifier.padding(start = 3.dp, end = 4.dp))
+                                // Speed dial is the cover alone, like on the real card.
+                                if (label == R.string.home_for_you) {
+                                    Text(stringResource(label), color = onCard, fontSize = 5.sp, fontWeight = FontWeight.SemiBold, lineHeight = 5.5.sp, maxLines = 1, modifier = Modifier.padding(start = 3.dp, end = 4.dp))
+                                }
                             }
                         }
                     }
