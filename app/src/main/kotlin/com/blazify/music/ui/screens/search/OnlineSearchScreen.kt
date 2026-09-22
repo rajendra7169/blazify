@@ -5,6 +5,9 @@
 
 package com.blazify.music.ui.screens.search
 
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import coil3.compose.AsyncImage
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
@@ -37,8 +40,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.luminance
@@ -794,11 +795,10 @@ fun OnlineSearchScreen(
 /**
  * Blazify: the "Recent Searches" block shown when the search box is empty.
  *
- * The chips wrap rather than scroll sideways. A rail hid everything past the
- * third entry off the right edge, where nobody drags to look, so most of the
- * history may as well not have been kept.
+ * Two rows of chips that scroll sideways, so recent searches never take more
+ * than two lines above Browse however many there are. Two rows show twice what
+ * a single rail did before the rest runs off the right edge.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecentSearchesRail(
     history: List<SearchHistory>,
@@ -840,15 +840,19 @@ fun RecentSearchesRail(
             )
         }
 
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        // Each chip goes into whichever row is shorter, so the two rows stay level.
+        LazyHorizontalStaggeredGrid(
+            rows = StaggeredGridCells.Fixed(2),
+            horizontalItemSpacing = 6.dp,
             verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    // Two 30dp chips and the gap between them.
+                    .height(66.dp),
         ) {
-            history.take(12).forEach { entry ->
+            items(history.take(20), key = { it.query }) { entry ->
                 RecentSearchChip(
                     query = entry.query,
                     onClick = { onSearch(entry.query) },
