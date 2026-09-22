@@ -807,7 +807,7 @@ fun RecentSearchesRail(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         ) {
             Text(
                 text = stringResource(R.string.recent_searches),
@@ -830,8 +830,8 @@ fun RecentSearchesRail(
         }
 
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -846,7 +846,7 @@ fun RecentSearchesRail(
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
@@ -909,7 +909,8 @@ private fun RecentSearchChip(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             Modifier
-                .height(38.dp)
+                // Small enough that recent searches take a line or two, not the screen.
+                .height(30.dp)
                 .clip(RoundedCornerShape(percent = 50))
                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                 .border(
@@ -918,21 +919,21 @@ private fun RecentSearchChip(
                     shape = RoundedCornerShape(percent = 50),
                 )
                 .clickable(onClick = onClick)
-                .padding(start = 16.dp, end = 8.dp),
+                .padding(start = 12.dp, end = 6.dp),
     ) {
         Text(
             text = query,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.widthIn(max = 200.dp),
         )
         Box(
             modifier =
                 Modifier
-                    .padding(start = 6.dp)
-                    .size(20.dp)
+                    .padding(start = 4.dp)
+                    .size(18.dp)
                     .clip(RoundedCornerShape(percent = 50))
                     .clickable(onClick = onDelete),
             contentAlignment = Alignment.Center,
@@ -941,7 +942,7 @@ private fun RecentSearchChip(
                 painter = painterResource(R.drawable.close),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
             )
         }
     }
