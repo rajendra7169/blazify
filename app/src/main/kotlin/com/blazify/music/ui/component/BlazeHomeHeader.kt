@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.lerp
@@ -148,6 +149,11 @@ fun BlazeHomeHeader(
         val cardStart = MaterialTheme.colorScheme.primary
         val cardEnd = lerp(cardStart, Color.Black, if (isDark) 0.30f else 0.20f)
         val onCard = if (cardStart.luminance() > 0.6f) Color.Black else Color.White
+        // The buttons' fill: the card's colour where they sit, darkened (or lightened
+        // under dark text). Solid, because a shadow shows through a see-through fill.
+        val cardMiddle = lerp(cardStart, cardEnd, 0.5f)
+        val buttonFill =
+            if (onCard.luminance() > 0.5f) lerp(cardMiddle, Color.Black, 0.30f) else lerp(cardMiddle, Color.White, 0.40f)
         if (showGreeting) Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -226,12 +232,12 @@ fun BlazeHomeHeader(
                         modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
                     ) {
                         onForYouClick?.let {
-                            CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, it)
+                            CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, buttonFill, it)
                         }
                         // Just the cover: the label would crowd the photo, and a cover with
                         // a play mark next to For you already says what it does.
                         onSpeedDialClick?.let {
-                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it, showLabel = false)
+                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, buttonFill, it, showLabel = false)
                         }
                     }
                 }
@@ -286,8 +292,8 @@ fun BlazeHomeHeader(
 /**
  * A small button on the greeting card that starts music: the cover of the song it
  * plays first, with a play mark on it, then the label, or the bare cover alone. A cover says "this plays"
- * where a text-only pill read as a label nobody would think to tap. Its fill darkens
- * whatever is behind it, so the label stays readable on the card and on the photo.
+ * where a text-only pill read as a label nobody would think to tap. A drop shadow
+ * lifts it off the card.
  */
 @Composable
 private fun CardButton(
@@ -295,15 +301,18 @@ private fun CardButton(
     icon: Int,
     label: String,
     onCard: Color,
+    fill: Color,
     onClick: () -> Unit,
     showLabel: Boolean = true,
 ) {
-    val fill = if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.40f)
+    val shape = RoundedCornerShape(8.dp)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(32.dp)
-            .clip(RoundedCornerShape(8.dp))
+            // A drop shadow lifts the buttons off the card, so they read as things to press.
+            .shadow(elevation = 6.dp, shape = shape)
+            .clip(shape)
             .background(fill)
             .clickable(onClickLabel = label, role = Role.Button, onClick = onClick)
             // A cover alone has no words, so a screen reader is given the label instead.

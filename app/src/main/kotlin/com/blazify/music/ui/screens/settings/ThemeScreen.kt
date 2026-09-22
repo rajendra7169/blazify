@@ -768,8 +768,15 @@ internal fun ThemePhonePreview(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .height(11.dp)
+                                    .shadow(2.dp, RoundedCornerShape(3.dp))
                                     .clip(RoundedCornerShape(3.dp))
-                                    .background(if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.40f)),
+                                    .background(
+                                        lerp(
+                                            lerp(cs.primary, lerp(cs.primary, Color.Black, if (useDark) 0.30f else 0.20f), 0.5f),
+                                            if (onCard.luminance() > 0.5f) Color.Black else Color.White,
+                                            if (onCard.luminance() > 0.5f) 0.30f else 0.40f,
+                                        ),
+                                    ),
                             ) {
                                 Box(
                                     contentAlignment = Alignment.Center,
