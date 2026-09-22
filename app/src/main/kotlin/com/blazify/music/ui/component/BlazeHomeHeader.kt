@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.blazify.music.R
 import com.blazify.music.constants.DarkModeKey
 import com.blazify.music.constants.ShowHomeGreetingKey
@@ -68,10 +69,13 @@ fun BlazeHomeHeader(
     onSettingsClick: () -> Unit = {},
     onSearchClick: () -> Unit = {},
     onMicClick: () -> Unit = {},
-    // Two ways to start music from the card itself. Null hides the button; with
-    // neither, the card keeps its old "Enjoy the music" line instead.
-    onSpeedDialClick: (() -> Unit)? = null,
+    // Two ways to start music from the card itself, each showing the cover of the
+    // song it starts with. Null hides the button; with neither, the card keeps its
+    // old "Enjoy the music" line instead.
     onForYouClick: (() -> Unit)? = null,
+    forYouArt: String? = null,
+    onSpeedDialClick: (() -> Unit)? = null,
+    speedDialArt: String? = null,
 ) {
     val darkMode by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
     val isDark = if (darkMode == DarkMode.AUTO) isSystemInDarkTheme() else darkMode == DarkMode.ON
@@ -211,18 +215,18 @@ fun BlazeHomeHeader(
                         letterSpacing = 0.2.sp,
                     )
                 } else {
-                    Spacer(Modifier.height(10.dp))
-                    // Wider than the text column on purpose: the pair needs about 190dp,
+                    Spacer(Modifier.height(8.dp))
+                    // Wider than the text column on purpose: the pair needs about 215dp,
                     // and the column's 62% is less than that on a small phone.
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
                     ) {
-                        onSpeedDialClick?.let {
-                            CardButton(R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it)
-                        }
                         onForYouClick?.let {
-                            CardButton(R.drawable.star, stringResource(R.string.home_for_you), onCard, it)
+                            CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, it)
+                        }
+                        onSpeedDialClick?.let {
+                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, it)
                         }
                     }
                 }
@@ -275,40 +279,72 @@ fun BlazeHomeHeader(
 }
 
 /**
- * A small pill on the greeting card that starts music. Its fill darkens whatever is
- * behind it rather than lightening it, so the label stays readable on the card's
- * colour and on the photo alike: white on a pale yellow sweater is unreadable.
+ * A small button on the greeting card that starts music: the cover of the song it
+ * plays first, with a play mark on it, then the label. A cover says "this plays"
+ * where a text-only pill read as a label nobody would think to tap. Its fill darkens
+ * whatever is behind it, so the label stays readable on the card and on the photo.
  */
 @Composable
 private fun CardButton(
+    art: String?,
     icon: Int,
     label: String,
     onCard: Color,
     onClick: () -> Unit,
 ) {
-    val fill = if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.35f)
+    val fill = if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.40f)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .height(30.dp)
-            .clip(RoundedCornerShape(15.dp))
+            .height(32.dp)
+            .clip(RoundedCornerShape(8.dp))
             .background(fill)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp),
+            .clickable(onClick = onClick),
     ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = onCard,
-            modifier = Modifier.size(14.dp),
-        )
-        Spacer(Modifier.width(5.dp))
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(32.dp)
+                .background(onCard.copy(alpha = 0.12f)),
+        ) {
+            if (art != null) {
+                AsyncImage(
+                    model = art,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize(),
+                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(alpha = 0.55f)),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(12.dp),
+                    )
+                }
+            } else {
+                // No cover yet (still loading, or nothing to show): the button's own icon.
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = onCard,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
         Text(
             text = label,
             color = onCard,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
+            modifier = Modifier.padding(start = 8.dp, end = 12.dp),
         )
     }
 }

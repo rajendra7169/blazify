@@ -80,6 +80,15 @@ data class CommunityPlaylistItem(
     val songs: List<SongItem>
 )
 
+/**
+ * YouTube Music's "My Supermix": the one mix drawn from all of a person's listening
+ * at once, so Hindi, English and Nepali favourites play side by side instead of one
+ * corner of their taste. The id is not the person's own: YouTube fills it from
+ * whoever is signed in. Signed out, the same id plays a general mix and a signed-in
+ * person's Nepali "My Mix" id plays film scores, which is how we know.
+ */
+const val SUPERMIX_PLAYLIST_ID = "RDTMAK5uy_kset8DisdE7LSD4TNjEVvrKRTmG7a56sY"
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext val context: Context,
@@ -256,6 +265,10 @@ class HomeViewModel @Inject constructor(
 
     val accountName = MutableStateFlow("Guest")
     val accountImageUrl = MutableStateFlow<String?>(null)
+
+    // The song "My Supermix" starts with, fetched ahead so the For you button on the
+    // greeting card can show its cover and start the mix on exactly that song.
+    val forYouFirstSong = MutableStateFlow<SongItem?>(null)
 
     // Offered in December and January for the year Wrapped looks back on. Seen is kept per
     // year, so having opened last year's Wrapped doesn't hide this year's.
@@ -810,10 +823,16 @@ class HomeViewModel @Inject constructor(
                             }.onFailure {
                                 reportException(it)
                             }
+                            YouTube.next(WatchEndpoint(playlistId = SUPERMIX_PLAYLIST_ID)).onSuccess {
+                                forYouFirstSong.value = it.items.firstOrNull()
+                            }.onFailure {
+                                reportException(it)
+                            }
                         } else {
                             accountName.value = "Guest"
                             accountImageUrl.value = null
                             accountPlaylists.value = null
+                            forYouFirstSong.value = null
                         }
                     } finally {
                         isProcessingAccountData = false

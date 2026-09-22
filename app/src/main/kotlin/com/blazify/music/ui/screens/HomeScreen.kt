@@ -169,21 +169,13 @@ import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.CommunityPlaylistItem
 import com.blazify.music.viewmodels.HomeViewModel
+import com.blazify.music.viewmodels.SUPERMIX_PLAYLIST_ID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.random.Random
-
-/**
- * YouTube Music's "My Supermix": the one mix drawn from all of a person's listening
- * at once, so Hindi, English and Nepali favourites play side by side instead of one
- * corner of their taste. The id is not the person's own: YouTube fills it from
- * whoever is signed in. Signed out, the same id plays a general mix and a signed-in
- * person's Nepali "My Mix" id plays film scores, which is how we know.
- */
-private const val SUPERMIX_PLAYLIST_ID = "RDTMAK5uy_kset8DisdE7LSD4TNjEVvrKRTmG7a56sY"
 
 sealed class HomeSection(
     val id: String,
@@ -669,6 +661,7 @@ fun HomeScreen(
     val allLocalItems by viewModel.allLocalItems.collectAsStateWithLifecycle()
     val allYtItems by viewModel.allYtItems.collectAsStateWithLifecycle()
     val speedDialItems by viewModel.speedDialItems.collectAsStateWithLifecycle()
+    val forYouFirstSong by viewModel.forYouFirstSong.collectAsStateWithLifecycle()
     val pinnedSpeedDialItems by viewModel.pinnedSpeedDialItems.collectAsStateWithLifecycle()
     val selectedChip by viewModel.selectedChip.collectAsStateWithLifecycle()
 
@@ -1235,6 +1228,11 @@ fun HomeScreen(
                     val speedDialTitle = stringResource(R.string.speed_dial)
                     val forYouTitle = stringResource(R.string.home_for_you)
                     val speedDialSongs = speedDialItems.filterIsInstance<SongItem>()
+                    // Each button shows the cover of the song it starts with, so both are
+                    // decided before the tap: Speed dial's shuffle, and For you's first song.
+                    val speedDialOrder = remember(speedDialSongs.map { it.id }) { speedDialSongs.shuffled() }
+                    val picks = quickPicks.orEmpty().distinctBy { it.id }
+                    val forYouFromMix = isLoggedIn || picks.isEmpty()
                     BlazeHomeHeader(
                         // Asked for by a user: greet the person, not "Music Lover",
                         // once we actually know who they are.
@@ -1249,35 +1247,44 @@ fun HomeScreen(
                         onSettingsClick = { navController.navigate("settings") },
                         onSearchClick = { navController.navigate(Screens.Search.route) },
                         onMicClick = { navController.navigate("recognition") },
-                        // The songs in the Speed dial grid, shuffled so the button is not
-                        // the same first song every time. Albums, artists and playlists
-                        // in the grid open a page when tapped and are left out here.
-                        onSpeedDialClick =
-                            if (!isListenTogetherGuest && speedDialSongs.isNotEmpty()) {
+                        // Signed in, YouTube's own Supermix, built from everything the person
+                        // has played, started on the song whose cover the button shows.
+                        // Signed out there is no such mix, so Quick picks, and the Supermix
+                        // after all on a fresh install with nothing played yet.
+                        forYouArt =
+                            if (forYouFromMix) forYouFirstSong?.thumbnail else picks.firstOrNull()?.thumbnailUrl,
+                        onForYouClick =
+                            if (!isListenTogetherGuest) {
                                 {
                                     playerConnection.playQueue(
-                                        ListQueue(
-                                            title = speedDialTitle,
-                                            items = speedDialSongs.shuffled().map { it.toMediaItem() },
-                                        ),
+                                        if (forYouFromMix) {
+                                            YouTubeQueue(
+                                                WatchEndpoint(
+                                                    videoId = forYouFirstSong?.id,
+                                                    playlistId = SUPERMIX_PLAYLIST_ID,
+                                                ),
+                                                forYouFirstSong?.toMediaMetadata(),
+                                            )
+                                        } else {
+                                            ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
+                                        },
                                     )
                                 }
                             } else {
                                 null
                             },
-                        // Signed in, YouTube's own Supermix, built from everything the person
-                        // has played. Signed out there is no such mix, so Quick picks, and
-                        // the Supermix after all on a fresh install with nothing played yet.
-                        onForYouClick =
-                            if (!isListenTogetherGuest) {
+                        // The songs in the Speed dial grid, shuffled so the button does not
+                        // start on the same song every time. Albums, artists and playlists
+                        // in the grid open a page when tapped and are left out here.
+                        speedDialArt = speedDialOrder.firstOrNull()?.thumbnail,
+                        onSpeedDialClick =
+                            if (!isListenTogetherGuest && speedDialOrder.isNotEmpty()) {
                                 {
-                                    val picks = quickPicks.orEmpty().distinctBy { it.id }
                                     playerConnection.playQueue(
-                                        if (isLoggedIn || picks.isEmpty()) {
-                                            YouTubeQueue(WatchEndpoint(playlistId = SUPERMIX_PLAYLIST_ID))
-                                        } else {
-                                            ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
-                                        },
+                                        ListQueue(
+                                            title = speedDialTitle,
+                                            items = speedDialOrder.map { it.toMediaItem() },
+                                        ),
                                     )
                                 }
                             } else {

@@ -754,26 +754,30 @@ internal fun ThemePhonePreview(
                     // even padding above and below.
                     Text(stringResource(greetingLineRes()), color = onCard, fontSize = 8.5.sp, fontWeight = FontWeight.Bold, lineHeight = 9.5.sp, maxLines = 2)
                     Text(stringResource(R.string.blaze_greeting_default_name), color = onCard.copy(alpha = 0.95f), fontSize = 7.5.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    // The card's two buttons, in miniature: Speed dial and For you.
+                    // The card's two buttons, in miniature: For you and Speed dial, each a
+                    // cover square then a label (the real ones show song covers).
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(3.dp),
                         modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
                     ) {
                         listOf(
-                            R.drawable.grid_view to R.string.speed_dial,
                             R.drawable.star to R.string.home_for_you,
+                            R.drawable.grid_view to R.string.speed_dial,
                         ).forEach { (icon, label) ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .height(10.dp)
-                                    .clip(RoundedCornerShape(50))
-                                    .background(if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.35f))
-                                    .padding(horizontal = 4.dp),
+                                    .height(11.dp)
+                                    .clip(RoundedCornerShape(3.dp))
+                                    .background(if (onCard.luminance() > 0.5f) Color.Black.copy(alpha = 0.30f) else Color.White.copy(alpha = 0.40f)),
                             ) {
-                                Icon(painterResource(icon), null, tint = onCard, modifier = Modifier.size(5.dp))
-                                Spacer(Modifier.width(2.dp))
-                                Text(stringResource(label), color = onCard, fontSize = 5.sp, fontWeight = FontWeight.SemiBold, lineHeight = 5.5.sp, maxLines = 1)
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.size(11.dp).background(onCard.copy(alpha = 0.18f)),
+                                ) {
+                                    Icon(painterResource(icon), null, tint = onCard, modifier = Modifier.size(6.dp))
+                                }
+                                Text(stringResource(label), color = onCard, fontSize = 5.sp, fontWeight = FontWeight.SemiBold, lineHeight = 5.5.sp, maxLines = 1, modifier = Modifier.padding(start = 3.dp, end = 4.dp))
                             }
                         }
                     }
