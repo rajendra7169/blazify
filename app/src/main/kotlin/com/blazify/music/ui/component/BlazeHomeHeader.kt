@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +43,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.Role
@@ -154,12 +165,17 @@ fun BlazeHomeHeader(
         val cardMiddle = lerp(cardStart, cardEnd, 0.5f)
         val buttonFill =
             if (onCard.luminance() > 0.5f) lerp(cardMiddle, Color.Black, 0.30f) else lerp(cardMiddle, Color.White, 0.40f)
-        if (showGreeting) Box(
+        if (showGreeting) BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .height(160.dp),
         ) {
+            // Where the photo begins. Words that reach it go behind her and fade out.
+            val photoLeft = maxWidth - 200.dp
+            val greeting = stringResource(greetingRes())
+            val hasButtons = onForYouClick != null || onSpeedDialClick != null
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -170,9 +186,20 @@ fun BlazeHomeHeader(
                     ),
             )
 
-            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it.
-            // Drawn before the text so the buttons sit on top of her, never under:
-            // on a phone under ~420dp wide the second button reaches her.
+            // The words come first, so she stands in front of them: a long name, or a
+            // greeting that runs long in another language, stays on its line and fades
+            // out behind her instead of wrapping onto a new one.
+            CardWords(
+                greeting = greeting,
+                userName = userName,
+                onCard = onCard,
+                showWords = true,
+                hasButtons = hasButtons,
+                photoLeft = photoLeft,
+                modifier = Modifier.align(Alignment.CenterStart),
+            )
+
+            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it
             Image(
                 painter = painterResource(
                     if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
@@ -189,56 +216,25 @@ fun BlazeHomeHeader(
                     .clip(RoundedCornerShape(12.dp)),
             )
 
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxWidth(0.62f)
-                    .padding(start = 20.dp),
-            ) {
-                Text(
-                    text = stringResource(greetingRes()),
-                    color = onCard,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.3.sp,
-                    lineHeight = 27.sp,
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = userName,
-                    color = onCard.copy(alpha = 0.95f),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.3.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (onSpeedDialClick == null && onForYouClick == null) {
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = stringResource(R.string.home_enjoy_music),
-                        color = onCard.copy(alpha = 0.85f),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.2.sp,
-                    )
-                } else {
-                    Spacer(Modifier.height(8.dp))
-                    // Allowed wider than the text column, for large text sizes and long
-                    // translations of "For you" on a small phone.
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true),
-                    ) {
-                        onForYouClick?.let {
-                            CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, buttonFill, it)
-                        }
-                        // Just the cover: the label would crowd the photo, and a cover with
-                        // a play mark next to For you already says what it does.
-                        onSpeedDialClick?.let {
-                            CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, buttonFill, it, showLabel = false)
-                        }
+            // The buttons come last, in front of her. They are laid out as a copy of the
+            // words with the words hidden, so they sit exactly where one column puts them.
+            if (hasButtons) {
+                CardWords(
+                    greeting = greeting,
+                    userName = userName,
+                    onCard = onCard,
+                    showWords = false,
+                    hasButtons = true,
+                    photoLeft = photoLeft,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                ) {
+                    onForYouClick?.let {
+                        CardButton(forYouArt, R.drawable.star, stringResource(R.string.home_for_you), onCard, buttonFill, it)
+                    }
+                    // Just the cover: the label would crowd the photo, and a cover with
+                    // a play mark next to For you already says what it does.
+                    onSpeedDialClick?.let {
+                        CardButton(speedDialArt, R.drawable.grid_view, stringResource(R.string.speed_dial), onCard, buttonFill, it, showLabel = false)
                     }
                 }
             }
@@ -288,6 +284,111 @@ fun BlazeHomeHeader(
         Spacer(Modifier.height(8.dp))
     }
 }
+
+/**
+ * The greeting card's column: greeting, name, then the buttons or the "Enjoy the music"
+ * line. Every line stays on one line in any language and at any length.
+ *
+ * Drawn twice. With [showWords] the words show and the buttons' row is left empty; without
+ * it the words are invisible, kept only so the buttons land where they belong, and
+ * silent so a screen reader does not read them twice.
+ */
+@Composable
+private fun CardWords(
+    greeting: String,
+    userName: String,
+    onCard: Color,
+    showWords: Boolean,
+    hasButtons: Boolean,
+    photoLeft: Dp,
+    modifier: Modifier = Modifier,
+    buttons: @Composable () -> Unit = {},
+) {
+    // A slight drop shadow, so white words stay readable on a pale card.
+    val shadow = with(LocalDensity.current) {
+        Shadow(
+            color = (if (onCard.luminance() > 0.5f) Color.Black else Color.White).copy(alpha = 0.25f),
+            offset = Offset(0f, 1.dp.toPx()),
+            blurRadius = 3.dp.toPx(),
+        )
+    }
+    val words = if (showWords) Modifier else Modifier.alpha(0f).clearAndSetSemantics {}
+    // Where each line fades, measured from the photo's left edge (the lines start 20dp
+    // into the card). Her hand is in the first ~27dp at the name's height, with a gap
+    // before her sweater, so the name is gone by then; the greeting sits beside her
+    // hair and fades later, which keeps the sun or moon after it whole.
+    val fromLine = photoLeft - 20.dp
+    val greetingFade = Modifier.fadeOutBetween(fromLine + 16.dp, fromLine + 56.dp)
+    val lowerFade = Modifier.fadeOutBetween(fromLine - 4.dp, fromLine + 24.dp)
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp),
+    ) {
+        // Each line gets its own room below it, inside its fade, so the fade does
+        // not clip the shadow under the letters.
+        Box(greetingFade.padding(bottom = 6.dp)) {
+            Text(
+                text = greeting,
+                color = onCard,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.3.sp,
+                lineHeight = 27.sp,
+                softWrap = false,
+                style = TextStyle(shadow = shadow),
+                modifier = words,
+            )
+        }
+        Box(lowerFade.padding(bottom = if (hasButtons) 8.dp else 6.dp)) {
+            Text(
+                text = userName,
+                color = onCard.copy(alpha = 0.95f),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.3.sp,
+                maxLines = 1,
+                softWrap = false,
+                style = TextStyle(shadow = shadow),
+                modifier = words,
+            )
+        }
+        if (!hasButtons) {
+            Box(lowerFade) {
+                Text(
+                    text = stringResource(R.string.home_enjoy_music),
+                    color = onCard.copy(alpha = 0.85f),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.2.sp,
+                    softWrap = false,
+                    style = TextStyle(shadow = shadow),
+                    modifier = words,
+                )
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (showWords) Spacer(Modifier.height(32.dp)) else buttons()
+            }
+        }
+    }
+}
+
+/** Fades whatever is drawn out to nothing between [start] and [end], left to right. */
+private fun Modifier.fadeOutBetween(start: Dp, end: Dp): Modifier =
+    graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        .drawWithContent {
+            drawContent()
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(Color.Black, Color.Transparent),
+                    startX = start.toPx(),
+                    endX = end.toPx(),
+                ),
+                blendMode = BlendMode.DstIn,
+            )
+        }
 
 /**
  * A small button on the greeting card that starts music: the cover of the song it
