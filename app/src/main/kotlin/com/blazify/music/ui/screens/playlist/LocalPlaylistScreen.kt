@@ -133,6 +133,7 @@ import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.playback.ExoDownloadService
 import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.ui.component.ActionPromptDialog
+import com.blazify.music.ui.component.JumpToPlayingButton
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.DraggableScrollbar
 import com.blazify.music.ui.component.EmptyPlaceholder
@@ -500,6 +501,13 @@ fun LocalPlaylistScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
+        val displayedForJump = if (isSearching) filteredSongs else mutableSongs
+        // The header (hidden while searching) and the controls row sit above the songs.
+        val jumpIndex =
+            displayedForJump.indexOfFirst { it.song.id == mediaMetadata?.id }
+                .takeIf { it >= 0 }
+                ?.plus(if (isSearching) 1 else 2)
+
         LazyColumn(
             state = lazyListState,
             contentPadding = LocalPlayerAwareWindowInsets.current.union(WindowInsets.ime).asPaddingValues(),
@@ -793,6 +801,8 @@ fun LocalPlaylistScreen(
             scrollState = lazyListState,
             headerItems = 2,
         )
+
+        JumpToPlayingButton(lazyListState, jumpIndex)
 
         TopAppBar(
             title = {

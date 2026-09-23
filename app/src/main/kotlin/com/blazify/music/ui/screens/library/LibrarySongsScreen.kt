@@ -81,6 +81,7 @@ import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.ui.component.ChipsRow
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.HideOnScrollFAB
+import com.blazify.music.ui.component.JumpToPlayingButton
 import com.blazify.music.ui.component.LibrarySearchEmptyPlaceholder
 import com.blazify.music.ui.component.LibrarySearchHeader
 import com.blazify.music.ui.component.LocalMenuState
@@ -507,6 +508,12 @@ fun LibrarySongsScreen(
         }
 
         // Show upload FAB when on UPLOADED filter, shuffle FAB otherwise
+        // Only the header sits above the songs (the empty-search note shows when there are none).
+        JumpToPlayingButton(
+            lazyListState,
+            filteredSongs.indexOfFirst { it.song.id == mediaMetadata?.id }.takeIf { it >= 0 }?.plus(1),
+        )
+
         HideOnScrollFAB(
             visible = if (filter == SongFilter.UPLOADED) true else filteredSongs.isNotEmpty(),
             lazyListState = lazyListState,

@@ -6,6 +6,7 @@
 package com.blazify.music.ui.screens.playlist
 
 import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.JumpToPlayingButton
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -358,6 +359,14 @@ fun OnlinePlaylistScreen(
                 }
             }
         }
+
+        // The header, hidden while searching, is the only item above the songs.
+        JumpToPlayingButton(
+            lazyListState,
+            filteredSongs.indexOfFirst { it.second.id == mediaMetadata?.id }
+                .takeIf { it >= 0 }
+                ?.plus(if (isSearching) 0 else 1),
+        )
 
         TopAppBar(
             title = {
