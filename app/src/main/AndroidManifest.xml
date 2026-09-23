@@ -111,6 +111,30 @@
                 <data android:pathPrefix="/blazify/listen" />
             </intent-filter>
 
+            <!-- A playlist somebody shared. The page it lands on hands over to the scheme
+                 filter below; the songs ride in the part after the "#", which a browser
+                 never sends to the site. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="rajendra7169.github.io" />
+                <data android:pathPrefix="/blazify/playlist" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="blazify" />
+                <data android:host="playlist" />
+            </intent-filter>
+
             <!-- What the invite page actually opens. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

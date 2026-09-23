@@ -15,6 +15,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import android.os.IBinder
 import android.view.View
 import android.view.WindowManager
@@ -101,6 +102,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -226,6 +228,8 @@ import com.blazify.music.utils.safeDataStoreEdit
 import com.blazify.music.utils.get
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.utils.PlaylistLink
+import com.blazify.music.utils.SharedPlaylistImport
 import com.blazify.music.utils.reportException
 import com.blazify.music.utils.setAppLocale
 import com.blazify.music.viewmodels.HomeViewModel
@@ -272,6 +276,9 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private var pendingIntent: Intent? = null
+
+    /** A playlist somebody shared, waiting to be kept or turned down. */
+    private var sharedPlaylist by mutableStateOf<PlaylistLink.Shared?>(null)
     private var latestVersionName by mutableStateOf(BuildConfig.VERSION_NAME)
 
     // Keep PlayerConnection as regular property - NOT mutableStateOf to prevent UI recomposition
@@ -1146,6 +1153,60 @@ class MainActivity : ComponentActivity() {
                         ChangelogScreen(onDismiss = { showChangelog.value = false })
                     }
 
+                    sharedPlaylist?.let { shared ->
+                        val scope = rememberCoroutineScope()
+                        var saving by remember(shared) { mutableStateOf(false) }
+                        AlertDialog(
+                            onDismissRequest = { if (!saving) sharedPlaylist = null },
+                            title = { Text(stringResource(R.string.shared_playlist_title)) },
+                            text = {
+                                Text(
+                                    pluralStringResource(
+                                        R.plurals.shared_playlist_body,
+                                        shared.songIds.size,
+                                        shared.name,
+                                        shared.songIds.size,
+                                    ),
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    enabled = !saving,
+                                    onClick = {
+                                        saving = true
+                                        scope.launch {
+                                            val outcome = SharedPlaylistImport.save(shared, database)
+                                            saving = false
+                                            sharedPlaylist = null
+                                            outcome
+                                                .onSuccess {
+                                                    Toast.makeText(
+                                                        this@MainActivity,
+                                                        getString(R.string.shared_playlist_kept, it.saved, it.total),
+                                                        Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                    navController.navigate("local_playlist/${it.playlistId}")
+                                                }.onFailure {
+                                                    Toast.makeText(
+                                                        this@MainActivity,
+                                                        R.string.shared_playlist_failed,
+                                                        Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                }
+                                        }
+                                    },
+                                ) {
+                                    Text(stringResource(R.string.save))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(enabled = !saving, onClick = { sharedPlaylist = null }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                            },
+                        )
+                    }
+
                     offeredRelease.value?.let { release ->
                         val scope = rememberCoroutineScope()
                         UpdateDialog(
@@ -1715,6 +1776,11 @@ class MainActivity : ComponentActivity() {
         intent.data = null
         intent.removeExtra(Intent.EXTRA_TEXT)
         val coroutineScope = lifecycle.coroutineScope
+
+        PlaylistLink.parse(uri)?.let { shared ->
+            sharedPlaylist = shared
+            return
+        }
 
         val listenCode =
             uri.getQueryParameter("code")
