@@ -527,6 +527,10 @@ fun PlayerMenu(
                                 },
                             ),
                         )
+                        // The artist of the song playing, so a whole artist can go from here.
+                        mediaMetadata.artists.firstOrNull()?.let { artist ->
+                            add(blockArtistMenuItem(artist.id, artist.name, onDismiss))
+                        }
                         add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.repeat_times)) },

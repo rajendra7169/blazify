@@ -196,7 +196,8 @@ fun YouTubeArtistMenu(
                                 }
                             }
                         }
-                    )
+                    ),
+                    blockArtistMenuItem(artist.id, artist.title, onDismiss),
                 )
             )
         }

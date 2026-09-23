@@ -138,6 +138,7 @@ import com.blazify.music.constants.EnableSongCacheKey
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HiddenSongIdsKey
+import com.blazify.music.constants.BlockedArtistsKey
 import com.blazify.music.constants.PodcastSpeedsKey
 import com.blazify.music.constants.VarispeedKey
 import com.blazify.music.constants.SaveDataOnMobileKey
@@ -213,6 +214,7 @@ import com.blazify.music.playback.queues.YouTubePlaylistQueue
 import com.blazify.music.playback.queues.filterExplicit
 import com.blazify.music.playback.queues.filterVideoSongs
 import com.blazify.music.playback.queues.filterHidden
+import com.blazify.music.playback.queues.filterBlockedArtists
 import com.blazify.music.constants.LoudnessLevel
 import com.blazify.music.constants.LoudnessLevelKey
 import com.blazify.music.utils.CoilBitmapLoader
@@ -559,6 +561,7 @@ class MusicService :
     private var cachedHideVideoSongs = false
     @Volatile
     private var cachedHiddenSongIds: Set<String> = emptySet()
+    private var cachedBlockedArtists: Set<String> = emptySet()
 
     // Podcast speed per show: the saved speed for each show id.
     @Volatile
@@ -1374,6 +1377,9 @@ class MusicService :
             dataStore.data.map { it[HiddenSongIdsKey] ?: emptySet() }.distinctUntilChanged().collect { cachedHiddenSongIds = it }
         }
         scope.launch {
+            dataStore.data.map { it[BlockedArtistsKey] ?: emptySet() }.distinctUntilChanged().collect { cachedBlockedArtists = it }
+        }
+        scope.launch {
             dataStore.data.map { it[SaveDataOnMobileKey] ?: true }.distinctUntilChanged().collect { YTPlayerUtils.saveDataOnMobile = it }
         }
         scope.launch {
@@ -1443,6 +1449,7 @@ class MusicService :
                 }.onSuccess { queue ->
                     runCatching {
                         automixItems.value = queue.items.map { it.toMediaItem() }.filterHidden(dataStore.get(HiddenSongIdsKey, emptySet()))
+                            .filterBlockedArtists(dataStore.get(BlockedArtistsKey, emptySet()))
                     }.onFailure { error ->
                         Timber.tag(TAG).w(error, "Failed to restore automix queue, clearing data")
                         clearPersistedQueueFiles()
@@ -2025,6 +2032,7 @@ class MusicService :
                         .filterExplicit(dataStore.get(HideExplicitKey, false))
                         .filterVideoSongs(dataStore.get(HideVideoSongsKey, false))
                         .filterHidden(dataStore.get(HiddenSongIdsKey, emptySet()))
+                            .filterBlockedArtists(dataStore.get(BlockedArtistsKey, emptySet()))
                 }
             if (queue.preloadItem != null && player.playbackState == STATE_IDLE) return@launch
             if (initialStatus.title != null) {
@@ -2126,6 +2134,7 @@ class MusicService :
                             .filterExplicit(dataStore.get(HideExplicitKey, false))
                             .filterVideoSongs(dataStore.get(HideVideoSongsKey, false))
                             .filterHidden(dataStore.get(HiddenSongIdsKey, emptySet()))
+                            .filterBlockedArtists(dataStore.get(BlockedArtistsKey, emptySet()))
                     }
 
                 if (initialStatus.title != null) {
@@ -2170,7 +2179,7 @@ class MusicService :
                                     .map { it.toMediaItem() }
                                     .filterExplicit(cachedHideExplicit)
                                     .filterVideoSongs(cachedHideVideoSongs)
-                                    .filterHidden(cachedHiddenSongIds)
+                                    .filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
 
                             if (radioItems.isNotEmpty()) {
                                 val itemCount = player.mediaItemCount
@@ -2219,13 +2228,13 @@ class MusicService :
                                     automixItems.value =
                                         secondResult.items.map { song ->
                                             song.toMediaItem()
-                                        }.filterHidden(cachedHiddenSongIds)
+                                        }.filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
                                 }.onFailure {
                                     if (firstResult.items.isNotEmpty()) {
                                         automixItems.value =
                                             firstResult.items.map { song ->
                                                 song.toMediaItem()
-                                            }.filterHidden(cachedHiddenSongIds)
+                                            }.filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
                                     }
                                 }
                         }.onFailure {
@@ -2243,7 +2252,7 @@ class MusicService :
                                                 .filter { it.id != currentSong.id }
                                                 .map { it.toMediaItem() }
                                         if (filteredItems.isNotEmpty()) {
-                                            automixItems.value = filteredItems.filterHidden(cachedHiddenSongIds)
+                                            automixItems.value = filteredItems.filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
                                         }
                                     }.onFailure {
                                         YouTube
@@ -2257,7 +2266,7 @@ class MusicService :
                                                             .filter { it.id != currentSong.id }
                                                             .map { it.toMediaItem() }
                                                     if (relatedItems.isNotEmpty()) {
-                                                        automixItems.value = relatedItems.filterHidden(cachedHiddenSongIds)
+                                                        automixItems.value = relatedItems.filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
                                                     }
                                                 }
                                             }
@@ -3029,7 +3038,7 @@ class MusicService :
                             .nextPage()
                             .filterExplicit(cachedHideExplicit)
                             .filterVideoSongs(cachedHideVideoSongs)
-                            .filterHidden(cachedHiddenSongIds)
+                            .filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
                     }
                 if (player.playbackState != STATE_IDLE && mediaItems.isNotEmpty()) {
                     player.addMediaItems(mediaItems)

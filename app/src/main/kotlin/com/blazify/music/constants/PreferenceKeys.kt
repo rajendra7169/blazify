@@ -117,6 +117,9 @@ val HideVideoSongsKey = booleanPreferencesKey("hideVideoSongs")
 
 // Songs the listener asked never to be played for them again (Don't play this song).
 val HiddenSongIdsKey = stringSetPreferencesKey("hiddenSongIds")
+
+// Artists blocked with "Block this artist" (see BlockedArtists for how each is kept).
+val BlockedArtistsKey = stringSetPreferencesKey("blockedArtists")
 val HideYoutubeShortsKey = booleanPreferencesKey("hideYoutubeShorts")
 val ShowArtistDescriptionKey = booleanPreferencesKey("showArtistDescription")
 val ShowArtistSubscriberCountKey = booleanPreferencesKey("showArtistSubscriberCount")

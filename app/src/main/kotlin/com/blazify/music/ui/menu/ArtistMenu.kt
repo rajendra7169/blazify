@@ -238,7 +238,8 @@ fun ArtistMenu(
                                 update(artist.artist.toggleLike())
                             }
                         }
-                    )
+                    ),
+                    blockArtistMenuItem(artist.id, artist.artist.name, onDismiss),
                 )
             )
         }

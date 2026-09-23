@@ -755,6 +755,10 @@ fun SongMenu(
                                 onDismiss()
                             },
                         ),
+                        // The song's own artist, so a whole artist can go from the song at hand.
+                        song.artists.firstOrNull()?.let { artist ->
+                            blockArtistMenuItem(artist.id, artist.name, onDismiss)
+                        },
                     ),
             )
         }

@@ -1020,6 +1020,15 @@
     <string name="hidden_songs_desc">Songs you asked not to be played for you</string>
     <string name="hidden_songs_empty">No hidden songs. Choose Don\'t play this song in a song\'s menu to hide one.</string>
     <string name="unhide">Unhide</string>
+    <string name="block_artist">Block %1$s</string>
+    <string name="block_artist_hint">Their songs won\'t come up in picks, radio, Home or search</string>
+    <string name="unblock_artist">Unblock %1$s</string>
+    <string name="unblock_artist_hint">Let their songs come up again</string>
+    <string name="artist_blocked">You won\'t hear %1$s unless you pick them yourself</string>
+    <string name="artist_unblocked">%1$s can come up again</string>
+    <string name="blocked_artists">Blocked artists</string>
+    <string name="blocked_artists_desc">Artists you asked not to hear</string>
+    <string name="blocked_artists_empty">No blocked artists. Choose Block in an artist\'s or song\'s menu to block one.</string>
     <string name="save_data_on_mobile">Save data on mobile networks</string>
     <string name="save_data_on_mobile_desc">With Audio quality on Auto, stream at 128 kbps on mobile data. Turn off for full quality everywhere</string>
     <string name="download_wifi_only">Download only on Wi-Fi</string>
