@@ -59,6 +59,8 @@ fun LocalPlaylistMenu(
     onDelete: () -> Unit,
     onDownload: () -> Unit,
     onQueue: () -> Unit,
+    /** Opens the link-and-QR sheet; a playlist of one's own has no link of its own to send. */
+    onShareAsLink: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val listenTogetherManager = LocalListenTogetherManager.current
@@ -187,7 +189,13 @@ fun LocalPlaylistMenu(
             add(
                 Material3MenuItemData(
                     title = { Text(stringResource(R.string.share)) },
-                    description = { Text(stringResource(R.string.share_playlist_desc)) },
+                    description = {
+                        Text(
+                            stringResource(
+                                if (isYouTubePlaylist) R.string.share_playlist_desc else R.string.share_playlist_ways,
+                            ),
+                        )
+                    },
                     icon = {
                         Icon(
                             painter = painterResource(R.drawable.share),
@@ -195,21 +203,24 @@ fun LocalPlaylistMenu(
                         )
                     },
                     onClick = {
-                        val shareText =
-                            if (isYouTubePlaylist) {
-                                "https://music.youtube.com/playlist?list=${playlist.playlist.browseId}"
-                            } else {
-                                songs.joinToString("\n") { it.song.song.title }
-                            }
-                        val sendIntent: Intent =
-                            Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shareText)
-                                type = "text/plain"
-                            }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        context.startActivity(shareIntent)
-                        onDismiss()
+                        // A playlist of one's own used to go out as a list of song titles,
+                        // which nobody could do anything with; it is packed into a link now.
+                        if (isYouTubePlaylist) {
+                            val sendIntent =
+                                Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(
+                                        Intent.EXTRA_TEXT,
+                                        "https://music.youtube.com/playlist?list=${playlist.playlist.browseId}",
+                                    )
+                                    type = "text/plain"
+                                }
+                            context.startActivity(Intent.createChooser(sendIntent, null))
+                            onDismiss()
+                        } else {
+                            onDismiss()
+                            onShareAsLink()
+                        }
                     },
                 ),
             )

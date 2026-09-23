@@ -146,6 +146,7 @@ import com.blazify.music.ui.component.SortHeader
 import com.blazify.music.ui.component.TextFieldDialog
 import com.blazify.music.ui.menu.CustomThumbnailMenu
 import com.blazify.music.ui.menu.LocalPlaylistMenu
+import com.blazify.music.ui.menu.SharePlaylistDialog
 import com.blazify.music.ui.menu.SelectionSongMenu
 import com.blazify.music.ui.menu.SongMenu
 import com.blazify.music.ui.screens.settings.DarkMode
@@ -440,6 +441,7 @@ fun LocalPlaylistScreen(
     }
 
     val headerItems = 2
+    var showShareDialog by rememberSaveable { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     var dragInfo by remember {
         mutableStateOf<Pair<Int, Int>?>(null)
@@ -501,6 +503,14 @@ fun LocalPlaylistScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
+        if (showShareDialog) {
+            SharePlaylistDialog(
+                playlistName = playlist?.playlist?.name.orEmpty(),
+                songIds = mutableSongs.map { it.song.id },
+                onDismiss = { showShareDialog = false },
+            )
+        }
+
         val displayedForJump = if (isSearching) filteredSongs else mutableSongs
         // The header (hidden while searching) and the controls row sit above the songs.
         val jumpIndex =
@@ -532,6 +542,7 @@ fun LocalPlaylistScreen(
                                 onShowRemoveDownloadDialog = { showRemoveDownloadDialog = true },
                                 onshowDeletePlaylistDialog = { showDeletePlaylistDialog = true },
                                 onStartSearch = { isSearching = true },
+                                onShareAsLink = { showShareDialog = true },
                                 snackbarHostState = snackbarHostState,
                                 modifier = Modifier.animateItem(),
                             )
@@ -939,6 +950,7 @@ fun LocalPlaylistHeader(
     onShowRemoveDownloadDialog: () -> Unit,
     onshowDeletePlaylistDialog: () -> Unit,
     onStartSearch: () -> Unit,
+    onShareAsLink: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
@@ -1457,6 +1469,7 @@ fun LocalPlaylistHeader(
                             context = context,
                             downloadState = downloadState,
                             onEdit = onShowEditDialog,
+                            onShareAsLink = onShareAsLink,
                             onSync = {
                                 scope.launch(Dispatchers.IO) {
                                     val playlistPage =
