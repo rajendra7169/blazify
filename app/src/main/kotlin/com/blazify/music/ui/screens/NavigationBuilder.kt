@@ -59,6 +59,7 @@ import com.blazify.music.ui.screens.settings.ContentSettings
 import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.screens.settings.PlayerSettings
 import com.blazify.music.ui.screens.settings.PrivacySettings
+import com.blazify.music.ui.screens.settings.BlockedArtistsSettings
 import com.blazify.music.ui.screens.settings.HiddenSongsSettings
 import com.blazify.music.ui.screens.settings.RomanizationSettings
 import com.blazify.music.ui.screens.settings.SettingsScreen
@@ -473,6 +474,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/content/hidden_songs") {
         HiddenSongsSettings(navController)
+    }
+
+    composable("settings/content/blocked_artists") {
+        BlockedArtistsSettings(navController)
     }
 
     composable("settings/ai") {

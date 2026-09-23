@@ -498,6 +498,12 @@ fun ContentSettings(
                     onClick = { navController.navigate("settings/content/hidden_songs") }
                 ),
                 Material3SettingsItem(
+                    icon = painterResource(R.drawable.artist),
+                    title = { Text(stringResource(R.string.blocked_artists)) },
+                    description = { Text(stringResource(R.string.blocked_artists_desc)) },
+                    onClick = { navController.navigate("settings/content/blocked_artists") }
+                ),
+                Material3SettingsItem(
                     icon = painterResource(R.drawable.playlist_add),
                     title = { Text(stringResource(R.string.add_to_playlist_top)) },
                     description = { Text(stringResource(R.string.add_to_playlist_top_desc)) },
