@@ -22,9 +22,11 @@ import com.blazify.innertube.models.SongItem
 import com.blazify.innertube.models.YTItem
 import com.blazify.innertube.pages.SearchSummaryPage
 import com.blazify.music.constants.HideExplicitKey
+import com.blazify.music.constants.BlockedArtistsKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HideYoutubeShortsKey
 import com.blazify.music.models.ItemsPage
+import com.blazify.music.extensions.filterBlockedArtists
 import com.blazify.music.utils.SearchRoutes
 import com.blazify.music.utils.dataStore
 import com.blazify.music.utils.get
@@ -55,11 +57,13 @@ constructor(
                 val hideExplicit = context.dataStore.get(HideExplicitKey, false)
                 val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
                 val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
+                val blocked = context.dataStore.get(BlockedArtistsKey, emptySet())
                 val shown =
                     page.songOnTop()
                         .filterExplicit(hideExplicit)
                         .filterVideoSongs(hideVideoSongs)
                         .filterYoutubeShorts(hideYoutubeShorts)
+                        .withoutBlockedArtists(blocked)
                 summaryPage = shown
                 // The results show as soon as YouTube answers. Artist names it left
                 // unlinked are looked up afterwards, all together, and become tappable
@@ -128,7 +132,8 @@ constructor(
                                             .distinctBy { it.id }
                                             .filterExplicit(hideExplicit)
                                             .filterVideoSongs(hideVideoSongs)
-                                            .filterYoutubeShorts(hideYoutubeShorts),
+                                            .filterYoutubeShorts(hideYoutubeShorts)
+                                            .filterBlockedArtists(context.dataStore.get(BlockedArtistsKey, emptySet())),
                                         result.continuation,
                                     )
                                 viewStateMap[filter.value] = page
@@ -157,6 +162,7 @@ constructor(
                 .filterExplicit(hideExplicit)
                 .filterVideoSongs(hideVideoSongs)
                 .filterYoutubeShorts(hideYoutubeShorts)
+                .filterBlockedArtists(context.dataStore.get(BlockedArtistsKey, emptySet()))
             val page = ItemsPage(
                 (viewState.items + newItems).distinctBy { it.id },
                 searchResult.continuation
@@ -166,6 +172,18 @@ constructor(
         }
     }
 }
+
+/** The same page without anything by a blocked artist, and without a section left empty. */
+private fun SearchSummaryPage.withoutBlockedArtists(blocked: Set<String>): SearchSummaryPage =
+    if (blocked.isEmpty()) {
+        this
+    } else {
+        copy(
+            summaries = summaries.mapNotNull { summary ->
+                summary.copy(items = summary.items.filterBlockedArtists(blocked)).takeIf { it.items.isNotEmpty() }
+            },
+        )
+    }
 
 /**
  * In a music app the top result should be a song. When YouTube ranks a video or a podcast

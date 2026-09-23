@@ -29,6 +29,7 @@ import com.blazify.innertube.pages.HomePage
 import com.blazify.innertube.utils.completed
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HiddenSongIdsKey
+import com.blazify.music.constants.BlockedArtistsKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HideYoutubeShortsKey
 import com.blazify.music.constants.InnerTubeCookieKey
@@ -42,12 +43,14 @@ import com.blazify.music.db.entities.LocalItem
 import com.blazify.music.db.entities.Song
 import com.blazify.music.db.entities.SpeedDialItem
 import com.blazify.music.extensions.filterVideoSongs
+import com.blazify.music.extensions.filterBlockedArtists
 import com.blazify.music.extensions.toEnum
 import com.blazify.music.models.SimilarRecommendation
 import com.blazify.music.ui.screens.wrapped.WrappedAudioService
 import com.blazify.music.ui.screens.wrapped.WrappedManager
 import com.blazify.music.utils.SyncUtils
 import com.blazify.music.utils.dataStore
+import com.blazify.music.utils.BlockedArtists
 import com.blazify.music.utils.safeDataStoreEdit
 import com.blazify.music.utils.get
 import com.blazify.music.utils.reportException
@@ -377,6 +380,7 @@ class HomeViewModel @Inject constructor(
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
         val hideExplicit = context.dataStore.get(HideExplicitKey, false)
         val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
+        val blockedArtists = context.dataStore.get(BlockedArtistsKey, emptySet())
         val likedSongs = database.likedSongsByCreateDateAsc().first()
         if (likedSongs.isEmpty()) return
 
@@ -395,6 +399,7 @@ class HomeViewModel @Inject constructor(
                                 .filter { item ->
                                     if (hideVideoSongs && item.isVideoSong) return@filter false
                                     if (item.id in hiddenSongIds) return@filter false
+                                    if (item.artists.any { BlockedArtists.isBlocked(blockedArtists, it.id, it.name) }) return@filter false
                                     // Only when the listener asked for it. This used to drop every
                                     // explicit song whatever the setting said, which quietly emptied
                                     // Daily Discover for anyone whose taste runs to hip-hop or rap.
@@ -430,6 +435,7 @@ class HomeViewModel @Inject constructor(
     private suspend fun getQuickPicks() {
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
         val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
+        val blockedArtists = context.dataStore.get(BlockedArtistsKey, emptySet())
         when (quickPicksEnum.first()) {
             QuickPicks.QUICK_PICKS -> {
                 val relatedSongs = database.quickPicks().first().filterVideoSongs(hideVideoSongs)
@@ -469,12 +475,12 @@ class HomeViewModel @Inject constructor(
                     similar = ytSimilarSongs,
                     forgotten = forgotten,
                     id = { it.id },
-                ).filterNot { it.id in hiddenSongIds }
+                ).filterNot { it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists)
             }
             QuickPicks.LAST_LISTEN -> {
                 val song = database.events().first().firstOrNull()?.song
                 if (song != null && database.hasRelatedSongs(song.id)) {
-                    quickPicks.value = database.getRelatedSongs(song.id).first().filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(20)
+                    quickPicks.value = database.getRelatedSongs(song.id).first().filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists).shuffled().take(20)
                 }
             }
         }
@@ -561,6 +567,7 @@ class HomeViewModel @Inject constructor(
         val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
         val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
         val hiddenSongIds = context.dataStore.get(HiddenSongIdsKey, emptySet())
+        val blockedArtists = context.dataStore.get(BlockedArtistsKey, emptySet())
         val fromTimeStamp = LocalDateTime.now().minusWeeks(2)
 
         // Phase 1: Load essential sections in parallel — local DB (fast) + YouTube home page.
@@ -570,12 +577,12 @@ class HomeViewModel @Inject constructor(
 
             launch(Dispatchers.IO) {
                 forgottenFavorites.value = database.forgottenFavorites().first()
-                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(20)
+                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists).shuffled().take(20)
             }
 
             launch(Dispatchers.IO) {
                 val songs = database.mostPlayedSongs(fromTimeStamp = fromTimeStamp, limit = 15, offset = 5, toTimeStamp = LocalDateTime.now()).first()
-                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.shuffled().take(10)
+                    .filterVideoSongs(hideVideoSongs).filterNot { it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists).shuffled().take(10)
                 val albums = database.mostPlayedAlbums(fromTimeStamp, limit = 8, offset = 2).first()
                     .filter { it.album.thumbnailUrl != null }.shuffled().take(5)
                 val artists = database.mostPlayedArtists(fromTimeStamp).first()
@@ -636,7 +643,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { item -> item.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
-                            .filterNot { it is SongItem && it.id in hiddenSongIds }
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists)
                             .shuffled().take(12)
                             .ifEmpty { return@mapNotNull null }
                     )
@@ -658,7 +665,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { it.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
-                            .filterNot { it is SongItem && it.id in hiddenSongIds }
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists)
                             .shuffled()
                             .ifEmpty { return@mapNotNull null }
                     )
@@ -683,7 +690,7 @@ class HomeViewModel @Inject constructor(
                             .distinctBy { it.id }
                             .filterExplicit(hideExplicit)
                             .filterVideoSongs(hideVideoSongs)
-                            .filterNot { it is SongItem && it.id in hiddenSongIds }
+                            .filterNot { it is SongItem && it.id in hiddenSongIds }.filterBlockedArtists(blockedArtists)
                             .shuffled().take(10)
                             .ifEmpty { return@mapNotNull null }
                     )

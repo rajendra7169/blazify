@@ -5,6 +5,11 @@
 
 package com.blazify.music.extensions
 
+import com.blazify.innertube.models.AlbumItem
+import com.blazify.innertube.models.ArtistItem
+import com.blazify.innertube.models.SongItem
+import com.blazify.innertube.models.YTItem
+import com.blazify.music.utils.BlockedArtists
 import com.blazify.music.db.entities.Album
 import com.blazify.music.db.entities.Playlist
 import com.blazify.music.db.entities.Song
@@ -56,6 +61,33 @@ fun List<Song>.filterVideoSongs(enabled: Boolean = true) =
         filter { !it.song.isVideo }
     } else {
         this
+    }
+
+/** Leaves out saved songs by an artist blocked with "Block this artist". */
+fun List<Song>.filterBlockedArtists(blocked: Set<String>) =
+    if (blocked.isEmpty()) {
+        this
+    } else {
+        filterNot { song -> song.artists.any { BlockedArtists.isBlocked(blocked, it.id, it.name) } }
+    }
+
+/**
+ * Leaves out anything by a blocked artist: their songs and albums, and the artist itself
+ * where a list holds artists.
+ */
+@JvmName("filterBlockedArtistsYT")
+fun List<YTItem>.filterBlockedArtists(blocked: Set<String>) =
+    if (blocked.isEmpty()) {
+        this
+    } else {
+        filterNot { item ->
+            when (item) {
+                is SongItem -> item.artists.any { BlockedArtists.isBlocked(blocked, it.id, it.name) }
+                is AlbumItem -> item.artists?.any { BlockedArtists.isBlocked(blocked, it.id, it.name) } == true
+                is ArtistItem -> BlockedArtists.isBlocked(blocked, item.id, item.title)
+                else -> false
+            }
+        }
     }
 
 // Extension function to filter explicit content for local Album entities
