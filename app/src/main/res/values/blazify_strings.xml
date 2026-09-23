@@ -1029,6 +1029,13 @@
     <string name="blocked_artists">Blocked artists</string>
     <string name="blocked_artists_desc">Artists you asked not to hear</string>
     <string name="jump_to_playing">Jump to playing</string>
+    <string name="share_playlist">Share playlist</string>
+    <string name="share_playlist_ways">A link or a square to point a camera at</string>
+    <string name="share_playlist_hint">Anyone with Blazify can open this and keep the playlist. The songs travel in the link itself, not through any website.</string>
+    <string name="shared_playlist_title">Keep this playlist?</string>
+    <string name="shared_playlist_kept">Kept %1$d of %2$d songs</string>
+    <string name="shared_playlist_failed">Could not keep that playlist</string>
+    <string name="share_playlist_trimmed">A link holds %1$d songs, so the last %2$d are left out.</string>
     <string name="blocked_artists_empty">No blocked artists. Choose Block in an artist\'s or song\'s menu to block one.</string>
     <string name="save_data_on_mobile">Save data on mobile networks</string>
     <string name="save_data_on_mobile_desc">With Audio quality on Auto, stream at 128 kbps on mobile data. Turn off for full quality everywhere</string>
@@ -1403,4 +1410,8 @@
     <!-- Updater -->
     <string name="beta_updates">Get beta updates</string>
     <string name="beta_updates_desc">Try new versions before everyone else. Betas can have bugs; turn this off to wait for the next stable update.</string>
+    <plurals name="shared_playlist_body">
+        <item quantity="one">%1$s, one song, shared with you.</item>
+        <item quantity="other">%1$s, %2$d songs, shared with you.</item>
+    </plurals>
 </resources>

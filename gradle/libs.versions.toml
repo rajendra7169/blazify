@@ -2,6 +2,7 @@
 androidGradlePlugin = "9.2.1"
 browser = "1.10.0"
 robolectric = "4.14.1"
+zxing = "3.5.3"
 androidxTestCore = "1.6.1"
 json = "20260522"
 kotlin = "2.3.21"
@@ -68,6 +69,7 @@ materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "ma
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }

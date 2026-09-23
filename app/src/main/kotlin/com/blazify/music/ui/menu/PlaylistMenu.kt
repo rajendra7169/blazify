@@ -214,6 +214,7 @@ fun PlaylistMenu(
         )
     }
 
+    var showShareDialog by remember { mutableStateOf(false) }
     var showDeletePlaylistDialog by remember {
         mutableStateOf(false)
     }
@@ -629,6 +630,22 @@ fun PlaylistMenu(
                                 ),
                             )
                         }
+                        // A playlist made here has no link of its own, so it is packed into one.
+                        if (playlist.playlist.shareLink == null && songs.isNotEmpty()) {
+                            add(
+                                Material3MenuItemData(
+                                    title = { Text(text = stringResource(R.string.share_playlist)) },
+                                    description = { Text(text = stringResource(R.string.share_playlist_ways)) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.share),
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = { showShareDialog = true },
+                                ),
+                            )
+                        }
                         playlist.playlist.shareLink?.let { shareLink ->
                             add(
                                 Material3MenuItemData(
@@ -656,6 +673,14 @@ fun PlaylistMenu(
                     },
             )
         }
+    }
+
+    if (showShareDialog) {
+        SharePlaylistDialog(
+            playlistName = playlist.playlist.name,
+            songIds = songs.map { it.id },
+            onDismiss = { showShareDialog = false },
+        )
     }
 
     val exportPlaylistStr = stringResource(R.string.export_playlist)

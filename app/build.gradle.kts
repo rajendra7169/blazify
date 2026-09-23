@@ -464,6 +464,9 @@ dependencies {
     implementation(libs.timber)
 
     testImplementation(libs.junit)
+    // Turns a shared playlist's link into the square people point a camera at.
+    implementation(libs.zxing.core)
+
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.ktor.client.mock)
