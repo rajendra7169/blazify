@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-24T01:27:21.730Z",
+  "updatedAt": "2026-09-24T10:27:26.603Z",
   "current": {
     "playerHash": "7460dd14",
     "playerUrl": "https://www.youtube.com/s/player/7460dd14/player_ias.vflset/en_GB/base.js",
@@ -1698,6 +1698,16 @@
       "releaseTag": "player-882a803a"
     },
     {
+      "playerHash": "8854c9cd",
+      "playerUrl": "https://www.youtube.com/s/player/8854c9cd/player_ias.vflset/en_GB/base.js",
+      "sha256": "afc7471d9c5d9933d35b335c1e868a610f7adf87b9ca9cf50140fda6443aca77",
+      "firstSeenAt": "2026-09-24T05:07:21.146Z",
+      "status": "validated",
+      "validator": "faraday",
+      "configPath": "registry/player_configs.json",
+      "releaseTag": "player-8854c9cd"
+    },
+    {
       "playerHash": "88917196",
       "playerUrl": "https://www.youtube.com/s/player/88917196/player_ias.vflset/en_GB/base.js",
       "sha256": "a45d663d446be1cdf26524a3d8b59f26d66dfe93191cd48265329ed1e9f02cb8",
@@ -3046,6 +3056,26 @@
       "validator": "faraday",
       "configPath": "registry/player_configs.json",
       "releaseTag": "player-fac48bea"
+    },
+    {
+      "playerHash": "fac91e21",
+      "playerUrl": "https://www.youtube.com/s/player/fac91e21/player_ias.vflset/en_GB/base.js",
+      "sha256": "29ba7e91ea3bb00bbe464c9ed3a093d97631006458e5fb5a7c41f6ed3094f6ee",
+      "firstSeenAt": "2026-09-24T09:07:23.967Z",
+      "status": "validated",
+      "validator": "faraday",
+      "configPath": "registry/player_configs.json",
+      "releaseTag": "player-fac91e21"
+    },
+    {
+      "playerHash": "fb50cd46",
+      "playerUrl": "https://www.youtube.com/s/player/fb50cd46/player_ias.vflset/en_GB/base.js",
+      "sha256": "551cade661af6e20590499169468b5e9c072aa9ebcc112be3e1d11fb72b7228a",
+      "firstSeenAt": "2026-09-24T10:27:26.603Z",
+      "status": "validated",
+      "validator": "faraday",
+      "configPath": "registry/player_configs.json",
+      "releaseTag": "player-fb50cd46"
     },
     {
       "playerHash": "fbf778eb",
