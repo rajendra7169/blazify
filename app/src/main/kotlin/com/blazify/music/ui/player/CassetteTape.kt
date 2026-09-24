@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * CASSETTE design centrepiece: a 3D retro compact cassette (dark shell, cream
  * label, accent stripe, "A" side badge, "60" length mark) with a window showing

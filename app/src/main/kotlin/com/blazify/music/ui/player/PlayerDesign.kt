@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Selectable player LAYOUTS (not colours). The player's colours stay dynamic
  * (album-art driven); only the arrangement of art / controls changes.

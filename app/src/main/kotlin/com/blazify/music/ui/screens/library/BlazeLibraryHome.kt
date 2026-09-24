@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * BlazePlayer-style Library landing: system playlists as colour+glyph gradient
  * cards (Liked long, Cached/Downloaded pair, Your Top 50 long, Uploaded long),

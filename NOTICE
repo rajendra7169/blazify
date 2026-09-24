@@ -12,3 +12,16 @@ This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version. See the LICENSE file for the full license text.
+
+Contributors
+------------
+
+Blazify is written by Rajendra Pandey. The projects its streaming core comes
+from were written by many people, and the lists of them are kept by those
+projects themselves:
+
+  Metrolist   https://github.com/MetrolistGroup/Metrolist/graphs/contributors
+  OuterTune   https://github.com/OuterTune/OuterTune/graphs/contributors
+  InnerTune   https://github.com/z-huang/InnerTune/graphs/contributors
+
+Source files that carry work from those projects name them in their header.

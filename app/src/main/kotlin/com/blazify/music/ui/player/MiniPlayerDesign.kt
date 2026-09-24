@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Selectable mini-player LAYOUTS. Colours stay dynamic (album-art driven);
  * only the shape / arrangement of the collapsed mini-player changes.

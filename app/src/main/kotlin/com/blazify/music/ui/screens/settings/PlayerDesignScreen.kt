@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Player-design gallery: swipe through player LAYOUTS inside a phone frame. Each
  * page is a LIVE preview of the real player rendered with the currently-playing

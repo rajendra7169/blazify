@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Blazify's loading animation: three theme-coloured dots bouncing in a
  * staggered wave with soft reflection shadows underneath (dribbble-style).

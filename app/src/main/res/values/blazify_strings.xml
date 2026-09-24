@@ -1231,6 +1231,8 @@
     <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="coffee_dialog_subtitle">Scan the code to support Blazify</string>
     <string name="made_with_love">Made with ❤️ by Rajendra Pandey</string>
+    <string name="about_open_source">Free and open source under GPL-3.0</string>
+    <string name="about_built_on">Built on InnerTune · OuterTune · Metrolist</string>
     <string name="arrange">Arrange</string>
     <!-- Library redesign -->
     <string name="created_by_you">Created by you</string>

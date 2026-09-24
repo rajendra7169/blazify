@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Blaze-styled home rail components for the "Yours" tab, ported from the
  * Flutter BlazePlayer home screen (section headers, music cards, gradient

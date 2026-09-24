@@ -1,12 +1,14 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Metrolist Project (C) 2026
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  */
 
 package com.blazify.music.ui.screens.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,6 +75,7 @@ private const val GITHUB_URL = "https://github.com/rajendra7169"
 // The project, not the profile. The social row above is about who made it;
 // this is about the thing itself.
 private const val PROJECT_URL = "https://github.com/rajendra7169/blazify"
+private const val LICENSE_URL = "https://github.com/rajendra7169/blazify/blob/main/LICENSE"
 private const val INSTAGRAM_URL = "https://www.instagram.com/raja.indra7169"
 private const val GITHUB_AVATAR = "https://github.com/rajendra7169.png"
 
@@ -269,6 +272,27 @@ fun AboutScreen(
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        // The licence this app is under, and the projects its streaming core
+        // comes from. GPL-3.0 asks for both to be said where people can read them.
+        Text(
+            text = stringResource(R.string.about_open_source),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable { uriHandler.openUri(LICENSE_URL) },
+        )
+
+        Spacer(Modifier.height(2.dp))
+
+        Text(
+            text = stringResource(R.string.about_built_on),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
         )
 

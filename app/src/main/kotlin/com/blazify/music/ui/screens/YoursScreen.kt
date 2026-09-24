@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * The "Yours" tab — a personal home of Blaze-styled rails ported from the
  * Flutter BlazePlayer home: recently played, recommended, browse categories,

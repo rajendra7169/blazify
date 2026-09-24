@@ -1,6 +1,6 @@
 /**
  * Blazify Project (C) 2026
- * Licensed under GPL-3.0 | See git history for contributors
+ * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * First-run onboarding: four pages that show what Blazify does, each with a pair
  * of phone frames illustrating the feature. Shown once, then never again.
