@@ -80,6 +80,8 @@ import com.blazify.music.ui.component.Material3SettingsGroup
 import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.component.PreferenceEntry
 import com.blazify.music.ui.component.TextFieldDialog
+import com.blazify.music.ui.component.UpdateDialog
+import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.AccountSettingsViewModel
@@ -95,7 +97,24 @@ fun AccountSettings(
     val context = LocalContext.current
     val (betaUpdates) = rememberPreference(BetaUpdatesKey, false)
     var showDeveloperDialog by remember { mutableStateOf(false) }
-    var updateState by remember { mutableStateOf<UpdateCheck>(UpdateCheck.Idle) }
+    // The app checks on launch, so by the time anybody opens this the answer is
+    // usually already known. Starting at Idle asked them to press for something
+    // that had been found minutes ago.
+    var updateState by remember {
+        mutableStateOf<UpdateCheck>(
+            Updater
+                .getCachedLatestRelease()
+                ?.takeIf {
+                    BuildConfig.UPDATER_AVAILABLE &&
+                        Updater.isUpdateAvailable(BuildConfig.VERSION_NAME, it.versionName) &&
+                        Updater.getDownloadUrlForCurrentVariant(it) != null
+                }?.let { UpdateCheck.Available(it) }
+                ?: UpdateCheck.Idle,
+        )
+    }
+    // The download runs in the app, in a dialog, the same one settings and the
+    // launch offer use. It used to hand the file to a browser.
+    var updateRelease by remember { mutableStateOf<ReleaseInfo?>(null) }
     val repoUrl = stringResource(R.string.blazify_repo_url)
     val websiteUrl = stringResource(R.string.developer_website_url)
     val devGithubUrl = stringResource(R.string.developer_github_url)
@@ -435,7 +454,7 @@ fun AccountSettings(
                             UpdateCheck.Latest -> stringResource(R.string.update_check_latest)
                             UpdateCheck.Failed -> stringResource(R.string.update_check_failed)
                             is UpdateCheck.Available ->
-                                stringResource(R.string.update_check_available, state.version)
+                                stringResource(R.string.update_check_available, state.release.versionName)
                             UpdateCheck.Idle -> stringResource(R.string.update_check_idle)
                         },
                     icon = {
@@ -448,7 +467,7 @@ fun AccountSettings(
                     onClick = {
                         val ready = updateState as? UpdateCheck.Available
                         if (ready != null) {
-                            uriHandler.openUri(ready.downloadUrl)
+                            updateRelease = ready.release
                             return@PreferenceEntry
                         }
                         if (updateState == UpdateCheck.Running) return@PreferenceEntry
@@ -460,7 +479,7 @@ fun AccountSettings(
                                     onSuccess = { (release, isNewer) ->
                                         val url = release?.let(Updater::getDownloadUrlForCurrentVariant)
                                         if (isNewer && release != null && url != null) {
-                                            UpdateCheck.Available(release.versionName, url)
+                                            UpdateCheck.Available(release)
                                         } else {
                                             UpdateCheck.Latest
                                         }
@@ -503,27 +522,12 @@ fun AccountSettings(
                 Spacer(Modifier.height(4.dp))
             }
 
-            if (BuildConfig.UPDATER_AVAILABLE && latestVersionName != BuildConfig.VERSION_NAME) {
-                val releaseInfo = Updater.getCachedLatestRelease()
-                val downloadUrl = releaseInfo?.let { Updater.getDownloadUrlForCurrentVariant(it) }
-                
-                if (downloadUrl != null) {
-                    PreferenceEntry(
-                        title = {
-                            Text(text = stringResource(R.string.new_version_available))
-                        },
-                        description = latestVersionName,
-                        icon = {
-                            BadgedBox(badge = { Badge() }) {
-                                Icon(painterResource(R.drawable.update), null)
-                            }
-                        },
-                        onClick = {
-                            uriHandler.openUri(downloadUrl)
-                        }
-                    )
-                }
-            }
+            // A second row saying the same thing, one line below the row that
+            // already says it, used to live here. It opened a browser.
+        }
+
+        updateRelease?.let { release ->
+            UpdateDialog(release = release, onDismiss = { updateRelease = null })
         }
 
         Spacer(Modifier.height(16.dp))
@@ -666,5 +670,5 @@ private sealed interface UpdateCheck {
 
     data object Failed : UpdateCheck
 
-    data class Available(val version: String, val downloadUrl: String) : UpdateCheck
+    data class Available(val release: ReleaseInfo) : UpdateCheck
 }
