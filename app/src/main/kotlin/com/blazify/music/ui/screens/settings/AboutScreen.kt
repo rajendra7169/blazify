@@ -277,23 +277,14 @@ fun AboutScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        // The licence this app is under, and the projects its streaming core
-        // comes from. GPL-3.0 asks for both to be said where people can read them.
+        // The licence this app is under, where anybody can read it. The projects
+        // it builds on are named in NOTICE, the README and the file headers.
         Text(
             text = stringResource(R.string.about_open_source),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
             modifier = Modifier.clickable { uriHandler.openUri(LICENSE_URL) },
-        )
-
-        Spacer(Modifier.height(2.dp))
-
-        Text(
-            text = stringResource(R.string.about_built_on),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
         )
 
         Spacer(Modifier.height(40.dp))
