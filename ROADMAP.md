@@ -25,17 +25,50 @@ really do change the order.
 
 ## 🚧 Coming in the next release
 
-Built and waiting for the next release:
+Nothing waiting yet — 9.16.0 has just gone out. Vote on what comes next in
+[Ideas](https://github.com/rajendra7169/blazify/discussions/categories/ideas).
 
+---
+
+## 🎉 New in 9.16.0
+
+Out now: [download it](https://github.com/rajendra7169/blazify/releases/latest),
+or update from **Settings › Updater**.
+
+**The song, seen and heard**
+- **Video Art player** — the song's own official video plays behind the player,
+  muted and kept in step with the audio. It stays off on mobile data unless you ask.
+- **Radio stations play.** The live broadcasts in Listen together work now, marked
+  LIVE while they are on air, and they are kept out of queues and downloads.
+- **Skip the parts that are not the song** — SponsorBlock's community marks, so
+  talking intros, credits and sponsor breaks are jumped, and the lyrics shift with
+  them so the words still match. Off until you turn it on, and it asks without
+  telling the server what you are playing.
+
+**Bringing music in, and passing it on**
 - **Import playlists from Spotify** — paste a playlist or album link and Blazify
   looks each song up and builds the playlist here, telling you what it could not find.
-- **Skip the parts that are not the song** — SponsorBlock's community marks, so
-  talking intros, credits and sponsor breaks in music videos are jumped. Off until
-  you turn it on, and it asks without telling the server what you are playing.
+- **Share a playlist** as a link or a QR code. The songs travel in the link itself,
+  so no website ever sees them, and opening one offers to keep it.
 - **Scrobble to ListenBrainz** — the open listening history, alongside Last.fm.
+
+**The queue and the player**
+- **Swipe a song to the right** in the queue and it plays next — no dragging a row
+  up eighty places. Picks keep the order you made them in.
+- **Jump to the playing song** in a long playlist, album or library list.
 - **Play a song a set number of times** before the queue carries on.
+- **Block an artist** and they stay out of Home, search, picks and radio.
+- Updates download in the app now, with a progress bar, instead of in a browser.
+
+**Everywhere else**
 - **Sideways screens and tablets** — the player designs, the theme gallery and
   Look & Feel all lay themselves out for a screen held wide.
+- **15 more languages** filled in, including Spanish, Portuguese, Hindi, Arabic,
+  Chinese, Russian, French, German, Japanese, Korean, Turkish and Vietnamese.
+- Search shows its results as soon as YouTube answers, and a song is put on top
+  when YouTube leads with a video of it.
+- A lost connection no longer loses the song: minutes are fetched ahead and
+  playback is picked up when the connection returns.
 
 ---
 
