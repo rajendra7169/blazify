@@ -83,6 +83,13 @@ import com.blazify.music.utils.Updater
 import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.viewmodels.HomeViewModel
+import com.blazify.innertube.utils.parseCookieString
+import coil3.compose.AsyncImage
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.layout.fillMaxSize
 
 private class SettingRow(
     val icon: Int,
@@ -119,10 +126,14 @@ fun SettingsScreen(
         Updater.isUpdateAvailable(BuildConfig.VERSION_NAME, latestVersionName)
     var query by rememberSaveable { mutableStateOf("") }
 
-    // Profile + quick-toggle state for the landing header.
+    // Profile + quick-toggle state for the landing header. The name and picture come
+    // from the account YouTube reports, the same place Home and the account sheet read,
+    // rather than a stored string that is only written at sign-in.
     val (innerTubeCookie) = rememberPreference(InnerTubeCookieKey, "")
-    val (accountName) = rememberPreference(AccountNameKey, "")
-    val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in innerTubeCookie }
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val accountName by homeViewModel.accountName.collectAsStateWithLifecycle()
+    val accountImageUrl by homeViewModel.accountImageUrl.collectAsStateWithLifecycle()
+    val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
     val (darkMode, onDarkModeChange) = rememberEnumPreference(DarkModeKey, DarkMode.AUTO)
     val (dynamicTheme, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, true)
     val (pureBlack, setPureBlack) = rememberPreference(PureBlackKey, true)
@@ -214,6 +225,7 @@ fun SettingsScreen(
 
         ProfileHeader(
             name = accountName.takeIf { it.isNotBlank() && isLoggedIn } ?: stringResource(R.string.guest),
+            imageUrl = accountImageUrl.takeIf { isLoggedIn },
             isLoggedIn = isLoggedIn,
             onClick = { navController.navigate(if (isLoggedIn) "account" else "login") },
         )
@@ -405,7 +417,7 @@ private fun BlazeSettingRow(row: SettingRow, colorIndex: Int) {
 }
 
 @Composable
-private fun ProfileHeader(name: String, isLoggedIn: Boolean, onClick: () -> Unit) {
+private fun ProfileHeader(name: String, imageUrl: String?, isLoggedIn: Boolean, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -429,12 +441,21 @@ private fun ProfileHeader(name: String, isLoggedIn: Boolean, onClick: () -> Unit
                 .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.person),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(24.dp),
-            )
+            if (imageUrl != null) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.person),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
