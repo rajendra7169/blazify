@@ -2311,6 +2311,19 @@ class MusicService :
     // picking 5, 9 and 11 plays 5, 9, 11 rather than 11, 9, 5.
     private val pendingPlayNextIds = mutableListOf<String>()
 
+    /** The picks still waiting, oldest first, for whoever needs to queue behind them. */
+    val playNextPicks: List<String> get() = pendingPlayNextIds.toList()
+
+    /**
+     * Records a song already in the queue as a Play next pick. Swiping a row moves it in the
+     * list itself, so nothing is added — but it still has to take its turn behind the picks
+     * made before it, or swiping three songs would play them backwards.
+     */
+    fun notePlayNextPick(mediaId: String) {
+        pendingPlayNextIds.remove(mediaId)
+        pendingPlayNextIds.add(mediaId)
+    }
+
     /**
      * Drops the broadcasts from a list of items on their way into the queue.
      *

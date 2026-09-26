@@ -102,6 +102,7 @@ import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.playback.queues.YouTubeQueue
 import com.blazify.music.ui.component.AlbumGridItem
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.ExpandableText
 import com.blazify.music.ui.component.HideOnScrollFAB
 import com.blazify.music.ui.component.IconButton
@@ -996,7 +997,7 @@ fun ArtistScreen(
             }
         }
 
-        SnackbarHost(
+        BlazeSnackbarHost(
             hostState = snackbarHostState,
             modifier =
                 Modifier

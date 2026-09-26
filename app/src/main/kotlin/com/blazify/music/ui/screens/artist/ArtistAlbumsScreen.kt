@@ -54,6 +54,7 @@ import com.blazify.music.constants.CONTENT_TYPE_HEADER
 import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
 import com.blazify.music.constants.GridThumbnailHeight
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.LibraryAlbumGridItem
 import com.blazify.music.ui.component.LocalMenuState
@@ -158,7 +159,7 @@ fun ArtistAlbumsScreen(
             scrollBehavior = scrollBehavior,
         )
 
-        SnackbarHost(
+        BlazeSnackbarHost(
             hostState = snackbarHostState,
             modifier =
                 Modifier

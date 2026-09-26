@@ -7,6 +7,7 @@
 package com.blazify.music.ui.screens.playlist
 
 import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.JumpToPlayingButton
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -484,7 +485,7 @@ fun OnlinePlaylistScreen(
             },
         )
 
-        SnackbarHost(
+        BlazeSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
         )

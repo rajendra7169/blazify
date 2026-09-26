@@ -115,6 +115,7 @@ import com.blazify.music.listentogether.RoomRole
 import com.blazify.music.models.MediaMetadata
 import com.blazify.music.ui.component.ActionPromptDialog
 import com.blazify.music.ui.component.BlazeSleepTimerDialog
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.CastButton
 import com.blazify.music.ui.component.BottomSheet
 import com.blazify.music.ui.component.BottomSheetState
@@ -609,7 +610,22 @@ fun Queue(
         fun moveToPlayNext(from: Int) {
             val current = currentWindowIndex
             if (current == -1 || from !in mutableQueueWindows.indices || from == current) return
-            val to = if (from > current) current + 1 else current
+
+            // Behind the songs picked before this one, not in front of them: swipe 5, then 9,
+            // then 11 and they play 5, 9, 11. The menu's Play next has always worked that way.
+            val movingId = mutableQueueWindows[from].mediaItem.mediaId
+            val picks = playerConnection.playNextPicks.filter { it != movingId }
+            var target = current + 1
+            var matched = 0
+            while (target < mutableQueueWindows.size &&
+                matched < picks.size &&
+                mutableQueueWindows[target].mediaItem.mediaId == picks[matched]
+            ) {
+                target++
+                matched++
+            }
+            val to = if (from > target) target else (target - 1).coerceAtLeast(current)
+            playerConnection.notePlayNextPick(movingId)
             if (from == to) return
             if (!playerConnection.player.shuffleModeEnabled) {
                 playerConnection.player.moveMediaItem(from, to)
@@ -1161,7 +1177,7 @@ fun Queue(
             }
         }
 
-        SnackbarHost(
+        BlazeSnackbarHost(
             hostState = snackbarHostState,
             modifier =
                 Modifier

@@ -134,6 +134,7 @@ import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.playback.ExoDownloadService
 import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.ui.component.ActionPromptDialog
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.JumpToPlayingButton
 import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.DraggableScrollbar
@@ -932,7 +933,7 @@ fun LocalPlaylistScreen(
             },
         )
 
-        SnackbarHost(
+        BlazeSnackbarHost(
             hostState = snackbarHostState,
             modifier =
                 Modifier

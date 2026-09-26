@@ -186,6 +186,7 @@ import com.blazify.music.playback.queues.YouTubeQueue
 import androidx.compose.ui.platform.LocalUriHandler
 import com.blazify.music.utils.StarPrompt
 import com.blazify.music.constants.OnboardingCompletedKey
+import com.blazify.music.ui.component.BlazeSnackbarHost
 import com.blazify.music.ui.component.BlazeSplash
 import com.blazify.music.ui.screens.OnboardingScreen
 import com.blazify.music.ui.component.AccountSettingsDialog
@@ -1222,7 +1223,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Scaffold(
-                        snackbarHost = { SnackbarHost(snackbarHostState) },
+                        snackbarHost = { BlazeSnackbarHost(snackbarHostState) },
                         topBar = {
                             AnimatedVisibility(
                                 visible = shouldShowTopBar,

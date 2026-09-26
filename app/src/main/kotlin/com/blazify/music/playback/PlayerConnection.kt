@@ -278,6 +278,11 @@ class PlayerConnection(
         }
     }
 
+    /** Play next picks still waiting, oldest first — see [MusicService.notePlayNextPick]. */
+    val playNextPicks: List<String> get() = service.playNextPicks
+
+    fun notePlayNextPick(mediaId: String) = service.notePlayNextPick(mediaId)
+
     fun playNext(item: MediaItem) = playNext(listOf(item))
 
     fun playNext(items: List<MediaItem>) {
