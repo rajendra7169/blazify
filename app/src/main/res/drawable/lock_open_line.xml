@@ -1,0 +1,23 @@
+<!-- The same padlock with the shackle lifted: the queue can be rearranged. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M8,11V7.5A4,4 0 0 1 16,7.5V8.6"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M6.8,11h10.4a1.8,1.8 0 0 1 1.8,1.8v6.4a1.8,1.8 0 0 1 -1.8,1.8h-10.4a1.8,1.8 0 0 1 -1.8,-1.8v-6.4a1.8,1.8 0 0 1 1.8,-1.8z"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,15v2.4"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+</vector>

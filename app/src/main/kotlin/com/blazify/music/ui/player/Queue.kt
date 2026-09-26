@@ -152,6 +152,9 @@ import androidx.compose.ui.text.font.FontWeight
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalFoundationApi::class)
+/** Tall enough for a key and its label, the way the player's own row is. */
+private val QueueBottomBarHeight = 76.dp
+
 @Composable
 fun Queue(
     state: BottomSheetState,
@@ -663,7 +666,7 @@ fun Queue(
                         .add(
                             WindowInsets(
                                 top = ListItemHeight + 8.dp,
-                                bottom = ListItemHeight + 8.dp,
+                                bottom = QueueBottomBarHeight + 8.dp,
                             ),
                         ).asPaddingValues(),
                 modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection),
@@ -1031,9 +1034,11 @@ fun Queue(
                                 ).clickable { locked = !locked },
                     ) {
                         Icon(
-                            painter = painterResource(if (locked) R.drawable.lock else R.drawable.lock_open),
+                            // Drawn at the weight of the shuffle and repeat keys. The solid
+                            // padlock the lists ship with sat in this row like a stamp.
+                            painter = painterResource(if (locked) R.drawable.lock_line else R.drawable.lock_open_line),
                             contentDescription = stringResource(if (locked) R.string.queue_locked else R.string.queue_unlocked),
-                            tint = if (unlocked) BlazeThemeColor else MaterialTheme.colorScheme.onSurface,
+                            tint = if (unlocked) BlazeThemeColor else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -1128,7 +1133,7 @@ fun Queue(
                         },
                     ).fillMaxWidth()
                     .height(
-                        ListItemHeight +
+                        QueueBottomBarHeight +
                             WindowInsets.systemBars
                                 .asPaddingValues()
                                 .calculateBottomPadding(),
@@ -1138,56 +1143,70 @@ fun Queue(
                     }.windowInsetsPadding(
                         WindowInsets.systemBars
                             .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
-                    ).padding(12.dp),
+                    ).padding(horizontal = 12.dp, vertical = 2.dp),
         ) {
-            // On is amber and sits in a lit circle, the way it does in the player; off is a
-            // plain dimmed key. Alpha alone left both looking like the same grey icon.
-            QueueBottomKey(
-                icon = R.drawable.shuffle,
-                active = shuffleModeEnabled,
-                enabled = !isListenTogetherGuest,
-                modifier = Modifier.align(Alignment.CenterStart),
-                onClick = {
-                    coroutineScope
-                        .launch {
-                            lazyListState.animateScrollToItem(
-                                if (playerConnection.player.shuffleModeEnabled) playerConnection.player.currentMediaItemIndex else 0,
-                            )
-                        }.invokeOnCompletion {
-                            playerConnection.player.shuffleModeEnabled =
-                                !playerConnection.player.shuffleModeEnabled
-                        }
-                },
-            )
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .size(width = 64.dp, height = 32.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
+            // The same keys the player's own bottom row uses — icon over a small label,
+            // amber while the mode is on — so the two rows read as one family instead of
+            // three bare glyphs floating in a bar.
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.expand_more),
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp),
+                PlayerBottomButton(
+                    icon = R.drawable.shuffle,
+                    label = stringResource(R.string.shuffle),
+                    active = shuffleModeEnabled,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    activeTint = BlazeThemeColor,
+                    enabled = !isListenTogetherGuest,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        coroutineScope
+                            .launch {
+                                lazyListState.animateScrollToItem(
+                                    if (playerConnection.player.shuffleModeEnabled) playerConnection.player.currentMediaItemIndex else 0,
+                                )
+                            }.invokeOnCompletion {
+                                playerConnection.player.shuffleModeEnabled =
+                                    !playerConnection.player.shuffleModeEnabled
+                            }
+                    },
+                )
+
+                PlayerBottomButton(
+                    icon = R.drawable.expand_more,
+                    label = stringResource(R.string.close),
+                    active = false,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    activeTint = BlazeThemeColor,
+                    modifier = Modifier.weight(1f),
+                    onClick = { state.collapseSoft() },
+                )
+
+                PlayerBottomButton(
+                    icon =
+                        when (repeatMode) {
+                            Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                            else -> R.drawable.repeat
+                        },
+                    label = stringResource(R.string.repeat),
+                    contentDescription =
+                        stringResource(
+                            when (repeatMode) {
+                                Player.REPEAT_MODE_ONE -> R.string.repeat_mode_one
+                                Player.REPEAT_MODE_ALL -> R.string.repeat_mode_all
+                                else -> R.string.repeat_mode_off
+                            },
+                        ),
+                    active = repeatMode != Player.REPEAT_MODE_OFF,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    activeTint = BlazeThemeColor,
+                    enabled = !isListenTogetherGuest,
+                    modifier = Modifier.weight(1f),
+                    onClick = playerConnection.player::toggleRepeatMode,
                 )
             }
-
-            QueueBottomKey(
-                icon =
-                    when (repeatMode) {
-                        Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                        Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
-                        else -> R.drawable.repeat
-                    },
-                active = repeatMode != Player.REPEAT_MODE_OFF,
-                enabled = !isListenTogetherGuest,
-                modifier = Modifier.align(Alignment.CenterEnd),
-                onClick = playerConnection.player::toggleRepeatMode,
-            )
         }
 
         BlazeSnackbarHost(
@@ -1196,45 +1215,11 @@ fun Queue(
                 Modifier
                     .padding(
                         bottom =
-                            ListItemHeight +
+                            QueueBottomBarHeight +
                                 WindowInsets.systemBars
                                     .asPaddingValues()
                                     .calculateBottomPadding(),
                     ).align(Alignment.BottomCenter),
-        )
-    }
-}
-
-/**
- * A shuffle or repeat key at the foot of the queue: lit in Blaze amber while it is on.
- */
-@Composable
-private fun QueueBottomKey(
-    icon: Int,
-    active: Boolean,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(if (active) BlazeThemeColor.copy(alpha = 0.18f) else Color.Transparent)
-                .clickable(enabled = enabled, onClick = onClick),
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint =
-                when {
-                    !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                    active -> BlazeThemeColor
-                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
-                },
-            modifier = Modifier.size(22.dp),
         )
     }
 }

@@ -585,6 +585,7 @@
     <string name="queue_plays_next">%s plays next</string>
     <string name="queue_locked">Queue locked</string>
     <string name="queue_unlocked">Queue unlocked</string>
+    <string name="repeat">Repeat</string>
     <string name="add_to_queue_desc">Add to the end of the queue</string>
     <string name="add_to_library_desc">Save to your library</string>
     <string name="download_desc">Download for offline playback</string>
