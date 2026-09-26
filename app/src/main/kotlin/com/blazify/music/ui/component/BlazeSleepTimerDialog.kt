@@ -106,21 +106,31 @@ fun BlazeSleepTimerDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    // 20dp either side and 24dp under, the same frame the menu sheet
+                    // gives its own content.
+                    .padding(horizontal = 20.dp)
                     .padding(bottom = 24.dp),
         ) {
-            Icon(
-                painter = painterResource(R.drawable.bedtime),
-                contentDescription = null,
-                tint = accent,
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.sleep_timer_stop_music_after),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(Modifier.height(16.dp))
+            // Icon then heading along the left, the way the Cast sheet opens.
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.bedtime),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = accent,
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.sleep_timer_stop_music_after),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth(),
