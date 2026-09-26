@@ -117,6 +117,8 @@ import kotlin.math.pow
 import kotlin.math.round
 import com.blazify.music.utils.LocalMusic
 import com.blazify.music.extensions.toMediaItem
+import com.blazify.music.ui.component.NewActionRow
+import com.blazify.music.ui.theme.BlazeThemeColor
 
 @Composable
 fun PlayerMenu(
@@ -394,9 +396,143 @@ fun PlayerMenu(
     ) {
         item {
             val startingRadioText = stringResource(R.string.starting_radio)
-            NewActionGrid(
+            // What people reach for most, first, and the rest a swipe to the side. Download
+            // outranks a radio station by a long way, and three fixed tiles could only hold
+            // three of them with their labels crushed.
+            NewActionRow(
                 actions =
                     listOfNotNull(
+                        if (!isLocal) {
+                            when (download?.state) {
+                                Download.STATE_COMPLETED ->
+                                    NewAction(
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.offline),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(32.dp),
+                                                tint = BlazeThemeColor,
+                                            )
+                                        },
+                                        text = stringResource(R.string.remove_download),
+                                        onClick = {
+                                            DownloadService.sendRemoveDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                mediaMetadata.id,
+                                                false,
+                                            )
+                                        },
+                                    )
+
+                                Download.STATE_QUEUED, Download.STATE_DOWNLOADING ->
+                                    NewAction(
+                                        icon = {
+                                            BlazeLoader(
+                                                modifier = Modifier.size(28.dp),
+                                                strokeWidth = 2.dp,
+                                            )
+                                        },
+                                        text = stringResource(R.string.downloading),
+                                        onClick = {
+                                            DownloadService.sendRemoveDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                mediaMetadata.id,
+                                                false,
+                                            )
+                                        },
+                                    )
+
+                                else ->
+                                    NewAction(
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.download),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(32.dp),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        },
+                                        text = stringResource(R.string.action_download),
+                                        // A broadcast never ends, so there is no file to keep.
+                                        enabled = !isLive,
+                                        onClick = {
+                                            database.transaction {
+                                                insert(mediaMetadata)
+                                            }
+                                            val downloadRequest =
+                                                DownloadRequest
+                                                    .Builder(mediaMetadata.id, mediaMetadata.id.toUri())
+                                                    .setCustomCacheKey(mediaMetadata.id)
+                                                    .setData(mediaMetadata.title.toByteArray())
+                                                    .build()
+                                            DownloadService.sendAddDownload(
+                                                context,
+                                                ExoDownloadService::class.java,
+                                                downloadRequest,
+                                                false,
+                                            )
+                                        },
+                                    )
+                            }
+                        } else {
+                            null
+                        },
+                        NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.playlist_add),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_playlist),
+                            onClick = { showChoosePlaylistDialog = true },
+                            // There is nothing of a broadcast to keep for later.
+                            enabled = !isLive,
+                        ),
+                        NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.queue_music),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_queue),
+                            enabled = !isLive && !isListenTogetherGuest,
+                            onClick = {
+                                onDismiss()
+                                playerConnection.addToQueue(mediaMetadata.toMediaItem())
+                            },
+                        ),
+                        if (artists.isNotEmpty() && !isLocal) {
+                            NewAction(
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.artist),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                },
+                                text = stringResource(R.string.view_artist),
+                                onClick = {
+                                    if (mediaMetadata.artists.size == 1) {
+                                        navController.navigate("artist/${mediaMetadata.artists[0].id}")
+                                        playerBottomSheetState.collapseSoft()
+                                        onDismiss()
+                                    } else {
+                                        showSelectArtistDialog = true
+                                    }
+                                },
+                            )
+                        } else {
+                            null
+                        },
                         if (!isListenTogetherGuest && !isLocal) {
                             NewAction(
                                 icon = {
@@ -417,67 +553,8 @@ fun PlayerMenu(
                         } else {
                             null
                         },
-                        NewAction(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.playlist_add),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            text = stringResource(R.string.add_to_playlist),
-                            onClick = { showChoosePlaylistDialog = true },
-                            // There is nothing of a broadcast to keep for later.
-                            enabled = !isLive,
-                        ),
-                        // Copying an address for a file only this phone has copies
-                        // nothing anyone can open, so its place goes to something
-                        // a local file can actually do.
-                        if (isLocal) NewAction(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.queue_music),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            text = stringResource(R.string.add_to_queue),
-                            onClick = {
-                                onDismiss()
-                                playerConnection.addToQueue(mediaMetadata.toMediaItem())
-                            },
-                        ) else NewAction(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.link),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            text = stringResource(R.string.copy_link),
-                            onClick = {
-                                val clipboard =
-                                    context.getSystemService(
-                                        android.content.Context.CLIPBOARD_SERVICE,
-                                    ) as android.content.ClipboardManager
-                                val clip =
-                                    android.content.ClipData.newPlainText(
-                                        "Song Link",
-                                        "https://music.youtube.com/watch?v=${mediaMetadata.id}",
-                                    )
-                                clipboard.setPrimaryClip(clip)
-                                android.widget.Toast
-                                    .makeText(context, R.string.link_copied, android.widget.Toast.LENGTH_SHORT)
-                                    .show()
-                                onDismiss()
-                            },
-                        ),
                     ),
-                columns = if (isListenTogetherGuest) 2 else 3,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
             )
         }
 
@@ -528,10 +605,6 @@ fun PlayerMenu(
                                 },
                             ),
                         )
-                        // The artist of the song playing, so a whole artist can go from here.
-                        mediaMetadata.artists.firstOrNull()?.let { artist ->
-                            add(blockArtistMenuItem(artist.id, artist.name, onDismiss))
-                        }
                         add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.repeat_times)) },
@@ -554,36 +627,37 @@ fun PlayerMenu(
                                 onClick = { showRepeatTimes = true },
                             ),
                         )
-                        // Don't show "View Artist" for podcasts - only show "View Podcast"
-                        if (artists.isNotEmpty() && !isPodcast && !isLocal) {
+                        // Copy link came down from the tiles, where View artist now is.
+                        if (!isLocal) {
                             add(
                                 Material3MenuItemData(
-                                    title = { Text(text = stringResource(R.string.view_artist)) },
-                                    description = {
-                                        Text(
-                                            text = mediaMetadata.artists.joinToString { it.name },
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    },
+                                    title = { Text(text = stringResource(R.string.copy_link)) },
                                     icon = {
                                         Icon(
-                                            painter = painterResource(R.drawable.artist),
+                                            painter = painterResource(R.drawable.link),
                                             contentDescription = null,
-                                            modifier = Modifier.size(24.dp),
                                         )
                                     },
                                     onClick = {
-                                        if (mediaMetadata.artists.size == 1) {
-                                            navController.navigate("artist/${mediaMetadata.artists[0].id}")
-                                            playerBottomSheetState.collapseSoft()
-                                            onDismiss()
-                                        } else {
-                                            showSelectArtistDialog = true
-                                        }
+                                        val clipboard =
+                                            context.getSystemService(
+                                                android.content.Context.CLIPBOARD_SERVICE,
+                                            ) as android.content.ClipboardManager
+                                        clipboard.setPrimaryClip(
+                                            android.content.ClipData.newPlainText(
+                                                "Song Link",
+                                                "https://music.youtube.com/watch?v=${mediaMetadata.id}",
+                                            ),
+                                        )
+                                        Toast.makeText(context, R.string.link_copied, Toast.LENGTH_SHORT).show()
+                                        onDismiss()
                                     },
                                 ),
                             )
+                        }
+                        // The artist of the song playing, so a whole artist can go from here.
+                        mediaMetadata.artists.firstOrNull()?.let { artist ->
+                            add(blockArtistMenuItem(artist.id, artist.name, onDismiss))
                         }
                         if (mediaMetadata.album != null && !isLocal) {
                             add(
@@ -686,93 +760,6 @@ fun PlayerMenu(
 
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
-        if (!isLocal) item {
-            Material3MenuGroup(
-                items =
-                    listOf(
-                        when (download?.state) {
-                            Download.STATE_COMPLETED -> {
-                                Material3MenuItemData(
-                                    title = {
-                                        Text(
-                                            text = stringResource(R.string.remove_download),
-                                        )
-                                    },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.offline),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(24.dp),
-                                        )
-                                    },
-                                    onClick = {
-                                        DownloadService.sendRemoveDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            mediaMetadata.id,
-                                            false,
-                                        )
-                                    },
-                                )
-                            }
-
-                            Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> {
-                                Material3MenuItemData(
-                                    title = { Text(text = stringResource(R.string.downloading)) },
-                                    icon = {
-                                        BlazeLoader(
-                                            modifier = Modifier.size(24.dp),
-                                            strokeWidth = 2.dp,
-                                        )
-                                    },
-                                    onClick = {
-                                        DownloadService.sendRemoveDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            mediaMetadata.id,
-                                            false,
-                                        )
-                                    },
-                                )
-                            }
-
-                            else -> {
-                                Material3MenuItemData(
-                                    // A broadcast never ends, so there is no file to keep.
-                                    enabled = !isLive,
-                                    title = { Text(text = stringResource(R.string.action_download)) },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(R.drawable.download),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(24.dp),
-                                        )
-                                    },
-                                    onClick = {
-                                        database.transaction {
-                                            insert(mediaMetadata)
-                                        }
-                                        val downloadRequest =
-                                            DownloadRequest
-                                                .Builder(mediaMetadata.id, mediaMetadata.id.toUri())
-                                                .setCustomCacheKey(mediaMetadata.id)
-                                                .setData(mediaMetadata.title.toByteArray())
-                                                .build()
-                                        DownloadService.sendAddDownload(
-                                            context,
-                                            ExoDownloadService::class.java,
-                                            downloadRequest,
-                                            false,
-                                        )
-                                    },
-                                )
-                            }
-                        },
-                    ),
-            )
-        }
-
-        item { Spacer(modifier = Modifier.height(12.dp)) }
 
         item {
             Material3MenuGroup(

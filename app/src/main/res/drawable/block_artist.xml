@@ -1,0 +1,17 @@
+<!-- A barred circle: this artist is turned away. Kept apart from the hidden-image
+     mark that "Don't play this song" uses, which it used to share. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,3.2a8.8,8.8 0 1 0 0,17.6a8.8,8.8 0 1 0 0,-17.6z"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8" />
+    <path
+        android:pathData="M5.8,5.8L18.2,18.2"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+</vector>

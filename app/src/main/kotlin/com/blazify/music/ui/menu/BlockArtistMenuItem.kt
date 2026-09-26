@@ -50,7 +50,7 @@ fun blockArtistMenuItem(
         },
         icon = {
             Icon(
-                painter = painterResource(if (isBlocked) R.drawable.artist else R.drawable.hide_image),
+                painter = painterResource(if (isBlocked) R.drawable.artist else R.drawable.block_artist),
                 contentDescription = null,
             )
         },

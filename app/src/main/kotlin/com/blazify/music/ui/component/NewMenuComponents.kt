@@ -40,6 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
 
 // Enhanced Action Button - Material 3 Expressive Design
 @Composable
@@ -107,9 +110,12 @@ fun NewActionButton(
                 style = MaterialTheme.typography.labelMedium,
                 color = animatedContent,
                 textAlign = TextAlign.Center,
+                // Two lines, always: a label that does not fit wraps rather than
+                // scrolling past ("Add to playlist" used to crawl by as "aylist"),
+                // and reserving both lines keeps the tiles level with each other.
+                minLines = 2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.basicMarquee(),
             )
         }
     }
@@ -205,6 +211,48 @@ fun NewActionGrid(
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
+        }
+    }
+}
+
+/**
+ * The same action tiles in one line you can push sideways.
+ *
+ * A fixed three across had to squeeze every label into a third of the screen, which set
+ * them marqueeing ("Add to playlist" scrolling past as "aylist"). Side by side at a width
+ * that fits the words, the ones used most sit first and the rest are a swipe away.
+ */
+@Composable
+fun NewActionRow(
+    actions: List<NewAction>,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp),
+        modifier = modifier,
+    ) {
+        items(actions.size) { index ->
+            val action = actions[index]
+            NewActionButton(
+                icon = action.icon,
+                text = action.text,
+                onClick = action.onClick,
+                modifier = Modifier.width(108.dp),
+                enabled = action.enabled,
+                backgroundColor =
+                    if (action.backgroundColor != Color.Unspecified) {
+                        action.backgroundColor
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+                contentColor =
+                    if (action.contentColor != Color.Unspecified) {
+                        action.contentColor
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+            )
         }
     }
 }
