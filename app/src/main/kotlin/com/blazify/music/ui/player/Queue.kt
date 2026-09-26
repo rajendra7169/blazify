@@ -84,6 +84,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -1120,18 +1121,39 @@ fun Queue(
 
         val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
 
+        val barColor =
+            if (pureBlack) {
+                Color.Black
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.90f)
+            }
+
+        // Songs fade into the bar instead of being cut off by its edge. It carries no
+        // touches of its own, so the list still scrolls under it.
         Box(
             modifier =
                 Modifier
-                    .background(
-                        if (pureBlack) {
-                            Color.Black
-                        } else {
-                            MaterialTheme.colorScheme
-                                .secondaryContainer
-                                .copy(alpha = 0.90f)
-                        },
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom =
+                            QueueBottomBarHeight +
+                                WindowInsets.systemBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding(),
                     ).fillMaxWidth()
+                    .height(32.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, barColor),
+                        ),
+                    ),
+        )
+
+        Box(
+            modifier =
+                Modifier
+                    .background(barColor)
+                    .fillMaxWidth()
                     .height(
                         QueueBottomBarHeight +
                             WindowInsets.systemBars
