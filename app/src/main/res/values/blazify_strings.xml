@@ -582,6 +582,7 @@
     <string name="edit_desc">Edit the title or artist</string>
     <string name="start_radio_desc">Start a radio based on this item</string>
     <string name="play_next_desc">Play next in the queue</string>
+    <string name="queue_plays_next">%s plays next</string>
     <string name="add_to_queue_desc">Add to the end of the queue</string>
     <string name="add_to_library_desc">Save to your library</string>
     <string name="download_desc">Download for offline playback</string>

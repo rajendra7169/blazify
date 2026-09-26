@@ -603,6 +603,30 @@ fun Queue(
             }
         }
 
+        // Moves a song to the place right behind the one playing. Shuffle keeps its own
+        // running order, so with it on the order is rewritten instead of the list — the
+        // same split the drag above makes.
+        fun moveToPlayNext(from: Int) {
+            val current = currentWindowIndex
+            if (current == -1 || from !in mutableQueueWindows.indices || from == current) return
+            val to = if (from > current) current + 1 else current
+            if (from == to) return
+            if (!playerConnection.player.shuffleModeEnabled) {
+                playerConnection.player.moveMediaItem(from, to)
+            } else {
+                playerConnection.player.setShuffleOrder(
+                    DefaultShuffleOrder(
+                        queueWindows
+                            .map { it.firstPeriodIndex }
+                            .toMutableList()
+                            .move(from, to)
+                            .toIntArray(),
+                        System.currentTimeMillis(),
+                    ),
+                )
+            }
+        }
+
         Box(
             modifier =
                 Modifier
@@ -640,22 +664,42 @@ fun Queue(
                     ) {
                         val currentItem by rememberUpdatedState(window)
                         val isActive = window.uid == currentPlayingUid
+                        val currentIndex by rememberUpdatedState(index)
+                        val removedSongMsg =
+                            stringResource(R.string.removed_song_from_playlist, currentItem.mediaItem.metadata?.title ?: "")
+                        val playsNextMsg =
+                            stringResource(R.string.queue_plays_next, currentItem.mediaItem.metadata?.title ?: "")
+                        val undoStr = stringResource(R.string.undo)
+                        // Half a row's width, not the whole screen: a song eighty places down
+                        // should take one flick to move, which is the point of the gesture.
+                        //
+                        // Play next moves a row, it does not throw it away, so the swipe is
+                        // refused (false) and the row springs back under the finger. Resetting
+                        // it afterwards instead left the row lying open off screen, because the
+                        // reset changes the value the effect doing it is keyed on.
                         val dismissBoxState =
                             rememberSwipeToDismissBoxState(
-                                positionalThreshold = { totalDistance -> totalDistance },
+                                positionalThreshold = { totalDistance -> totalDistance * 0.5f },
+                                confirmValueChange = { value ->
+                                    if (value == SwipeToDismissBoxValue.StartToEnd) {
+                                        moveToPlayNext(currentIndex)
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = playsNextMsg,
+                                                duration = SnackbarDuration.Short,
+                                            )
+                                        }
+                                        false
+                                    } else {
+                                        true
+                                    }
+                                },
                             )
 
                         var processedDismiss by remember { mutableStateOf(false) }
-                        val removedSongMsg =
-                            stringResource(R.string.removed_song_from_playlist, currentItem.mediaItem.metadata?.title ?: "")
-                        val undoStr = stringResource(R.string.undo)
                         LaunchedEffect(dismissBoxState.currentValue) {
                             val dv = dismissBoxState.currentValue
-                            if (!processedDismiss && !isListenTogetherGuest && (
-                                    dv == SwipeToDismissBoxValue.StartToEnd ||
-                                        dv == SwipeToDismissBoxValue.EndToStart
-                                )
-                            ) {
+                            if (!processedDismiss && !isListenTogetherGuest && dv == SwipeToDismissBoxValue.EndToStart) {
                                 processedDismiss = true
                                 playerConnection.player.removeMediaItem(currentItem.firstPeriodIndex)
                                 dismissJob?.cancel()
@@ -792,15 +836,17 @@ fun Queue(
                             }
                         }
 
-                        if (locked) {
+                        // Play next is safe, so it works on a locked queue as well; removing
+                        // a song is what the lock is for.
+                        SwipeToDismissBox(
+                            state = dismissBoxState,
+                            enableDismissFromStartToEnd = !isListenTogetherGuest && !isActive,
+                            enableDismissFromEndToStart = !locked && !isListenTogetherGuest,
+                            backgroundContent = {
+                                QueueSwipeBackground(direction = dismissBoxState.dismissDirection)
+                            },
+                        ) {
                             content()
-                        } else {
-                            SwipeToDismissBox(
-                                state = dismissBoxState,
-                                backgroundContent = {},
-                            ) {
-                                content()
-                            }
                         }
                     }
                 }
@@ -1126,6 +1172,36 @@ fun Queue(
                                     .asPaddingValues()
                                     .calculateBottomPadding(),
                     ).align(Alignment.BottomCenter),
+        )
+    }
+}
+
+/**
+ * What shows behind a queue row while it is being swiped: the move on the right, the
+ * removal on the left. Swiping against an empty background told nobody what would happen.
+ */
+@Composable
+private fun QueueSwipeBackground(direction: SwipeToDismissBoxValue) {
+    if (direction == SwipeToDismissBoxValue.Settled) return
+    val playNext = direction == SwipeToDismissBoxValue.StartToEnd
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = if (playNext) Arrangement.Start else Arrangement.End,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+    ) {
+        Icon(
+            painter = painterResource(if (playNext) R.drawable.playlist_play else R.drawable.delete),
+            contentDescription = null,
+            tint = if (playNext) BlazeThemeColor else MaterialTheme.colorScheme.error,
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = stringResource(if (playNext) R.string.play_next else R.string.delete),
+            style = MaterialTheme.typography.labelLarge,
+            color = if (playNext) BlazeThemeColor else MaterialTheme.colorScheme.error,
         )
     }
 }
