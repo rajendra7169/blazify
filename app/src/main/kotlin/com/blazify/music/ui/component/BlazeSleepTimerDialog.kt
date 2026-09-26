@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,6 +60,7 @@ import kotlin.math.roundToInt
  * amber CANCEL/START pill buttons, an end-of-song option, and a live countdown with
  * END/RESET while a timer is running.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlazeSleepTimerDialog(
     sleepTimerEnabled: Boolean,
@@ -79,30 +81,46 @@ fun BlazeSleepTimerDialog(
     var useSongs by remember { mutableStateOf(false) }
     val accent = MaterialTheme.colorScheme.primary
 
-    AlertDialog(
-        // Its own width rather than the platform's, but not the whole screen edge to
-        // edge: a gap either side, and on a tablet it stops growing at 420dp.
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier =
-            Modifier
-                .padding(horizontal = 28.dp)
-                .widthIn(max = 420.dp),
+    // A sheet up from the bottom, like Queue and Cast beside it. It used to be the one
+    // control on that row that arrived as a box in the middle of the screen.
+    AnimatedBottomSheet(
+        isVisible = true,
         onDismissRequest = onDismiss,
-        icon = {
+        // The same ground and the same handle the Cast and menu sheets use, so the row
+        // of keys does not open three different-looking sheets.
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = {
+            Box(
+                modifier =
+                    Modifier
+                        .padding(vertical = 12.dp)
+                        .size(width = 40.dp, height = 4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)),
+            )
+        },
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp),
+        ) {
             Icon(
                 painter = painterResource(R.drawable.bedtime),
                 contentDescription = null,
                 tint = accent,
             )
-        },
-        title = {
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.sleep_timer_stop_music_after),
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
-        },
-        confirmButton = {},
-        text = {
+            Spacer(Modifier.height(16.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth(),
@@ -333,8 +351,8 @@ fun BlazeSleepTimerDialog(
                     }
                 }
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable
