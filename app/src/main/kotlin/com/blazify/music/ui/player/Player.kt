@@ -365,7 +365,10 @@ fun BottomSheetPlayer(
 
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val isKeepScreenOn by rememberPreference(KeepScreenOn, false)
-    val keepScreenOn = isPlaying && isKeepScreenOn
+    // Video Art keeps the screen awake whatever the setting says. Every other design is
+    // something to listen to with the phone face down; this one is something to watch,
+    // and it used to go dark mid-video unless the setting had been found and turned on.
+    val keepScreenOn = isPlaying && (isKeepScreenOn || playerDesign == PlayerDesign.VIDEO)
 
     DisposableEffect(playerBackground, playerDesign, state.isExpanded, useDarkTheme, keepScreenOn, isFullScreen, hideStatusBarOnFullscreen) {
         val window = (context as? android.app.Activity)?.window
@@ -2120,7 +2123,6 @@ fun BottomSheetPlayer(
                         onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                         onToggleLike = { playerConnection.toggleLike() },
                         onShowLyrics = { showInlineLyrics = true },
-                        onCollapse = { state.collapseSoft() },
                         titleActions = {
                             // Theme and the song menu sit beside the title, as on the other designs.
                             Spacer(Modifier.size(12.dp))
@@ -2374,41 +2376,6 @@ fun BottomSheetPlayer(
             )
         }
 
-        // A way down from the full player at the top left, where Ring always had one. Ring draws
-        // its own inside its top bar and Cassette one in its own style; these three share this.
-        if (!isFullScreen && !showInlineLyrics && queueSheetState.progress < 0.999f &&
-            playerDesign in setOf(PlayerDesign.CLASSIC, PlayerDesign.FULL_ART, PlayerDesign.VIDEO, PlayerDesign.RECORD)
-        ) {
-            RingIconButton(
-                res = R.drawable.expand_more,
-                // The Video design's video is under it, whatever the page colour below.
-                tint = if (playerDesign == PlayerDesign.VIDEO) Color.White else TextBackgroundColor,
-                size = 28,
-                modifier =
-                    Modifier
-                        .align(Alignment.TopStart)
-                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Start))
-                        .padding(start = 6.dp, top = 8.dp)
-                        .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f)),
-                onClick = { state.collapseSoft() },
-            )
-        }
-
-        // Cassette's way down: the same place, as one of its own raised keys.
-        if (!isFullScreen && !showInlineLyrics && queueSheetState.progress < 0.999f &&
-            playerDesign == PlayerDesign.CASSETTE
-        ) {
-            RetroIconKey(
-                iconRes = R.drawable.expand_more,
-                modifier =
-                    Modifier
-                        .align(Alignment.TopStart)
-                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Start))
-                        .padding(start = PlayerHorizontalPadding, top = 10.dp)
-                        .alpha((1f - queueSheetState.progress).coerceIn(0f, 1f)),
-                onClick = { state.collapseSoft() },
-            )
-        }
 
         // RING design: bottom overlay, drawn over the queue peek: the synced lines, fading in from
         // above and out below, then the standard button row at the very bottom, where the other
@@ -3092,7 +3059,6 @@ private fun RingPlayerLayout(
     onToggleRepeat: () -> Unit,
     onToggleLike: () -> Unit,
     onShowLyrics: () -> Unit,
-    onCollapse: () -> Unit,
     onToggleShuffle: () -> Unit,
     titleActions: @Composable RowScope.() -> Unit = {},
     seeker: PlayerSeeker? = null,
@@ -3107,12 +3073,11 @@ private fun RingPlayerLayout(
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // --- top bar: minimize · "Now Playing" · theme (both icons plain, near the edges) ---
+        // --- top bar: "Now Playing" and where it is playing from, centred ---
         Row(
             modifier = Modifier.fillMaxWidth().padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            RingIconButton(R.drawable.expand_more, textColor, size = 28, onClick = onCollapse)
             Column(
                 modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -3136,9 +3101,7 @@ private fun RingPlayerLayout(
                     )
                 }
             }
-            // Balances the minimize button so the heading stays centred; the theme button now
-            // sits beside the song title.
-            Spacer(Modifier.size(46.dp))
+
         }
 
         // --- ring ---

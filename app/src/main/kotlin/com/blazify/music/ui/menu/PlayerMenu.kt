@@ -402,6 +402,36 @@ fun PlayerMenu(
             NewActionRow(
                 actions =
                     listOfNotNull(
+                        NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.queue_music),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_queue),
+                            enabled = !isLive && !isListenTogetherGuest,
+                            onClick = {
+                                onDismiss()
+                                playerConnection.addToQueue(mediaMetadata.toMediaItem())
+                            },
+                        ),
+                        NewAction(
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.playlist_add),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
+                            text = stringResource(R.string.add_to_playlist),
+                            onClick = { showChoosePlaylistDialog = true },
+                            // There is nothing of a broadcast to keep for later.
+                            enabled = !isLive,
+                        ),
                         if (!isLocal) {
                             when (download?.state) {
                                 Download.STATE_COMPLETED ->
@@ -479,36 +509,6 @@ fun PlayerMenu(
                         } else {
                             null
                         },
-                        NewAction(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.playlist_add),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            text = stringResource(R.string.add_to_playlist),
-                            onClick = { showChoosePlaylistDialog = true },
-                            // There is nothing of a broadcast to keep for later.
-                            enabled = !isLive,
-                        ),
-                        NewAction(
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.queue_music),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            text = stringResource(R.string.add_to_queue),
-                            enabled = !isLive && !isListenTogetherGuest,
-                            onClick = {
-                                onDismiss()
-                                playerConnection.addToQueue(mediaMetadata.toMediaItem())
-                            },
-                        ),
                         if (artists.isNotEmpty() && !isLocal) {
                             NewAction(
                                 icon = {
@@ -632,6 +632,7 @@ fun PlayerMenu(
                             add(
                                 Material3MenuItemData(
                                     title = { Text(text = stringResource(R.string.copy_link)) },
+                                    description = { Text(text = stringResource(R.string.copy_link_hint)) },
                                     icon = {
                                         Icon(
                                             painter = painterResource(R.drawable.link),
@@ -705,6 +706,18 @@ fun PlayerMenu(
                                             ),
                                     )
                                 },
+                                description = {
+                                    Text(
+                                        text =
+                                            stringResource(
+                                                if (isInLibrary) {
+                                                    R.string.remove_from_library_hint
+                                                } else {
+                                                    R.string.add_to_library_hint
+                                                },
+                                            ),
+                                    )
+                                },
                                 icon = {
                                     Icon(
                                         painter =
@@ -768,6 +781,7 @@ fun PlayerMenu(
                         if (!isLocal) add(
                             Material3MenuItemData(
                                 title = { Text(text = stringResource(R.string.listen_together)) },
+                                description = { Text(text = stringResource(R.string.listen_together_song_hint)) },
                                 icon = {
                                     // Show a small badge when there are pending suggestions
                                     Box {

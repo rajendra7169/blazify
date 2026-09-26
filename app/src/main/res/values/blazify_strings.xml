@@ -586,6 +586,10 @@
     <string name="queue_locked">Queue locked</string>
     <string name="queue_unlocked">Queue unlocked</string>
     <string name="repeat">Repeat</string>
+    <string name="copy_link_hint">A link to this song on YouTube Music</string>
+    <string name="add_to_library_hint">Keep it in Your library</string>
+    <string name="remove_from_library_hint">Take it out of Your library</string>
+    <string name="listen_together_song_hint">Play in step with friends in a room</string>
     <string name="add_to_queue_desc">Add to the end of the queue</string>
     <string name="add_to_library_desc">Save to your library</string>
     <string name="download_desc">Download for offline playback</string>

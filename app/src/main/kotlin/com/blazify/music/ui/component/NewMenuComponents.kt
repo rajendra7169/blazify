@@ -110,12 +110,17 @@ fun NewActionButton(
                 style = MaterialTheme.typography.labelMedium,
                 color = animatedContent,
                 textAlign = TextAlign.Center,
-                // Two lines, always: a label that does not fit wraps rather than
-                // scrolling past ("Add to playlist" used to crawl by as "aylist"),
-                // and reserving both lines keeps the tiles level with each other.
-                minLines = 2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                // One line, and a label too long for its tile keeps going round rather
+                // than stopping half read. The default marquee runs three times and
+                // stops, which is what left "Add to playlist" parked as "aylist".
+                maxLines = 1,
+                softWrap = false,
+                modifier =
+                    Modifier.basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        initialDelayMillis = 1200,
+                        repeatDelayMillis = 1200,
+                    ),
             )
         }
     }

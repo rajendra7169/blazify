@@ -712,11 +712,10 @@ private fun PreviewTitleActions(pc: PlayerConnection?, textColor: Color) {
     PreviewPillButton(R.drawable.more_horiz, textColor, pillIcon)
 }
 
-/** "Now Playing" and the source in the middle, the collapse button on the left. */
+/** "Now Playing" and the source, centred. */
 @Composable
-private fun PreviewHeader(meta: MediaMetadata?, textColor: Color, collapse: @Composable () -> Unit = { MiniIcon(R.drawable.expand_more, textColor, 20) }) {
+private fun PreviewHeader(meta: MediaMetadata?, textColor: Color) {
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Box(Modifier.align(Alignment.CenterStart)) { collapse() }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 30.dp)) {
             Text(stringResource(R.string.now_playing), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = textColor)
             meta?.album?.title?.takeIf { it.isNotBlank() }?.let {
@@ -934,7 +933,7 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
         modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PreviewHeader(meta, textColor) { PreviewRetroKey(R.drawable.expand_more) }
+        PreviewHeader(meta, textColor)
         Spacer(Modifier.weight(0.4f))
         CassetteTape(
             isPlaying = isPlaying,
@@ -1030,11 +1029,8 @@ private fun FullArtPreview(meta: MediaMetadata?, pc: PlayerConnection?) {
     Box(Modifier.fillMaxSize()) {
         PreviewArt(meta?.thumbnailUrl, RoundedCornerShape(0.dp), Modifier.fillMaxSize())
         FullArtScrim()
-        // "Now Playing" + source centred at the top, the collapse button on the left.
+        // "Now Playing" + source centred at the top.
         val fullArtShadow = Shadow(Color.Black.copy(alpha = 0.75f), Offset(0f, 2f), 6f)
-        Box(Modifier.align(Alignment.TopStart).padding(start = 14.dp, top = 14.dp)) {
-            MiniIcon(R.drawable.expand_more, Color.White, 20)
-        }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp, start = 20.dp, end = 20.dp),
