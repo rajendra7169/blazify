@@ -1128,7 +1128,9 @@ fun MediaMetadataListItem(
                         }
                     }
                 },
-                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -1140,7 +1142,9 @@ fun MediaMetadataListItem(
                 isSelected = isSelected,
                 isActive = isActive,
                 isPlaying = isPlaying,
-                shape = RoundedCornerShape(ThumbnailCornerRadius),
+                // The queue's own artwork, rounded like the rest of Blazify rather than
+                // the 3dp corner the lists inherited.
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.size(ListThumbnailSize)
             )
         },

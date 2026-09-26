@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -146,6 +147,7 @@ import com.blazify.music.constants.SleepTimerFadeOutKey
 import com.blazify.music.constants.SleepTimerStopAfterCurrentSongKey
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.material3.Button
+import androidx.compose.ui.text.font.FontWeight
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -624,6 +626,11 @@ fun Queue(
                 target++
                 matched++
             }
+            // Already standing in that spot. The swipe asks twice — once for the anchor it
+            // is heading to and once as it settles — and without this the second ask moved
+            // the song on again, landing it in front of the song playing.
+            if (from == target) return
+
             val to = if (from > target) target else (target - 1).coerceAtLeast(current)
             playerConnection.notePlayNextPick(movingId)
             if (from == to) return
@@ -970,58 +977,66 @@ fun Queue(
                             .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     ),
         ) {
+            // Title over its own line of numbers, and the lock as a key you can see the
+            // state of. The count and the length used to sit in a second column on two
+            // baselines of their own, which read as three headings fighting each other.
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier =
                     Modifier
-                        .height(ListItemHeight)
-                        .padding(horizontal = 12.dp),
+                        .heightIn(min = ListItemHeight)
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
             ) {
-                Text(
-                    text = queueTitle.orEmpty(),
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-
-                AnimatedVisibility(
-                    visible = !inSelectMode,
-                    enter = fadeIn() + slideInVertically { it },
-                    exit = fadeOut() + slideOutVertically { it },
-                ) {
-                    Row {
-                        IconButton(
-                            onClick = { locked = !locked },
-                            modifier = Modifier.padding(horizontal = 6.dp),
-                        ) {
-                            Icon(
-                                painter = painterResource(if (locked) R.drawable.lock else R.drawable.lock_open),
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.End,
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = queueTitle.orEmpty(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     Text(
                         text =
                             pluralStringResource(
                                 R.plurals.n_song,
                                 queueWindows.size,
                                 queueWindows.size,
-                            ),
-                        style = MaterialTheme.typography.bodyMedium,
+                            ) + "  ·  " + makeTimeString(queueLength * 1000L),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
+                }
 
-                    Text(
-                        text = makeTimeString(queueLength * 1000L),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                AnimatedVisibility(
+                    visible = !inSelectMode,
+                    enter = fadeIn() + slideInVertically { it },
+                    exit = fadeOut() + slideOutVertically { it },
+                ) {
+                    val unlocked = !locked
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (unlocked) {
+                                        BlazeThemeColor.copy(alpha = 0.18f)
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                                    },
+                                ).clickable { locked = !locked },
+                    ) {
+                        Icon(
+                            painter = painterResource(if (locked) R.drawable.lock else R.drawable.lock_open),
+                            contentDescription = stringResource(if (locked) R.string.queue_locked else R.string.queue_unlocked),
+                            tint = if (unlocked) BlazeThemeColor else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
                 }
             }
 
@@ -1125,7 +1140,11 @@ fun Queue(
                             .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                     ).padding(12.dp),
         ) {
-            IconButton(
+            // On is amber and sits in a lit circle, the way it does in the player; off is a
+            // plain dimmed key. Alpha alone left both looking like the same grey icon.
+            QueueBottomKey(
+                icon = R.drawable.shuffle,
+                active = shuffleModeEnabled,
                 enabled = !isListenTogetherGuest,
                 modifier = Modifier.align(Alignment.CenterStart),
                 onClick = {
@@ -1139,42 +1158,36 @@ fun Queue(
                                 !playerConnection.player.shuffleModeEnabled
                         }
                 },
+            )
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier =
+                    Modifier
+                        .align(Alignment.Center)
+                        .size(width = 64.dp, height = 32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
             ) {
-                val baseAlpha = if (shuffleModeEnabled) 1f else 0.5f
-                val finalAlpha = if (!isListenTogetherGuest) baseAlpha else 0.3f
                 Icon(
-                    painter = painterResource(R.drawable.shuffle),
+                    painter = painterResource(R.drawable.expand_more),
                     contentDescription = null,
-                    modifier = Modifier.alpha(finalAlpha),
+                    modifier = Modifier.size(22.dp),
                 )
             }
 
-            Icon(
-                painter = painterResource(R.drawable.expand_more),
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.Center),
-            )
-
-            IconButton(
+            QueueBottomKey(
+                icon =
+                    when (repeatMode) {
+                        Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
+                        Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                        else -> R.drawable.repeat
+                    },
+                active = repeatMode != Player.REPEAT_MODE_OFF,
                 enabled = !isListenTogetherGuest,
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onClick = playerConnection.player::toggleRepeatMode,
-            ) {
-                val baseAlpha = if (repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f
-                val finalAlpha = if (!isListenTogetherGuest) baseAlpha else 0.3f
-                Icon(
-                    painter =
-                        painterResource(
-                            when (repeatMode) {
-                                Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                                Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
-                                else -> throw IllegalStateException()
-                            },
-                        ),
-                    contentDescription = null,
-                    modifier = Modifier.alpha(finalAlpha),
-                )
-            }
+            )
         }
 
         BlazeSnackbarHost(
@@ -1188,6 +1201,40 @@ fun Queue(
                                     .asPaddingValues()
                                     .calculateBottomPadding(),
                     ).align(Alignment.BottomCenter),
+        )
+    }
+}
+
+/**
+ * A shuffle or repeat key at the foot of the queue: lit in Blaze amber while it is on.
+ */
+@Composable
+private fun QueueBottomKey(
+    icon: Int,
+    active: Boolean,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+            modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(if (active) BlazeThemeColor.copy(alpha = 0.18f) else Color.Transparent)
+                .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint =
+                when {
+                    !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    active -> BlazeThemeColor
+                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+                },
+            modifier = Modifier.size(22.dp),
         )
     }
 }
