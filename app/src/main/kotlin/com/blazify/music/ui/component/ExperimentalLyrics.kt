@@ -13,6 +13,13 @@ import android.content.Intent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -163,6 +170,7 @@ fun ExperimentalLyrics(
     sliderPositionProvider: () -> Long?,
     modifier: Modifier = Modifier,
     showLyrics: Boolean,
+    isFullScreen: Boolean = false,
     lyricsViewModel: LyricsViewModel = hiltViewModel()
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -901,15 +909,19 @@ fun ExperimentalLyrics(
             }
         )
 
-        // Language / source switcher pill — top-centre of the lyrics pane.
-        if (!isSelectionModeActive && !isGuest && lyrics != null && lyrics != LYRICS_NOT_FOUND && mediaMetadata != null) {
-            LyricsLanguageButton(
-                onClick = { showSourcePicker = true },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(top = 8.dp),
-            )
+        // The source picker — top-centre of the lyrics pane, and gone in full screen,
+        // which is the one place somebody asked for nothing but the words.
+        AnimatedVisibility(
+            visible = !isFullScreen && !isSelectionModeActive && !isGuest &&
+                lyrics != null && lyrics != LYRICS_NOT_FOUND && mediaMetadata != null,
+            enter = fadeIn() + slideInVertically { -it / 2 } + expandVertically(),
+            exit = fadeOut() + slideOutVertically { -it / 2 } + shrinkVertically(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp),
+        ) {
+            LyricsLanguageButton(onClick = { showSourcePicker = true })
         }
     }
 

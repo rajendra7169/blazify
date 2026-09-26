@@ -16,6 +16,7 @@ fun Lyrics(
     sliderPositionProvider: () -> Long?,
     modifier: Modifier = Modifier,
     showLyrics: Boolean,
+    isFullScreen: Boolean = false,
     lyricsViewModel: LyricsViewModel = hiltViewModel()
 ) {
     // The newer lyrics view is the only one now. It was already the default, and
@@ -24,6 +25,7 @@ fun Lyrics(
         sliderPositionProvider = sliderPositionProvider,
         modifier = modifier,
         showLyrics = showLyrics,
+        isFullScreen = isFullScreen,
         lyricsViewModel = lyricsViewModel
     )
 }

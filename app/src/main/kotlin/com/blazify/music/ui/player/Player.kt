@@ -2313,6 +2313,7 @@ fun BottomSheetPlayer(
                                         mediaMetadata = mediaMetadata,
                                         showLyrics = showLyrics,
                                         positionProvider = { effectivePosition },
+                                        isFullScreen = isFullScreen,
                                     )
                                 } else {
                                     Thumbnail(
@@ -2563,6 +2564,7 @@ fun InlineLyricsView(
     mediaMetadata: MediaMetadata?,
     showLyrics: Boolean,
     positionProvider: () -> Long,
+    isFullScreen: Boolean = false,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val currentLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
@@ -2667,6 +2669,7 @@ fun InlineLyricsView(
                         sliderPositionProvider = positionProvider,
                         modifier = Modifier.padding(horizontal = 24.dp),
                         showLyrics = showLyrics,
+                        isFullScreen = isFullScreen,
                     )
                 }
                 ProvideTextStyle(
@@ -2816,6 +2819,7 @@ private fun BoxScope.LandscapePlayer(
                                 mediaMetadata = mediaMetadata,
                                 showLyrics = showLyrics,
                                 positionProvider = { effectivePosition },
+                                isFullScreen = isFullScreen,
                             )
                         } else {
                             // Each design keeps its own artwork sideways: the ring, the

@@ -253,7 +253,13 @@ private fun lyricsSourceRank(providerName: String): Int {
     }
 }
 
-/** Small pill on the lyrics screen that opens the source/language picker. */
+/**
+ * Small pill on the lyrics screen that opens the picker.
+ *
+ * It said "Language", which promised the song in another language. What it opens is the
+ * same words from every source we can reach, so you can take whichever one is in step
+ * with the music — that is what it says now.
+ */
 @Composable
 internal fun LyricsLanguageButton(
     onClick: () -> Unit,
@@ -269,9 +275,9 @@ internal fun LyricsLanguageButton(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
     ) {
-        Icon(painterResource(R.drawable.translate), null, Modifier.size(18.dp))
+        Icon(painterResource(R.drawable.lyrics), null, Modifier.size(18.dp))
         Spacer(Modifier.width(6.dp))
-        Text(stringResource(R.string.lyrics_language))
+        Text(stringResource(R.string.lyrics_sources))
     }
 }
 

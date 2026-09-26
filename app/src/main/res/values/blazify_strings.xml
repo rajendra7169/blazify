@@ -490,6 +490,7 @@
     <string name="lyrics_search_google">Google</string>
     <string name="lyrics_find_all_sources">Find in all sources</string>
     <string name="lyrics_language">Language</string>
+    <string name="lyrics_sources">Sources</string>
     <string name="lyrics_choose_source">Choose lyrics</string>
     <string name="lyrics_choose_source_desc">Pick a source or language for this song</string>
 
