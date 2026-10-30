@@ -1183,6 +1183,8 @@ class MusicService :
                 val shuffleModeEnabled = player.shuffleModeEnabled
                 val playbackParameters = player.playbackParameters
                 val volume = player.volume
+                // The order shuffle chose, so the rebuilt player plays the rest of it rather than a new one.
+                val shuffleOrder = player.shuffleOrder
                 val mediaItems = List(player.mediaItemCount) { index ->
                     player.getMediaItemAt(index)
                 }
@@ -1208,6 +1210,7 @@ class MusicService :
                 newPlayer.setMediaItems(mediaItems, currentIndex, currentPosition)
                 newPlayer.repeatMode = repeatMode
                 newPlayer.shuffleModeEnabled = shuffleModeEnabled
+                newPlayer.setShuffleOrder(shuffleOrder)
                 newPlayer.playbackParameters = playbackParameters
                 newPlayer.volume = volume
                 newPlayer.playWhenReady = playWhenReady
@@ -5926,6 +5929,9 @@ class MusicService :
 
         secPlayer.repeatMode = savedRepeatMode
         secPlayer.shuffleModeEnabled = savedShuffleEnabled
+        // The same shuffled order carries over. Drawing a new one at every crossfade sent a
+        // shuffled queue back over songs already heard and skipped others.
+        secPlayer.setShuffleOrder(player.shuffleOrder)
 
         try {
             secPlayer.prepare()
@@ -5939,11 +5945,6 @@ class MusicService :
         }
 
         performCrossfadeSwap()
-
-        if (savedShuffleEnabled) {
-            val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
-            applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
-        }
     }
 
     private fun performCrossfadeSwap() {
