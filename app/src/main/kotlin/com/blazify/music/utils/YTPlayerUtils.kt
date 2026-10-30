@@ -170,6 +170,29 @@ object YTPlayerUtils {
         Timber.tag(logTag).d("Main client refused a stream — resting it for five minutes")
     }
 
+    /** The name of the client whose streams [noteMainClientCutOff] is about. */
+    val mainClientName: String get() = MAIN_CLIENT.clientName
+
+    /**
+     * Until when the main client is left out because one of its streams was refused part way
+     * through a song.
+     *
+     * That is the token failing rather than a link growing old: the same thing happens to the
+     * next song, and the one after. Five minutes' rest put the listener back on it for the
+     * first song after, to stop thirty seconds in again, so it rests for half an hour.
+     */
+    @Volatile
+    private var mainClientCutOffUntil: Long = 0
+
+    private const val MAIN_CLIENT_CUT_OFF_MS = 30 * 60 * 1000L
+
+    /** A stream from the main client was refused while it played: use the others for a while. */
+    fun noteMainClientCutOff() {
+        mainClientCutOffUntil = System.currentTimeMillis() + MAIN_CLIENT_CUT_OFF_MS
+        setMainClientTrustedUntil(0L)
+        Timber.tag(TAG).w("${MAIN_CLIENT.clientName} stream refused while playing: using the other clients for half an hour")
+    }
+
     /**
      * When working out the signature last failed.
      *
@@ -191,7 +214,8 @@ object YTPlayerUtils {
             System.currentTimeMillis() - cipherFailedAt < MAIN_CLIENT_REST_MS
 
     private fun mainClientRefusing(): Boolean =
-        mainClientRefusedAt > 0 &&
+        System.currentTimeMillis() < mainClientCutOffUntil ||
+            mainClientRefusedAt > 0 &&
             System.currentTimeMillis() - mainClientRefusedAt < MAIN_CLIENT_REST_MS
 
     // Fire-and-forget scope for the cipher config self-heal triggered when a cipher client fails
@@ -572,9 +596,19 @@ object YTPlayerUtils {
         // that round trip was measured at sixteen seconds on a real phone.
         // After it fails, it is left out for a few minutes and the fallbacks —
         // which need no cipher — are asked instead.
+        //
+        // It is left out as well when no streaming token could be made for it. Without one the
+        // content server sends the first megabyte or so of the song and refuses the rest, so the
+        // song stops about thirty seconds in (issue 23, a phone where the token's browser engine
+        // never answered). The other clients need no token and play the whole song.
+        val noStreamingToken = MAIN_CLIENT.useWebPoTokens && poToken?.streamingDataPoToken == null
+        if (noStreamingToken) {
+            Timber.tag(TAG).w("No streaming token for ${MAIN_CLIENT.clientName}: playing $videoId from the other clients")
+        }
         val startIndex = when {
             isAgeRestricted -> 0
             mainClientRefusing() -> 0
+            noStreamingToken -> 0
             else -> -1
         }
 
@@ -817,7 +851,7 @@ object YTPlayerUtils {
                 if (playWithoutTest) {
                     Timber.tag(logTag).d("Main client trusted — playing its stream without a test request")
                 }
-                if (playWithoutTest || validateStatus(streamUrl)) {
+                if (playWithoutTest || validateStatus(streamUrl, format.contentLength)) {
                     if (isMainClient && !playWithoutTest) trustMainClient()
                     // working stream found
                     Timber.tag(logTag).d("Stream validated successfully with client: ${currentClient.clientName}")
@@ -1033,13 +1067,20 @@ object YTPlayerUtils {
      * failures through the player — a whole failed load, a cache clear and a
      * re-resolve, thirteen seconds of silence, where one round trip would have
      * moved on to the next client in four.
+     *
+     * The two bytes come from three quarters of the way in, not the start. An
+     * address the content server only half accepts — the main client's without
+     * a working token — serves its first megabyte or so and refuses everything
+     * after it, so a test at the start passed and the song then stopped about
+     * thirty seconds in (issue 23). Late in the file, the test sees the refusal.
      */
-    private fun validateStatus(url: String): Boolean {
+    private fun validateStatus(url: String, contentLength: Long?): Boolean {
         Timber.tag(logTag).d("Validating stream URL status")
         try {
+            val probeAt = contentLength?.takeIf { it > 2 }?.let { it * 3 / 4 } ?: 0L
             val requestBuilder = okhttp3.Request.Builder()
                 .get()
-                .header("Range", "bytes=0-1")
+                .header("Range", "bytes=$probeAt-${probeAt + 1}")
                 .url(url)
 
             // Add authentication cookie for privately owned tracks

@@ -589,6 +589,9 @@ class MusicService :
     @Volatile
     private var cachedAutoLoadMore = true
 
+    /** Which client each song's stream came from, so a refusal can be laid at the right door. */
+    private val streamClients = java.util.concurrent.ConcurrentHashMap<String, String>()
+
     // URL cache for stream URLs - class-level so it can be invalidated on errors
     private val songUrlCache = Collections.synchronizedMap(
         object : LinkedHashMap<String, Pair<String, Long>>(0, 0.75f, true) {
@@ -3688,6 +3691,12 @@ class MusicService :
 
             isExpiredUrlError(error) -> {
                 Timber.tag(TAG).d("Expired URL (403/410) detected, refreshing stream URL")
+                // A main-client stream refused part way through is far more often its token
+                // failing than the link growing old (issue 23): the retry, and the songs after
+                // it, use the other clients.
+                if (mediaId != null && streamClients[mediaId] == YTPlayerUtils.mainClientName) {
+                    YTPlayerUtils.noteMainClientCutOff()
+                }
                 handleExpiredUrlError(mediaId)
                 return
             }
@@ -4938,6 +4947,7 @@ class MusicService :
 
                 val streamUrl = nonNullPlayback.streamUrl
                 currentStreamClient.value = nonNullPlayback.streamClient
+                nonNullPlayback.streamClient?.let { streamClients[mediaId] = it }
 
                 songUrlCache[mediaId] =
                     streamUrl to System.currentTimeMillis() + (nonNullPlayback.streamExpiresInSeconds * 1000L)
