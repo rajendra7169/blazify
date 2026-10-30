@@ -15,7 +15,8 @@
 On a phone without Google services (de-Googled, LineageOS, a Huawei), take the
 [latest release](https://github.com/rajendra7169/blazify/releases/latest) and take
 `Blazify.apk` instead of `Blazify-gms.apk`. It is the same app without casting
-to a television.
+to a television. Or get it from
+[F-Droid](https://f-droid.org/packages/com.blazify.music/).
 
 **Official website: [rajendra7169.github.io/blazify](https://rajendra7169.github.io/blazify/)** · screenshots, features and downloads for every platform
 
@@ -167,6 +168,15 @@ installs each new release for you.
 Tap that on your phone, or add `https://github.com/rajendra7169/blazify` in
 Obtainium by hand. Blazify updates itself too; this is for people who prefer
 one app managing everything they sideload.
+
+### F-Droid
+
+Blazify is on [F-Droid](https://f-droid.org/packages/com.blazify.music/), built
+from this source code and checked against the published release. New versions
+reach it a few days after they appear here. The F-Droid build has no casting to
+a television, and F-Droid updates it for you.
+
+<a href="https://f-droid.org/packages/com.blazify.music/"><img src="docs/assets/buttons/store-fdroid.png" width="130" alt="Get it on F-Droid" /></a>
 
 ### Also on app stores
 
