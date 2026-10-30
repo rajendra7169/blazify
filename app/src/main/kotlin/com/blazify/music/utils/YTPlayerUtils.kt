@@ -635,6 +635,12 @@ object YTPlayerUtils {
                 (startIndex until STREAM_FALLBACK_CLIENTS.size).toList()
             }
 
+        // Whether any client was turned away with a bot check. That is the identity being doubted,
+        // not the song being blocked, and a fresh identity clears it; but the last client's answer
+        // is the one reported, and when that was a plain "unavailable" the song was written off
+        // without the identity ever being renewed.
+        var botChecked = false
+
         for (clientIndex in clientOrder) {
             // reset for each client
             format = null
@@ -892,6 +898,9 @@ object YTPlayerUtils {
                 }
             } else {
                 Timber.tag(logTag).d("Player response status not OK: ${streamPlayerResponse?.playabilityStatus?.status}, reason: ${streamPlayerResponse?.playabilityStatus?.reason}")
+                if (streamPlayerResponse?.playabilityStatus?.reason?.contains("not a bot", ignoreCase = true) == true) {
+                    botChecked = true
+                }
             }
         }
 
@@ -922,7 +931,7 @@ object YTPlayerUtils {
             }
             // Only a plain refusal is final. A sign-in or bot check can clear up with a fresh
             // identity or a moment's wait, so those keep the old error and its retries.
-            val refused = streamPlayerResponse.playabilityStatus.status in setOf("UNPLAYABLE", "ERROR")
+            val refused = streamPlayerResponse.playabilityStatus.status in setOf("UNPLAYABLE", "ERROR") && !botChecked
             if (refused) unavailableSongs[videoId] = System.currentTimeMillis()
             throw PlaybackException(
                 errorReason,
