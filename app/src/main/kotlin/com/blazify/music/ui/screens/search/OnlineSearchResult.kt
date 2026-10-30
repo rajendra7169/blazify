@@ -578,7 +578,10 @@ fun OnlineSearchResult(
                     )
                 }
             }
+            // The results' song-finder button belongs to the results; over the suggestions it
+            // only covered them (issue 24).
             HideOnScrollFAB(
+                visible = !isSearchFocused,
                 lazyListState = lazyListState,
                 icon = R.drawable.mic,
                 onClick = { navController.navigate("recognition") },
