@@ -82,16 +82,12 @@ constructor(
                 PlaylistSongSortType.ARTIST -> {
                     val collator = Collator.getInstance(Locale.getDefault())
                     collator.strength = Collator.PRIMARY
-                    filteredSongs
-                        .sortedWith(compareBy(collator) { song -> song.song.artists.joinToString("") { it.name } })
-                        .groupBy { it.song.album?.title }
-                        .flatMap { (_, songsByAlbum) ->
-                            songsByAlbum.sortedBy {
-                                it.song.artists.joinToString(
-                                    ""
-                                ) { it.name }
-                            }
-                        }
+                    // By artist, then by album within each artist. Grouping by album after the
+                    // sort pulled an artist's songs apart whenever two artists shared an album name.
+                    filteredSongs.sortedWith(
+                        compareBy<PlaylistSong, String>(collator) { song -> song.song.artists.joinToString("") { it.name } }
+                            .thenBy(collator) { it.song.album?.title.orEmpty() },
+                    )
                 }
 
                 PlaylistSongSortType.PLAY_TIME -> filteredSongs.sortedBy { it.song.song.totalPlayTime }
