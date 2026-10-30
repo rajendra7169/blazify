@@ -163,7 +163,10 @@ fun PlaybackError(
                         error = error,
                         errorCodeName = getErrorCodeName(error.errorCode),
                         errorCode = error.errorCode,
-                        timestampMs = error.timestampMs,
+                        // The error is stamped with time since the phone started, which
+                        // printed as a day in 1970; this turns it into the time of day.
+                        timestampMs = System.currentTimeMillis() -
+                            (android.os.SystemClock.elapsedRealtime() - error.timestampMs),
                         app = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.FLAVOR}, ${BuildConfig.ARCHITECTURE}",
                         android = "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
                         device = "${Build.MANUFACTURER} ${Build.MODEL}",
