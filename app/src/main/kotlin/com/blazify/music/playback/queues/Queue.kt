@@ -27,22 +27,28 @@ interface Queue {
         val position: Long = 0L,
     ) {
         fun filterExplicit(enabled: Boolean = true) =
-            if (enabled) {
-                copy(
-                    items = items.filterExplicit(),
-                )
-            } else {
-                this
-            }
+            if (enabled) filterItems { it.metadata?.explicit != true } else this
 
         fun filterVideoSongs(disableVideos: Boolean = false) =
-            if (disableVideos) {
-                copy(
-                    items = items.filterVideoSongs(true),
-                )
-            } else {
-                this
-            }
+            if (disableVideos) filterItems { it.metadata?.isVideoSong != true } else this
+
+        /**
+         * Leaves out what [keep] turns away while [mediaItemIndex] still points at the song that
+         * was tapped. Filtering the list alone left the index where it was, so with explicit songs
+         * or videos hidden a tap on one song in a list started a different one. If the tapped song
+         * is itself left out, the next one kept is played from its start.
+         */
+        private fun filterItems(keep: (MediaItem) -> Boolean): Status {
+            val filtered = items.filter(keep)
+            if (filtered.size == items.size) return this
+            val start = items.getOrNull(mediaItemIndex)
+            val keptBefore = items.take(mediaItemIndex.coerceAtLeast(0)).count(keep)
+            return copy(
+                items = filtered,
+                mediaItemIndex = keptBefore.coerceAtMost((filtered.size - 1).coerceAtLeast(0)),
+                position = if (start != null && keep(start)) position else 0L,
+            )
+        }
 
         /**
          * Leaves out songs the listener hid with "Don't play this song". The song at
