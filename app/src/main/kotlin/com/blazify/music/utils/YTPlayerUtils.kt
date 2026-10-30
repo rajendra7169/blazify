@@ -621,7 +621,21 @@ object YTPlayerUtils {
 
         val hasHighQuality = mainPlayerResponse.streamingData?.adaptiveFormats?.any { it.audioQuality == "AUDIO_QUALITY_HIGH" } == true
 
-        for (clientIndex in (startIndex until STREAM_FALLBACK_CLIENTS.size)) {
+        // Without a token the main client's stream is not dropped, only moved to the back. Where
+        // every other client is refused as well (a network YouTube is asking to prove it is not a
+        // bot, an old phone whose browser engine cannot make the token), its first minute or so
+        // is still more than nothing, which is what the song got before the others were tried.
+        val mainAsLastResort =
+            noStreamingToken && !isAgeRestricted && !mainClientRefusing() &&
+                MAIN_CLIENT.clientName !in disabledStreamClients
+        val clientOrder =
+            if (mainAsLastResort) {
+                STREAM_FALLBACK_CLIENTS.indices + listOf(-1)
+            } else {
+                (startIndex until STREAM_FALLBACK_CLIENTS.size).toList()
+            }
+
+        for (clientIndex in clientOrder) {
             // reset for each client
             format = null
             streamUrl = null
@@ -846,9 +860,13 @@ object YTPlayerUtils {
                 // Private uploads and age-restricted songs keep their test: those are exactly the
                 // cases where the main client's address can look fine and still be refused.
                 val isMainClient = currentClient.clientName == MAIN_CLIENT.clientName
+                // Reached without a token only as the last resort, whose stream is known to fail a
+                // test late in the file: it is played for the part it has.
                 val playWithoutTest =
-                    isMainClient && mainClientTrusted() && !isUploadedTrack && !wasOriginallyAgeRestricted
-                if (playWithoutTest) {
+                    isMainClient && (mainClientTrusted() || noStreamingToken) && !isUploadedTrack && !wasOriginallyAgeRestricted
+                if (playWithoutTest && noStreamingToken) {
+                    Timber.tag(TAG).w("Every other client refused $videoId: playing ${MAIN_CLIENT.clientName} without a token")
+                } else if (playWithoutTest) {
                     Timber.tag(logTag).d("Main client trusted — playing its stream without a test request")
                 }
                 if (playWithoutTest || validateStatus(streamUrl, format.contentLength)) {
