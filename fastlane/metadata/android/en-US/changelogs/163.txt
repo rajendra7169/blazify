@@ -1,0 +1,3 @@
+New: half the download size, sync a song's plain lyrics yourself by tapping along, the next songs are saved on Wi-Fi so music keeps going with no connection, Home's shuffle, For you and Speed dial play your saved songs when offline, and Remove from queue in a song's menu.
+
+Fixed: songs stopping about 30 seconds in, the search screen after deleting a search, Last.fm, Discord status, shuffle with crossfade, and more.
