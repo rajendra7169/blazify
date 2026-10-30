@@ -13,8 +13,9 @@ broken download on from one to the next. Run after each GitHub release:
 The tag must already be pushed to Codeberg. Notes and APKs are taken from the
 GitHub release itself, so every copy says the same thing. Tokens are read from
 ~/.config/blazify-gitlab-token and ~/.config/blazify-codeberg-token and never
-printed. The website change is committed in ~/Documents/GitHub/portfolio-site
-but not pushed; push it with the command printed at the end.
+printed. The website change is committed in ~/Documents/GitHub/rajendra-pandey-portfolio
+but not pushed; push it with the command printed at the end. (Until 2026-10-17 the site
+was ~/Documents/GitHub/portfolio-site; that folder no longer publishes anything.)
 """
 import json
 import os
@@ -29,7 +30,8 @@ GITHUB = "https://api.github.com/repos/rajendra7169/blazify"
 GITLAB_PROJECT = os.environ.get("GITLAB_PROJECT", "hackerraja7169/blazify")
 GITLAB = "https://gitlab.com/api/v4/projects/" + urllib.parse.quote(GITLAB_PROJECT, safe="")
 CODEBERG = "https://codeberg.org/api/v1/repos/" + os.environ.get("CODEBERG_REPO", "rajaindra7169/blazify")
-SITE = Path("~/Documents/GitHub/portfolio-site").expanduser()
+# The live site since 2026-10-17; it serves public/ as the site's root.
+SITE = Path("~/Documents/GitHub/rajendra-pandey-portfolio").expanduser()
 
 
 def token(name):
@@ -131,7 +133,7 @@ def main(tag):
     if subprocess.run(git + ["diff", "--cached", "--quiet"]).returncode:
         subprocess.run(git + ["commit", "-q", "-m", f"Blazify {version} on the backup hosts"], check=True)
         print("Website file committed. Publish it with:\n"
-              f"  git -C {SITE} push https://github.com/rajendra7169/portfolio.git site-main:main")
+              f"  git -C {SITE} push https://github.com/rajendra7169/portfolio.git main")
     else:
         print("Website file already up to date")
 
