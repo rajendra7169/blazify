@@ -1001,7 +1001,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
           <a class="btn" href="#get">Download free <i>↓</i></a>
           <div class="proof">
             <span class="dots"><b><svg class="ic"><use href="#i-head"/></svg></b><b><svg class="ic"><use href="#i-flame"/></svg></b><b><svg class="ic"><use href="#i-note"/></svg></b></span>
-            <small><strong id="dlCount">668</strong> downloads<br>and counting</small>
+            <small><strong id="dlCount">5,000+</strong> downloads<br>and counting</small>
           </div>
           <div class="eq" aria-hidden="true"></div>
         </div>
@@ -1999,9 +1999,13 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
 
   const REPOS = ['blazify', 'blazify-desktop', 'blazify-ios'];
   const KEY = 'blazify-downloads-v2';
+  /* What the page says until GitHub answers, and the least it ever says. GitHub
+     allows each visitor 60 questions an hour and then answers nothing, and a repo
+     that fails counts as none, so a low total here means a refusal, not fewer downloads. */
+  const FLOOR = 5000;
 
   const show = n => {
-    if (typeof n !== 'number' || !isFinite(n) || n <= 0) return;  // never paint NaN over a real fallback
+    if (typeof n !== 'number' || !isFinite(n) || n <= FLOOR) return;  // never paint NaN or less over the fallback
     const from = parseInt(el.textContent.replace(/\D/g, ''), 10) || 0;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || n === from) {
       el.textContent = n.toLocaleString();
