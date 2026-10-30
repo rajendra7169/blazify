@@ -89,6 +89,8 @@ fun QueueMenu(
     playerBottomSheetState: BottomSheetState,
     onShowDetailsDialog: () -> Unit,
     onDismiss: () -> Unit,
+    // Shown for songs in the queue itself, where swiping one away was the only way to remove it.
+    onRemoveFromQueue: (() -> Unit)? = null,
 ) {
     mediaMetadata ?: return
 
@@ -381,8 +383,23 @@ fun QueueMenu(
                                 playerConnection.addToQueue(mediaMetadata.toMediaItem())
                             }
                         }
-                    )
-                )
+                    ),
+                    onRemoveFromQueue?.let { remove ->
+                        Material3MenuItemData(
+                            title = { Text(text = stringResource(R.string.remove_from_queue)) },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.delete),
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                onDismiss()
+                                remove()
+                            }
+                        )
+                    },
+                ).filterNotNull()
             )
         }
 
