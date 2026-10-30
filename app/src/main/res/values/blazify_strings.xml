@@ -1460,4 +1460,7 @@
     <string name="sync_lyrics_leave_confirm">Leave</string>
     <!-- The queue's name when playing songs picked by hand from a list -->
     <string name="queue_selection">Selected songs</string>
+    <!-- The queue's name when Home's shuffle or the greeting card's buttons play saved songs with no connection -->
+    <string name="offline_mix">Saved on this phone</string>
+    <string name="offline_mix_empty">No connection, and no songs saved on this phone yet. Download songs to listen offline.</string>
 </resources>

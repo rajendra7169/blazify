@@ -134,6 +134,7 @@ import com.blazify.music.db.entities.PlaylistSongMap
 import com.blazify.music.db.entities.Song
 import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.extensions.isInternetConnected
 import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.playback.queues.LocalAlbumRadio
 import com.blazify.music.playback.queues.YouTubeAlbumRadio
@@ -777,6 +778,27 @@ fun HomeScreen(
             )
         }
     }
+    // With no connection, Home's shuffle and the greeting card's buttons play what is saved on
+    // the phone, shuffled, instead of asking YouTube for a radio or a mix that cannot come and
+    // failing on every song. [first] are put at the front when they are saved: the Speed dial's
+    // own songs, so that button still plays its grid as far as the phone has it.
+    val context = LocalContext.current
+    val offlineMixTitle = stringResource(R.string.offline_mix)
+    val offlineMixEmpty = stringResource(R.string.offline_mix_empty)
+    val playSavedSongs: (first: Set<String>) -> Unit = { first ->
+        scope.launch {
+            val saved = viewModel.songsOnPhone()
+            if (saved.isEmpty()) {
+                snackbarHostState.showSnackbar(offlineMixEmpty)
+                return@launch
+            }
+            val (front, rest) = saved.partition { it.id in first }
+            playerConnection.playQueue(
+                ListQueue(offlineMixTitle, (front.shuffled() + rest.shuffled()).map { it.toMediaItem() }),
+            )
+        }
+    }
+
     // Track randomization job
     var randomizeJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
@@ -1303,19 +1325,23 @@ fun HomeScreen(
                         onForYouClick =
                             if (!isListenTogetherGuest) {
                                 {
-                                    playerConnection.playQueue(
-                                        if (forYouFromMix) {
-                                            YouTubeQueue(
-                                                WatchEndpoint(
-                                                    videoId = forYouSong?.id,
-                                                    playlistId = SUPERMIX_PLAYLIST_ID,
-                                                ),
-                                                forYouSong?.toMediaMetadata(),
-                                            )
-                                        } else {
-                                            ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
-                                        },
-                                    )
+                                    if (!context.isInternetConnected()) {
+                                        playSavedSongs(emptySet())
+                                    } else {
+                                        playerConnection.playQueue(
+                                            if (forYouFromMix) {
+                                                YouTubeQueue(
+                                                    WatchEndpoint(
+                                                        videoId = forYouSong?.id,
+                                                        playlistId = SUPERMIX_PLAYLIST_ID,
+                                                    ),
+                                                    forYouSong?.toMediaMetadata(),
+                                                )
+                                            } else {
+                                                ListQueue(title = forYouTitle, items = picks.map { it.toMediaItem() })
+                                            },
+                                        )
+                                    }
                                     viewModel.forYouPlayed()
                                 }
                             } else {
@@ -1328,12 +1354,16 @@ fun HomeScreen(
                         onSpeedDialClick =
                             if (!isListenTogetherGuest && speedDialOrder.isNotEmpty()) {
                                 {
-                                    playerConnection.playQueue(
-                                        ListQueue(
-                                            title = speedDialTitle,
-                                            items = speedDialOrder.map { it.toMediaItem() },
-                                        ),
-                                    )
+                                    if (!context.isInternetConnected()) {
+                                        playSavedSongs(speedDialOrder.map { it.id }.toSet())
+                                    } else {
+                                        playerConnection.playQueue(
+                                            ListQueue(
+                                                title = speedDialTitle,
+                                                items = speedDialOrder.map { it.toMediaItem() },
+                                            ),
+                                        )
+                                    }
                                     viewModel.speedDialPlayed()
                                 }
                             } else {
@@ -2735,7 +2765,9 @@ fun HomeScreen(
                 lazyListState = lazylistState,
                 icon = R.drawable.shuffle,
                 onClick = {
-                    if (!isListenTogetherGuest) {
+                    if (!isListenTogetherGuest && !context.isInternetConnected()) {
+                        playSavedSongs(emptySet())
+                    } else if (!isListenTogetherGuest) {
                         val local =
                             when {
                                 allLocalItems.isNotEmpty() && allYtItems.isNotEmpty() -> Random.nextFloat() < 0.5

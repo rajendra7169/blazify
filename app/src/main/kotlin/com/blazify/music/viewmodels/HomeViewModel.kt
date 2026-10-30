@@ -8,6 +8,8 @@ package com.blazify.music.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.datasource.cache.ContentMetadata
 import androidx.lifecycle.viewModelScope
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.models.AlbumItem
@@ -43,6 +45,9 @@ import com.blazify.music.db.entities.Album
 import com.blazify.music.db.entities.LocalItem
 import com.blazify.music.db.entities.Song
 import com.blazify.music.db.entities.SpeedDialItem
+import com.blazify.music.di.DownloadCache
+import com.blazify.music.di.PlayerCache
+import com.blazify.music.extensions.filterExplicit
 import com.blazify.music.extensions.filterVideoSongs
 import com.blazify.music.extensions.filterBlockedArtists
 import com.blazify.music.extensions.toEnum
@@ -67,6 +72,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -126,7 +132,37 @@ class HomeViewModel @Inject constructor(
     val syncUtils: SyncUtils,
     val wrappedManager: WrappedManager,
     private val wrappedAudioService: WrappedAudioService,
+    @PlayerCache private val playerCache: Cache,
+    @DownloadCache private val downloadCache: Cache,
 ) : ViewModel() {
+    /**
+     * Every song that plays with no connection: downloaded, kept whole in the song cache, or one
+     * of the listener's own files. Home's shuffle and the greeting card's buttons play these when
+     * there is no connection, instead of asking YouTube for a radio that cannot come. Read when a
+     * button is pressed rather than kept up to date, since most days nobody asks.
+     */
+    suspend fun songsOnPhone(): List<Song> =
+        withContext(Dispatchers.IO) {
+            val ids = (playerCache.keys + downloadCache.keys).filterNot { it.startsWith("local:") }
+            // A few hundred at a time: Android 8's database takes at most 999 values in one query.
+            val saved =
+                ids.chunked(500).flatMap { database.getSongsByIds(it) }.filter { song ->
+                    val id = song.id
+                    val length =
+                        song.format?.contentLength
+                            ?: ContentMetadata.getContentLength(playerCache.getContentMetadata(id)).takeIf { it > 0 }
+                            ?: ContentMetadata.getContentLength(downloadCache.getContentMetadata(id)).takeIf { it > 0 }
+                    length != null &&
+                        (downloadCache.isCached(id, 0, length) || playerCache.isCached(id, 0, length))
+                }
+            val hideExplicit = context.dataStore.get(HideExplicitKey, false)
+            (saved + database.localSongsBlocking())
+                .distinctBy { it.id }
+                // A shuffle of music, so podcast episodes kept for later are left to their own page.
+                .filterNot { it.song.isEpisode }
+                .filterExplicit(hideExplicit)
+        }
+
     val isRefreshing = MutableStateFlow(false)
     val isLoading = MutableStateFlow(false)
 
