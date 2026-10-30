@@ -162,11 +162,6 @@ fun OnlineSearchResult(
     val hideVideoSongs by rememberPreference(HideVideoSongsKey, defaultValue = false)
     val autoRadioQueue by rememberPreference(AutoRadioQueueKey, defaultValue = true)
 
-    BackHandler(enabled = isSearchFocused) {
-        isSearchFocused = false
-        focusManager.clearFocus()
-    }
-
     // Extract query from navigation arguments
     val encodedQuery = navController.currentBackStackEntry?.arguments?.getString("query") ?: ""
     val decodedQuery = remember(encodedQuery) { SearchRoutes.decodeQuery(encodedQuery) }
@@ -174,6 +169,17 @@ fun OnlineSearchResult(
     var query by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(decodedQuery, TextRange(decodedQuery.length)))
     }
+
+    // Leaving the suggestions without searching goes back to the results with the words they
+    // belong to. Keeping the half-edited words left the results under a box that said
+    // something else, or nothing at all.
+    val backToResults: () -> Unit = {
+        isSearchFocused = false
+        focusManager.clearFocus()
+        query = TextFieldValue(decodedQuery, TextRange(decodedQuery.length))
+    }
+
+    BackHandler(enabled = isSearchFocused) { backToResults() }
 
     val onSearch: (String) -> Unit =
         remember {
@@ -570,10 +576,7 @@ fun OnlineSearchResult(
                         query = query.text,
                         onQueryChange = { query = it },
                         onSearch = onSearch,
-                        onDismiss = {
-                            isSearchFocused = false
-                            focusManager.clearFocus()
-                        },
+                        onDismiss = backToResults,
                         pureBlack = pureBlack,
                     )
                 }
