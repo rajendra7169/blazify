@@ -33,6 +33,23 @@ class AccountSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
+     * Change to another account, or another channel of this one. What was synced belongs to the
+     * account being left, so it goes first, the same as signing out would take it. False when the
+     * account no longer answers, and then nothing has been touched.
+     */
+    suspend fun switchAccount(context: Context, account: com.blazify.music.utils.SavedAccount): Boolean {
+        if (!com.blazify.music.utils.AccountSwitcher.stillSignedIn(account)) return false
+        com.blazify.music.utils.AccountSwitcher.rememberCurrent(context)
+        withContext(Dispatchers.IO) { syncUtils.clearAllSyncedContentSuspend() }
+        return com.blazify.music.utils.AccountSwitcher.use(context, account)
+    }
+
+    /** Signing in over another account: its synced songs and playlists must not mix with the new ones. */
+    suspend fun clearSyncedContent() {
+        withContext(Dispatchers.IO) { syncUtils.clearAllSyncedContentSuspend() }
+    }
+
+    /**
      * Logout user and clear all synced content to prevent data mixing between accounts
      */
     fun logoutAndClearSyncedContent(context: Context, onCookieChange: (String) -> Unit) {
@@ -65,6 +82,7 @@ class AccountSettingsViewModel @Inject constructor(
     suspend fun logoutAndClearLibraryData(context: Context) {
         Timber.d("[LOGOUT_CLEAR] ViewModel: logoutAndClearLibraryData called")
         withContext(Dispatchers.IO) {
+            com.blazify.music.utils.AccountSwitcher.forgetCurrent(context)
             // Forget account first — clears cookie/auth from DataStore.
             // Once isLoggedIn() returns false, ALL sync operations will skip.
             App.forgetAccount(context)
@@ -82,6 +100,7 @@ class AccountSettingsViewModel @Inject constructor(
     suspend fun logoutKeepData(context: Context, onCookieChange: (String) -> Unit) {
         Timber.d("[LOGOUT_KEEP] ViewModel: logoutKeepData called")
         withContext(Dispatchers.IO) {
+            com.blazify.music.utils.AccountSwitcher.forgetCurrent(context)
             App.forgetAccount(context)
         }
         Timber.d("[LOGOUT_KEEP] ViewModel: Account forgotten, clearing cookie in UI")

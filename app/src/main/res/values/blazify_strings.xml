@@ -1461,4 +1461,14 @@
     <!-- The queue's name when Home's shuffle or the greeting card's buttons play saved songs with no connection -->
     <string name="offline_mix">Saved on this phone</string>
     <string name="offline_mix_empty">No connection, and no songs saved on this phone yet. Download songs to listen offline.</string>
+    <string name="accounts_and_channels">Accounts and channels</string>
+    <string name="accounts_restart_note">Blazify restarts on the one you choose, and its playlists and library come in. Your downloads stay.</string>
+    <string name="accounts_channels_heading">Channels on this account</string>
+    <string name="accounts_other_heading">Other accounts</string>
+    <string name="accounts_add_another">Add another account</string>
+    <string name="accounts_remove">Remove from this phone</string>
+    <string name="accounts_choose_channel">Choose a channel</string>
+    <string name="accounts_choose_channel_note">Your playlists and library come from the channel you pick. You can change it later in your account.</string>
+    <string name="accounts_switching">Switching…</string>
+    <string name="accounts_expired">That account is signed out. Add it again to use it.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.blazify.innertube
 
+import com.blazify.innertube.models.AccountChannel
 import com.blazify.innertube.models.AccountInfo
 import com.blazify.innertube.models.AlbumItem
 import com.blazify.innertube.models.Artist
@@ -3357,6 +3358,41 @@ object YouTube {
                 .header
                 ?.activeAccountHeaderRenderer
                 ?.toAccountInfo()!!
+        }
+
+    /**
+     * The channels of the account signed in to. Each item is looked for wherever it is in the
+     * answer, rather than along one exact path: this answer is not the one the app reads daily, so
+     * a rearranged wrapper shouldn't cost anybody the list.
+     */
+    suspend fun accountChannels(): Result<List<AccountChannel>> =
+        runCatching {
+            fun read(text: String): List<AccountChannel> {
+                val found = mutableListOf<AccountChannel>()
+
+                fun walk(element: kotlinx.serialization.json.JsonElement) {
+                    when (element) {
+                        is kotlinx.serialization.json.JsonArray -> element.forEach(::walk)
+                        is kotlinx.serialization.json.JsonObject -> {
+                            val item = (element["accountItem"] ?: element["accountItemRenderer"])
+                                as? kotlinx.serialization.json.JsonObject
+                            if (item != null) {
+                                AccountChannel.from(item)?.let(found::add)
+                            } else {
+                                element.values.forEach(::walk)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+                walk(kotlinx.serialization.json.Json.parseToJsonElement(text))
+                return found.distinctBy { it.id }
+            }
+
+            // The music site first, as it is the one the rest of the app talks to. Some accounts
+            // are only answered in full by the main site, so an empty answer gets a second try.
+            val music = runCatching { read(innerTube.accountsList(WEB_REMIX).bodyAsText()) }.getOrDefault(emptyList())
+            music.ifEmpty { read(innerTube.accountsList(YouTubeClient.WEB.copy(loginSupported = true)).bodyAsText()) }
         }
 
     suspend fun feedback(tokens: List<String>): Result<Boolean> =

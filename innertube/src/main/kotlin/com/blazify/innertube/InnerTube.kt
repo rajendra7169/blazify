@@ -417,6 +417,15 @@ class InnerTube {
         }
     }
 
+    suspend fun accountsList(client: YouTubeClient) = withRetry {
+        httpClient.post("account/accounts_list") {
+            ytClient(client, setLogin = true)
+            // Asked as the Google account itself: asked as one of its channels, the answer
+            // can be only that channel's.
+            setBody(com.blazify.innertube.models.body.AccountsListBody(client.toContext(locale, visitorData, null)))
+        }
+    }
+
     suspend fun likeVideo(
         client: YouTubeClient,
         videoId: String,

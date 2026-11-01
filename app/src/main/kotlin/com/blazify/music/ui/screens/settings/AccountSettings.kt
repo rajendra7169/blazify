@@ -142,6 +142,8 @@ fun AccountSettings(
     var showToken by remember { mutableStateOf(false) }
     var showTokenEditor by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showAccounts by remember { mutableStateOf(false) }
+    val (savedAccounts) = rememberPreference(com.blazify.music.constants.SavedAccountsKey, "")
     val scope = rememberCoroutineScope()
 
     Column(
@@ -348,6 +350,33 @@ fun AccountSettings(
             ),
             useLowContrast = true
         )
+
+        if (showAccounts) {
+            AccountsDialog(
+                isLoggedIn = isLoggedIn,
+                onDismiss = { showAccounts = false },
+                onAddAccount = {
+                    showAccounts = false
+                    onClose()
+                    navController.navigate("login")
+                },
+            )
+        }
+
+        if (isLoggedIn || savedAccounts.length > 2) {
+            Spacer(Modifier.height(8.dp))
+
+            Material3SettingsGroup(
+                items = listOf(
+                    Material3SettingsItem(
+                        title = { Text(stringResource(R.string.accounts_and_channels)) },
+                        icon = painterResource(R.drawable.person),
+                        onClick = { showAccounts = true },
+                    ),
+                ),
+                useLowContrast = true,
+            )
+        }
 
         Spacer(Modifier.height(8.dp))
 
