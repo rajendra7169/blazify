@@ -10,6 +10,9 @@ import com.blazify.music.utils.loadedBitmap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -50,6 +53,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.draw.shadow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Brush
@@ -90,6 +94,8 @@ import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import java.util.Calendar
 
+private val SearchRowHeight = 52.dp
+
 /**
  * Blazify home header, ported from the original Flutter app:
  * top row (account | logo + wordmark | settings), greeting card with the
@@ -119,6 +125,10 @@ fun BlazeHomeHeader(
     // follows the album — as the iOS header draws them. White on black read as
     // furniture; the colour says they belong to the app that is playing.
     val iconTint = MaterialTheme.colorScheme.primary
+    // The logo and name are smaller where the full size would run into the two icons: a narrow
+    // screen, or an ordinary one with very large text.
+    val compactHeader =
+        LocalConfiguration.current.screenWidthDp / LocalDensity.current.fontScale < 330f
 
     Column(modifier = Modifier.fillMaxWidth()) {
         // Header row: account | logo + "Blazify" | settings
@@ -155,7 +165,7 @@ fun BlazeHomeHeader(
                     ),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(if (compactHeader) 30.dp else 42.dp)
                         .graphicsLayer { alpha = logoAlpha }
                         .onGloballyPositioned { at ->
                             val r = at.boundsInWindow()
@@ -163,12 +173,12 @@ fun BlazeHomeHeader(
                                 android.graphics.RectF(r.left, r.top, r.right, r.bottom)
                         },
                 )
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(if (compactHeader) 6.dp else 10.dp))
                 Text(
                     text = "Blazify",
-                    fontSize = 26.sp,
+                    fontSize = if (compactHeader) 18.sp else 26.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 3.sp,
+                    letterSpacing = if (compactHeader) 1.sp else 3.sp,
                     maxLines = 1,
                     style = androidx.compose.ui.text.TextStyle(
                         brush = if (isDark) {
@@ -244,8 +254,12 @@ fun BlazeHomeHeader(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .height(160.dp),
         ) {
+            // Her full size on any ordinary phone. On a very narrow screen she shrinks with the
+            // card, or she would cover all of it and the name and buttons with it.
+            val photoWidth = minOf(200.dp, maxWidth * 0.62f)
+            val photoHeight = photoWidth * 1.2f
             // Where the photo begins. Words that reach it go behind her and fade out.
-            val photoLeft = maxWidth - 200.dp
+            val photoLeft = maxWidth - photoWidth
             val greeting = stringResource(greetingRes())
             val hasButtons = onForYouClick != null || onSpeedDialClick != null
 
@@ -272,7 +286,7 @@ fun BlazeHomeHeader(
                 modifier = Modifier.align(Alignment.CenterStart),
             )
 
-            // Hero image: 200x240, bottom-aligned with the card, spilling 80dp above it
+            // Hero image: bottom-aligned with the card, spilling above it
             Image(
                 painter = painterResource(
                     if (isDark) R.drawable.blaze_home_dark else R.drawable.blaze_home_light,
@@ -281,11 +295,11 @@ fun BlazeHomeHeader(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .requiredWidth(200.dp)
-                    .requiredHeight(240.dp)
-                    // requiredHeight overflows evenly (40dp top and bottom);
+                    .requiredWidth(photoWidth)
+                    .requiredHeight(photoHeight)
+                    // requiredHeight overflows evenly, top and bottom;
                     // shift up so the bottom edge sits flush with the card
-                    .offset(y = (-40).dp)
+                    .offset(y = (160.dp - photoHeight) / 2)
                     .clip(RoundedCornerShape(12.dp)),
             )
 
@@ -314,45 +328,68 @@ fun BlazeHomeHeader(
         }
 
 
-        // Search bar
+        // Search, and beside it its own round button for finding the song that's playing near
+        // you. The pill stays plain so it always reads the same; the button takes the colour of
+        // the song, as the card above does. The pill takes whatever width is left and its hint
+        // shortens, so no screen is too narrow for the two, and it grows with a large text size.
         if (showSearchBar) Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .background(if (isDark) Color.White.copy(alpha = 0.1f) else Color(0xFFEEEEEE))
-                .clickable(onClick = onSearchClick)
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Icon(
-                painter = painterResource(R.drawable.search),
-                contentDescription = null,
-                tint = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
-                modifier = Modifier.size(24.dp),
-            )
-            Spacer(Modifier.width(12.dp))
-            // Keep the placeholder on one line: on narrow screens it used to wrap and
-            // grow the search bar's height, so ellipsize instead.
-            Text(
-                text = stringResource(R.string.home_search_hint),
-                color = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
-                fontSize = 15.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            // Song recognition
-            Icon(
-                painter = painterResource(R.drawable.sound_wave),
-                contentDescription = null,
-                tint = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
+            val pillShape = RoundedCornerShape(50)
+            val hintColor = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(24.dp)
-                    .clickable(onClick = onMicClick),
-            )
-        }
+                    .weight(1f)
+                    .heightIn(min = SearchRowHeight)
+                    // Solid, because a shadow shows through a see-through fill.
+                    .then(if (isDark) Modifier else Modifier.shadow(4.dp, pillShape))
+                    .clip(pillShape)
+                    .background(if (isDark) Color(0xFF1C1C1E) else Color.White)
+                    .clickable(onClick = onSearchClick)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.search),
+                    contentDescription = null,
+                    tint = hintColor,
+                    modifier = Modifier.size(22.dp),
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.home_search_hint),
+                    color = hintColor,
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+            }
 
+            val songStart by animateColorAsState(cardStart, tween(500), label = "recognizeStart")
+            val songEnd by animateColorAsState(cardEnd, tween(500), label = "recognizeEnd")
+            val songInk by animateColorAsState(onCard, tween(500), label = "recognizeInk")
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(SearchRowHeight)
+                    .shadow(6.dp, CircleShape, ambientColor = songStart, spotColor = songStart)
+                    .clip(CircleShape)
+                    .background(Brush.linearGradient(listOf(songStart, songEnd)))
+                    .clickable(onClick = onMicClick),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.sound_wave),
+                    contentDescription = stringResource(R.string.recognize_music),
+                    tint = songInk,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
     }
 }
 

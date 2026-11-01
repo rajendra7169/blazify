@@ -796,19 +796,38 @@ internal fun ThemePhonePreview(
             Spacer(Modifier.height(9.dp))
             // Search pill (icon · placeholder · mic).
             val searchTint = if (useDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000)
-            if (showSearchPill) Row(
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(24.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(if (useDark) Color.White.copy(alpha = 0.10f) else Color(0xFFEEEEEE))
-                    .padding(horizontal = 9.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
-                Spacer(Modifier.width(5.dp))
-                Text(stringResource(R.string.home_search_hint), fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Icon(painterResource(R.drawable.sound_wave), null, tint = searchTint, modifier = Modifier.size(11.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(24.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(if (useDark) Color(0xFF1C1C1E) else Color.White)
+                        .padding(horizontal = 9.dp),
+                ) {
+                    Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text(stringResource(R.string.home_search_hint), fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                ) {
+                    Icon(
+                        painterResource(R.drawable.sound_wave),
+                        null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(12.dp),
+                    )
+                }
             }
             Spacer(Modifier.height(8.dp))
             // Mood chips with labels, like the real home — the rail runs past the screen
