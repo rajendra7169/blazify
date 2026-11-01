@@ -436,7 +436,6 @@ class MusicService :
     private var fadingPlayer: ExoPlayer? = null
     private var isCrossfading = false
     private var crossfadeJob: Job? = null
-    private var isRunning = false
     private var mediaSession: MediaLibrarySession? = null
     private var controllerFuture: com.google.common.util.concurrent.ListenableFuture<MediaController>? = null
 
@@ -1485,12 +1484,12 @@ class MusicService :
                         automixItems.value = queue.items.map { it.toMediaItem() }.filterHidden(dataStore.get(HiddenSongIdsKey, emptySet()))
                             .filterBlockedArtists(dataStore.get(BlockedArtistsKey, emptySet()))
                     }.onFailure { error ->
-                        Timber.tag(TAG).w(error, "Failed to restore automix queue, clearing data")
-                        clearPersistedQueueFiles()
+                        Timber.tag(TAG).w(error, "Failed to restore automix queue, clearing it")
+                        automixFile.delete()
                     }
                 }.onFailure { error ->
-                    Timber.tag(TAG).w(error, "Failed to read automix queue, clearing data")
-                    clearPersistedQueueFiles()
+                    Timber.tag(TAG).w(error, "Failed to read automix queue, clearing it")
+                    automixFile.delete()
                 }
             }
 
@@ -1515,8 +1514,8 @@ class MusicService :
                         }
                     }
                 }.onFailure { error ->
-                    Timber.tag(TAG).w(error, "Failed to read player state, clearing data")
-                    clearPersistedQueueFiles()
+                    Timber.tag(TAG).w(error, "Failed to read player state, clearing it")
+                    playerStateFile.delete()
                 }
             }
         }
@@ -5188,11 +5187,7 @@ class MusicService :
                 )
 
             runCatching {
-                filesDir.resolve(PERSISTENT_QUEUE_FILE).outputStream().use { fos ->
-                    ObjectOutputStream(fos).use { oos ->
-                        oos.writeObject(persistQueue)
-                    }
-                }
+                writeWhole(PERSISTENT_QUEUE_FILE, persistQueue)
                 Timber.tag(TAG).d("Queue saved successfully")
             }.onFailure {
                 Timber.tag(TAG).e(it, "Failed to save queue")
@@ -5200,11 +5195,7 @@ class MusicService :
             }
 
             runCatching {
-                filesDir.resolve(PERSISTENT_AUTOMIX_FILE).outputStream().use { fos ->
-                    ObjectOutputStream(fos).use { oos ->
-                        oos.writeObject(persistAutomix)
-                    }
-                }
+                writeWhole(PERSISTENT_AUTOMIX_FILE, persistAutomix)
                 Timber.tag(TAG).d("Automix saved successfully")
             }.onFailure {
                 Timber.tag(TAG).e(it, "Failed to save automix")
@@ -5219,9 +5210,26 @@ class MusicService :
     }
 
     /**
+     * Through a temporary file, so a kill in the middle of a write can't leave half a file that
+     * makes the next start throw the saved queue away.
+     */
+    private fun writeWhole(name: String, value: java.io.Serializable) {
+        val file = filesDir.resolve(name)
+        val tmp = filesDir.resolve("$name.tmp")
+        tmp.outputStream().use { fos ->
+            ObjectOutputStream(fos).use { oos ->
+                oos.writeObject(value)
+            }
+        }
+        if (!tmp.renameTo(file)) {
+            file.delete()
+            tmp.renameTo(file)
+        }
+    }
+
+    /**
      * Where playback is: the item, the position in it and a few player settings. It is tiny, so
-     * it is written every few seconds while playing, through a temporary file so a kill in the
-     * middle of a write can't leave half a file that makes the next start throw the queue away.
+     * it is written every few seconds while playing.
      */
     private fun savePlayerStateToDisk() {
         if (player.mediaItemCount == 0) return
@@ -5236,17 +5244,7 @@ class MusicService :
                     currentMediaItemIndex = player.currentMediaItemIndex,
                     playbackState = player.playbackState,
                 )
-            val file = filesDir.resolve(PERSISTENT_PLAYER_STATE_FILE)
-            val tmp = filesDir.resolve("$PERSISTENT_PLAYER_STATE_FILE.tmp")
-            tmp.outputStream().use { fos ->
-                ObjectOutputStream(fos).use { oos ->
-                    oos.writeObject(state)
-                }
-            }
-            if (!tmp.renameTo(file)) {
-                file.delete()
-                tmp.renameTo(file)
-            }
+            writeWhole(PERSISTENT_PLAYER_STATE_FILE, state)
             Timber.tag(TAG).d("Player state saved successfully")
         }.onFailure {
             Timber.tag(TAG).e(it, "Failed to save player state")
