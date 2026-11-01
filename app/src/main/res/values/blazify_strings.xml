@@ -959,6 +959,9 @@
     <string name="listening">Listening…</string>
     <string name="processing">Processing…</string>
     <string name="no_match_found">No match found</string>
+    <string name="song_not_found">Song not found</string>
+    <string name="song_not_found_hint">Hold your phone closer to the music, wait for a part with singing or a clear tune, and try again.</string>
+    <string name="finding_the_song">Finding the song…</string>
     <string name="recognition_error">Recognition error</string>
     <string name="try_again">Try again</string>
     <string name="recognition_history">Recognition history</string>

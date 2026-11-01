@@ -225,6 +225,28 @@ fun RecognitionScreen(
             )
         },
     ) { paddingValues ->
+        // Behind everything, and only while there is something going on.
+        AnimatedVisibility(
+            visible = recognitionStatus is RecognitionStatus.Listening,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            FlyingNotes(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+            )
+        }
+        AnimatedVisibility(
+            visible = recognitionStatus is RecognitionStatus.Processing,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            FindingSparks(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+            )
+        }
+
         Column(
             modifier =
                 Modifier
@@ -277,7 +299,6 @@ fun RecognitionScreen(
 
                     is RecognitionStatus.NoMatch -> {
                         NoMatchState(
-                            message = status.message,
                             onTryAgain = {
                                 startRecognition()
                             },
@@ -442,7 +463,7 @@ private fun ProcessingState() {
         }
 
         Text(
-            text = stringResource(R.string.processing),
+            text = stringResource(R.string.finding_the_song),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -568,37 +589,22 @@ private fun SuccessState(
 
 @Composable
 private fun NoMatchState(
-    message: String,
     onTryAgain: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.errorContainer),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.close),
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-            )
-        }
+        SongNotFoundArt(modifier = Modifier.size(220.dp))
 
         Text(
-            text = stringResource(R.string.no_match_found),
+            text = stringResource(R.string.song_not_found),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
 
         Text(
-            text = message,
+            text = stringResource(R.string.song_not_found_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
