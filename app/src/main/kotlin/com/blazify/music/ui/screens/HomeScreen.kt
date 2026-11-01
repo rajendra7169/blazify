@@ -23,6 +23,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -115,6 +118,7 @@ import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.AutoRadioQueueKey
 import com.blazify.music.constants.GridItemSize
 import com.blazify.music.constants.GridItemsSizeKey
@@ -1241,6 +1245,19 @@ fun HomeScreen(
         forgottenFavoritesLazyGridState.scrollToItem(0)
     }
 
+    // Home draws its own header, so it gives back the room kept for the top bar. It does that
+    // itself: when the room depended on the route, a change of route reached every page at once,
+    // and the page on its way out jumped up by the height of the bar as it left.
+    val pageInsets = LocalPlayerAwareWindowInsets.current.asPaddingValues()
+    val layoutDirection = LocalLayoutDirection.current
+    val homePadding =
+        PaddingValues(
+            start = pageInsets.calculateStartPadding(layoutDirection),
+            top = (pageInsets.calculateTopPadding() - AppBarHeight).coerceAtLeast(0.dp),
+            end = pageInsets.calculateEndPadding(layoutDirection),
+            bottom = pageInsets.calculateBottomPadding(),
+        )
+
     PullToRefreshBox(
         state = pullRefreshState,
         isRefreshing = isRefreshing,
@@ -1252,7 +1269,7 @@ fun HomeScreen(
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
-                        .padding(LocalPlayerAwareWindowInsets.current.asPaddingValues()),
+                        .padding(homePadding),
             )
         },
     ) {
@@ -1283,7 +1300,7 @@ fun HomeScreen(
 
             LazyColumn(
                 state = lazylistState,
-                contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
+                contentPadding = homePadding,
             ) {
                 // Blazify header: account | logo + wordmark | settings,
                 // greeting card with overflowing hero image, and search bar

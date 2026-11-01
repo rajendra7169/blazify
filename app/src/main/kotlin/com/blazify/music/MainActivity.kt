@@ -981,15 +981,12 @@ class MainActivity : ComponentActivity() {
                 val playerReady by playerReadyState
                 val activePlayerConnection = if (playerReady) playerConnection else null
 
-                // Home draws its own in-content header, so it gets no app-bar padding
-                val isHomeRoute = navBackStackEntry?.destination?.route == Screens.Home.route
                 val playerAwareWindowInsets =
                     remember(
                         bottomInset,
                         shouldShowNavigationBar,
                         playerBottomSheetState.isDismissed,
                         showRail,
-                        isHomeRoute,
                         navPadding,
                         useNewMiniPlayerDesign,
                     ) {
@@ -1009,7 +1006,7 @@ class MainActivity : ComponentActivity() {
                         }
                         windowsInsets
                             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
-                            .add(WindowInsets(top = if (isHomeRoute) 0.dp else AppBarHeight, bottom = bottom))
+                            .add(WindowInsets(top = AppBarHeight, bottom = bottom))
                     }
                 appBarScrollBehavior(
                     canScroll = {
