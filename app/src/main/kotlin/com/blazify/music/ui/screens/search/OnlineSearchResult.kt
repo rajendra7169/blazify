@@ -586,7 +586,7 @@ fun OnlineSearchResult(
             HideOnScrollFAB(
                 visible = !isSearchFocused,
                 lazyListState = lazyListState,
-                icon = R.drawable.mic,
+                icon = R.drawable.sound_wave,
                 onClick = { navController.navigate("recognition") },
             )
         }

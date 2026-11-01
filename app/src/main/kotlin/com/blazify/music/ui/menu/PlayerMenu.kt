@@ -673,7 +673,7 @@ fun PlayerMenu(
                                     },
                                     icon = {
                                         Icon(
-                                            painter = painterResource(if (isPodcast) R.drawable.mic else R.drawable.album),
+                                            painter = painterResource(if (isPodcast) R.drawable.sound_wave else R.drawable.album),
                                             contentDescription = null,
                                             modifier = Modifier.size(24.dp),
                                         )

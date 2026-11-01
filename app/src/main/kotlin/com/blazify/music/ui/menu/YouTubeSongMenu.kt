@@ -704,7 +704,7 @@ fun YouTubeSongMenu(
                                 description = { Text(text = album.name) },
                                 icon = {
                                     Icon(
-                                        painter = painterResource(if (isPodcast) R.drawable.mic else R.drawable.album),
+                                        painter = painterResource(if (isPodcast) R.drawable.sound_wave else R.drawable.album),
                                         contentDescription = null,
                                     )
                                 },

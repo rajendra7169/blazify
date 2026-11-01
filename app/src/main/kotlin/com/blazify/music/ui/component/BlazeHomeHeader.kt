@@ -345,7 +345,7 @@ fun BlazeHomeHeader(
             )
             // Song recognition
             Icon(
-                painter = painterResource(R.drawable.mic),
+                painter = painterResource(R.drawable.sound_wave),
                 contentDescription = null,
                 tint = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0x8A000000),
                 modifier = Modifier

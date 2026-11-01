@@ -808,7 +808,7 @@ internal fun ThemePhonePreview(
                 Icon(painterResource(R.drawable.search), null, tint = searchTint, modifier = Modifier.size(11.dp))
                 Spacer(Modifier.width(5.dp))
                 Text(stringResource(R.string.home_search_hint), fontSize = 7.sp, color = searchTint, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Icon(painterResource(R.drawable.mic), null, tint = searchTint, modifier = Modifier.size(11.dp))
+                Icon(painterResource(R.drawable.sound_wave), null, tint = searchTint, modifier = Modifier.size(11.dp))
             }
             Spacer(Modifier.height(8.dp))
             // Mood chips with labels, like the real home — the rail runs past the screen

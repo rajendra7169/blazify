@@ -329,11 +329,10 @@ private fun ReadyState(onStartRecognition: () -> Unit) {
                         .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.mic),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                SoundWaveBars(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    lively = false,
+                    modifier = Modifier.size(84.dp),
                 )
             }
         }
@@ -348,45 +347,17 @@ private fun ReadyState(onStartRecognition: () -> Unit) {
 
 @Composable
 private fun ListeningState(onCancel: () -> Unit) {
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.2f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(1000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "scale",
-    )
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        // Container large enough for scaled animation (200dp * 1.2 = 240dp)
         Box(
             modifier = Modifier.size(260.dp),
             contentAlignment = Alignment.Center,
         ) {
-            // Outer pulsing ring
-            Box(
-                modifier =
-                    Modifier
-                        .size(200.dp)
-                        .scale(scale)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-            )
-
-            // Inner pulsing ring
-            Box(
-                modifier =
-                    Modifier
-                        .size(180.dp)
-                        .scale(scale * 0.9f)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+            SoundRipples(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxSize(),
             )
 
             // Main button
@@ -399,11 +370,10 @@ private fun ListeningState(onCancel: () -> Unit) {
                         .clickable { onCancel() },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.mic),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                SoundWaveBars(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    lively = true,
+                    modifier = Modifier.size(96.dp),
                 )
             }
         }
@@ -571,7 +541,7 @@ private fun SuccessState(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.mic),
+                    painter = painterResource(R.drawable.sound_wave),
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                 )
