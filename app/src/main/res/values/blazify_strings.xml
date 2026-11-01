@@ -603,8 +603,6 @@
     <string name="start_radio_desc">Start a radio based on this item</string>
     <string name="play_next_desc">Play next in the queue</string>
     <string name="queue_plays_next">%s plays next</string>
-    <string name="queue_locked">Queue locked</string>
-    <string name="queue_unlocked">Queue unlocked</string>
     <string name="repeat">Repeat</string>
     <string name="copy_link_hint">A link to this song on YouTube Music</string>
     <string name="add_to_library_hint">Keep it in Your library</string>

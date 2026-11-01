@@ -108,7 +108,6 @@ import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
 import com.blazify.music.constants.ListItemHeight
 import com.blazify.music.constants.PlayerBackgroundStyle
-import com.blazify.music.constants.QueueEditLockKey
 import com.blazify.music.constants.UseNewPlayerDesignKey
 import com.blazify.music.extensions.metadata
 import com.blazify.music.extensions.move
@@ -228,7 +227,6 @@ fun Queue(
         BackHandler(onBack = onExitSelectionMode)
     }
 
-    var locked by rememberPreference(QueueEditLockKey, defaultValue = true)
 
     val (useNewPlayerDesign, onUseNewPlayerDesignChange) =
         rememberPreference(
@@ -806,7 +804,7 @@ fun Queue(
                                                     )
                                                 }
                                             }
-                                            if (!locked && !isListenTogetherGuest) {
+                                            if (!isListenTogetherGuest) {
                                                 IconButton(
                                                     onClick = { },
                                                     modifier = Modifier.draggableHandle(),
@@ -866,12 +864,11 @@ fun Queue(
                             }
                         }
 
-                        // Play next is safe, so it works on a locked queue as well; removing
-                        // a song is what the lock is for.
+                        // Right for Play next, left to remove with an Undo offered straight after.
                         SwipeToDismissBox(
                             state = dismissBoxState,
                             enableDismissFromStartToEnd = !isListenTogetherGuest && !isActive,
-                            enableDismissFromEndToStart = !locked && !isListenTogetherGuest,
+                            enableDismissFromEndToStart = !isListenTogetherGuest,
                             backgroundContent = {
                                 QueueSwipeBackground(direction = dismissBoxState.dismissDirection)
                             },
@@ -984,8 +981,7 @@ fun Queue(
                             .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     ),
         ) {
-            // Title over its own line of numbers, and the lock as a key you can see the
-            // state of. The count and the length used to sit in a second column on two
+            // Title over its own line of numbers. The count and the length used to sit in a second column on two
             // baselines of their own, which read as three headings fighting each other.
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -1015,37 +1011,6 @@ fun Queue(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                }
-
-                AnimatedVisibility(
-                    visible = !inSelectMode,
-                    enter = fadeIn() + slideInVertically { it },
-                    exit = fadeOut() + slideOutVertically { it },
-                ) {
-                    val unlocked = !locked
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier =
-                            Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (unlocked) {
-                                        BlazeThemeColor.copy(alpha = 0.18f)
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-                                    },
-                                ).clickable { locked = !locked },
-                    ) {
-                        Icon(
-                            // Drawn at the weight of the shuffle and repeat keys. The solid
-                            // padlock the lists ship with sat in this row like a stamp.
-                            painter = painterResource(if (locked) R.drawable.lock_line else R.drawable.lock_open_line),
-                            contentDescription = stringResource(if (locked) R.string.queue_locked else R.string.queue_unlocked),
-                            tint = if (unlocked) BlazeThemeColor else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
                 }
             }
 

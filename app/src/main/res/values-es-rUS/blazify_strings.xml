@@ -1252,8 +1252,6 @@
     <string name="lyrics_sources">Fuentes</string>
     <string name="home_for_you">Para ti</string>
     <string name="queue_plays_next">%s suena a continuación</string>
-    <string name="queue_locked">Cola bloqueada</string>
-    <string name="queue_unlocked">Cola desbloqueada</string>
     <string name="repeat">Repetir</string>
     <string name="copy_link_hint">Un enlace a esta canción en YouTube Music</string>
     <string name="add_to_library_hint">Guárdala en tu biblioteca</string>
