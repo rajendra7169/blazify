@@ -439,6 +439,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The first frame used to be an empty page with the bottom bar on it, because Home takes a
+     * few frames to build, and the launch logo goes at the first frame: a logo, then most of a
+     * second of black. Holding that frame back keeps the logo up until there is a page to show.
+     * The limit is for anything that opens on something other than Home.
+     */
+    private fun holdFirstFrameUntilHomeIsBuilt() {
+        val startedAt = android.os.SystemClock.uptimeMillis()
+        val content = findViewById<View>(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : android.view.ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    val ready =
+                        com.blazify.music.utils.LaunchSignal.homeSettled.value ||
+                            android.os.SystemClock.uptimeMillis() - startedAt > 1500
+                    if (ready) content.viewTreeObserver.removeOnPreDrawListener(this)
+                    return ready
+                }
+            },
+        )
+    }
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -446,6 +468,7 @@ class MainActivity : ComponentActivity() {
         // to the normal theme now that we're about to draw the real UI.
         setTheme(R.style.Theme_Blazify)
         super.onCreate(savedInstanceState)
+        holdFirstFrameUntilHomeIsBuilt()
         // Android takes its launch screen away by itself the moment the first frame is drawn.
         // Asked to animate that ourselves, it waited for the app's own thread — busy building
         // the screen — and stood in place for seconds; left to Android it goes at once.

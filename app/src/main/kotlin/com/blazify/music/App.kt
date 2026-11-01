@@ -451,6 +451,7 @@ class App :
     companion object {
         suspend fun forgetAccount(context: Context) {
             Timber.d("forgetAccount: Starting logout process")
+            com.blazify.music.utils.KeptHome.forget(context)
 
             // Clear DataStore preferences
             Timber.d("forgetAccount: Clearing DataStore preferences")

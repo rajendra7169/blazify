@@ -636,8 +636,36 @@ class HomeViewModel @Inject constructor(
 
         // Phase 1: Load essential sections in parallel — local DB (fast) + YouTube home page.
         // isLoading is set to false as soon as all Phase 1 tasks complete so the UI appears quickly.
+        fun forShowing(page: HomePage) =
+            page.copy(
+                sections = page.sections.mapNotNull { section ->
+                    val filtered = section.items
+                        .filterOutNulls()
+                        .filterExplicit(hideExplicit)
+                        .filterVideoSongs(hideVideoSongs)
+                        .filterYoutubeShorts(hideYoutubeShorts)
+                    if (filtered.isEmpty()) null else section.copy(items = filtered)
+                }
+            )
+
+        var showingKept = false
+
         coroutineScope {
             launch(Dispatchers.IO) { getQuickPicks() }
+
+            // Last time's home page right away, so opening the app shows music rather than
+            // placeholders while YouTube answers. Its next-page token may have run out, so it
+            // goes without one; the fresh page brings its own.
+            launch(Dispatchers.IO) {
+                val kept = com.blazify.music.utils.KeptHome.read(context) ?: return@launch
+                YouTube.homeFromKept(kept).onSuccess { page ->
+                    if (homePage.value == null) {
+                        page.chips?.let { YouTubeBrowseViewModel.rememberChips(it) }
+                        homePage.value = forShowing(page).copy(continuation = null)
+                        showingKept = com.blazify.music.utils.KeptHome.isRecent(context)
+                    }
+                }
+            }
 
             launch(Dispatchers.IO) {
                 forgottenFavorites.value = forgottenSongs()
@@ -655,20 +683,20 @@ class HomeViewModel @Inject constructor(
             }
 
             launch(Dispatchers.IO) {
-                YouTube.home().onSuccess { page ->
+                YouTube.homeToKeep().onSuccess { (page, text) ->
                     // Mood pages pick their placeholder by these; known from here, the first
                     // one opened is drawn in the right shape too.
                     page.chips?.let { YouTubeBrowseViewModel.rememberChips(it) }
-                    homePage.value = page.copy(
-                        sections = page.sections.mapNotNull { section ->
-                            val filtered = section.items
-                                .filterOutNulls()
-                                .filterExplicit(hideExplicit)
-                                .filterVideoSongs(hideVideoSongs)
-                                .filterYoutubeShorts(hideYoutubeShorts)
-                            if (filtered.isEmpty()) null else section.copy(items = filtered)
+                    // Swapped in under someone's thumb, the shelves would jump just as they reach
+                    // for one. A recent page stays until the next start or a pull to refresh;
+                    // the fresh one is what those will show.
+                    homePage.value =
+                        if (showingKept) {
+                            homePage.value?.copy(continuation = page.continuation)
+                        } else {
+                            forShowing(page)
                         }
-                    )
+                    com.blazify.music.utils.KeptHome.write(context, text)
                 }.onFailure { reportException(it) }
             }
 

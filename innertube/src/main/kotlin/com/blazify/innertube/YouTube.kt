@@ -1541,6 +1541,27 @@ object YouTube {
             }
 
             val response = innerTube.browse(WEB_REMIX, browseId = "FEmusic_home", params = params).body<BrowseResponse>()
+            homeFrom(response)
+        }
+
+    /** The home page and the answer it was read from, so the next start can show it straight away. */
+    suspend fun homeToKeep(): Result<Pair<HomePage, String>> =
+        runCatching {
+            val text = innerTube.browse(WEB_REMIX, browseId = "FEmusic_home").bodyAsText()
+            homeFrom(keptHomeJson.decodeFromString<BrowseResponse>(text)) to text
+        }
+
+    /** The home page again from an answer kept earlier. */
+    fun homeFromKept(text: String): Result<HomePage> =
+        runCatching { homeFrom(keptHomeJson.decodeFromString<BrowseResponse>(text)) }
+
+    private val keptHomeJson =
+        kotlinx.serialization.json.Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
+        }
+
+    private fun homeFrom(response: BrowseResponse): HomePage {
             Timber.d("home() response received")
             val continuation =
                 response.contents
@@ -1576,8 +1597,8 @@ object YouTube {
                     ?.chips
                     ?.mapNotNull { HomePage.Chip.fromChipCloudChipRenderer(it) }
             Timber.d("home() chips: ${chips?.size ?: 0}")
-            HomePage(chips, sections, continuation)
-        }
+            return HomePage(chips, sections, continuation)
+    }
 
     private suspend fun homeContinuation(continuation: String): Result<HomePage> =
         runCatching {
