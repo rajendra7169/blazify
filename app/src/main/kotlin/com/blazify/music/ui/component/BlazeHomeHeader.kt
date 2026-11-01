@@ -313,7 +313,6 @@ fun BlazeHomeHeader(
             }
         }
 
-        Spacer(Modifier.height(8.dp))
 
         // Search bar
         if (showSearchBar) Row(
@@ -354,7 +353,6 @@ fun BlazeHomeHeader(
             )
         }
 
-        Spacer(Modifier.height(8.dp))
     }
 }
 
