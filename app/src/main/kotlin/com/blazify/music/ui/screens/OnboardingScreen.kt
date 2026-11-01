@@ -8,7 +8,6 @@
 
 package com.blazify.music.ui.screens
 
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.safeDrawing
@@ -192,11 +191,14 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             // It is drawn over the live app, which is already composed beneath
             // it; without this a tap on any empty part of it went straight
             // through to Home — on the emulators a stray one opened the account
-            // panel on top of the onboarding. Every touch it does not use stops here.
+            // panel on top of the onboarding. Listening is enough to stop a touch
+            // here. Nothing may be consumed: a button takes a consumed move as its
+            // tap being cancelled, and a real finger always moves a little, so
+            // Next, Skip and Start listening lit up and then did nothing.
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
-                        awaitPointerEvent(PointerEventPass.Final).changes.forEach { it.consume() }
+                        awaitPointerEvent()
                     }
                 }
             }
