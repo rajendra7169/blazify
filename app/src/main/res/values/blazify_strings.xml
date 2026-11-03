@@ -1478,6 +1478,7 @@
     <string name="accounts_remove">Remove from this phone</string>
     <string name="accounts_choose_channel">Choose a channel</string>
     <string name="accounts_choose_channel_note">Your playlists and library come from the channel you pick. You can change it later in your account.</string>
+    <string name="signing_in">Signing in…</string>
     <string name="accounts_switching">Switching…</string>
     <string name="accounts_expired">That account is signed out. Add it again to use it.</string>
 </resources>
