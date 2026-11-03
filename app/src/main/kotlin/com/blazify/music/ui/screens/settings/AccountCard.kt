@@ -22,12 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -180,19 +178,6 @@ internal fun AccountCard(
                     )
                 }
 
-                if (isLoggedIn) {
-                    OutlinedButton(
-                        onClick = onLogout,
-                        colors =
-                            ButtonDefaults.outlinedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                            ),
-                    ) {
-                        Text(stringResource(R.string.action_logout))
-                    }
-                }
-
                 if (isLoggedIn || others > 0) {
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(
@@ -219,6 +204,31 @@ internal fun AccountCard(
                         onAddAccount = onAddAccount,
                         showNote = false,
                     )
+                    // Inside the list rather than beside the name, where a button
+                    // left room for only the first few letters of it.
+                    if (isLoggedIn) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable(onClick = onLogout)
+                                    .padding(horizontal = 18.dp, vertical = 12.dp),
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.logout),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(40.dp).padding(8.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.action_logout),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
                 }
             }
         }
