@@ -1326,4 +1326,14 @@
     <string name="stop_downloading_text">Songs, die noch warten oder laden, werden gestoppt. Fertige Songs bleiben auf deinem Telefon.</string>
     <string name="stop_downloading_confirm">Stoppen</string>
     <string name="keep_downloading">Weiter laden</string>
+    <string name="signing_in">Anmeldung…</string>
+    <string name="accounts_add_account">Konto hinzufügen</string>
+    <string name="accounts_sign_in_hint">Melde dich mit Google an, um deine Playlists und Bibliothek zu sehen</string>
+    <string name="accounts_tap_to_manage">Dein Konto, Kanäle und Synchronisierung</string>
+    <string name="update_card_title">Update verfügbar</string>
+    <string name="update_card_text">Blazify %1$s kann heruntergeladen werden</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">%1$d weiteres Konto auf diesem Telefon</item>
+        <item quantity="other">%1$d weitere Konten auf diesem Telefon</item>
+    </plurals>
 </resources>

@@ -1326,4 +1326,14 @@
     <string name="stop_downloading_text">Bekleyen veya inen şarkılar durdurulur. İndirmesi biten şarkılar telefonunuzda kalır.</string>
     <string name="stop_downloading_confirm">Durdur</string>
     <string name="keep_downloading">İndirmeye devam et</string>
+    <string name="signing_in">Oturum açılıyor…</string>
+    <string name="accounts_add_account">Hesap ekle</string>
+    <string name="accounts_sign_in_hint">Çalma listeleriniz ve kitaplığınız için Google ile oturum açın</string>
+    <string name="accounts_tap_to_manage">Hesabınız, kanallarınız ve senkronizasyon</string>
+    <string name="update_card_title">Güncelleme var</string>
+    <string name="update_card_text">Blazify %1$s indirilmeye hazır</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">Bu telefonda %1$d hesap daha</item>
+        <item quantity="other">Bu telefonda %1$d hesap daha</item>
+    </plurals>
 </resources>

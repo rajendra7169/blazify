@@ -1337,4 +1337,14 @@
     <string name="stop_downloading_text">As músicas na fila ou baixando são interrompidas. As que já terminaram continuam no seu celular.</string>
     <string name="stop_downloading_confirm">Parar</string>
     <string name="keep_downloading">Continuar baixando</string>
+    <string name="signing_in">Entrando…</string>
+    <string name="accounts_add_account">Adicionar uma conta</string>
+    <string name="accounts_sign_in_hint">Entre com o Google para ver suas playlists e sua biblioteca</string>
+    <string name="accounts_tap_to_manage">Sua conta, canais e sincronização</string>
+    <string name="update_card_title">Atualização disponível</string>
+    <string name="update_card_text">O Blazify %1$s está pronto para baixar</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">Mais %1$d conta neste celular</item>
+        <item quantity="other">Mais %1$d contas neste celular</item>
+    </plurals>
 </resources>

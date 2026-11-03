@@ -1479,6 +1479,15 @@
     <string name="accounts_choose_channel">Choose a channel</string>
     <string name="accounts_choose_channel_note">Your playlists and library come from the channel you pick. You can change it later in your account.</string>
     <string name="signing_in">Signing in…</string>
+    <string name="accounts_add_account">Add an account</string>
+    <string name="accounts_sign_in_hint">Sign in with Google for your playlists and library</string>
+    <string name="accounts_tap_to_manage">Your account, channels and sync</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">%1$d more account on this phone</item>
+        <item quantity="other">%1$d more accounts on this phone</item>
+    </plurals>
+    <string name="update_card_title">Update available</string>
+    <string name="update_card_text">Blazify %1$s is ready to download</string>
     <string name="accounts_switching">Switching…</string>
     <string name="accounts_expired">That account is signed out. Add it again to use it.</string>
 </resources>

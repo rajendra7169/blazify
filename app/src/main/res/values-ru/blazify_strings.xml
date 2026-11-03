@@ -1348,4 +1348,16 @@
     <string name="stop_downloading_text">Песни в очереди и в процессе загрузки будут остановлены. Уже загруженные останутся на телефоне.</string>
     <string name="stop_downloading_confirm">Остановить</string>
     <string name="keep_downloading">Продолжить загрузку</string>
+    <string name="signing_in">Вход…</string>
+    <string name="accounts_add_account">Добавить аккаунт</string>
+    <string name="accounts_sign_in_hint">Войдите через Google, чтобы видеть плейлисты и библиотеку</string>
+    <string name="accounts_tap_to_manage">Ваш аккаунт, каналы и синхронизация</string>
+    <string name="update_card_title">Доступно обновление</string>
+    <string name="update_card_text">Blazify %1$s готов к загрузке</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">Ещё %1$d аккаунт на этом телефоне</item>
+        <item quantity="few">Ещё %1$d аккаунта на этом телефоне</item>
+        <item quantity="many">Ещё %1$d аккаунтов на этом телефоне</item>
+        <item quantity="other">Ещё %1$d аккаунта на этом телефоне</item>
+    </plurals>
 </resources>

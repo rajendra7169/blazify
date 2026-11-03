@@ -1315,4 +1315,13 @@
     <string name="stop_downloading_text">대기 중이거나 다운로드 중인 노래는 중지됩니다. 이미 완료된 노래는 휴대폰에 그대로 남습니다.</string>
     <string name="stop_downloading_confirm">중지</string>
     <string name="keep_downloading">계속 다운로드</string>
+    <string name="signing_in">로그인 중…</string>
+    <string name="accounts_add_account">계정 추가</string>
+    <string name="accounts_sign_in_hint">재생목록과 보관함을 보려면 Google로 로그인하세요</string>
+    <string name="accounts_tap_to_manage">내 계정, 채널, 동기화</string>
+    <string name="update_card_title">업데이트 있음</string>
+    <string name="update_card_text">Blazify %1$s 다운로드 준비 완료</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="other">이 휴대폰에 계정 %1$d개 더 있음</item>
+    </plurals>
 </resources>

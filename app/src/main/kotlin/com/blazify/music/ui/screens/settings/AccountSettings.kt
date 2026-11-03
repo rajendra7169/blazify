@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,42 +35,39 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import com.blazify.music.utils.reportException
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.blazify.music.ui.theme.BlazeGradientEnd
-import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.innertube.YouTube
 import com.blazify.innertube.utils.parseCookieString
 import com.blazify.music.BuildConfig
 import com.blazify.music.R
 import com.blazify.music.constants.AccountChannelHandleKey
-import com.blazify.music.constants.BetaUpdatesKey
 import com.blazify.music.constants.AccountEmailKey
 import com.blazify.music.constants.AccountNameKey
+import com.blazify.music.constants.BetaUpdatesKey
 import com.blazify.music.constants.DataSyncIdKey
 import com.blazify.music.constants.InnerTubeCookieKey
 import com.blazify.music.constants.UseLoginForBrowse
@@ -82,11 +80,16 @@ import com.blazify.music.ui.component.Material3SettingsItem
 import com.blazify.music.ui.component.PreferenceEntry
 import com.blazify.music.ui.component.TextFieldDialog
 import com.blazify.music.ui.component.UpdateDialog
+import com.blazify.music.ui.theme.BlazeGradientEnd
+import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.utils.reportException
 import com.blazify.music.viewmodels.AccountSettingsViewModel
 import com.blazify.music.viewmodels.HomeViewModel
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun AccountSettings(
@@ -116,6 +119,21 @@ fun AccountSettings(
     // The download runs in the app, in a dialog, the same one settings and the
     // launch offer use. It used to hand the file to a browser.
     var updateRelease by remember { mutableStateOf<ReleaseInfo?>(null) }
+    // From the card at the top, Download means download: the dialog opens
+    // already fetching, rather than asking the same question a second time.
+    var updateStartsNow by remember { mutableStateOf(false) }
+
+    // If launch had not found out yet, ask quietly now, from the same two-hour
+    // answer the app keeps, so an update shows up here without a press.
+    LaunchedEffect(Unit) {
+        if (BuildConfig.UPDATER_AVAILABLE && updateState == UpdateCheck.Idle) {
+            Updater.checkForUpdate(includeBetas = betaUpdates).onSuccess { (release, isNewer) ->
+                if (isNewer && release != null && Updater.getDownloadUrlForCurrentVariant(release) != null) {
+                    updateState = UpdateCheck.Available(release)
+                }
+            }
+        }
+    }
     val repoUrl = stringResource(R.string.blazify_repo_url)
     val websiteUrl = stringResource(R.string.developer_website_url)
     val devGithubUrl = stringResource(R.string.developer_github_url)
@@ -142,8 +160,6 @@ fun AccountSettings(
     var showToken by remember { mutableStateOf(false) }
     var showTokenEditor by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
-    var showAccounts by remember { mutableStateOf(false) }
-    val (savedAccounts) = rememberPreference(com.blazify.music.constants.SavedAccountsKey, "")
     val scope = rememberCoroutineScope()
 
     Column(
@@ -180,6 +196,17 @@ fun AccountSettings(
         }
 
         Spacer(Modifier.height(12.dp))
+
+        (updateState as? UpdateCheck.Available)?.let { ready ->
+            UpdateCard(
+                versionName = ready.release.versionName,
+                onDownload = {
+                    updateStartsNow = true
+                    updateRelease = ready.release
+                },
+            )
+            Spacer(Modifier.height(12.dp))
+        }
 
         // Logout confirmation dialog
         if (showLogoutDialog) {
@@ -298,85 +325,23 @@ fun AccountSettings(
             )
         }
 
-        Material3SettingsGroup(
-            items = listOf(
-                Material3SettingsItem(
-                    title = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (isLoggedIn && accountImageUrl != null) {
-                                AsyncImage(
-                                    model = accountImageUrl,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.size(40.dp).clip(CircleShape)
-                                )
-
-                                Spacer(Modifier.width(12.dp))
-                            }
-
-                            Text(
-                                text = if (isLoggedIn) accountName else stringResource(R.string.login),
-                            )
-                        }
-                    },
-                    icon = if (!isLoggedIn) painterResource(R.drawable.login) else null,
-                    trailingContent = {
-                        if (isLoggedIn) {
-                            OutlinedButton(
-                                onClick = {
-                                    Timber.d("[LOGOUT] User clicked logout button, showing dialog")
-                                    showLogoutDialog = true
-                                },
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
-                                )
-                            ) {
-                                Text(stringResource(R.string.action_logout))
-                            }
-                        }
-                    },
-                    onClick = {
-                        onClose()
-                        if (isLoggedIn) {
-                            navController.navigate("account")
-                        } else {
-                            navController.navigate("login")
-                        }
-                    }
-                )
-            ),
-            useLowContrast = true
+        AccountCard(
+            isLoggedIn = isLoggedIn,
+            name = accountName,
+            photo = accountImageUrl,
+            onOpen = {
+                onClose()
+                navController.navigate("account")
+            },
+            onLogout = {
+                Timber.d("[LOGOUT] User clicked logout button, showing dialog")
+                showLogoutDialog = true
+            },
+            onAddAccount = {
+                onClose()
+                navController.navigate("login")
+            },
         )
-
-        if (showAccounts) {
-            AccountsDialog(
-                isLoggedIn = isLoggedIn,
-                onDismiss = { showAccounts = false },
-                onAddAccount = {
-                    showAccounts = false
-                    onClose()
-                    navController.navigate("login")
-                },
-            )
-        }
-
-        if (isLoggedIn || savedAccounts.length > 2) {
-            Spacer(Modifier.height(8.dp))
-
-            Material3SettingsGroup(
-                items = listOf(
-                    Material3SettingsItem(
-                        title = { Text(stringResource(R.string.accounts_and_channels)) },
-                        icon = painterResource(R.drawable.person),
-                        onClick = { showAccounts = true },
-                    ),
-                ),
-                useLowContrast = true,
-            )
-        }
 
         Spacer(Modifier.height(8.dp))
 
@@ -497,6 +462,7 @@ fun AccountSettings(
                     onClick = {
                         val ready = updateState as? UpdateCheck.Available
                         if (ready != null) {
+                            updateStartsNow = false
                             updateRelease = ready.release
                             return@PreferenceEntry
                         }
@@ -557,7 +523,11 @@ fun AccountSettings(
         }
 
         updateRelease?.let { release ->
-            UpdateDialog(release = release, onDismiss = { updateRelease = null })
+            UpdateDialog(
+                release = release,
+                onDismiss = { updateRelease = null },
+                startNow = updateStartsNow,
+            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -701,4 +671,53 @@ private sealed interface UpdateCheck {
     data object Failed : UpdateCheck
 
     data class Available(val release: ReleaseInfo) : UpdateCheck
+}
+
+/**
+ * A new version, said at the top of the sheet in the app's own colours, with
+ * the download one press away. People open this sheet far more often than
+ * settings, so this is where they should find out.
+ */
+@Composable
+private fun UpdateCard(versionName: String, onDownload: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(Brush.horizontalGradient(listOf(BlazeThemeColor, BlazeGradientEnd)))
+                .clickable(onClick = onDownload)
+                .padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.update),
+            contentDescription = null,
+            tint = Color.White,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.update_card_title),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+            )
+            Text(
+                text = stringResource(R.string.update_card_text, versionName),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+        }
+        Button(
+            onClick = onDownload,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = BlazeGradientEnd,
+                ),
+        ) {
+            Text(stringResource(R.string.update_download), fontWeight = FontWeight.Bold)
+        }
+    }
 }

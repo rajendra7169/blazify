@@ -1335,4 +1335,14 @@
     <string name="stop_downloading_text">Les titres en attente ou en cours sont arrêtés. Ceux déjà terminés restent sur votre téléphone.</string>
     <string name="stop_downloading_confirm">Arrêter</string>
     <string name="keep_downloading">Continuer</string>
+    <string name="signing_in">Connexion…</string>
+    <string name="accounts_add_account">Ajouter un compte</string>
+    <string name="accounts_sign_in_hint">Connectez-vous avec Google pour vos playlists et votre bibliothèque</string>
+    <string name="accounts_tap_to_manage">Votre compte, vos chaînes et la synchronisation</string>
+    <string name="update_card_title">Mise à jour disponible</string>
+    <string name="update_card_text">Blazify %1$s est prêt à être téléchargé</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">%1$d autre compte sur ce téléphone</item>
+        <item quantity="other">%1$d autres comptes sur ce téléphone</item>
+    </plurals>
 </resources>

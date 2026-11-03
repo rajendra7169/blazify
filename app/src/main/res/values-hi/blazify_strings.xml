@@ -1326,4 +1326,14 @@
     <string name="stop_downloading_text">इंतज़ार में या डाउनलोड हो रहे गाने रोक दिए जाएंगे। जो गाने पूरे हो चुके हैं, वे आपके फ़ोन में रहेंगे।</string>
     <string name="stop_downloading_confirm">रोकें</string>
     <string name="keep_downloading">डाउनलोड जारी रखें</string>
+    <string name="signing_in">साइन इन हो रहा है…</string>
+    <string name="accounts_add_account">खाता जोड़ें</string>
+    <string name="accounts_sign_in_hint">अपनी प्लेलिस्ट और लाइब्रेरी के लिए Google से साइन इन करें</string>
+    <string name="accounts_tap_to_manage">आपका खाता, चैनल और सिंक</string>
+    <string name="update_card_title">अपडेट उपलब्ध है</string>
+    <string name="update_card_text">Blazify %1$s डाउनलोड के लिए तैयार है</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="one">इस फ़ोन पर %1$d और खाता</item>
+        <item quantity="other">इस फ़ोन पर %1$d और खाते</item>
+    </plurals>
 </resources>

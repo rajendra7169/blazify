@@ -1315,4 +1315,13 @@
     <string name="stop_downloading_text">等待中或正在下载的歌曲将停止下载。已下载完成的歌曲会保留在手机上。</string>
     <string name="stop_downloading_confirm">停止</string>
     <string name="keep_downloading">继续下载</string>
+    <string name="signing_in">正在登录…</string>
+    <string name="accounts_add_account">添加账号</string>
+    <string name="accounts_sign_in_hint">使用 Google 登录以查看播放列表和媒体库</string>
+    <string name="accounts_tap_to_manage">你的账号、频道和同步</string>
+    <string name="update_card_title">有可用更新</string>
+    <string name="update_card_text">Blazify %1$s 已可下载</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="other">此手机上还有 %1$d 个账号</item>
+    </plurals>
 </resources>

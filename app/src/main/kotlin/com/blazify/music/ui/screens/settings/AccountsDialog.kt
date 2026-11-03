@@ -67,6 +67,39 @@ fun AccountsDialog(
     onDismiss: () -> Unit,
     onAddAccount: () -> Unit,
 ) {
+    var switching by remember { mutableStateOf(false) }
+    DefaultDialog(
+        onDismiss = { if (!switching) onDismiss() },
+        title = { Text(stringResource(R.string.accounts_and_channels)) },
+        content = {
+            Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+                AccountsPanel(
+                    isLoggedIn = isLoggedIn,
+                    onAddAccount = onAddAccount,
+                    onSwitching = { switching = it },
+                )
+            }
+        },
+        buttons = {
+            TextButton(enabled = !switching, onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
+}
+
+/**
+ * The accounts on this phone and the channels of the one in use: switch to any,
+ * forget one, or add another. Shown in its own dialog, and opened in place under
+ * the account card, so the same list behaves the same wherever it is reached.
+ */
+@Composable
+internal fun AccountsPanel(
+    isLoggedIn: Boolean,
+    onAddAccount: () -> Unit,
+    onSwitching: (Boolean) -> Unit = {},
+    showNote: Boolean = true,
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewModel: AccountSettingsViewModel = hiltViewModel()
@@ -79,6 +112,7 @@ fun AccountsDialog(
     var channels by remember { mutableStateOf<List<AccountChannel>>(emptyList()) }
     var loadingChannels by remember { mutableStateOf(isLoggedIn) }
     var switching by remember { mutableStateOf(false) }
+    LaunchedEffect(switching) { onSwitching(switching) }
     val expired = stringResource(R.string.accounts_expired)
 
     LaunchedEffect(Unit) {
@@ -103,20 +137,18 @@ fun AccountsDialog(
         }
     }
 
-    DefaultDialog(
-        onDismiss = { if (!switching) onDismiss() },
-        title = { Text(stringResource(R.string.accounts_and_channels)) },
-        content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(
-                    text = stringResource(R.string.accounts_restart_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 18.dp),
-                )
+                if (showNote) {
+                    Text(
+                        text = stringResource(R.string.accounts_restart_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 18.dp),
+                    )
+                }
 
                 if (loadingChannels) {
                     Box(
@@ -206,13 +238,6 @@ fun AccountsDialog(
                     }
                 }
             }
-        },
-        buttons = {
-            TextButton(enabled = !switching, onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-    )
 }
 
 @Composable

@@ -1368,4 +1368,18 @@
     <string name="stop_downloading_text">سيتم إيقاف الأغاني المنتظرة أو قيد التنزيل. تبقى الأغاني التي اكتمل تنزيلها على هاتفك.</string>
     <string name="stop_downloading_confirm">إيقاف</string>
     <string name="keep_downloading">متابعة التنزيل</string>
+    <string name="signing_in">جارٍ تسجيل الدخول…</string>
+    <string name="accounts_add_account">إضافة حساب</string>
+    <string name="accounts_sign_in_hint">سجّل الدخول باستخدام Google للوصول إلى قوائم التشغيل ومكتبتك</string>
+    <string name="accounts_tap_to_manage">حسابك وقنواتك والمزامنة</string>
+    <string name="update_card_title">يتوفر تحديث</string>
+    <string name="update_card_text">Blazify %1$s جاهز للتنزيل</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="zero">لا حسابات أخرى (%1$d)</item>
+        <item quantity="one">حساب آخر (%1$d) على هذا الهاتف</item>
+        <item quantity="two">حسابان آخران (%1$d) على هذا الهاتف</item>
+        <item quantity="few">%1$d حسابات أخرى على هذا الهاتف</item>
+        <item quantity="many">%1$d حسابًا آخر على هذا الهاتف</item>
+        <item quantity="other">%1$d حساب آخر على هذا الهاتف</item>
+    </plurals>
 </resources>

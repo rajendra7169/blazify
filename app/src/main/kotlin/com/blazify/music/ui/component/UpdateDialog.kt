@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,8 @@ private sealed interface Stage {
 fun UpdateDialog(
     release: ReleaseInfo,
     onDismiss: () -> Unit,
+    // Opened from a Download button: begin at once instead of offering again.
+    startNow: Boolean = false,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -72,6 +75,28 @@ fun UpdateDialog(
     var needsPermission by remember { mutableStateOf(false) }
 
     val asset = remember(release) { Updater.pickAsset(release.assets) }
+
+    fun startDownload() {
+        val picked = asset ?: return
+        scope.launch {
+            stage = Stage.Downloading(0, picked.size.takeIf { it > 0 })
+            UpdateInstaller.fetch(
+                context = context,
+                urls = picked.allUrls,
+                displayName = picked.name,
+                onProgress = { done, total ->
+                    stage = Stage.Downloading(done, total ?: picked.size.takeIf { it > 0 })
+                },
+            ).onSuccess { stage = Stage.Ready(it) }
+                .onFailure {
+                    stage = Stage.Failed(readable(it))
+                }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (startNow && stage is Stage.Offer) startDownload()
+    }
 
     fun startInstall(fetched: UpdateInstaller.Fetched) {
         if (!UpdateInstaller.mayInstall(context)) {
@@ -183,22 +208,7 @@ fun UpdateDialog(
             when (val s = stage) {
                 is Stage.Offer ->
                     if (asset != null) {
-                        TextButton(onClick = {
-                            scope.launch {
-                                stage = Stage.Downloading(0, asset.size.takeIf { it > 0 })
-                                UpdateInstaller.fetch(
-                                    context = context,
-                                    urls = asset.allUrls,
-                                    displayName = asset.name,
-                                    onProgress = { done, total ->
-                                        stage = Stage.Downloading(done, total ?: asset.size.takeIf { it > 0 })
-                                    },
-                                ).onSuccess { stage = Stage.Ready(it) }
-                                    .onFailure {
-                                        stage = Stage.Failed(readable(it))
-                                    }
-                            }
-                        }) { Text(stringResource(R.string.update_download)) }
+                        TextButton(onClick = ::startDownload) { Text(stringResource(R.string.update_download)) }
                     }
 
                 is Stage.Downloading -> Unit

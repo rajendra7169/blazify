@@ -1315,4 +1315,13 @@
     <string name="stop_downloading_text">待機中またはダウンロード中の曲は停止されます。ダウンロード済みの曲はそのまま端末に残ります。</string>
     <string name="stop_downloading_confirm">停止</string>
     <string name="keep_downloading">ダウンロードを続ける</string>
+    <string name="signing_in">ログインしています…</string>
+    <string name="accounts_add_account">アカウントを追加</string>
+    <string name="accounts_sign_in_hint">Google でログインしてプレイリストとライブラリを表示</string>
+    <string name="accounts_tap_to_manage">アカウント、チャンネル、同期</string>
+    <string name="update_card_title">アップデートがあります</string>
+    <string name="update_card_text">Blazify %1$s をダウンロードできます</string>
+    <plurals name="accounts_more_saved">
+        <item quantity="other">この端末にほかに %1$d 個のアカウント</item>
+    </plurals>
 </resources>
