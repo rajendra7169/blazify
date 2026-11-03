@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import com.blazify.music.ui.component.BlazeDownloadLoader
 import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -617,7 +618,7 @@ fun SongMenu(
                                 },
                             )
                             Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> NewAction(
-                                icon = { BlazeLoader(modifier = Modifier.size(28.dp)) },
+                                icon = { BlazeDownloadLoader(modifier = Modifier.size(28.dp)) },
                                 text = stringResource(R.string.downloading),
                                 onClick = {
                                     DownloadService.sendRemoveDownload(context, ExoDownloadService::class.java, song.id, false)

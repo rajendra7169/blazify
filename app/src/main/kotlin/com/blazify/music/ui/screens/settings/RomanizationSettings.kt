@@ -40,7 +40,7 @@ import com.blazify.music.constants.LyricsRomanizeAsMainKey
 import com.blazify.music.constants.LyricsRomanizeCyrillicByLineKey
 import com.blazify.music.constants.LyricsRomanizeList
 import com.blazify.music.lyrics.JapaneseDictionary
-import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.BlazeDownloadLoader
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.Material3SettingsGroup
 import com.blazify.music.ui.component.Material3SettingsItem
@@ -181,7 +181,7 @@ fun RomanizationSettings(
                                 OutlinedButton(onClick = JapaneseDictionary::delete) {
                                     Text(stringResource(R.string.delete))
                                 }
-                            is JapaneseDictionary.State.Downloading -> BlazeLoader(modifier = Modifier.size(20.dp))
+                            is JapaneseDictionary.State.Downloading -> BlazeDownloadLoader(modifier = Modifier.size(20.dp))
                             is JapaneseDictionary.State.Failed ->
                                 OutlinedButton(onClick = JapaneseDictionary::startDownload) {
                                     Text(stringResource(R.string.retry))

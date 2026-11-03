@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -250,3 +251,100 @@ private fun easeOut(x: Float) = 1f - (1f - x).let { it * it * it }
 /** Eases up from 0 to 1 between [inStart] and [inEnd], holds, then eases back to 0 by [outEnd]. */
 private fun envelope(u: Float, inStart: Float, inEnd: Float, outStart: Float, outEnd: Float) =
     ease(ramp(u, inStart, inEnd)) * (1f - ease(ramp(u, outStart, outEnd)))
+
+/**
+ * The loader for a download: the logo's headphones hold still while an arrow in
+ * the flame's colours drops through them into a tray, again and again. The
+ * headphones say it is Blazify, the arrow says what it is doing, so a spinner
+ * beside a song reads as "saving to the phone" rather than as any other wait.
+ * Same signature as [BlazeLoader], so a call site can swap one for the other.
+ */
+@Composable
+fun BlazeDownloadLoader(
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    // Compatibility with CircularProgressIndicator call sites — ignored.
+    strokeWidth: Dp = Dp.Unspecified,
+) {
+    val base = if (color.isSpecified) color else MaterialTheme.colorScheme.primary
+    val palette = remember(base) { LoaderPalette(base) }
+
+    val seconds by produceState(0f) {
+        val start = withFrameNanos { it }
+        while (true) withFrameNanos { value = (it - start) / 1_000_000_000f }
+    }
+
+    Canvas(modifier = modifier.size(44.dp)) {
+        val side = size.minDimension
+        val k = side / BlazeLogoShapes.VIEW_SIZE
+        withTransform({
+            translate((size.width - side) / 2f, (size.height - side) / 2f)
+            scale(k, k, pivot = Offset.Zero)
+            translate(-BlazeLogoShapes.VIEW_LEFT, -BlazeLogoShapes.VIEW_TOP)
+        }) {
+            drawDownload(seconds, palette)
+        }
+    }
+}
+
+/** One drop of the arrow into the tray. */
+private const val DROP_SECONDS = 1.3f
+
+private val ArrowShape by lazy {
+    Path().apply {
+        // Shaft and head as one shape, so it fills in one go and keeps round joins.
+        moveTo(476f, 330f)
+        lineTo(548f, 330f)
+        lineTo(548f, 536f)
+        lineTo(640f, 536f)
+        lineTo(512f, 676f)
+        lineTo(384f, 536f)
+        lineTo(476f, 536f)
+        close()
+    }
+}
+
+private val TrayShape by lazy {
+    Path().apply {
+        moveTo(380f, 700f)
+        lineTo(380f, 770f)
+        lineTo(644f, 770f)
+        lineTo(644f, 700f)
+    }
+}
+
+private fun DrawScope.drawDownload(t: Float, c: LoaderPalette) {
+    val logoBrush = Brush.verticalGradient(listOf(c.top, c.bottom), startY = 180f, endY = 780f)
+    val u = (t % DROP_SECONDS) / DROP_SECONDS
+
+    // The headphones: the part of the logo people know, held still as the frame.
+    drawPath(LogoPaths.band, logoBrush, alpha = 0.9f)
+    drawPath(LogoPaths.cupLeft, c.cups)
+    drawPath(LogoPaths.cupRight, c.cups)
+
+    // The arrow falls in from above, lands, and sinks into the tray as it fades,
+    // while the next one is already on its way.
+    val fall = easeOut(ramp(u, 0f, 0.5f))
+    val sink = ease(ramp(u, 0.62f, 0.95f))
+    val y = -170f * (1f - fall) + 70f * sink
+    val a = ramp(u, 0f, 0.18f) * (1f - sink)
+    if (a > 0f) {
+        translate(0f, y) {
+            drawPath(ArrowShape, logoBrush, alpha = a)
+            drawPath(
+                ArrowShape,
+                logoBrush,
+                alpha = a,
+                style = Stroke(width = 34f, join = StrokeJoin.Round),
+            )
+        }
+    }
+
+    // The tray gives a little as each arrow lands, and glows while it does.
+    val land = envelope(u, 0.46f, 0.56f, 0.62f, 0.86f)
+    withTransform({
+        scale(1f + 0.06f * land, 1f - 0.10f * land, Offset(512f, 770f))
+    }) {
+        drawPath(TrayShape, lerp(c.cups, c.top, land), style = Stroke(width = 46f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+}

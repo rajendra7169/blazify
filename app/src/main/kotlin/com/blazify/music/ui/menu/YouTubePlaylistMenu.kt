@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.BlazeDownloadLoader
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -624,7 +624,7 @@ fun YouTubePlaylistMenu(
                                         Material3MenuItemData(
                                             title = { Text(text = stringResource(R.string.downloading)) },
                                             icon = {
-                                                BlazeLoader(
+                                                BlazeDownloadLoader(
                                                     modifier = Modifier.size(24.dp),
                                                     strokeWidth = 2.dp,
                                                 )

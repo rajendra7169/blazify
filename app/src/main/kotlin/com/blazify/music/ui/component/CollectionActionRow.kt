@@ -175,7 +175,7 @@ private fun RoundButton(
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             if (busy) {
-                BlazeLoader(
+                BlazeDownloadLoader(
                     modifier = Modifier.size(22.dp).semantics { contentDescription = description },
                     strokeWidth = 2.dp,
                 )

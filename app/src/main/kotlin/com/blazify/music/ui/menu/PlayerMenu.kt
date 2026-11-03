@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import com.blazify.music.ui.component.BlazeDownloadLoader
 import com.blazify.music.ui.component.BlazeLoader
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -458,7 +459,7 @@ fun PlayerMenu(
                                 Download.STATE_QUEUED, Download.STATE_DOWNLOADING ->
                                     NewAction(
                                         icon = {
-                                            BlazeLoader(
+                                            BlazeDownloadLoader(
                                                 modifier = Modifier.size(28.dp),
                                                 strokeWidth = 2.dp,
                                             )

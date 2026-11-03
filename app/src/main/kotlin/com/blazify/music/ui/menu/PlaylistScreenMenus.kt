@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.BlazeDownloadLoader
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -95,7 +95,7 @@ fun LocalPlaylistMenu(
                     title = { Text(stringResource(R.string.downloading)) },
                     description = { Text(stringResource(R.string.download_in_progress_desc)) },
                     icon = {
-                        BlazeLoader(
+                        BlazeDownloadLoader(
                             modifier = Modifier.size(24.dp),
                             strokeWidth = 2.dp,
                         )
@@ -365,7 +365,7 @@ fun AutoPlaylistMenu(
                     title = { Text(stringResource(R.string.downloading)) },
                     description = { Text(stringResource(R.string.download_in_progress_desc)) },
                     icon = {
-                        BlazeLoader(
+                        BlazeDownloadLoader(
                             modifier = Modifier.size(24.dp),
                             strokeWidth = 2.dp,
                         )
@@ -545,7 +545,7 @@ fun TopPlaylistMenu(
                     title = { Text(stringResource(R.string.downloading)) },
                     description = { Text(stringResource(R.string.download_in_progress_desc)) },
                     icon = {
-                        BlazeLoader(
+                        BlazeDownloadLoader(
                             modifier = Modifier.size(24.dp),
                             strokeWidth = 2.dp,
                         )
@@ -709,7 +709,7 @@ fun CachePlaylistMenu(
                     title = { Text(stringResource(R.string.downloading)) },
                     description = { Text(stringResource(R.string.download_in_progress_desc)) },
                     icon = {
-                        BlazeLoader(
+                        BlazeDownloadLoader(
                             modifier = Modifier.size(24.dp),
                             strokeWidth = 2.dp,
                         )
