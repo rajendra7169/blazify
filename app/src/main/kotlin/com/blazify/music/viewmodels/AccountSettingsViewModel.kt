@@ -40,7 +40,10 @@ class AccountSettingsViewModel @Inject constructor(
     suspend fun switchAccount(context: Context, account: com.blazify.music.utils.SavedAccount): Boolean {
         if (!com.blazify.music.utils.AccountSwitcher.stillSignedIn(account)) return false
         com.blazify.music.utils.AccountSwitcher.rememberCurrent(context)
-        withContext(Dispatchers.IO) { syncUtils.clearAllSyncedContentSuspend() }
+        // Limited, as on sign-in: the next account's sync replaces it anyway.
+        kotlinx.coroutines.withTimeoutOrNull(30_000) {
+            withContext(Dispatchers.IO) { syncUtils.clearAllSyncedContentSuspend() }
+        }
         return com.blazify.music.utils.AccountSwitcher.use(context, account)
     }
 

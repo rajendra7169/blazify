@@ -171,7 +171,9 @@ fun LoginScreen(navController: NavController) {
                     // what was synced for it out of the library so the two don't mix.
                     if (!previousCookie.isNullOrBlank() && previousCookie != currentCookie) {
                         com.blazify.music.utils.AccountSwitcher.rememberCurrent(context)
-                        accountsViewModel.clearSyncedContent()
+                        // Limited too: the new account's own sync replaces this
+                        // content anyway, so a slow clear must not hold up signing in.
+                        kotlinx.coroutines.withTimeoutOrNull(30_000) { accountsViewModel.clearSyncedContent() }
                     }
 
                     // Save ALL credentials atomically to DataStore, then restart the app.

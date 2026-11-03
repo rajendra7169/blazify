@@ -1596,50 +1596,38 @@ class SyncUtils @Inject constructor(
         updateState { copy(overallStatus = SyncStatus.Syncing, currentOperation = "Clearing synced content") }
 
         try {
+            // Read everything FIRST, outside the transaction, as executeClearPodcastData
+            // does: a DAO Flow collected inside withTransaction can wait on the very
+            // transaction it is inside, and adding a second account hung here for good.
+            val likedSongs = database.likedSongsByNameAsc().first()
+            val librarySongs = database.songsByNameAsc().first().filter { it.song.inLibrary != null }
+            val likedAlbums = database.albumsLikedByNameAsc().first()
+            val subscribedArtists = database.artistsBookmarkedByNameAsc().first()
+            val syncedPlaylists = database.playlistsByNameAsc().first().filter { it.playlist.browseId != null }
+            val uploadedSongs = database.uploadedSongsByNameAsc().first()
+            val uploadedAlbums = database.albumsUploadedByCreateDateAsc().first()
+
+            // Then every write together, so the library is never left half cleared.
             database.withTransaction {
-                // Clear liked songs
-                val likedSongs = database.likedSongsByNameAsc().first()
                 likedSongs.forEach {
                     database.update(it.song.copy(liked = false, likedDate = null))
                 }
-
-                // Clear library songs
-                val librarySongs = database.songsByNameAsc().first()
                 librarySongs.forEach {
-                    if (it.song.inLibrary != null) {
-                        database.update(it.song.copy(inLibrary = null))
-                    }
+                    database.update(it.song.copy(inLibrary = null))
                 }
-
-                // Clear liked albums
-                val likedAlbums = database.albumsLikedByNameAsc().first()
                 likedAlbums.forEach {
                     database.update(it.album.copy(bookmarkedAt = null))
                 }
-
-                // Clear subscribed artists
-                val subscribedArtists = database.artistsBookmarkedByNameAsc().first()
                 subscribedArtists.forEach {
                     database.update(it.artist.copy(bookmarkedAt = null))
                 }
-
-                // Delete synced playlists
-                val savedPlaylists = database.playlistsByNameAsc().first()
-                savedPlaylists.forEach {
-                    if (it.playlist.browseId != null) {
-                        database.clearPlaylist(it.playlist.id)
-                        database.delete(it.playlist)
-                    }
+                syncedPlaylists.forEach {
+                    database.clearPlaylist(it.playlist.id)
+                    database.delete(it.playlist)
                 }
-
-                // Clear uploaded songs
-                val uploadedSongs = database.uploadedSongsByNameAsc().first()
                 uploadedSongs.forEach {
                     database.update(it.song.copy(isUploaded = false, uploadEntityId = null))
                 }
-
-                // Clear uploaded albums
-                val uploadedAlbums = database.albumsUploadedByCreateDateAsc().first()
                 uploadedAlbums.forEach {
                     database.update(it.album.copy(isUploaded = false))
                 }
