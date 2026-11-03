@@ -232,7 +232,7 @@
     <string name="equalizer_desc">オーディオイコライザーを調整します</string>
     <string name="enable_dynamic_icon">動的アイコン</string>
     <string name="pure_black_mini_player">ピュアブラックのミニプレーヤー</string>
-    <string name="listen_together">Listen Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="play_pause">再生/停止</string>
     <string name="wrapped_intro_title">BLAZIFY</string>
     <string name="apple_music_style">Apple Music</string>
@@ -271,7 +271,7 @@
     <string name="mute">ミュート</string>
     <string name="unmute">ミュート解除</string>
     <string name="listen_together_view_logs">ログ</string>
-    <string name="listen_together_notification_channel_name">Listen Together</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
     <string name="invalid_room_code">無効なルームコードです</string>
     <string name="room_code">ルームコード</string>
     <string name="leave_room">ルームから退出</string>
@@ -448,7 +448,7 @@
     <string name="crossfade_gapless">曲間のない曲では無効にする</string>
     <string name="crossfade_gapless_desc">曲間のない曲ではクロスフェードしません</string>
     <string name="audio_offload_disabled_by_crossfade">クロスフェードを使用中はこの機能を使用できません</string>
-    <string name="together">Together</string>
+    <string name="together">Blaze Together</string>
     <string name="ai_lyrics_translation">AI歌詞翻訳</string>
     <string name="ai_translating_lyrics">歌詞を翻訳中…</string>
     <string name="ai_lyrics_translated">翻訳しました</string>

@@ -667,8 +667,8 @@
     <string name="discord_activity_name">활동 이름</string>
     <string name="discord_advanced_mode">고급 모드</string>
     <string name="discord_advanced_mode_description">추가 Rich Presence 사용자 지정 옵션을 표시합니다</string>
-    <string name="together">Together</string>
-    <string name="listen_together">Listen Together</string>
+    <string name="together">Blaze Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">서버 URL</string>
     <string name="listen_together_choose_server">서버 선택</string>
     <string name="listen_together_custom_server">사용자 지정 서버</string>
@@ -706,7 +706,7 @@
     <string name="listen_together_suggestion_received">%1$s 님이 %2$s을(를) 추천했습니다</string>
     <string name="listen_together_suggestion_sent">호스트에게 추천 곡을 보냈습니다!</string>
     <string name="listen_together_join_request_notification">%1$s 님이 방에 참여하고 싶어 합니다</string>
-    <string name="listen_together_notification_channel_name">Listen Together</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
     <string name="listen_together_notification_channel_desc">Listen Together 이벤트에 대한 알림입니다</string>
     <string name="listen_together_room_created">방이 생성되었습니다: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">방에 있는 동안에는 사용자 이름을 변경할 수 없습니다</string>

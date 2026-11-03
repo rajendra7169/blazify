@@ -336,7 +336,7 @@
     <string name="listen_together_not_configured">Listen Together belum dikonfigurasi. Harap atur URL server di: Listen Together &gt; Pengaturan &gt; URL Server</string>
     <string name="listen_together_suggestion_sent">Saran terkirim ke host!</string>
     <string name="listen_together_join_request_notification">%1$s ingin bergabung ke sesi</string>
-    <string name="listen_together_notification_channel_name">Listen Together</string>
+    <string name="listen_together_notification_channel_name">Dengar bersama</string>
     <string name="listen_together_notification_channel_desc">Notifikasi untuk acara Listen Together</string>
     <string name="listen_together_room_created">Sesi dibuat: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Nama pengguna tidak dapat diubah saat berada di dalam ruangan</string>

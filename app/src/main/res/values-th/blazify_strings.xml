@@ -367,7 +367,7 @@
     <string name="listen_together_suggestion_received">%1$s เสนอให้เล่น %2$s</string>
     <string name="listen_together_suggestion_sent">ส่งคำแนะนำไปยังโฮสต์แล้ว!</string>
     <string name="listen_together_join_request_notification">%1$s ต้องการเข้าร่วมห้อง</string>
-    <string name="listen_together_notification_channel_name">Listen Together</string>
+    <string name="listen_together_notification_channel_name">ฟังเพลงร่วมกัน</string>
     <string name="listen_together_notification_channel_desc">การแจ้งเตือนเกี่ยวกับกิจกรรมของ Listen Together</string>
     <string name="listen_together_room_created">สร้างห้อง %s แล้ว</string>
     <string name="listen_together_cannot_edit_username_in_room">ชื่อผู้ใช้ไม่สามารถแก้ไขขณะอยู่ในห้องได้</string>
