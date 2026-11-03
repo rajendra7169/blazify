@@ -26,6 +26,7 @@ to a television. Or get it from
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-channel-FFA726?logo=whatsapp&logoColor=1A0E00)](https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y)
 [![Discussions](https://img.shields.io/badge/discussions-ask%20anything-FFA726?logo=github&logoColor=1A0E00)](https://github.com/rajendra7169/blazify/discussions)
 [![License](https://img.shields.io/badge/license-GPL--3.0-FFA726.svg)](LICENSE)
+[![Translation status](https://hosted.weblate.org/widget/blazify/svg-badge.svg)](https://hosted.weblate.org/engage/blazify/)
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-FFA726)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-FFA726)
 
@@ -268,6 +269,16 @@ ones you want most.
 and UI/UX suggestions, each with a short form. Or use **Settings → Report a problem**
 inside the app: it fills in your app version and phone for you, which is usually the
 difference between a bug that gets fixed and one that cannot be reproduced.
+
+**[Translate Blazify on Weblate](https://hosted.weblate.org/engage/blazify/)**: the app
+follows your phone's language, and translations are done on Weblate. If a word reads
+wrong in your language, or a text still shows in English, you can fix it there in the
+browser, with no coding and no GitHub account needed. Your fix comes to the app in the
+next release.
+
+<a href="https://hosted.weblate.org/engage/blazify/">
+<img src="https://hosted.weblate.org/widget/blazify/multi-auto.svg" alt="Translation status per language" />
+</a>
 
 ---
 
