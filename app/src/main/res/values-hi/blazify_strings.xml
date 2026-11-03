@@ -1321,4 +1321,9 @@
     <string name="accounts_switching">बदला जा रहा है…</string>
     <string name="accounts_expired">वह खाता साइन आउट हो गया है। इस्तेमाल करने के लिए उसे फिर से जोड़ें।</string>
     <string name="removed_song_from_queue">\"%s\" को कतार से हटाया गया</string>
+    <string name="downloading_tap_to_stop">डाउनलोड हो रहा है… रोकने के लिए टैप करें</string>
+    <string name="stop_downloading_title">डाउनलोड रोकें?</string>
+    <string name="stop_downloading_text">इंतज़ार में या डाउनलोड हो रहे गाने रोक दिए जाएंगे। जो गाने पूरे हो चुके हैं, वे आपके फ़ोन में रहेंगे।</string>
+    <string name="stop_downloading_confirm">रोकें</string>
+    <string name="keep_downloading">डाउनलोड जारी रखें</string>
 </resources>

@@ -1321,4 +1321,9 @@
     <string name="accounts_switching">Wird gewechselt…</string>
     <string name="accounts_expired">Dieses Konto ist abgemeldet. Füge es erneut hinzu, um es zu nutzen.</string>
     <string name="removed_song_from_queue">„%s“ aus der Warteschlange entfernt</string>
+    <string name="downloading_tap_to_stop">Wird geladen … tippen zum Stoppen</string>
+    <string name="stop_downloading_title">Download stoppen?</string>
+    <string name="stop_downloading_text">Songs, die noch warten oder laden, werden gestoppt. Fertige Songs bleiben auf deinem Telefon.</string>
+    <string name="stop_downloading_confirm">Stoppen</string>
+    <string name="keep_downloading">Weiter laden</string>
 </resources>

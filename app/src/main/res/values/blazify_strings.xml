@@ -1341,6 +1341,11 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Connections</string>
     <string name="hint_integrations">Discord Rich Presence, Last.fm scrobbling</string>
+    <string name="downloading_tap_to_stop">Downloading… tap to stop</string>
+    <string name="stop_downloading_title">Stop downloading?</string>
+    <string name="stop_downloading_text">Songs still waiting or arriving are stopped. Songs that already finished stay on your phone.</string>
+    <string name="stop_downloading_confirm">Stop</string>
+    <string name="keep_downloading">Keep downloading</string>
     <string name="removed_song_from_queue">Removed \"%s\" from the queue</string>
     <string name="hint_together_settings">Blaze Together sync and room settings</string>
     <string name="guest">Guest</string>

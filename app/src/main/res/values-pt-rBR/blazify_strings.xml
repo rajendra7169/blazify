@@ -1332,4 +1332,9 @@
     <string name="accounts_switching">Trocando…</string>
     <string name="accounts_expired">Essa conta foi desconectada. Adicione-a de novo para usá-la.</string>
     <string name="removed_song_from_queue">\"%s\" removida da fila</string>
+    <string name="downloading_tap_to_stop">Baixando… toque para parar</string>
+    <string name="stop_downloading_title">Parar o download?</string>
+    <string name="stop_downloading_text">As músicas na fila ou baixando são interrompidas. As que já terminaram continuam no seu celular.</string>
+    <string name="stop_downloading_confirm">Parar</string>
+    <string name="keep_downloading">Continuar baixando</string>
 </resources>

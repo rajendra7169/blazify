@@ -1310,4 +1310,9 @@
     <string name="accounts_switching">Beralih…</string>
     <string name="accounts_expired">Akun itu sudah keluar. Tambahkan lagi untuk menggunakannya.</string>
     <string name="removed_song_from_queue">\"%s\" dihapus dari antrean</string>
+    <string name="downloading_tap_to_stop">Mengunduh… ketuk untuk berhenti</string>
+    <string name="stop_downloading_title">Hentikan unduhan?</string>
+    <string name="stop_downloading_text">Lagu yang masih menunggu atau sedang diunduh akan dihentikan. Lagu yang sudah selesai tetap ada di ponsel Anda.</string>
+    <string name="stop_downloading_confirm">Hentikan</string>
+    <string name="keep_downloading">Lanjutkan mengunduh</string>
 </resources>

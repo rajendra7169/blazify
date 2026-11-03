@@ -1343,4 +1343,9 @@
     <string name="accounts_switching">Переключение…</string>
     <string name="accounts_expired">Из этого аккаунта выполнен выход. Добавьте его снова, чтобы им пользоваться.</string>
     <string name="removed_song_from_queue">«%s» удалена из очереди</string>
+    <string name="downloading_tap_to_stop">Загрузка… нажмите, чтобы остановить</string>
+    <string name="stop_downloading_title">Остановить загрузку?</string>
+    <string name="stop_downloading_text">Песни в очереди и в процессе загрузки будут остановлены. Уже загруженные останутся на телефоне.</string>
+    <string name="stop_downloading_confirm">Остановить</string>
+    <string name="keep_downloading">Продолжить загрузку</string>
 </resources>

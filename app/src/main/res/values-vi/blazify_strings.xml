@@ -1310,4 +1310,9 @@
     <string name="accounts_switching">Đang chuyển…</string>
     <string name="accounts_expired">Tài khoản đó đã bị đăng xuất. Hãy thêm lại để sử dụng.</string>
     <string name="removed_song_from_queue">Đã xóa \"%s\" khỏi hàng đợi</string>
+    <string name="downloading_tap_to_stop">Đang tải xuống… chạm để dừng</string>
+    <string name="stop_downloading_title">Dừng tải xuống?</string>
+    <string name="stop_downloading_text">Các bài đang chờ hoặc đang tải sẽ bị dừng. Những bài đã tải xong vẫn ở trên điện thoại của bạn.</string>
+    <string name="stop_downloading_confirm">Dừng</string>
+    <string name="keep_downloading">Tiếp tục tải</string>
 </resources>

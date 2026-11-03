@@ -1363,4 +1363,9 @@
     <string name="accounts_switching">جارٍ التبديل…</string>
     <string name="accounts_expired">تم تسجيل الخروج من هذا الحساب. أضفه مرة أخرى لاستخدامه.</string>
     <string name="removed_song_from_queue">تمت إزالة \"%s\" من قائمة الانتظار</string>
+    <string name="downloading_tap_to_stop">جارٍ التنزيل… اضغط للإيقاف</string>
+    <string name="stop_downloading_title">إيقاف التنزيل؟</string>
+    <string name="stop_downloading_text">سيتم إيقاف الأغاني المنتظرة أو قيد التنزيل. تبقى الأغاني التي اكتمل تنزيلها على هاتفك.</string>
+    <string name="stop_downloading_confirm">إيقاف</string>
+    <string name="keep_downloading">متابعة التنزيل</string>
 </resources>

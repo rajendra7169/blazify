@@ -1310,4 +1310,9 @@
     <string name="accounts_switching">正在切换…</string>
     <string name="accounts_expired">该账号已退出登录。请重新添加后使用。</string>
     <string name="removed_song_from_queue">已从待播列表中移除“%s”</string>
+    <string name="downloading_tap_to_stop">正在下载… 点按即可停止</string>
+    <string name="stop_downloading_title">要停止下载吗？</string>
+    <string name="stop_downloading_text">等待中或正在下载的歌曲将停止下载。已下载完成的歌曲会保留在手机上。</string>
+    <string name="stop_downloading_confirm">停止</string>
+    <string name="keep_downloading">继续下载</string>
 </resources>

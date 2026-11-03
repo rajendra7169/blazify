@@ -1332,4 +1332,9 @@
     <string name="accounts_switching">Cambiando…</string>
     <string name="accounts_expired">Se cerró la sesión de esa cuenta. Vuelve a agregarla para usarla.</string>
     <string name="removed_song_from_queue">Se quitó \"%s\" de la cola</string>
+    <string name="downloading_tap_to_stop">Descargando… toca para detener</string>
+    <string name="stop_downloading_title">¿Detener la descarga?</string>
+    <string name="stop_downloading_text">Se detienen las canciones en espera o en descarga. Las que ya terminaron se quedan en tu teléfono.</string>
+    <string name="stop_downloading_confirm">Detener</string>
+    <string name="keep_downloading">Seguir descargando</string>
 </resources>

@@ -1321,4 +1321,9 @@
     <string name="accounts_switching">Geçiş yapılıyor…</string>
     <string name="accounts_expired">Bu hesabın oturumu kapalı. Kullanmak için yeniden ekleyin.</string>
     <string name="removed_song_from_queue">\"%s\" sıradan kaldırıldı</string>
+    <string name="downloading_tap_to_stop">İndiriliyor… durdurmak için dokunun</string>
+    <string name="stop_downloading_title">İndirme durdurulsun mu?</string>
+    <string name="stop_downloading_text">Bekleyen veya inen şarkılar durdurulur. İndirmesi biten şarkılar telefonunuzda kalır.</string>
+    <string name="stop_downloading_confirm">Durdur</string>
+    <string name="keep_downloading">İndirmeye devam et</string>
 </resources>

@@ -15,15 +15,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.Download
@@ -41,7 +50,9 @@ private val PlayButton = 68.dp
  * than sliding Play off to one side.
  *
  * [downloadState] is a media3 [Download] state for the whole list, or null
- * where downloading does not apply (a podcast, an empty list).
+ * where downloading does not apply (a podcast, an empty list). While the list
+ * is downloading, the spinner can be tapped to stop it through [onStopDownload];
+ * songs that already finished stay on the phone.
  */
 @Composable
 fun CollectionActionRow(
@@ -49,6 +60,7 @@ fun CollectionActionRow(
     onLike: () -> Unit,
     downloadState: Int?,
     onDownload: () -> Unit,
+    onStopDownload: (() -> Unit)? = null,
     onPlay: () -> Unit,
     onShuffle: (() -> Unit)?,
     onMore: () -> Unit,
@@ -73,14 +85,38 @@ fun CollectionActionRow(
         if (downloadState != null) {
             val done = downloadState == Download.STATE_COMPLETED
             val busy = downloadState == Download.STATE_QUEUED || downloadState == Download.STATE_DOWNLOADING
+            var askStop by remember { mutableStateOf(false) }
             RoundButton(
                 icon = if (done) R.drawable.offline else R.drawable.download,
-                description = stringResource(if (done) R.string.offline else R.string.action_download),
+                description = stringResource(
+                    when {
+                        done -> R.string.offline
+                        busy -> R.string.downloading_tap_to_stop
+                        else -> R.string.action_download
+                    },
+                ),
                 tint = if (done) MaterialTheme.colorScheme.primary else null,
-                enabled = !done && !busy,
+                enabled = !done && (!busy || onStopDownload != null),
                 busy = busy,
-                onClick = onDownload,
+                onClick = { if (busy) askStop = true else onDownload() },
             )
+            if (askStop && busy && onStopDownload != null) {
+                AlertDialog(
+                    onDismissRequest = { askStop = false },
+                    title = { Text(stringResource(R.string.stop_downloading_title)) },
+                    text = { Text(stringResource(R.string.stop_downloading_text)) },
+                    confirmButton = {
+                        TextButton(onClick = { askStop = false; onStopDownload() }) {
+                            Text(stringResource(R.string.stop_downloading_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { askStop = false }) {
+                            Text(stringResource(R.string.keep_downloading))
+                        }
+                    },
+                )
+            }
         } else {
             Spacer(Modifier.size(SideButton))
         }
@@ -139,7 +175,10 @@ private fun RoundButton(
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             if (busy) {
-                BlazeLoader(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+                BlazeLoader(
+                    modifier = Modifier.size(22.dp).semantics { contentDescription = description },
+                    strokeWidth = 2.dp,
+                )
             } else {
                 Icon(
                     painter = painterResource(icon),

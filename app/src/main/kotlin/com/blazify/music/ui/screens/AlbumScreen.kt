@@ -6,14 +6,6 @@
 
 package com.blazify.music.ui.screens
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import com.blazify.music.playback.downloadAll
-import com.blazify.music.models.toMediaMetadata
-import com.blazify.music.extensions.toMediaItem
-import com.blazify.music.playback.queues.ListQueue
-import com.blazify.music.ui.component.CollectionActionRow
-import com.blazify.music.ui.component.BlazeLoader
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -49,7 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -76,7 +67,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.blazify.music.LocalDatabase
@@ -88,8 +81,15 @@ import com.blazify.music.R
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.db.entities.Album
+import com.blazify.music.extensions.toMediaItem
+import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.playback.ExoDownloadService
+import com.blazify.music.playback.downloadAll
+import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.playback.queues.LocalAlbumRadio
+import com.blazify.music.ui.component.BlazeLoader
 import com.blazify.music.ui.component.ClickableArtistText
+import com.blazify.music.ui.component.CollectionActionRow
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.component.NavigationTitle
@@ -104,6 +104,8 @@ import com.blazify.music.ui.utils.resize
 import com.blazify.music.utils.makeTimeString
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.AlbumViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -310,6 +312,16 @@ fun AlbumScreen(
                                     albumWithSongs.songs.map { it.toMediaMetadata() },
                                     downloadUtil.downloads.value,
                                 )
+                            }
+                        },
+                        // Only what is still waiting or arriving; finished songs stay.
+                        onStopDownload = {
+                            val now = downloadUtil.downloads.value
+                            albumWithSongs.songs.map { it.id }.forEach { id ->
+                                val state = now[id]?.state
+                                if (state == Download.STATE_QUEUED || state == Download.STATE_DOWNLOADING) {
+                                    DownloadService.sendRemoveDownload(context, ExoDownloadService::class.java, id, false)
+                                }
                             }
                         },
                         onPlay = {

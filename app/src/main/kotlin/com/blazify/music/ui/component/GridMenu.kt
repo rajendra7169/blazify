@@ -141,7 +141,7 @@ fun LazyGridScope.DownloadGridMenu(
                         strokeWidth = 2.dp
                     )
                 },
-                title = R.string.downloading,
+                title = R.string.downloading_tap_to_stop,
                 onClick = onRemoveDownload
             )
         }

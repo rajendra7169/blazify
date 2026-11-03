@@ -1330,4 +1330,9 @@
     <string name="accounts_switching">Changement…</string>
     <string name="accounts_expired">Ce compte est déconnecté. Ajoutez-le de nouveau pour l\'utiliser.</string>
     <string name="removed_song_from_queue">« %s » retiré de la file d\'attente</string>
+    <string name="downloading_tap_to_stop">Téléchargement… touchez pour arrêter</string>
+    <string name="stop_downloading_title">Arrêter le téléchargement ?</string>
+    <string name="stop_downloading_text">Les titres en attente ou en cours sont arrêtés. Ceux déjà terminés restent sur votre téléphone.</string>
+    <string name="stop_downloading_confirm">Arrêter</string>
+    <string name="keep_downloading">Continuer</string>
 </resources>

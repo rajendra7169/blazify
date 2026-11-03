@@ -6,17 +6,6 @@
 
 package com.blazify.music.ui.screens.playlist
 
-import com.blazify.music.extensions.toMediaItem
-import com.blazify.music.playback.queues.ListQueue
-import com.blazify.music.playback.queues.YouTubeQueue
-import com.blazify.music.ui.component.CollectionActionRow
-import com.blazify.music.playback.downloadStateOf
-import com.blazify.music.playback.downloadAll
-import com.blazify.music.LocalDownloadUtil
-import androidx.media3.exoplayer.offline.Download
-import com.blazify.music.ui.component.BlazeLoader
-import com.blazify.music.ui.component.BlazeSnackbarHost
-import com.blazify.music.ui.component.OpenOnPlaying
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -86,12 +75,15 @@ import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.blazify.innertube.models.PlaylistItem
 import com.blazify.innertube.models.SongItem
 import com.blazify.music.LocalDatabase
+import com.blazify.music.LocalDownloadUtil
 import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalNavController
 import com.blazify.music.LocalPlayerAwareWindowInsets
@@ -102,11 +94,21 @@ import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.db.entities.Playlist
 import com.blazify.music.db.entities.PlaylistEntity
 import com.blazify.music.db.entities.PlaylistSongMap
+import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.playback.ExoDownloadService
+import com.blazify.music.playback.downloadAll
+import com.blazify.music.playback.downloadStateOf
+import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.playback.queues.YouTubePlaylistQueue
+import com.blazify.music.playback.queues.YouTubeQueue
+import com.blazify.music.ui.component.BlazeLoader
+import com.blazify.music.ui.component.BlazeSnackbarHost
+import com.blazify.music.ui.component.CollectionActionRow
 import com.blazify.music.ui.component.ExpandableText
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.LocalMenuState
+import com.blazify.music.ui.component.OpenOnPlaying
 import com.blazify.music.ui.component.YouTubeListItem
 import com.blazify.music.ui.menu.YouTubePlaylistMenu
 import com.blazify.music.ui.menu.YouTubeSelectionSongMenu
@@ -679,6 +681,15 @@ private fun OnlinePlaylistHeader(
             onDownload = {
                 coroutineScope.launch(Dispatchers.IO) {
                     downloadAll(context, database, songs.map { it.toMediaMetadata() }, downloads)
+                }
+            },
+            // Only what is still waiting or arriving; finished songs stay.
+            onStopDownload = {
+                songs.map { it.id }.forEach { id ->
+                    val state = downloads[id]?.state
+                    if (state == Download.STATE_QUEUED || state == Download.STATE_DOWNLOADING) {
+                        DownloadService.sendRemoveDownload(context, ExoDownloadService::class.java, id, false)
+                    }
                 }
             },
             onPlay = {
