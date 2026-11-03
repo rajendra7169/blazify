@@ -1,0 +1,63 @@
+O Blazify é um player de música para Android, feito com Kotlin e Jetpack Compose. Ele toca o que você quiser do YouTube Music, guarda o que você escolher para ouvir offline quando estiver sem internet e acompanha a letra enquanto ela é cantada, sem anúncios, sem interrupções e sem precisar de conta. Se quiser, você pode entrar com o Google para receber recomendações melhores, e não há rastreamento. Todos os serviços com que ele se comunica estão listados em Privacidade.
+
+<b>Para ouvir</b>
+
+* Milhões de músicas, por busca ou navegação: músicas, álbuns, artistas, playlists e vídeos
+* Reprodução sem intervalos, com a próxima faixa preparada com antecedência
+* Baixe o que quiser para ouvir offline, ou deixe o app guardar as músicas enquanto você ouve
+* Toque as músicas do seu celular junto com todo o resto, na mesma fila e no mesmo player
+* Uma fila que você reorganiza arrastando, salva como playlist ou usa para iniciar uma rádio
+* Timer de desligamento, com opção de parar no fim da faixa
+* Não tocar esta música: tire uma música das filas, rádios e sugestões
+* Toque duplo para avançar ou voltar em todos os players, e podcasts que mantêm a própria velocidade
+* Um bloco de tocar/pausar nas Configurações rápidas e atalhos para Curtidas, Downloads e Aleatório
+* Economia de dados na rede móvel e downloads só no Wi-Fi
+
+<b>Som</b>
+
+* Equalizador de dez bandas com curva de resposta de frequência em tempo real e 13 predefinições
+* Pré-amplificador, com cada predefinição pré-compensada para que os reforços nunca distorçam
+* Reforço de graves, surround e reverberação
+* Nivelamento de volume entre músicas
+* Pular silêncio, velocidade de reprodução e tom
+
+<b>Letras</b>
+
+* Letras sincronizadas com destaque palavra por palavra
+* Várias fontes, consultadas na ordem que você escolher
+* Tradução e romanização
+* Visualização em tela cheia e cards de letra para compartilhar como imagem
+
+<b>Aparência</b>
+
+* Material 3 com as cores dinâmicas do Material You
+* Cores tiradas da capa do álbum, só nos detalhes ou na tela inteira
+* Vários designs de player, com prévia ao vivo enquanto você escolhe
+* Claro, escuro, preto puro ou o mesmo do sistema
+
+<b>Biblioteca e compartilhamento</b>
+
+* Músicas curtidas, histórico, suas próprias playlists e um Top 50 montado com o que você realmente ouve
+* Ouvir juntos: compartilhe o código de uma sala e ouça em sincronia com os amigos
+* Importação de playlists de um arquivo ou link
+* Scrobbling no last.fm e status no Discord, ambos opcionais e com suas próprias credenciais
+* Reconhecimento de música: aproxime o celular e descubra o que está tocando
+* Android Auto e widgets para a tela inicial
+* Backup de toda a sua biblioteca em um único arquivo para restaurar em outro aparelho
+
+<b>Privacidade</b>
+
+O Blazify não tem publicidade, análises nem bibliotecas de rastreamento de nenhum tipo. Entrar com uma conta é totalmente opcional. Tudo funciona sem login, exceto sua biblioteca pessoal do YouTube Music.
+
+Ele se comunica com o YouTube Music e com os servidores de vídeo do Google; com o decodificador do PipePipe (api.pipepipe.dev), que recebe apenas a versão do player do YouTube e os valores embaralhados do stream; com o próprio repositório do Blazify, para obter uma tabela de configurações do player (raw.githubusercontent.com, cdn.jsdelivr.net); e com provedores de letras, para a música que está tocando. Com qualquer outro serviço, só quando você ativa, como o dicionário de leitura japonesa para letras em japonês romanizado, que é baixado uma única vez do Maven Central (repo1.maven.org) e somente depois que você concordar.
+
+Vale dizer com clareza, porque é a única vez que o app envia algo sobre os seus próprios arquivos: quando você escaneia as músicas do celular, toda faixa cujo arquivo não tem capa tem o título pesquisado online para que uma imagem seja encontrada. Arquivos que já têm capa nunca são enviados. Isso pode ser desativado, e desativar só faz você ficar sem as capas que faltam.
+
+<b>Software livre</b>
+
+O Blazify é licenciado sob a GNU General Public License v3.0. Seu núcleo de streaming se baseia no trabalho dos projetos InnerTune, OuterTune e Metrolist, todos GPL-3.0; a interface, os temas, a identidade visual e o desenvolvimento de recursos são originais. Veja o arquivo NOTICE no repositório do código-fonte.
+
+O Blazify não é afiliado, financiado, autorizado nem endossado pelo YouTube, pela Google LLC ou por qualquer uma de suas afiliadas.
+
+Código-fonte, versões e rastreador de problemas: https://github.com/rajendra7169/blazify
+Site: https://rajendra7169.github.io/blazify/

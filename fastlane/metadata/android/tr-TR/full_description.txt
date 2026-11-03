@@ -1,0 +1,63 @@
+Blazify, Kotlin ve Jetpack Compose ile geliştirilmiş, Android cihazlar için bir müzik çalardır. YouTube Music'ten dilediğiniz gibi yayın akışı sağlar, internetiniz olmadığında dinlemek istediklerinizi çevrimdışı saklar ve şarkı sözlerini söylendikleri anda takip eder; reklam yok, rahatsızlık yok, hesap zorunluluğu yok. İsterseniz daha iyi şarkı önerileri için Google ile oturum açabilirsiniz; hiçbir izleme yapılmaz. Uygulamanın iletişim kurduğu her hizmet Gizlilik bölümünde listelenmiştir.
+
+<b>Dinleme</b>
+
+* Adıyla arayarak ya da göz atarak bulabileceğiniz milyonlarca şarkı: şarkılar, albümler, sanatçılar, çalma listeleri ve videolar
+* Sonraki parça önceden hazırlanarak kesintisiz çalma
+* Her şeyi çevrimdışı dinlemek için indirin ya da şarkıları siz dinledikçe saklamasına izin verin
+* Telefonunuzdaki müzikleri diğer her şeyle birlikte, aynı kuyrukta ve aynı çalarda çalın
+* Sürükleyerek yeniden sıralayabileceğiniz, çalma listesi olarak kaydedebileceğiniz veya radyo başlatabileceğiniz bir kuyruk
+* Parça sonunda durdurma seçeneğiyle uyku zamanlayıcısı
+* Bu şarkıyı çalma: bir şarkıyı kuyruklardan, radyodan ve önerilerden uzak tutun
+* Tüm çalarlarda çift dokunarak ileri/geri sarma ve kendi hızını koruyan podcast'ler
+* Hızlı Ayarlar'da oynat/duraklat kutucuğu ile Beğenilenler, İndirilenler ve Karıştır kısayolları
+* Mobil ağlarda veri tasarrufu ve yalnızca Wi-Fi'de indirme
+
+<b>Ses</b>
+
+* Canlı frekans yanıtı eğrisi ve 13 hazır ayar sunan on bantlı ekolayzır
+* Ön yükseltici kontrolü; her hazır ayar önceden dengelendiği için yükseltmeler asla bozulmaya (clipping) yol açmaz
+* Bas güçlendirme, surround ve yankı
+* Şarkılar arasında ses seviyesi dengeleme
+* Sessizliği atlama, çalma hızı ve perde
+
+<b>Şarkı sözleri</b>
+
+* Kelime kelime vurgulanan, zamanla senkronize şarkı sözleri
+* Seçtiğiniz sırayla başvurulan birden fazla kaynak
+* Çeviri ve Latin harflerine dönüştürme
+* Tam ekran görünüm ve görsel olarak paylaşabileceğiniz söz kartları
+
+<b>Görünüm</b>
+
+* Material You dinamik renkleriyle Material 3
+* Albüm kapağından alınan renk; yalnızca vurgu olarak ya da tüm ekranda
+* Seçim yaparken canlı önizleme sunan birden fazla çalar tasarımı
+* Açık, koyu, tam siyah ya da sistem ayarına uygun tema
+
+<b>Kitaplık ve paylaşım</b>
+
+* Beğenilen şarkılar, dinleme geçmişi, kendi çalma listeleriniz ve gerçekten dinlediklerinizden oluşan bir Top 50
+* Birlikte Dinle: oda kodunu paylaşın ve arkadaşlarınızla eş zamanlı dinleyin
+* Dosyadan veya bağlantıdan çalma listesi içe aktarma
+* last.fm scrobbling ve Discord durumu; ikisi de isteğe bağlı ve kendi kimlik bilgilerinizle
+* Müzik tanıma: telefonunuzu kaldırın ve çalan şarkıyı öğrenin
+* Android Auto ve ana ekran widget'ları
+* Tüm kitaplığınızı tek bir dosyaya yedekleyin ve başka bir cihazda geri yükleyin
+
+<b>Gizlilik</b>
+
+Blazify'da hiçbir türden reklam, analiz ya da izleme kitaplığı bulunmaz. Oturum açmak tamamen isteğe bağlıdır. Kişisel YouTube Music kitaplığınız dışındaki her şey oturum açmadan çalışır.
+
+Uygulama; YouTube Music ve Google'ın video sunucularıyla, yalnızca YouTube'un oynatıcı sürümünü ve karıştırılmış akış değerlerini alan PipePipe'ın çözücüsüyle (api.pipepipe.dev), oynatıcı ayarları tablosu için Blazify'ın kendi deposuyla (raw.githubusercontent.com, cdn.jsdelivr.net) ve çalan şarkı için şarkı sözü sağlayıcılarıyla iletişim kurar. Bunların dışındakilerle yalnızca siz açtığınızda iletişim kurar; örneğin Latin harfli Japonca sözler için kullanılan Japonca okunuş sözlüğü, yalnızca siz onay verdikten sonra Maven Central'dan (repo1.maven.org) bir kez indirilir.
+
+Açıkça belirtmeye değer bir nokta var, çünkü uygulamanın kendi dosyalarınız hakkında herhangi bir yere bilgi gönderdiği tek durum budur: telefonunuzdaki müzikleri taradığınızda, dosyasında kapak görseli bulunmayan her parçanın adı, bir görsel bulunabilmesi için çevrimiçi olarak aranır. Zaten kapak görseli olan dosyalar asla gönderilmez. Bu özellik kapatılabilir; kapatmanın tek bedeli eksik kapaklardır.
+
+<b>Özgür yazılım</b>
+
+Blazify, GNU General Public License v3.0 ile lisanslanmıştır. Akış çekirdeği, tamamı GPL-3.0 lisanslı InnerTune, OuterTune ve Metrolist projelerinin çalışmaları üzerine kuruludur; arayüz, temalar, marka kimliği ve özellik çalışmaları özgündür. Ayrıntılar için kaynak deposundaki NOTICE dosyasına bakın.
+
+Blazify; YouTube, Google LLC veya bunların herhangi bir iştiraki ile bağlantılı değildir ve bunlar tarafından finanse edilmemekte, yetkilendirilmemekte ya da onaylanmamaktadır.
+
+Kaynak kod, sürümler ve hata takibi: https://github.com/rajendra7169/blazify
+Web sitesi: https://rajendra7169.github.io/blazify/

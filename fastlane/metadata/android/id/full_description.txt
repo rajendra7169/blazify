@@ -1,0 +1,63 @@
+Blazify adalah pemutar musik untuk perangkat Android, dibuat dengan Kotlin dan Jetpack Compose. Aplikasi ini memutar musik dari YouTube Music sesuai keinginan Anda, menyimpan pilihan Anda untuk didengarkan offline saat tidak ada internet, dan menampilkan lirik seiring lagu dinyanyikan, tanpa iklan, tanpa gangguan, dan tanpa perlu akun. Jika mau, Anda bisa masuk dengan Google untuk rekomendasi lagu yang lebih baik, dan tidak ada pelacakan. Setiap layanan yang dihubungi aplikasi ini tercantum di bagian Privasi.
+
+<b>Mendengarkan</b>
+
+* Jutaan lagu, cari berdasarkan nama atau temukan dengan menjelajah: lagu, album, artis, playlist, dan video
+* Pemutaran tanpa jeda, dengan lagu berikutnya disiapkan lebih awal
+* Unduh apa saja untuk didengarkan offline, atau biarkan aplikasi menyimpan lagu saat Anda memutarnya
+* Putar musik yang ada di ponsel Anda bersama lagu lainnya, dalam antrean dan pemutar yang sama
+* Antrean yang bisa diurutkan ulang dengan diseret, disimpan sebagai playlist, atau dijadikan awal radio
+* Timer tidur, dengan opsi berhenti di akhir lagu
+* Jangan putar lagu ini: jauhkan lagu dari antrean, radio, dan saran
+* Ketuk dua kali untuk maju/mundur di setiap pemutar, dan podcast yang menyimpan kecepatannya sendiri
+* Ubin putar/jeda di Setelan Cepat, serta pintasan untuk Disukai, Unduhan, dan Acak
+* Hemat data di jaringan seluler, dan unduh hanya lewat Wi-Fi
+
+<b>Suara</b>
+
+* Equalizer sepuluh band dengan kurva respons frekuensi langsung dan 13 preset
+* Kontrol preamp, setiap preset sudah dikompensasi agar penguatan tidak pernah menyebabkan clipping
+* Bass boost, surround, dan reverb
+* Penyetaraan volume antarlagu
+* Lewati keheningan, kecepatan pemutaran, dan nada
+
+<b>Lirik</b>
+
+* Lirik yang tersinkron waktu dengan sorotan kata demi kata
+* Beberapa sumber, yang dicari sesuai urutan pilihan Anda
+* Terjemahan dan romanisasi
+* Tampilan layar penuh, dan kartu lirik yang bisa Anda bagikan sebagai gambar
+
+<b>Tampilan dan nuansa</b>
+
+* Material 3 dengan warna dinamis Material You
+* Warna diambil dari sampul album, hanya untuk aksen atau seluruh layar
+* Beberapa desain pemutar untuk dipilih, dengan pratinjau langsung saat memilih
+* Terang, gelap, hitam pekat, atau mengikuti sistem
+
+<b>Pustaka dan berbagi</b>
+
+* Lagu yang disukai, riwayat mendengarkan, playlist Anda sendiri, dan Top 50 dari lagu yang benar-benar Anda putar
+* Dengarkan Bersama: bagikan kode ruang dan putar musik secara sinkron bersama teman
+* Impor playlist dari file atau tautan
+* Scrobbling last.fm dan status Discord, keduanya opsional dengan kredensial Anda sendiri
+* Pengenalan musik: angkat ponsel Anda dan ketahui lagu yang sedang diputar
+* Android Auto dan widget layar utama
+* Cadangkan seluruh pustaka Anda ke satu file dan pulihkan di perangkat lain
+
+<b>Privasi</b>
+
+Blazify tidak memiliki iklan, analitik, maupun pustaka pelacakan dalam bentuk apa pun. Masuk ke akun sepenuhnya opsional. Semuanya, kecuali pustaka YouTube Music pribadi Anda, berfungsi tanpa masuk.
+
+Aplikasi ini terhubung ke YouTube Music dan server video Google; ke dekoder PipePipe (api.pipepipe.dev), yang hanya menerima versi pemutar YouTube dan nilai stream yang diacak; ke repositori Blazify sendiri untuk tabel setelan pemutar (raw.githubusercontent.com, cdn.jsdelivr.net); dan ke penyedia lirik untuk lagu yang sedang diputar. Layanan lain hanya dihubungi jika Anda mengaktifkannya, seperti kamus cara baca bahasa Jepang untuk lirik Jepang yang diromanisasi, yang diunduh sekali dari Maven Central (repo1.maven.org) hanya setelah Anda menyetujuinya.
+
+Satu hal perlu disampaikan terus terang, karena inilah satu-satunya saat aplikasi mengirim informasi apa pun tentang file Anda sendiri ke mana pun: saat Anda memindai musik di ponsel, judul setiap lagu yang filenya tidak memiliki gambar sampul akan dicari secara online agar gambarnya bisa ditemukan. File yang sudah memiliki gambar sampul tidak pernah dikirim. Fitur ini bisa dinonaktifkan; satu-satunya akibatnya, sampul yang hilang tidak akan dicarikan.
+
+<b>Perangkat lunak bebas</b>
+
+Blazify dilisensikan di bawah GNU General Public License v3.0. Inti streaming-nya dibangun di atas karya proyek InnerTune, OuterTune, dan Metrolist, yang semuanya berlisensi GPL-3.0; antarmuka, tema, branding, dan pengembangan fiturnya adalah karya orisinal. Lihat file NOTICE di repositori kode sumber.
+
+Blazify tidak berafiliasi dengan, didanai, diberi wewenang, atau didukung oleh YouTube, Google LLC, atau afiliasi mereka mana pun.
+
+Kode sumber, rilis, dan pelacak masalah: https://github.com/rajendra7169/blazify
+Situs web: https://rajendra7169.github.io/blazify/

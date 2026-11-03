@@ -1,0 +1,63 @@
+Blazify là trình phát nhạc dành cho thiết bị Android, được xây dựng bằng Kotlin và Jetpack Compose. Ứng dụng cho phép bạn nghe trực tuyến từ YouTube Music theo ý thích, lưu lại những bài bạn muốn để nghe ngoại tuyến khi không có Internet, và hiển thị lời bài hát chạy theo từng câu hát. Không quảng cáo, không làm phiền và không cần tài khoản. Nếu muốn, bạn có thể đăng nhập bằng Google để nhận gợi ý bài hát tốt hơn, và hoàn toàn không có theo dõi. Mọi dịch vụ mà ứng dụng kết nối đều được liệt kê trong mục Quyền riêng tư.
+
+<b>Nghe nhạc</b>
+
+* Hàng triệu bài hát, tìm theo tên hoặc khám phá bằng cách duyệt: bài hát, album, nghệ sĩ, danh sách phát và video
+* Phát liền mạch không ngắt quãng, bài tiếp theo luôn được chuẩn bị sẵn
+* Tải xuống mọi thứ để nghe ngoại tuyến, hoặc để ứng dụng tự lưu bài hát khi bạn phát
+* Phát nhạc có sẵn trên điện thoại cùng mọi thứ khác, trong cùng hàng đợi và cùng trình phát
+* Hàng đợi có thể sắp xếp lại bằng cách kéo thả, lưu thành danh sách phát hoặc dùng để bắt đầu radio
+* Hẹn giờ ngủ, có tùy chọn dừng khi hết bài
+* Không phát bài này: loại một bài hát khỏi hàng đợi, radio và gợi ý
+* Chạm hai lần để tua trên mọi trình phát, và podcast giữ tốc độ phát riêng của chúng
+* Ô phát/tạm dừng trong Cài đặt nhanh, cùng lối tắt tới Đã thích, Tải xuống và Trộn bài
+* Tiết kiệm dữ liệu khi dùng mạng di động, và chỉ tải xuống qua Wi-Fi
+
+<b>Âm thanh</b>
+
+* Bộ cân bằng âm 10 dải với đường cong đáp tuyến tần số hiển thị trực tiếp và 13 cài đặt sẵn
+* Điều chỉnh tiền khuếch đại (preamp), mỗi cài đặt sẵn đều được bù trước để khi tăng âm không bao giờ bị méo tiếng (clipping)
+* Tăng âm trầm, âm thanh vòm và tiếng vang
+* Cân bằng âm lượng giữa các bài hát
+* Bỏ qua khoảng lặng, điều chỉnh tốc độ phát và cao độ
+
+<b>Lời bài hát</b>
+
+* Lời bài hát đồng bộ theo thời gian, làm nổi bật từng từ
+* Nhiều nguồn lời bài hát, được truy vấn theo thứ tự bạn chọn
+* Dịch và chuyển sang chữ Latinh
+* Chế độ xem toàn màn hình, và thẻ lời bài hát có thể chia sẻ dưới dạng hình ảnh
+
+<b>Giao diện</b>
+
+* Material 3 với màu động Material You
+* Màu lấy từ ảnh bìa album, chỉ cho màu nhấn hoặc cho toàn bộ màn hình
+* Nhiều thiết kế trình phát để lựa chọn, có xem trước trực tiếp khi bạn chọn
+* Sáng, tối, đen tuyền hoặc theo hệ thống
+
+<b>Thư viện và chia sẻ</b>
+
+* Bài hát đã thích, lịch sử nghe, danh sách phát của riêng bạn và Top 50 được tạo từ những gì bạn thực sự nghe
+* Nghe cùng nhau (Listen Together): chia sẻ mã phòng và phát đồng bộ với bạn bè
+* Nhập danh sách phát từ tệp hoặc liên kết
+* Scrobble lên last.fm và hiển thị trạng thái trên Discord, đều là tùy chọn và dùng thông tin đăng nhập của riêng bạn
+* Nhận diện bài hát: giơ điện thoại lên để biết bài gì đang phát
+* Android Auto và tiện ích màn hình chính
+* Sao lưu toàn bộ thư viện vào một tệp duy nhất và khôi phục trên thiết bị khác
+
+<b>Quyền riêng tư</b>
+
+Blazify không có quảng cáo, không có công cụ phân tích và không có bất kỳ thư viện theo dõi nào. Việc đăng nhập là hoàn toàn tùy chọn. Mọi tính năng, ngoại trừ thư viện YouTube Music cá nhân của bạn, đều hoạt động khi chưa đăng nhập.
+
+Ứng dụng kết nối với YouTube Music và máy chủ video của Google; với bộ giải mã của PipePipe (api.pipepipe.dev), nơi chỉ nhận phiên bản trình phát của YouTube và các giá trị luồng đã bị xáo trộn; với kho mã riêng của Blazify để lấy bảng cài đặt trình phát (raw.githubusercontent.com, cdn.jsdelivr.net); và với các nhà cung cấp lời bài hát cho bài đang phát. Mọi kết nối khác chỉ diễn ra khi bạn bật tính năng tương ứng, chẳng hạn từ điển cách đọc tiếng Nhật dùng để chuyển lời bài hát tiếng Nhật sang chữ Latinh, chỉ được tải xuống một lần từ Maven Central (repo1.maven.org) sau khi bạn đồng ý.
+
+Có một điều cần nói rõ, vì đây là trường hợp duy nhất ứng dụng gửi bất kỳ thông tin nào về tệp của chính bạn ra bên ngoài: khi bạn quét nhạc trên điện thoại, với những bài có tệp không chứa ảnh bìa, tên bài sẽ được tra cứu trực tuyến để tìm ảnh. Những tệp đã có ảnh bìa sẽ không bao giờ được gửi đi. Bạn có thể tắt tính năng này, và việc tắt nó chỉ khiến những ảnh bìa còn thiếu không được bổ sung.
+
+<b>Phần mềm tự do</b>
+
+Blazify được cấp phép theo GNU General Public License v3.0. Phần lõi phát trực tuyến dựa trên thành quả của các dự án InnerTune, OuterTune và Metrolist, tất cả đều theo GPL-3.0; giao diện, chủ đề, nhận diện thương hiệu và các tính năng là sản phẩm nguyên bản. Xem tệp NOTICE trong kho mã nguồn.
+
+Blazify không liên kết với YouTube, Google LLC hoặc bất kỳ đơn vị liên kết nào của họ, và không được các bên này tài trợ, ủy quyền hay chứng thực.
+
+Mã nguồn, bản phát hành và trình theo dõi lỗi: https://github.com/rajendra7169/blazify
+Trang web: https://rajendra7169.github.io/blazify/

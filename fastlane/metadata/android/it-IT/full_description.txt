@@ -1,0 +1,63 @@
+Blazify è un lettore musicale per Android, sviluppato con Kotlin e Jetpack Compose. Riproduce in streaming da YouTube Music ciò che vuoi, conserva ciò che scegli per ascoltarlo offline quando non hai internet e segue il testo mentre viene cantato, senza pubblicità, senza interruzioni e senza account. Se vuoi, puoi accedere con Google per ricevere consigli migliori sui brani, e non c'è alcun tracciamento. Tutti i servizi con cui comunica sono elencati in Privacy.
+
+<b>Ascolto</b>
+
+* Milioni di brani, per nome o navigando: brani, album, artisti, playlist e video
+* Riproduzione senza pause, con il brano successivo preparato in anticipo
+* Scarica ciò che vuoi per ascoltarlo offline, oppure lascia che l'app salvi i brani mentre li ascolti
+* Riproduci la musica del telefono insieme a tutto il resto, nella stessa coda e nello stesso lettore
+* Una coda che puoi riordinare trascinando, salvare come playlist o usare per avviare una radio
+* Timer di spegnimento, con opzione di fine brano
+* Non riprodurre questo brano: escludi un brano da code, radio e suggerimenti
+* Doppio tocco per andare avanti o indietro in ogni lettore, e podcast che mantengono la propria velocità
+* Un riquadro play/pausa nelle Impostazioni rapide e scorciatoie per Preferiti, Download e Riproduzione casuale
+* Risparmio dati sulla rete mobile e download solo in Wi-Fi
+
+<b>Audio</b>
+
+* Equalizzatore a dieci bande con curva di risposta in frequenza in tempo reale e 13 preset
+* Preamplificatore, con ogni preset precompensato perché le enfatizzazioni non distorcano mai
+* Potenziamento dei bassi, surround e riverbero
+* Livellamento del volume tra i brani
+* Salto dei silenzi, velocità di riproduzione e tonalità
+
+<b>Testi</b>
+
+* Testi sincronizzati con evidenziazione parola per parola
+* Diverse fonti, interrogate nell'ordine che preferisci
+* Traduzione e romanizzazione
+* Vista a schermo intero e card del testo da condividere come immagine
+
+<b>Aspetto</b>
+
+* Material 3 con i colori dinamici di Material You
+* Colori presi dalla copertina dell'album, solo come accento o su tutto lo schermo
+* Diversi design del lettore, con anteprima dal vivo mentre scegli
+* Chiaro, scuro, nero puro o come il sistema
+
+<b>Libreria e condivisione</b>
+
+* Brani preferiti, cronologia di ascolto, le tue playlist e una Top 50 basata su ciò che ascolti davvero
+* Ascolta insieme: condividi il codice di una stanza e ascolta in sincronia con gli amici
+* Importazione di playlist da file o da link
+* Scrobbling su last.fm e stato su Discord, entrambi facoltativi e con le tue credenziali
+* Riconoscimento musicale: avvicina il telefono e scopri cosa sta suonando
+* Android Auto e widget per la schermata Home
+* Backup dell'intera libreria in un unico file, da ripristinare su un altro dispositivo
+
+<b>Privacy</b>
+
+Blazify non contiene pubblicità, strumenti di analisi né librerie di tracciamento di alcun tipo. L'accesso è del tutto facoltativo. Tutto funziona senza accedere, tranne la tua libreria personale di YouTube Music.
+
+Comunica con YouTube Music e con i server video di Google; con il decodificatore di PipePipe (api.pipepipe.dev), che riceve solo la versione del player di YouTube e i valori offuscati dello stream; con il repository di Blazify, per una tabella di impostazioni del player (raw.githubusercontent.com, cdn.jsdelivr.net); e con i fornitori di testi, per il brano in riproduzione. Con qualsiasi altro servizio solo se lo attivi, come il dizionario di lettura giapponese per i testi giapponesi romanizzati, che viene scaricato una sola volta da Maven Central (repo1.maven.org) e solo dopo il tuo consenso.
+
+Va detto chiaramente, perché è l'unica volta in cui l'app invia informazioni sui tuoi file: quando analizzi la musica del telefono, per ogni brano il cui file non contiene una copertina il titolo viene cercato online per trovare un'immagine. I file che hanno già una copertina non vengono mai inviati. La funzione si può disattivare, e disattivarla ti fa perdere solo le copertine mancanti.
+
+<b>Software libero</b>
+
+Blazify è distribuito con licenza GNU General Public License v3.0. Il suo nucleo di streaming si basa sul lavoro dei progetti InnerTune, OuterTune e Metrolist, tutti GPL-3.0; l'interfaccia, i temi, il marchio e lo sviluppo delle funzionalità sono originali. Consulta il file NOTICE nel repository del codice sorgente.
+
+Blazify non è affiliato, finanziato, autorizzato né approvato da YouTube, Google LLC o da qualsiasi loro società affiliata.
+
+Codice sorgente, release e segnalazione problemi: https://github.com/rajendra7169/blazify
+Sito web: https://rajendra7169.github.io/blazify/
