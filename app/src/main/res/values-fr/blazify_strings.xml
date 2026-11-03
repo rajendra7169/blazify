@@ -1329,4 +1329,5 @@
     <string name="accounts_choose_channel_note">Vos playlists et votre bibliothèque viennent de la chaîne choisie. Vous pourrez la changer plus tard dans votre compte.</string>
     <string name="accounts_switching">Changement…</string>
     <string name="accounts_expired">Ce compte est déconnecté. Ajoutez-le de nouveau pour l\'utiliser.</string>
+    <string name="removed_song_from_queue">« %s » retiré de la file d\'attente</string>
 </resources>

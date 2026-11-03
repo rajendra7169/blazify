@@ -1331,4 +1331,5 @@
     <string name="accounts_choose_channel_note">Tus listas y tu biblioteca vienen del canal que elijas. Puedes cambiarlo después en tu cuenta.</string>
     <string name="accounts_switching">Cambiando…</string>
     <string name="accounts_expired">Se cerró la sesión de esa cuenta. Vuelve a agregarla para usarla.</string>
+    <string name="removed_song_from_queue">Se quitó \"%s\" de la cola</string>
 </resources>

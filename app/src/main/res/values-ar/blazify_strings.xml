@@ -1362,4 +1362,5 @@
     <string name="accounts_choose_channel_note">تأتي قوائم التشغيل والمكتبة من القناة التي تختارها. يمكنك تغييرها لاحقًا من حسابك.</string>
     <string name="accounts_switching">جارٍ التبديل…</string>
     <string name="accounts_expired">تم تسجيل الخروج من هذا الحساب. أضفه مرة أخرى لاستخدامه.</string>
+    <string name="removed_song_from_queue">تمت إزالة \"%s\" من قائمة الانتظار</string>
 </resources>

@@ -1320,4 +1320,5 @@
     <string name="accounts_choose_channel_note">Çalma listeleriniz ve kitaplığınız seçtiğiniz kanaldan gelir. Bunu daha sonra hesabınızdan değiştirebilirsiniz.</string>
     <string name="accounts_switching">Geçiş yapılıyor…</string>
     <string name="accounts_expired">Bu hesabın oturumu kapalı. Kullanmak için yeniden ekleyin.</string>
+    <string name="removed_song_from_queue">\"%s\" sıradan kaldırıldı</string>
 </resources>

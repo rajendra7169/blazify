@@ -1331,4 +1331,5 @@
     <string name="accounts_choose_channel_note">Suas playlists e sua biblioteca vêm do canal que você escolher. Dá para mudar depois na sua conta.</string>
     <string name="accounts_switching">Trocando…</string>
     <string name="accounts_expired">Essa conta foi desconectada. Adicione-a de novo para usá-la.</string>
+    <string name="removed_song_from_queue">\"%s\" removida da fila</string>
 </resources>

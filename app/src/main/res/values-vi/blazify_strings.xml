@@ -1309,4 +1309,5 @@
     <string name="accounts_choose_channel_note">Danh sách phát và thư viện của bạn lấy từ kênh bạn chọn. Bạn có thể đổi sau trong tài khoản.</string>
     <string name="accounts_switching">Đang chuyển…</string>
     <string name="accounts_expired">Tài khoản đó đã bị đăng xuất. Hãy thêm lại để sử dụng.</string>
+    <string name="removed_song_from_queue">Đã xóa \"%s\" khỏi hàng đợi</string>
 </resources>

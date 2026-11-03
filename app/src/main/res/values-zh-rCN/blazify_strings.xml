@@ -1309,4 +1309,5 @@
     <string name="accounts_choose_channel_note">你的播放列表和媒体库来自所选频道。之后可以在账号中更改。</string>
     <string name="accounts_switching">正在切换…</string>
     <string name="accounts_expired">该账号已退出登录。请重新添加后使用。</string>
+    <string name="removed_song_from_queue">已从待播列表中移除“%s”</string>
 </resources>

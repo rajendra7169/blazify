@@ -1320,4 +1320,5 @@
     <string name="accounts_choose_channel_note">Deine Playlists und Bibliothek kommen vom gewählten Kanal. Du kannst ihn später in deinem Konto ändern.</string>
     <string name="accounts_switching">Wird gewechselt…</string>
     <string name="accounts_expired">Dieses Konto ist abgemeldet. Füge es erneut hinzu, um es zu nutzen.</string>
+    <string name="removed_song_from_queue">„%s“ aus der Warteschlange entfernt</string>
 </resources>

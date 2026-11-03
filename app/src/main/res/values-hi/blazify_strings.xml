@@ -1320,4 +1320,5 @@
     <string name="accounts_choose_channel_note">आपकी प्लेलिस्ट और लाइब्रेरी आपके चुने हुए चैनल से आती हैं। आप इसे बाद में अपने खाते में बदल सकते हैं।</string>
     <string name="accounts_switching">बदला जा रहा है…</string>
     <string name="accounts_expired">वह खाता साइन आउट हो गया है। इस्तेमाल करने के लिए उसे फिर से जोड़ें।</string>
+    <string name="removed_song_from_queue">\"%s\" को कतार से हटाया गया</string>
 </resources>

@@ -1309,4 +1309,5 @@
     <string name="accounts_choose_channel_note">你的播放清單和媒體庫會來自所選的頻道。之後可以在帳號中變更。</string>
     <string name="accounts_switching">正在切換…</string>
     <string name="accounts_expired">這個帳號已登出。請重新新增後再使用。</string>
+    <string name="removed_song_from_queue">已從播放佇列中移除「%s」</string>
 </resources>

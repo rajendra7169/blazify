@@ -1309,4 +1309,5 @@
     <string name="accounts_choose_channel_note">プレイリストとライブラリは選んだチャンネルのものになります。後からアカウント画面で変更できます。</string>
     <string name="accounts_switching">切り替え中…</string>
     <string name="accounts_expired">このアカウントはログアウトされています。使うにはもう一度追加してください。</string>
+    <string name="removed_song_from_queue">「%s」を再生キューから削除しました</string>
 </resources>

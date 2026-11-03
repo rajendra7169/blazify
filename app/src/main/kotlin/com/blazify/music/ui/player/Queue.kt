@@ -691,7 +691,7 @@ fun Queue(
                         val isActive = window.uid == currentPlayingUid
                         val currentIndex by rememberUpdatedState(index)
                         val removedSongMsg =
-                            stringResource(R.string.removed_song_from_playlist, currentItem.mediaItem.metadata?.title ?: "")
+                            stringResource(R.string.removed_song_from_queue, currentItem.mediaItem.metadata?.title ?: "")
                         val playsNextMsg =
                             stringResource(R.string.queue_plays_next, currentItem.mediaItem.metadata?.title ?: "")
                         val undoStr = stringResource(R.string.undo)
