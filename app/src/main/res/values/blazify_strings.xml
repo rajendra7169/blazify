@@ -770,7 +770,7 @@
     <!-- Listen Together -->
     <string name="together">Blaze Together</string>
     <string name="blaze_together">Blaze Together</string>
-    <string name="listen_together">Listen Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">Server URL</string>
     <string name="listen_together_choose_server">Choose server</string>
     <string name="listen_together_custom_server">Custom server</string>
@@ -801,16 +801,16 @@
     <string name="listen_together_auto_approval_suggestions_desc">Automatically approve and queue song suggestions from guests</string>
     <string name="listen_together_sync_volume">Sync host volume</string>
     <string name="listen_together_sync_volume_desc">Guests will match the host\'s volume level</string>
-    <string name="listen_together_in_top_bar">Listen Together in top bar</string>
-    <string name="listen_together_in_top_bar_desc">Show Listen Together in the top app bar instead of the navigation bar</string>
+    <string name="listen_together_in_top_bar">Blaze Together in top bar</string>
+    <string name="listen_together_in_top_bar_desc">Show Blaze Together in the top app bar instead of the navigation bar</string>
     <string name="listen_together_description">Listen to music with your friends in real time. Create a room to host, or join an existing room with a code</string>
-    <string name="listen_together_background_disconnect_note">NOTE: When you are connected but not in a room, Listen Together disconnects after 30 minutes in the background to save battery</string>
-    <string name="listen_together_not_configured">Listen Together is not set up. Please configure the server URL in: Listen Together &gt; Settings &gt; Server URL</string>
+    <string name="listen_together_background_disconnect_note">NOTE: When you are connected but not in a room, Blaze Together disconnects after 30 minutes in the background to save battery</string>
+    <string name="listen_together_not_configured">Blaze Together is not set up. Please configure the server URL in: Blaze Together &gt; Settings &gt; Server URL</string>
     <string name="listen_together_suggestion_received">%1$s suggested %2$s</string>
     <string name="listen_together_suggestion_sent">Suggestion sent to host!</string>
     <string name="listen_together_join_request_notification">%1$s wants to join the room</string>
-    <string name="listen_together_notification_channel_name">Listen Together</string>
-    <string name="listen_together_notification_channel_desc">Notifications for Listen Together events</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notifications for Blaze Together events</string>
     <string name="listen_together_room_created">Room created: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">The username cannot be changed while in a room</string>
     <string name="waiting_for_approval">Waiting for host approval…</string>
@@ -1341,7 +1341,8 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Connections</string>
     <string name="hint_integrations">Discord Rich Presence, Last.fm scrobbling</string>
-    <string name="hint_together_settings">Listen Together sync and room settings</string>
+    <string name="removed_song_from_queue">Removed \"%s\" from the queue</string>
+    <string name="hint_together_settings">Blaze Together sync and room settings</string>
     <string name="guest">Guest</string>
     <string name="manage_account">Manage your account</string>
     <string name="tap_to_sign_in">Tap to sign in</string>
