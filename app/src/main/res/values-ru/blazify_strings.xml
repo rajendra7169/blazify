@@ -1358,6 +1358,6 @@
         <item quantity="one">Ещё %1$d аккаунт на этом телефоне</item>
         <item quantity="few">Ещё %1$d аккаунта на этом телефоне</item>
         <item quantity="many">Ещё %1$d аккаунтов на этом телефоне</item>
-        <item quantity="other">Ещё %1$d аккаунта на этом телефоне</item>
+        <item quantity="other">Ещё %1$d аккаунтов на этом телефоне</item>
     </plurals>
 </resources>
