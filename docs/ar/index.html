@@ -1140,9 +1140,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <path fill="url(#gflame)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
         <button class="howto" type="button" data-guide="windows"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Windows</h3>
-        <div class="ver" id="verWindows">الإصدار 1.0.5 · 164 MB · مثبّت</div>
+        <div class="ver" id="verWindows">الإصدار 1.4.0 · مثبّت</div>
         <p>مشغّل سطح المكتب مع مكتبة الصوت مدمجة فيه. يُثبَّت دون الحاجة إلى كلمة مرور المسؤول.</p>
-        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">تنزيل لنظام Windows</a>
+        <a class="dl" href="https://rajendrapandey.info.np/projects/blazify">تنزيل لنظام Windows</a>
       </article>
 
       <article class="card rise">
@@ -1163,7 +1163,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 </svg>
         <button class="howto" type="button" data-guide="linux"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
         <h3>Linux</h3>
-        <div class="ver" id="verLinux">الإصدار 1.0.5 · deb · AppImage · tar.gz</div>
+        <div class="ver" id="verLinux">الإصدار 1.4.0 · deb · AppImage · tar.gz</div>
         <p>بودكاست وفصول ونصوص مكتوبة ودعم لمفاتيح الوسائط. ثلاث صيغ للحزم تناسب أي توزيعة.</p>
         <button class="dl" type="button" data-pick="linux">تنزيل لنظام Linux</button>
       </article>
@@ -1531,7 +1531,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       </div>
       <div class="f-col">
         <h5>تنزيل</h5>
-        <a href="https://github.com/rajendra7169/blazify/releases/latest">Android</a> <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Windows</a> <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Linux</a> <a href="https://github.com/rajendra7169/blazify-ios">iPhone</a> <a href="https://apkpure.com/blazify/com.blazify.music" rel="noopener">APKPure</a> <a href="https://appteka.store/app/b16r317210" rel="noopener">Appteka</a>
+        <a href="https://github.com/rajendra7169/blazify/releases/latest">Android</a> <a href="https://rajendrapandey.info.np/projects/blazify">Windows</a> <a href="https://rajendrapandey.info.np/projects/blazify">Linux</a> <a href="https://github.com/rajendra7169/blazify-ios">iPhone</a> <a href="https://apkpure.com/blazify/com.blazify.music" rel="noopener">APKPure</a> <a href="https://appteka.store/app/b16r317210" rel="noopener">Appteka</a>
       </div>
       <div class="f-col">
         <h5>المشروع</h5>
@@ -1996,13 +1996,13 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
     document.getElementById('guideBody').innerHTML = `
       <div class="pick">
-        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.deb</b>
+        <a href="https://rajendrapandey.info.np/projects/blazify"><span style="flex:1"><b>.deb</b>
           <span>Debian, Ubuntu, Mint, Pop!_OS. Install with
           <code>sudo apt install ./Blazify.deb</code></span></span><em>most people</em></a>
-        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.AppImage</b>
+        <a href="https://rajendrapandey.info.np/projects/blazify"><span style="flex:1"><b>.AppImage</b>
           <span>Fedora, Arch, openSUSE, or anywhere else. One file, nothing
           installed, and its audio library travels inside it</span></span><em>any distro</em></a>
-        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.tar.gz</b>
+        <a href="https://rajendrapandey.info.np/projects/blazify"><span style="flex:1"><b>.tar.gz</b>
           <span>The same application as a plain folder, if you would rather
           unpack it yourself</span></span></a>
       </div>
@@ -2200,16 +2200,14 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
     setHref('dlAndroidFoss', v.androidPlain, v.androidPlainSize);
     applyBeta(v.beta);
     if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
-    if (v.desktop) {
-      setText('verWindows', 'Version ' + v.desktop + (v.winSize ? ' · ' + v.winSize : '') + ' · installer');
-      setText('verLinux', 'Version ' + v.desktop + ' · deb · AppImage · tar.gz');
-    }
+    // The desktop version is written in the page: GitHub's release list stops at an
+    // older one, and the page asks nothing of where the desktop app is released now.
     if (v.ios) setText('verIos', 'Version ' + v.ios + (v.iosSize ? ' · ' + v.iosSize : '') + ' · sideload');
   };
 
   const readVersions = sets => {
     const a = newest(sets[0]), d = newest(sets[1]), i = newest(sets[2]);
-    const apk = asset(a, 'Blazify.apk'), exe = asset(d, 'Blazify-setup.exe'), ipa = asset(i, 'Blazify.ipa');
+    const apk = asset(a, 'Blazify.apk'), ipa = asset(i, 'Blazify.ipa');
     const android = buildsOf(a);
     // The newest release of any kind: a beta only when it is ahead of the stable one.
     // The newest beta by its version, not by where it happens to sit in the list: a release that
@@ -2238,7 +2236,6 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
           }
         : null,
       desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
-      winSize: mb(exe && exe.size),
       ios: i && i.tag_name ? i.tag_name.replace(/^v/, '') : null,
       iosSize: mb(ipa && ipa.size),
     };

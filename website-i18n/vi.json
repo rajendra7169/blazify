@@ -29,11 +29,8 @@
  "Download the Blazify APK: streaming, synced lyrics, equalizer, Android Auto and home-screen widgets.": "Tải APK Blazify: nghe trực tuyến, lời bài hát đồng bộ, bộ cân bằng âm, Android Auto và tiện ích màn hình chính.",
  "Download APK": "Tải APK",
  "Windows": "Windows",
- "Version 1.0.5 · 164 MB · installer": "Phiên bản 1.0.5 · 164 MB · trình cài đặt",
  "The desktop player with its audio library bundled in. Installs without an administrator password.": "Trình phát trên máy tính, đã kèm sẵn thư viện âm thanh. Cài đặt không cần mật khẩu quản trị viên.",
- "<a class=\"dl\" href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Download for Windows</a>": "<a class=\"dl\" href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Tải cho Windows</a>",
  "Linux": "Linux",
- "Version 1.0.5 · deb · AppImage · tar.gz": "Phiên bản 1.0.5 · deb · AppImage · tar.gz",
  "Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.": "Podcast, chương, bản chép lời và hỗ trợ phím đa phương tiện. Ba dạng gói cho mọi bản phân phối.",
  "Download for Linux": "Tải cho Linux",
  "iOS": "iOS",
@@ -232,7 +229,6 @@
  "Back to top": "Lên đầu trang",
  "Stream it. Feel it. Blaze it.<br>Made in Nepal.": "Nghe. Cảm nhận. Cháy hết mình.<br>Được làm tại Nepal.",
  "Download": "Tải xuống",
- "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Windows</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>": "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Windows</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>",
  "Project": "Dự án",
  "<a href=\"https://github.com/rajendra7169/blazify\">Source code</a> <a href=\"https://github.com/rajendra7169/blazify/blob/main/LICENSE\">Licence</a> <a href=\"privacy/\">Privacy policy</a> <a href=\"https://github.com/rajendra7169/blazify/issues\">Report a bug</a>": "<a href=\"https://github.com/rajendra7169/blazify\">Mã nguồn</a> <a href=\"https://github.com/rajendra7169/blazify/blob/main/LICENSE\">Giấy phép</a> <a href=\"privacy/\">Chính sách quyền riêng tư</a> <a href=\"https://github.com/rajendra7169/blazify/issues\">Báo lỗi</a>",
  "Community": "Cộng đồng",
@@ -242,5 +238,9 @@
  "<span>© 2026 Rajendra Pandey · GPL-3.0</span> <span>Free software, and free of charge, for as long as it exists.</span>": "<span>© 2026 Rajendra Pandey · GPL-3.0</span> <span>Phần mềm tự do, và miễn phí, chừng nào nó còn tồn tại.</span>",
  "<span>BLAZIFY</span>": "<span>BLAZIFY</span>",
  "<span>Star Blazify on GitHub</span> <b id=\"starCount\" hidden></b>": "<span>Gắn sao trên GitHub</span> <b id=\"starCount\" hidden></b>",
- "<span class=\"hg-go\">See the source</span>": "<span class=\"hg-go\">Xem mã nguồn</span>"
+ "<span class=\"hg-go\">See the source</span>": "<span class=\"hg-go\">Xem mã nguồn</span>",
+ "<a class=\"dl\" href=\"https://rajendrapandey.info.np/projects/blazify\">Download for Windows</a>": "<a class=\"dl\" href=\"https://rajendrapandey.info.np/projects/blazify\">Tải cho Windows</a>",
+ "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Windows</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>": "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Windows</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>",
+ "Version 1.4.0 · installer": "Phiên bản 1.4.0 · trình cài đặt",
+ "Version 1.4.0 · deb · AppImage · tar.gz": "Phiên bản 1.4.0 · deb · AppImage · tar.gz"
 }

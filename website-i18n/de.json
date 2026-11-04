@@ -29,11 +29,8 @@
  "Download the Blazify APK: streaming, synced lyrics, equalizer, Android Auto and home-screen widgets.": "Lade die Blazify-APK herunter: Streaming, synchronisierte Songtexte, Equalizer, Android Auto und Widgets für den Startbildschirm.",
  "Download APK": "APK herunterladen",
  "Windows": "Windows",
- "Version 1.0.5 · 164 MB · installer": "Version 1.0.5 · 164 MB · Installer",
  "The desktop player with its audio library bundled in. Installs without an administrator password.": "Der Desktop-Player mit eingebauter Audio-Engine. Lässt sich ohne Administratorpasswort installieren.",
- "<a class=\"dl\" href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Download for Windows</a>": "<a class=\"dl\" href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Für Windows herunterladen</a>",
  "Linux": "Linux",
- "Version 1.0.5 · deb · AppImage · tar.gz": "Version 1.0.5 · deb · AppImage · tar.gz",
  "Podcasts, chapters, transcripts and media-key support. Three package shapes for any distribution.": "Podcasts, Kapitel, Transkripte und Unterstützung für Medientasten. Drei Paketformate für jede Distribution.",
  "Download for Linux": "Für Linux herunterladen",
  "iOS": "iOS",
@@ -232,7 +229,6 @@
  "Back to top": "Nach oben",
  "Stream it. Feel it. Blaze it.<br>Made in Nepal.": "Hör rein. Fühl es. Brenn dafür.<br>Gemacht in Nepal.",
  "Download": "Download",
- "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Windows</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>": "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Windows</a> <a href=\"https://github.com/rajendra7169/blazify-desktop/releases/latest\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>",
  "Project": "Projekt",
  "<a href=\"https://github.com/rajendra7169/blazify\">Source code</a> <a href=\"https://github.com/rajendra7169/blazify/blob/main/LICENSE\">Licence</a> <a href=\"privacy/\">Privacy policy</a> <a href=\"https://github.com/rajendra7169/blazify/issues\">Report a bug</a>": "<a href=\"https://github.com/rajendra7169/blazify\">Quellcode</a> <a href=\"https://github.com/rajendra7169/blazify/blob/main/LICENSE\">Lizenz</a> <a href=\"privacy/\">Datenschutzerklärung</a> <a href=\"https://github.com/rajendra7169/blazify/issues\">Fehler melden</a>",
  "Community": "Community",
@@ -242,5 +238,9 @@
  "<span>© 2026 Rajendra Pandey · GPL-3.0</span> <span>Free software, and free of charge, for as long as it exists.</span>": "<span>© 2026 Rajendra Pandey · GPL-3.0</span> <span>Freie Software, und kostenlos – solange es sie gibt.</span>",
  "<span>BLAZIFY</span>": "<span>BLAZIFY</span>",
  "<span>Star Blazify on GitHub</span> <b id=\"starCount\" hidden></b>": "<span>Auf GitHub einen Stern geben</span> <b id=\"starCount\" hidden></b>",
- "<span class=\"hg-go\">See the source</span>": "<span class=\"hg-go\">Quellcode ansehen</span>"
+ "<span class=\"hg-go\">See the source</span>": "<span class=\"hg-go\">Quellcode ansehen</span>",
+ "<a class=\"dl\" href=\"https://rajendrapandey.info.np/projects/blazify\">Download for Windows</a>": "<a class=\"dl\" href=\"https://rajendrapandey.info.np/projects/blazify\">Für Windows herunterladen</a>",
+ "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Windows</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>": "<a href=\"https://github.com/rajendra7169/blazify/releases/latest\">Android</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Windows</a> <a href=\"https://rajendrapandey.info.np/projects/blazify\">Linux</a> <a href=\"https://github.com/rajendra7169/blazify-ios\">iPhone</a> <a href=\"https://apkpure.com/blazify/com.blazify.music\" rel=\"noopener\">APKPure</a> <a href=\"https://appteka.store/app/b16r317210\" rel=\"noopener\">Appteka</a>",
+ "Version 1.4.0 · installer": "Version 1.4.0 · Installer",
+ "Version 1.4.0 · deb · AppImage · tar.gz": "Version 1.4.0 · deb · AppImage · tar.gz"
 }
