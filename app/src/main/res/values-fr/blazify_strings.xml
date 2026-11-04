@@ -256,7 +256,7 @@
     <string name="wrapped_ready_title">VOTRE CADEAU EST PRÊT À ÊTRE DÉVOILÉ !</string>
     <string name="wrapped_ready_subtitle">C\'est le moment de découvrir ce que vous avez aimé tout au long de cette année…</string>
     <string name="wrapped_thank_you">Merci de votre écoute !</string>
-    <string name="wrapped_special_thanks">Remerciements particuliers à MO Agamy pour la création de Blazify</string>
+    <string name="wrapped_special_thanks">Conçu avec ❤️ pour les passionnés de musique</string>
     <string name="wrapped_close">Fermer le résumé</string>
     <string name="wrapped_playlist_title">Votre %s en résumé</string>
     <string name="wrapped_create_playlist">Créer une playlist</string>
@@ -324,7 +324,7 @@
     <string name="crop_album_art">Recadrer la pochette d\'album</string>
     <string name="crop_album_art_desc">Forcez un format carré en recadrant les miniatures vidéo</string>
     <string name="keep_screen_on_when_player_is_expanded">Garder l\'écran allumé lorsque le lecteur est agrandi</string>
-    <string name="listen_together">Écouter ensemble</string>
+    <string name="listen_together">Écouter Ensemble</string>
     <string name="listen_together_server_url">URL du serveur</string>
     <string name="listen_together_username">Nom d\'utilisateur</string>
     <string name="listen_together_connected">Connecté</string>
@@ -344,13 +344,13 @@
     <string name="listen_together_logs">Journaux de connexion</string>
     <string name="listen_together_no_logs">Pas encore de commentaires</string>
     <string name="listen_together_description">Écoutez de la musique avec vos amis en temps réel. Créez une salle pour accueillir d\'autres utilisateurs, ou rejoignez une salle existante à l\'aide d\'un code</string>
-    <string name="listen_together_background_disconnect_note">REMARQUE : lorsque vous êtes connecté mais que vous ne vous trouvez pas dans une salle, Écouter Ensemble se déconnectera après 30 minutes d\'inactivité afin d\'économiser la batterie</string>
-    <string name="listen_together_not_configured">« Écouter ensemble » n\'est pas configurée. Veuillez configurer l\'URL du serveur dans Paramètres → Intégrations → Écouter ensemble</string>
+    <string name="listen_together_background_disconnect_note">REMARQUE : lorsque vous êtes connecté mais que vous ne vous trouvez pas dans une salle, Écouter Ensemble se déconnecte automatiquement au bout de 30 minutes en arrière-plan afin d\'économiser la batterie.</string>
+    <string name="listen_together_not_configured">« Écouter Ensemble » n\'est pas configuré. Veuillez configurer l\'URL du serveur dans : Écouter Ensemble &gt; Paramètres &gt; URL du serveur</string>
     <string name="listen_together_suggestion_received">%1$s a suggéré %2$s</string>
     <string name="listen_together_suggestion_sent">Suggestion envoyée à l\'hôte !</string>
     <string name="listen_together_join_request_notification">%1$s souhaite rejoindre la salle</string>
-    <string name="listen_together_notification_channel_name">Écouter ensemble</string>
-    <string name="listen_together_notification_channel_desc">Notifications pour les événements « Écouter ensemble »</string>
+    <string name="listen_together_notification_channel_name">Écouter Ensemble</string>
+    <string name="listen_together_notification_channel_desc">Notifications concernant les événements « Écouter Ensemble »</string>
     <string name="listen_together_room_created">Salle créée : %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Il n\'est pas possible de modifier son nom d\'utilisateur lorsqu\'on se trouve dans une salle</string>
     <string name="waiting_for_approval">En attente de l\'approbation de l\'hôte…</string>
@@ -501,8 +501,8 @@
     <string name="crossfade_beta_message">Le fondu enchaîné est une nouvelle fonctionnalité et peut contenir des bugs. Si vous rencontrez des problèmes, merci de les signaler.\n\nREMARQUE : Cette fonctionnalité désactive le déchargement audio en raison de limitations techniques</string>
     <string name="audio_offload_disabled_by_crossfade">Désactivé car le fondu enchaîné est actif</string>
     <string name="hide_youtube_shorts">Masquer YouTube Shorts</string>
-    <string name="listen_together_in_top_bar">Écouter ensemble dans la barre supérieure</string>
-    <string name="listen_together_in_top_bar_desc">Affichez « Écouter ensemble » dans la barre d\'applications supérieure plutôt que dans la barre de navigation</string>
+    <string name="listen_together_in_top_bar">« Écouter Ensemble » dans la barre supérieure</string>
+    <string name="listen_together_in_top_bar_desc">Affichez « Écouter Ensemble » dans la barre d\'applications supérieure au lieu de la barre de navigation</string>
     <string name="prevent_duplicate_tracks_in_queue">Empêcher les doublons dans la file d\'attente</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">Lorsqu\'un titre déjà présent dans la file d\'attente est ajouté, il sera déplacé de sa position précédente plutôt que d\'être ajouté à nouveau</string>
     <string name="ai_translation_literal_desc">Traduit le sens dans la langue cible</string>
@@ -526,7 +526,7 @@
     <string name="discord_buttons">Boutons</string>
     <string name="discord_button_1">Bouton 1</string>
     <string name="discord_button_2">Bouton 2</string>
-    <string name="discord_information_warning">Blazify envoie le titre en cours de lecture à la passerelle Discord afin de mettre à jour votre profil enrichi. Toutes les données sont transmises directement de votre appareil à Discord — aucun serveur tiers n\'intervient. Votre jeton reste sur votre appareil et n\'est jamais partagé. Cependant, l\'utilisation d\'un jeton utilisateur pour les connexions via la passerelle n\'est pas officiellement prise en charge et peut constituer une violation des conditions d\'utilisation de Discord. Procédez à vos propres risques !</string>
+    <string name="discord_information_warning">Blazify utilise les API publiques OAuth2 et Gateway de Discord pour partager ce que vous écoutez. L\'autorisation s\'effectue via une session de navigateur locale qui se ferme automatiquement après avoir capturé le code, et aucune donnée n\'est envoyée à des serveurs tiers. Votre jeton est stocké sur cet appareil dans des préférences chiffrées et n\'est jamais partagé. Blazify se connecte directement à wss://gateway.discord.gg pour publier votre activité, et ne demande que l\'étendue minimale requise (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Type d\'activité</string>
     <string name="discord_activity_playing">Lire</string>
     <string name="discord_activity_listening">Écouter</string>
@@ -986,7 +986,7 @@
     <string name="update_up_to_date">Vous avez la dernière version</string>
     <string name="error_age_restricted">Ce titre est soumis à une limite d\'âge, et Blazify ne peut pas encore lire ce type de titre.</string>
     <string name="error_job_cancelled">La vidéo n\'est pas disponible à la lecture. Réessayez ou passez au titre suivant.</string>
-    <string name="blaze_together">Blaze Together</string>
+    <string name="blaze_together">Écouter Ensemble</string>
     <string name="copy_details">Copier les détails</string>
     <string name="add_to_playlist_top">Ajouter les nouveaux titres en haut des playlists</string>
     <string name="add_to_playlist_top_desc">Désactivez pour les ajouter à la fin</string>
@@ -1112,7 +1112,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Connexions</string>
     <string name="hint_integrations">Discord Rich Presence, scrobbling Last.fm</string>
-    <string name="hint_together_settings">Synchronisation et paramètres de salon d\'Écouter ensemble</string>
+    <string name="hint_together_settings">Paramètres de synchronisation et de salle de Écouter Ensemble</string>
     <string name="guest">Invité</string>
     <string name="manage_account">Gérer votre compte</string>
     <string name="tap_to_sign_in">Appuyez pour vous connecter</string>
@@ -1213,6 +1213,7 @@
     <string name="repeat_times_stop">Arrêter de répéter</string>
     <plurals name="repeat_times_count">
         <item quantity="one">%1$d fois</item>
+        <item quantity="many">%1$d fois</item>
         <item quantity="other">%1$d fois</item>
     </plurals>
     <string name="listenbrainz_scrobbling">Envoyer mes écoutes à ListenBrainz</string>
@@ -1302,6 +1303,7 @@
     <string name="local_music_reason">Raison : %1$s</string>
     <plurals name="shared_playlist_body">
         <item quantity="one">%1$s, un titre, partagé avec vous.</item>
+        <item quantity="many">%1$s, %2$d titres, partagés avec vous.</item>
         <item quantity="other">%1$s, %2$d titres, partagés avec vous.</item>
     </plurals>
     <string name="sync_lyrics_title">Synchroniser les paroles</string>
@@ -1345,7 +1347,8 @@
     <string name="update_card_title">Mise à jour disponible</string>
     <string name="update_card_text">Blazify %1$s est prêt à être téléchargé</string>
     <plurals name="accounts_more_saved">
-        <item quantity="one">%1$d autre compte sur ce téléphone</item>
-        <item quantity="other">%1$d autres comptes sur ce téléphone</item>
+        <item quantity="one">%1$d compte supplémentaire</item>
+        <item quantity="many">%1$d comptes supplémentaires</item>
+        <item quantity="other">%1$d comptes supplémentaires</item>
     </plurals>
 </resources>
