@@ -176,7 +176,9 @@ nav{
   .brand span{font-size:22px}
   .lang summary{padding:8px 11px}
   .nav-cta{padding:9px 16px;font-size:14px}
-  .star-gh{font-size:13.5px;padding:9px 15px;max-width:100%;white-space:normal}
+  /* As wide as the card allows, not the narrower phone below it, centred on it. */
+  .star-gh{font-size:13.5px;padding:9px 15px;white-space:normal;width:max-content;max-width:calc(100vw - 88px);position:relative;left:50%;transform:translateX(-50%);margin:0 0 18px}
+  .star-gh:hover{transform:translate(-50%,-2px)}
   .star-gh span{text-align:start;line-height:1.3}
 }
 
@@ -203,7 +205,7 @@ nav{
   margin:0 0 6px;
 }
 .h-shout{
-  font-family:'Anton',sans-serif;font-size:clamp(42px,6.8vw,96px);line-height:.86;
+  font-family:'Anton',sans-serif;font-size:clamp(38px,5.6vw,80px);line-height:.86;
   letter-spacing:-.5px;
   /* The gradient only paints inside the box, and a line this tight leaves accents
      (É, Ả, Ç) and marks below (Ạ) outside it, where they vanished. Room above and
@@ -217,7 +219,7 @@ nav{
 :lang(ja) .h-shout,:lang(ko) .h-shout,:lang(zh-CN) .h-shout,:lang(zh-TW) .h-shout,
 :lang(hi) .h-shout,:lang(ar) .h-shout,:lang(ru) .h-shout{
   font-family:system-ui,-apple-system,'Noto Sans','Noto Sans CJK JP','Noto Sans Devanagari','Noto Sans Arabic',sans-serif;
-  font-weight:900;font-size:clamp(32px,5.2vw,76px);line-height:1.18;letter-spacing:0;padding-bottom:.06em;
+  font-weight:900;font-size:clamp(28px,4.4vw,64px);line-height:1.18;letter-spacing:0;padding-bottom:.06em;
 }
 :lang(ja) .h-soft,:lang(ko) .h-soft,:lang(zh-CN) .h-soft,:lang(zh-TW) .h-soft,
 :lang(hi) .h-soft,:lang(ar) .h-soft{
