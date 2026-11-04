@@ -1,15 +1,310 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://rajendra7169.github.io/blazify/</loc>
-    <lastmod>2026-09-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/de/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/it/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/ru/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/tr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/hi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/id/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/vi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/zh-CN/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
+  </url>
+  <url>
+    <loc>https://rajendra7169.github.io/blazify/zh-TW/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/"/>
   </url>
   <url>
     <loc>https://rajendra7169.github.io/blazify/privacy/</loc>
-    <lastmod>2026-09-06</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
 </urlset>

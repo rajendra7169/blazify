@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,6 +15,23 @@
      with a query string on the end. Without this they compete with each other
      and split whatever the page earns between them. -->
 <link rel="canonical" href="https://rajendra7169.github.io/blazify/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/">
 
 <!-- Absolute, because most crawlers will not resolve a relative og:image
      against the page. If this ever moves to a custom domain, this is the
@@ -181,6 +198,19 @@ nav{
   font-family:'Anton',sans-serif;font-size:clamp(46px,8.4vw,118px);line-height:.86;
   margin:0;letter-spacing:-.5px;
   background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+/* Anton and Instrument Serif carry Latin and Cyrillic only. In other scripts the
+   phone's own heaviest face stands in, a little smaller and with room for the
+   taller letters, so the shout still shouts and nothing is cut off at the foot. */
+:lang(ja) .h-shout,:lang(ko) .h-shout,:lang(zh-CN) .h-shout,:lang(zh-TW) .h-shout,
+:lang(hi) .h-shout,:lang(ar) .h-shout{
+  font-family:system-ui,-apple-system,'Noto Sans','Noto Sans CJK JP','Noto Sans Devanagari','Noto Sans Arabic',sans-serif;
+  font-weight:900;font-size:clamp(36px,6.4vw,92px);line-height:1.18;letter-spacing:0;padding-bottom:.06em;
+}
+:lang(ja) .h-soft,:lang(ko) .h-soft,:lang(zh-CN) .h-soft,:lang(zh-TW) .h-soft,
+:lang(hi) .h-soft,:lang(ar) .h-soft{
+  font-family:system-ui,-apple-system,'Noto Sans',sans-serif;font-style:normal;font-weight:500;
+  font-size:clamp(20px,2.6vw,36px);line-height:1.3;
 }
 .h-mid{width:clamp(60px,9vw,132px)}
 
@@ -997,7 +1027,22 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     <details class="lang" id="langPick">
       <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>EN</span></summary>
       <ul id="langList">
-        <li><a href="./" hreflang="en" aria-current="page">English</a></li>
+        <li><a href="./" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="es/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="pt/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="fr/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="de/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="it/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="ru/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="tr/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="ar/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="hi/" hreflang="hi" lang="hi">हिन्दी</a></li>
+        <li><a href="id/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="vi/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="ja/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="ko/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="zh-CN/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="zh-TW/" hreflang="zh-TW" lang="zh-TW">繁體中文</a></li>
       </ul>
     </details>
     <a class="nav-cta" href="#get">Get Blazify</a>

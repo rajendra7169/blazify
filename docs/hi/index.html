@@ -1,0 +1,2318 @@
+<!doctype html>
+<html lang="hi" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blazify: मुफ़्त म्यूज़िक प्लेयर और YouTube Music क्लाइंट | डाउनलोड</title>
+<meta name="description" content="Blazify डाउनलोड करें: Android, iPhone, Windows और Linux के लिए एक मुफ़्त, ओपन-सोर्स म्यूज़िक प्लेयर और YouTube Music क्लाइंट, सिंक लिरिक्स और इक्वलाइज़र के साथ।">
+<meta name="keywords" content="open source music player android, youtube music alternative, spotify alternative android, ad free music player, free music player no ads, offline music player android, foss music player, synced lyrics app, innertune alternative, metrolist">
+<!-- 64px, not the 512px logo. A browser fetches the icon early and at high
+     priority, so the old one spent 82KB of a slow connection on something
+     drawn at sixteen pixels. -->
+<link rel="icon" href="../assets/favicon-64.png" sizes="64x64">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<!-- The same page answers at /blazify/, /blazify/index.html and any address
+     with a query string on the end. Without this they compete with each other
+     and split whatever the page earns between them. -->
+<link rel="canonical" href="https://rajendra7169.github.io/blazify/hi/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/">
+
+<!-- Absolute, because most crawlers will not resolve a relative og:image
+     against the page. If this ever moves to a custom domain, this is the
+     line that has to move with it. -->
+<meta property="og:url" content="https://rajendra7169.github.io/blazify/hi/">
+<meta property="og:site_name" content="Blazify">
+<meta property="og:title" content="Blazify | सुनिए। महसूस कीजिए। धूम मचाइए।">
+<meta property="og:description" content="Android, iPhone, Windows और Linux के लिए एक मुफ़्त, ओपन-सोर्स म्यूज़िक प्लेयर और YouTube Music क्लाइंट। शब्द-दर-शब्द सिंक लिरिक्स, दस-बैंड इक्वलाइज़र, और अपनी तरफ़ से न कोई विज्ञापन, न कोई ट्रैकिंग।">
+<meta property="og:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Blazify, एक मुफ़्त और ओपन-सोर्स म्यूज़िक प्लेयर">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blazify | सुनिए। महसूस कीजिए। धूम मचाइए।">
+<meta name="twitter:description" content="Android, iPhone, Windows और Linux के लिए एक मुफ़्त, ओपन-सोर्स म्यूज़िक प्लेयर और YouTube Music क्लाइंट। सिंक लिरिक्स, इक्वलाइज़र, और अपनी तरफ़ से न कोई विज्ञापन, न कोई ट्रैकिंग।">
+<meta name="twitter:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Loaded without blocking the page. The stylesheet lives on a third host,
+     so waiting for it means waiting on someone else's DNS and TLS before a
+     single word appears. media="print" makes the browser fetch it at low
+     priority and not block on it; onload promotes it once it arrives, and the
+     noscript copy covers the rest. display=swap means text is readable in a
+     fallback face the whole time. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Outfit:wght@300;400;500;600&display=swap"></noscript>
+
+<style>
+:root{
+  /* warm-biased neutrals, pulled toward the brand rather than pure grey */
+  --void:#0B0A09;
+  --coal:#141110;
+  --slate:#1E1917;
+  --line:rgba(255,167,38,.14);
+  --amber:#FFA726;
+  --ember:#FF7043;
+  --cream:#FFF4E6;
+  --dim:#A89A8B;
+  --flame:linear-gradient(120deg,#FFA726 0%,#FF8A3D 45%,#FF7043 100%);
+  --r-lg:40px; --r-md:24px; --r-sm:16px;
+  --shell:min(1560px,93vw);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--void); color:var(--cream);
+  font-family:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-weight:300; line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;height:auto;display:block}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap;border:0}
+picture{display:block;line-height:0}
+a{color:inherit}
+.shell{width:var(--shell);margin-inline:auto}
+
+/* ── ambient glow ─────────────────────────────────────── */
+/* Painted as gradients rather than blurred circles. A 120px blur on a fixed
+   640px element has to be re-composited over the whole page as it scrolls,
+   which a desktop GPU absorbs and a phone does not. A radial gradient is the
+   same picture for free. */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.glow::before,.glow::after{content:'';position:absolute;border-radius:50%}
+.glow::before{
+  width:880px;height:880px;top:-380px;left:-300px;
+  background:radial-gradient(circle closest-side,rgba(255,167,38,.20),rgba(255,167,38,0));
+}
+.glow::after{
+  width:760px;height:760px;top:26%;right:-340px;
+  background:radial-gradient(circle closest-side,rgba(255,112,67,.14),rgba(255,112,67,0));
+}
+
+/* ── nav ──────────────────────────────────────────────── */
+nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(18px);background:rgba(11,10,9,.72);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{display:flex;align-items:center;gap:28px;padding:16px 0}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto}
+.brand img{width:36px;height:36px;flex:0 0 36px;object-fit:contain}
+.brand span{font-family:'Anton',sans-serif;font-size:25px;letter-spacing:.4px;
+  background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:26px;font-size:15px;font-weight:400}
+.nav-links a{color:var(--dim);text-decoration:none;transition:color .25s}
+.nav-links a:hover{color:var(--amber)}
+.nav-cta{
+  padding:10px 22px;border-radius:99px;background:var(--flame);color:#1A0E00;
+  font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap;
+  transition:transform .25s, box-shadow .25s;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,140,50,.36)}
+/* The language picker: quiet, outlined, so the amber pill stays the thing to press. */
+.lang{position:relative;border:0;padding:0;margin:0;background:none;border-radius:0}
+.lang[open]{border-color:transparent}
+.lang summary::after,.lang[open] summary::after{content:none}
+.lang summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  padding:9px 14px;border-radius:99px;border:1px solid var(--line);
+  color:var(--cream);font-size:14px;font-weight:600;letter-spacing:.3px;
+  transition:border-color .25s,color .25s,background .25s;
+}
+.lang summary::-webkit-details-marker{display:none}
+.lang summary .ic{width:17px;height:17px}
+.lang summary:hover,.lang[open] summary{border-color:var(--amber);color:var(--amber);background:rgba(255,167,38,.07)}
+.lang summary:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.lang ul{
+  position:absolute;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;z-index:60;
+  min-width:190px;max-height:min(70vh,460px);overflow:auto;
+  background:#151210;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.5);
+}
+.lang li a{display:block;padding:9px 12px;border-radius:10px;color:var(--cream);text-decoration:none;font-size:14.5px}
+.lang li a:hover,.lang li a:focus-visible{background:rgba(255,167,38,.1);color:var(--amber);outline:none}
+.lang li a[aria-current]{color:var(--amber);font-weight:600}
+
+/* Starring, asked for beside the thing being starred rather than in the menu bar. */
+.star-gh{
+  display:inline-flex;align-items:center;gap:9px;white-space:nowrap;align-self:center;
+  margin:0 auto 18px;padding:10px 18px;border-radius:99px;
+  background:rgba(14,11,9,.82);border:1px solid rgba(255,255,255,.14);
+  color:#FFF6EC;text-decoration:none;font-size:14.5px;font-weight:600;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform .25s,background .25s;
+}
+.star-gh:hover{transform:translateY(-2px);background:rgba(14,11,9,.95)}
+.star-gh .gh{width:18px;height:18px}
+.star-gh b{font-variant-numeric:tabular-nums;color:var(--amber);padding-left:9px;border-left:1px solid rgba(255,255,255,.18)}
+
+@media (max-width:520px){
+  .nav-in{gap:10px}
+  .brand{gap:8px;min-width:0}
+  .brand span{font-size:22px}
+  .lang summary{padding:8px 11px}
+  .nav-cta{padding:9px 16px;font-size:14px}
+  .star-gh{font-size:13.5px;padding:9px 15px}
+}
+
+/* ── hero ─────────────────────────────────────────────── */
+.hero{position:relative;z-index:1;padding:44px 0 0}
+.hero-frame{
+  background:var(--coal);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:44px 48px 0;position:relative;overflow:hidden;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-size:13px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--amber);font-weight:500;margin-bottom:26px;
+}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--amber)}
+
+.headline{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:20px;
+}
+.h-side{min-width:0}
+.h-side.right{text-align:right}
+.h-soft{
+  font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;
+  font-size:clamp(26px,3.4vw,46px);color:var(--cream);opacity:.86;line-height:1;
+  margin:0 0 6px;
+}
+.h-shout{
+  font-family:'Anton',sans-serif;font-size:clamp(46px,8.4vw,118px);line-height:.86;
+  margin:0;letter-spacing:-.5px;
+  background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+/* Anton and Instrument Serif carry Latin and Cyrillic only. In other scripts the
+   phone's own heaviest face stands in, a little smaller and with room for the
+   taller letters, so the shout still shouts and nothing is cut off at the foot. */
+:lang(ja) .h-shout,:lang(ko) .h-shout,:lang(zh-CN) .h-shout,:lang(zh-TW) .h-shout,
+:lang(hi) .h-shout,:lang(ar) .h-shout{
+  font-family:system-ui,-apple-system,'Noto Sans','Noto Sans CJK JP','Noto Sans Devanagari','Noto Sans Arabic',sans-serif;
+  font-weight:900;font-size:clamp(36px,6.4vw,92px);line-height:1.18;letter-spacing:0;padding-bottom:.06em;
+}
+:lang(ja) .h-soft,:lang(ko) .h-soft,:lang(zh-CN) .h-soft,:lang(zh-TW) .h-soft,
+:lang(hi) .h-soft,:lang(ar) .h-soft{
+  font-family:system-ui,-apple-system,'Noto Sans',sans-serif;font-style:normal;font-weight:500;
+  font-size:clamp(20px,2.6vw,36px);line-height:1.3;
+}
+.h-mid{width:clamp(60px,9vw,132px)}
+
+/* the amber slab, with the phone breaking out of its top edge */
+.slab{
+  margin-top:40px;background:var(--flame);border-radius:var(--r-lg) var(--r-lg) 0 0;
+  padding:40px 44px 44px;position:relative;
+  display:grid;grid-template-columns:1fr auto 1fr;gap:34px;align-items:center;
+}
+.slab-copy h2{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(24px,2.5vw,34px);
+  line-height:1.18;margin:0 0 14px;color:#2A1400;letter-spacing:-.3px;
+}
+.slab-copy p{margin:0 0 26px;color:rgba(42,20,0,.78);font-size:17px;max-width:34ch;font-weight:400}
+.btn{
+  display:inline-flex;align-items:center;gap:13px;padding:14px 16px 14px 26px;
+  border-radius:99px;background:#150D04;color:var(--cream);text-decoration:none;
+  font-weight:500;font-size:16px;transition:transform .25s,box-shadow .25s;
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(0,0,0,.34)}
+.btn i{
+  width:34px;height:34px;border-radius:50%;background:var(--flame);color:#150D04;
+  display:grid;place-items:center;font-style:normal;font-size:17px;font-weight:600;
+}
+.proof{
+  margin-top:26px;display:inline-flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.22);border-radius:99px;padding:9px 20px 9px 10px;
+}
+.proof .dots{display:flex}
+.proof .dots b{
+  width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.5);
+  margin-left:-9px;background:#2A1400;display:grid;place-items:center;font-size:12px
+}
+.proof .dots b:first-child{margin-left:0}
+.proof small{color:#2A1400;font-size:14px;font-weight:500;line-height:1.25}
+
+/* phone rises above the slab */
+.phone{position:relative;width:clamp(186px,17vw,238px);margin-top:-132px;z-index:3}
+.phone .device{border-radius:30px;padding:8px}
+.phone .device .screen{border-radius:23px}
+.slab-side{display:flex;flex-direction:column;gap:20px}
+.mini{
+  display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.2);
+  border-radius:var(--r-sm);padding:13px 17px;
+}
+.mini em{font-style:normal;font-size:21px;line-height:1}
+.mini span{color:#2A1400;font-size:14.5px;font-weight:500;line-height:1.3;text-align:left}
+
+/* equaliser: the one motif only a music player earns */
+.eq{display:flex;align-items:flex-end;gap:5px;height:34px;margin-top:22px}
+.eq b{width:5px;border-radius:3px;background:#2A1400;opacity:.55;animation:bounce 1.1s ease-in-out infinite}
+@keyframes bounce{0%,100%{height:24%}50%{height:100%}}
+
+/* ── strip ────────────────────────────────────────────── */
+.strip{
+  margin-top:22px;background:var(--slate);border-radius:var(--r-md);
+  padding:24px 26px;display:grid;gap:12px;border:1px solid var(--line);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,188px),1fr));
+}
+.strip div{
+  display:flex;align-items:center;gap:12px;font-size:14.5px;color:var(--cream);font-weight:400;
+  padding:13px 16px;border-radius:var(--r-sm);background:rgba(255,167,38,.05);
+  border:1px solid rgba(255,167,38,.10);transition:border-color .25s,background .25s,transform .25s;
+}
+.strip div:hover{background:rgba(255,167,38,.09);border-color:rgba(255,167,38,.26);transform:translateY(-2px)}
+.strip em{font-style:normal;font-size:20px}
+
+/* ── sections ─────────────────────────────────────────── */
+section{position:relative;z-index:1;padding:84px 0}
+.title{font-family:'Anton',sans-serif;font-size:clamp(34px,5vw,66px);line-height:.98;margin:0 0 16px;letter-spacing:-.4px}
+.title em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;
+  background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--dim);font-size:18px;max-width:56ch;margin:0 0 40px}
+
+/* platforms */
+.plat{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.card{
+  background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:32px;transition:transform .3s,border-color .3s;position:relative;overflow:hidden;
+}
+.card:hover{border-color:rgba(255,167,38,.42)}
+.card h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:23px;margin:0 0 6px}
+.card .ver{color:var(--amber);font-size:14px;font-weight:500;margin-bottom:16px}
+.card p{color:var(--dim);font-size:15.5px;margin:0 0 22px;min-height:66px}
+svg.mark{
+  width:46px;height:46px;display:block;margin-bottom:18px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.14));
+  transition:transform .35s cubic-bezier(.2,.8,.3,1);
+}
+.card:hover svg.mark{transform:translateY(-3px) rotate(-4deg) scale(1.07)}
+.dl{
+  font-family:'Outfit',sans-serif;cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;padding:12px 24px;border-radius:99px;
+  background:var(--flame);color:#1A0E00;font-weight:600;font-size:15px;text-decoration:none;
+  transition:transform .25s,box-shadow .25s;
+}
+.dl:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,140,50,.34)}
+.dl.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400}
+.betaget{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.betaget .dl{width:100%;justify-content:center;margin-top:8px}
+.betaget small{color:var(--dim);font-size:12.5px;line-height:1.45}
+.betaget p{color:var(--dim);font-size:13.5px;line-height:1.5;margin:14px 0 0}
+.beta{
+  margin-top:26px;
+  border:1px solid rgba(255,167,38,.38);border-radius:22px;padding:30px;
+  background:linear-gradient(180deg,rgba(255,167,38,.09),rgba(255,167,38,.02));
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;align-items:start;
+}
+.beta h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:22px;margin:0 0 8px}
+.beta p{color:var(--dim);font-size:15.5px;margin:0 0 14px}
+.beta .tag{
+  /* The page already has a .tag that pins itself to a corner; this one sits in the text. */
+  position:static;
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:12px;padding:5px 12px;border-radius:99px;
+  background:rgba(255,167,38,.16);color:var(--amber);font-size:12.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+}
+.beta .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.beta .links a{color:var(--amber);font-size:14.5px;text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
+.beta .links a:hover{border-bottom-color:var(--amber)}
+.notes-head{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--amber);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+.notes-head:first-child{margin-top:0}
+ul.notes{margin:0;padding-left:18px}
+ul.notes li{color:var(--dim);font-size:14.5px;line-height:1.5;margin-bottom:6px}
+.dl.ghost:hover{border-color:var(--amber);color:var(--amber);box-shadow:none}
+.soon{
+  position:absolute;top:20px;right:20px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--amber);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-weight:500;
+}
+
+
+/* one line-icon set, so the page reads as drawn rather than assembled */
+.ic{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.65;
+    stroke-linecap:round;stroke-linejoin:round;display:block;flex:0 0 auto}
+.f .ic{width:29px;height:29px;color:var(--amber);margin-bottom:13px}
+.strip .ic{width:22px;height:22px;color:var(--amber)}
+.mini .ic{width:22px;height:22px;color:#2A1400}
+.proof .dots b .ic{width:14px;height:14px;color:var(--amber);stroke-width:1.9}
+
+/* ── device mockups ───────────────────────────────────── */
+.device{
+  position:relative;padding:7px;border-radius:26px;
+  background:linear-gradient(152deg,#4a4a53 0%,#1c1c21 36%,#0d0d10 100%);
+  box-shadow:0 42px 80px rgba(0,0,0,.62),0 0 0 1px rgba(255,255,255,.07),
+             inset 0 1px 2px rgba(255,255,255,.16);
+}
+.device .screen{position:relative;border-radius:20px;overflow:hidden;background:#000;line-height:0}
+.device .screen img{border-radius:0}
+/* punch-hole camera, the way Android phones actually look */
+.device .notch{
+  position:absolute;top:9px;left:50%;transform:translateX(-50%);
+  width:9px;height:9px;background:#08080a;border-radius:50%;z-index:3;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);
+}
+.device .vol,.device .pwr{
+  position:absolute;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,#55555f,#26262d);
+}
+.device .vol{left:-3px;top:19%;height:6%}
+.device .vol.b{top:27%;height:6%}
+.device .pwr{right:-3px;top:24%;height:9%;border-radius:3px}
+
+/* a native app window, not a browser, because that is what this is */
+.win{
+  border-radius:14px;overflow:hidden;background:#15151a;
+  box-shadow:0 36px 76px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);
+  line-height:0;
+}
+.win .bar{
+  height:34px;display:flex;align-items:center;gap:8px;padding:0 14px;
+  background:linear-gradient(#2b2b32,#1f1f25);border-bottom:1px solid rgba(255,255,255,.06);
+}
+.win .bar i{width:11px;height:11px;border-radius:50%;display:block}
+.win .bar i:nth-child(1){background:#FF5F57}
+.win .bar i:nth-child(2){background:#FEBC2E}
+.win .bar i:nth-child(3){background:#28C840}
+.win .bar span{
+  margin-left:12px;font-size:12px;color:#7d7d88;font-weight:400;line-height:34px;
+  font-family:'Outfit',sans-serif;
+}
+
+/* gallery */
+.sub{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;margin:44px 0 18px;color:var(--cream)}
+/* a loop that runs by itself; hovering stops it so a screenshot can be read */
+.rail{overflow:hidden;padding:6px 0 22px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+      mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.track{display:flex;gap:22px;width:max-content;will-change:transform;touch-action:pan-y;
+       align-items:center}
+.rail{cursor:grab}
+.rail.dragging{cursor:grabbing}
+.rail.dragging .shot{pointer-events:none}
+.shot{flex:0 0 auto;width:206px;scroll-snap-align:start;transform-origin:50% 50%;
+      transition:transform .18s ease-out,opacity .18s ease-out}
+.shot .device,.shot .win{transition:transform .35s}
+.shot:hover .device,.shot:hover .win{transform:translateY(-8px)}
+.shot p{font-size:13px;color:var(--dim);margin:13px 0 0;text-align:center;line-height:1.4}
+.wide{width:min(600px,84vw)}
+
+/* features */
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}
+.f{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:26px;
+   transition:transform .3s,border-color .3s}
+.f:hover{border-color:rgba(255,167,38,.38)}
+.f em{font-style:normal;font-size:27px;display:block;margin-bottom:13px}
+.f h4{font-family:'Outfit',sans-serif;font-weight:600;font-size:17.5px;margin:0 0 7px}
+.f p{color:var(--dim);font-size:14.5px;margin:0;line-height:1.55}
+
+/* privacy band */
+.band{
+  background:var(--flame);border-radius:var(--r-lg);padding:60px 48px;text-align:center;color:#2A1400;
+}
+.band h2{font-family:'Anton',sans-serif;font-size:clamp(30px,4.4vw,58px);margin:0 0 14px;line-height:1}
+.band p{margin:0 auto;max-width:58ch;font-size:17.5px;color:rgba(42,20,0,.8);font-weight:400}
+
+/* ── roadmap: three lanes, the last two link to their vote posts ── */
+.rm-lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;align-items:start}
+.rm-lane{background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);padding:24px 22px 10px}
+.rm-lane.next{background:linear-gradient(160deg,rgba(255,167,38,.13),rgba(255,112,67,.03) 55%,var(--coal));border-color:rgba(255,167,38,.34)}
+.rm-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--cream)}
+.rm-h small{margin-left:auto;color:var(--dim);font-size:12.5px;font-weight:500;letter-spacing:.04em;text-transform:none;font-variant-numeric:tabular-nums}
+.rm-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.next .rm-dot{background:var(--amber);animation:rmPulse 2.2s infinite}
+.planned .rm-dot{border:2px solid var(--cream)}
+.considering .rm-dot{border:2px dashed var(--dim)}
+.rm-lane>p{color:var(--dim);font-size:13.5px;margin:0 0 12px;line-height:1.5}
+.rm-lane ul{list-style:none;margin:0;padding:0}
+.rm-lane li{border-top:1px solid var(--line)}
+.rm-row{display:flex;align-items:center;gap:14px;padding:13px 0;color:inherit;text-decoration:none}
+.rm-row b{display:block;font-weight:500;font-size:15.5px;color:var(--cream);line-height:1.35;transition:color .25s}
+.rm-row small{display:block;color:var(--dim);font-size:13.5px;line-height:1.45;margin-top:2px}
+.rm-vote{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:6px 12px 6px 9px;border-radius:99px;
+  border:1px solid var(--line);color:var(--dim);font-size:13px;font-weight:500;transition:border-color .25s,color .25s,transform .25s}
+.rm-vote .ic{width:14px;height:14px;stroke-width:2.2}
+a.rm-row:hover b,a.rm-row:focus-visible b{color:var(--amber)}
+a.rm-row:hover .rm-vote,a.rm-row:focus-visible .rm-vote{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.rm-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.rm-cta a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:99px;border:1px solid var(--line);
+  color:var(--cream);text-decoration:none;font-size:15px;font-weight:500;transition:border-color .25s,color .25s,transform .25s,box-shadow .25s}
+.rm-cta a:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.rm-cta .ic{width:17px;height:17px;stroke-width:2.2}
+.rm-cta a.rm-primary{background:var(--flame);border-color:transparent;color:#2A1400}
+.rm-cta a.rm-primary:hover{color:#2A1400;box-shadow:0 14px 30px rgba(255,112,67,.26)}
+@keyframes rmPulse{0%{box-shadow:0 0 0 0 rgba(255,167,38,.55)}70%{box-shadow:0 0 0 9px rgba(255,167,38,0)}100%{box-shadow:0 0 0 0 rgba(255,167,38,0)}}
+@media (prefers-reduced-motion:reduce){.next .rm-dot{animation:none}}
+
+/* ── help Blazify grow: the feature cards again, as things to do ── */
+.hg .f{display:flex;flex-direction:column;align-items:flex-start;color:inherit;text-decoration:none}
+.hg .f>.ic{color:var(--amber);margin-bottom:14px}
+.hg .f p{flex:1}
+.hg .f:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.hg-count{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:99px;background:rgba(255,167,38,.14);color:var(--amber);
+  font-size:12.5px;font-weight:500;vertical-align:2px;font-variant-numeric:tabular-nums}
+.hg-go{margin-top:14px;display:inline-flex;align-items:center;gap:7px;color:var(--amber);font-size:14px;font-weight:500}
+.hg-go::after{content:'\2192';transition:transform .25s}
+.hg a.f:hover .hg-go::after{transform:translateX(4px)}
+.hg-links{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.hg-links a{padding:7px 14px;border-radius:99px;border:1px solid var(--line);color:var(--cream);text-decoration:none;font-size:13.5px;
+  transition:border-color .25s,color .25s}
+.hg-links a:hover{border-color:var(--amber);color:var(--amber)}
+
+
+/* ── the lyrics demo: the one feature worth showing in motion ── */
+.stage{
+  display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:0;
+  border:1px solid rgba(255,167,38,.09);border-radius:var(--r-lg);overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,167,38,.05),transparent 55%),var(--coal);
+  box-shadow:0 34px 90px -30px color-mix(in srgb,var(--accent,#FFA726) 42%,transparent);
+  transition:background .9s ease,box-shadow .9s ease;
+}
+.now{
+  padding:30px 32px;display:flex;flex-direction:column;justify-content:center;gap:16px;
+  background:linear-gradient(150deg,var(--accent,#FFA726) 0%,color-mix(in srgb,var(--accent,#FFA726) 55%,#120C05) 100%);
+  transition:background .9s ease;
+}
+.art{
+  width:min(150px,42%);aspect-ratio:1;border-radius:20px;position:relative;overflow:hidden;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--accent,#FFA726) 82%,#fff),color-mix(in srgb,var(--accent,#FFA726) 40%,#0A0705));
+  box-shadow:0 26px 50px rgba(0,0,0,.42);display:grid;place-items:center;transition:background .9s ease;
+}
+.art svg{width:44%;opacity:.9}
+.now .t{font-family:'Outfit',sans-serif;font-weight:600;font-size:21px;color:#1A0E00;margin:0;line-height:1.2}
+.now .a{color:rgba(26,14,0,.72);font-size:14px;margin:0}
+.bar{height:5px;border-radius:9px;background:rgba(26,14,0,.22);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:#1A0E00;border-radius:9px;width:0}
+.times{display:flex;justify-content:space-between;font-size:13px;color:rgba(26,14,0,.7);
+  font-variant-numeric:tabular-nums}
+
+.words{padding:34px 36px;position:relative;min-height:286px;display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden}
+.words::before,.words::after{content:'';position:absolute;left:0;right:0;height:48px;z-index:2;pointer-events:none}
+.words::before{top:0;background:linear-gradient(var(--coal),transparent)}
+.words::after{bottom:0;background:linear-gradient(transparent,var(--coal))}
+.lines{display:flex;flex-direction:column;gap:11px;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+.ln{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(17px,1.5vw,22px);line-height:1.35;
+  color:rgba(255,244,230,.20);transition:color .45s;
+}
+.ln.on{color:rgba(255,244,230,.42)}
+.ln w{transition:color .18s,text-shadow .18s}
+.ln.on w.lit{color:var(--accent,#FFA726);text-shadow:0 0 22px color-mix(in srgb,var(--accent,#FFA726) 55%,transparent)}
+.tag{
+  position:absolute;top:20px;right:22px;z-index:3;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 13px;
+}
+@media (max-width:940px){
+  .stage{grid-template-columns:1fr;border-radius:var(--r-md)}
+  .now{padding:28px 22px;align-items:center;text-align:center}
+  .now > div{width:100%}
+  .words{padding:26px 20px;min-height:230px}
+}
+@media (prefers-reduced-motion:reduce){
+  .lines{transition:none}
+  .ln,.ln w{transition:none}
+}
+
+/* ── sound in the background, not on top of it ────────────────────
+   Two slow waves at the very back, in the brand hue and at an opacity
+   that reads as texture rather than decoration. They drift at different
+   speeds so the page never quite repeats. */
+.waves{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.5}
+.waves svg{position:absolute;left:0;width:220%;height:auto;color:var(--amber)}
+.waves .w1{top:46%;opacity:.10;animation:drift 34s linear infinite}
+.waves .w2{top:58%;opacity:.06;animation:drift 52s linear infinite reverse}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── depth: cards lean toward the cursor ──────────────────────── */
+.plat,.feat{perspective:1100px}
+.card,.f{transform-style:preserve-3d;will-change:transform}
+@media (prefers-reduced-motion:reduce){
+  .waves{display:none}
+  .card,.f{transform:none!important}
+}
+
+/* ── how to install ───────────────────────────────────────────────
+   A card can say what something is; it cannot walk somebody through a
+   sideload. The steps sit behind a button on each card so the card stays
+   short, and so the iPhone instructions, which are the long ones, do not
+   set the height of the row. */
+.howto{
+  position:absolute;top:18px;right:18px;z-index:2;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:99px;cursor:pointer;
+  background:rgba(255,167,38,.07);border:1px solid rgba(255,167,38,.16);
+  color:var(--dim);font-family:'Outfit',sans-serif;font-size:12.5px;
+  transition:color .25s,border-color .25s,background .25s;
+}
+.howto:hover{color:var(--amber);border-color:rgba(255,167,38,.4);background:rgba(255,167,38,.12)}
+.howto:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.howto svg{width:14px;height:14px;stroke-width:1.9}
+
+dialog.guide{
+  width:min(560px,92vw);padding:0;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--coal);color:var(--cream);box-shadow:0 40px 90px rgba(0,0,0,.6);
+}
+dialog.guide::backdrop{background:rgba(6,5,4,.72);backdrop-filter:blur(4px)}
+.guide-head{
+  display:flex;align-items:center;gap:14px;padding:24px 26px 18px;
+  border-bottom:1px solid var(--line);
+}
+.guide-head svg.mark{width:34px;height:34px;margin:0}
+.guide-head h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;margin:0;flex:1}
+.guide-head button{
+  background:none;border:none;color:var(--dim);font-size:26px;line-height:1;cursor:pointer;padding:0 4px;
+}
+.guide-head button:hover{color:var(--amber)}
+.guide-body{padding:22px 26px 26px;max-height:66vh;overflow-y:auto}
+.guide-body ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:13px}
+.guide-body li{color:var(--dim);font-size:15px;line-height:1.6}
+.guide-body li b{color:var(--cream);font-weight:600}
+.guide-body code{
+  background:rgba(255,167,38,.09);border:1px solid rgba(255,167,38,.14);border-radius:6px;
+  padding:2px 7px;font-size:13.5px;color:var(--amber);
+}
+.guide-note{
+  margin:20px 0 0;padding:14px 16px;border-radius:var(--r-sm);
+  background:rgba(255,167,38,.06);border:1px solid rgba(255,167,38,.13);
+  color:var(--dim);font-size:14px;line-height:1.6;
+}
+.guide-note b{color:var(--amber)}
+@media (max-width:900px){
+  /* Frosted glass is a desktop luxury. Both of these are fixed, so a phone
+     re-blurs the page behind them on every frame it scrolls. */
+  nav{backdrop-filter:none;background:rgba(11,10,9,.94)}
+  .mp{backdrop-filter:none;background:rgba(24,20,17,.97)}
+}
+@media (max-width:640px){
+  .howto{top:14px;right:14px;padding:5px 10px;font-size:11.5px}
+  .guide-body{padding:18px 20px 22px}
+}
+
+/* ── choosing a Linux package ─────────────────────────────────── */
+.pick{display:flex;flex-direction:column;gap:11px}
+.pick a{
+  display:flex;align-items:center;gap:15px;padding:15px 17px;border-radius:var(--r-sm);
+  background:rgba(255,167,38,.05);border:1px solid rgba(255,167,38,.12);
+  text-decoration:none;transition:border-color .25s,background .25s,transform .25s;
+}
+.pick a:hover{background:rgba(255,167,38,.1);border-color:rgba(255,167,38,.32);transform:translateY(-2px)}
+.pick b{display:block;font-family:'Outfit',sans-serif;font-weight:600;font-size:15.5px;color:var(--cream)}
+.pick span{display:block;color:var(--dim);font-size:13.5px;line-height:1.5;margin-top:3px}
+.pick em{
+  font-style:normal;flex:0 0 auto;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;
+  color:var(--amber);background:rgba(255,167,38,.1);border:1px solid rgba(255,167,38,.18);
+  border-radius:99px;padding:5px 11px;
+}
+
+/* ── the page as a track ──────────────────────────────────────────
+   Scroll position drawn as a seek bar, because that is what scrolling
+   through a page about a music player ought to feel like. */
+.seek{position:absolute;left:0;right:0;bottom:-1px;height:3px;
+      background:rgba(255,167,38,.10);z-index:60;overflow:hidden}
+.seek i{display:block;height:100%;width:0;background:var(--flame);position:relative;
+        box-shadow:0 0 14px rgba(255,167,38,.65)}
+.seek i::after{
+  content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:#FFE0B8;box-shadow:0 0 12px #FFA726;
+}
+
+/* ── a mini player, the way the app has one ───────────────────── */
+.mp{
+  position:fixed;left:50%;bottom:20px;transform:translate(-50%,140%);
+  z-index:55;display:flex;align-items:center;gap:16px;
+  width:min(560px,92vw);padding:11px 12px 11px 11px;border-radius:99px;
+  background:rgba(24,20,17,.86);backdrop-filter:blur(20px);
+  border:1px solid var(--line);box-shadow:0 22px 50px rgba(0,0,0,.55);
+  transition:transform .55s cubic-bezier(.2,.8,.3,1),opacity .4s;opacity:0;
+}
+.mp.up{transform:translate(-50%,0);opacity:1}
+.mp .cover{
+  width:44px;height:44px;border-radius:50%;flex:0 0 auto;position:relative;
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.07) 0 1px,rgba(0,0,0,.6) 1px 3px),#0d0d10;
+  animation:spin 4.5s linear infinite;
+}
+.mp .cover::after{content:'';position:absolute;inset:36%;border-radius:50%;background:var(--flame)}
+.mp .txt{min-width:0;flex:1}
+.mp .txt b{display:block;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--cream)}
+.mp .txt span{display:block;font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp .wave{display:flex;align-items:flex-end;gap:3px;height:20px;flex:0 0 auto}
+.mp .wave b{width:3px;border-radius:2px;background:var(--amber);opacity:.85;animation:bounce 1s ease-in-out infinite}
+.mp .go{
+  flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:99px;
+  background:var(--flame);color:#1A0E00;font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:640px){
+  .mp{gap:11px;padding:9px 10px 9px 9px;bottom:14px}
+  .mp .wave{display:none}
+  .mp .txt span{display:none}
+  .mp .go{padding:9px 16px;font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  .mp .cover,.mp .wave b{animation:none}
+  .mp{transition:none}
+}
+
+/* a real record in the demo, not a disc icon */
+.art .vinyl{
+  width:66%;aspect-ratio:1;border-radius:50%;position:relative;
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.06) 0 1px,rgba(0,0,0,.62) 1px 3.4px),#0a0a0c;
+  box-shadow:0 16px 34px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.06);
+  animation:spin 7s linear infinite;
+}
+.art .vinyl::after{
+  content:'';position:absolute;inset:33%;border-radius:50%;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--accent,#FFA726) 92%,#fff),var(--accent,#FFA726));
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.35);transition:background .9s ease;
+}
+.art .vinyl::before{
+  content:'';position:absolute;inset:47.5%;border-radius:50%;background:#0a0a0c;z-index:2;
+}
+@media (prefers-reduced-motion:reduce){.art .vinyl{animation:none}}
+
+/* ── installing, and the questions that come before it ─────────── */
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+details{
+  background:var(--coal);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:20px 24px;transition:border-color .25s;height:fit-content;
+}
+details[open]{border-color:rgba(255,167,38,.3)}
+summary{
+  cursor:pointer;list-style:none;font-family:'Outfit',sans-serif;font-weight:600;font-size:16.5px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--cream);
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';color:var(--amber);font-size:22px;font-weight:400;line-height:1;flex:0 0 auto}
+details[open] summary::after{content:'\2212'}
+details p{color:var(--dim);font-size:15px;line-height:1.65;margin:14px 0 0}
+details p:last-child{margin-bottom:0}
+details a{color:var(--amber)}
+
+/* ── the comparison ───────────────────────────────────────────── */
+/* ── back to the top ──────────────────────────────────────────────
+   Appears near the end, where somebody has run out of page and would
+   otherwise have to swipe all the way back. Sits clear of the mini
+   player, which is centred and nearly full width on a phone: to its
+   right on a wide screen, above it on a narrow one. */
+.totop{
+  position:fixed;right:24px;bottom:24px;z-index:56;
+  width:50px;height:50px;border-radius:50%;display:grid;place-items:center;
+  background:var(--flame);color:#1A0E00;border:none;cursor:pointer;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+  opacity:0;transform:translateY(80%) scale(.85);pointer-events:none;
+  transition:opacity .38s ease,transform .38s cubic-bezier(.2,.8,.3,1);
+}
+.totop.up{opacity:1;transform:none;pointer-events:auto}
+.totop:hover{transform:translateY(-3px)}
+.totop:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.totop .ic{width:23px;height:23px;stroke-width:2.1;color:#1A0E00}
+@media (max-width:640px){
+  .totop{right:16px;bottom:96px;width:46px;height:46px}
+}
+@media (prefers-reduced-motion:reduce){
+  .totop{transition:none}
+  .totop:hover{transform:none}
+}
+
+/* ── the person behind it ─────────────────────────────── */
+.maker{
+  position:relative;display:grid;grid-template-columns:auto 1fr;gap:38px;align-items:center;
+  background:linear-gradient(140deg,rgba(255,167,38,.10),rgba(255,112,67,.04) 46%,transparent);
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:44px 48px;overflow:hidden;
+}
+.maker::after{
+  content:'';position:absolute;inset:-1px;border-radius:var(--r-lg);pointer-events:none;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,167,38,.5),transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;padding:1px;
+}
+.maker .por{position:relative;flex:0 0 auto}
+.maker .por img{
+  width:132px;height:132px;border-radius:26px;object-fit:cover;
+  box-shadow:0 22px 46px rgba(0,0,0,.55);
+}
+.maker .por::before{
+  content:'';position:absolute;inset:-3px;border-radius:29px;z-index:-1;background:var(--flame);
+  filter:blur(13px);opacity:.55;
+}
+.maker h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:27px;margin:0 0 2px}
+.maker .role{color:var(--amber);font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;font-weight:500}
+.maker p{color:var(--dim);font-size:16.5px;margin:0 0 20px;max-width:62ch}
+.maker .links{display:flex;flex-wrap:wrap;gap:10px}
+.maker .links a{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:99px;
+  border:1px solid var(--line);color:var(--dim);text-decoration:none;font-size:14.5px;
+  transition:border-color .25s,color .25s,transform .25s;
+}
+.maker .links a:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+@media (max-width:940px){
+  .maker{grid-template-columns:1fr;text-align:center;padding:32px 22px;gap:22px;border-radius:var(--r-md)}
+  .maker .por{margin-inline:auto}
+  .maker .links{justify-content:center}
+  .maker p{margin-inline:auto}
+}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z-index:1}
+.f-grid{display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:36px}
+.f-col h5{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin:0 0 14px;font-weight:500}
+.f-col a{display:block;color:var(--dim);text-decoration:none;font-size:15px;margin-bottom:9px;transition:color .25s}
+.f-col a:hover{color:var(--cream)}
+.f-bot{border-top:1px solid var(--line);padding-top:26px;color:var(--dim);font-size:14px;
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+
+/* motion */
+.rise{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rise.in{opacity:1;transform:none}
+
+@media (max-width:940px){
+  .nav-links{display:none}
+  .hero-frame{padding:36px 22px 0;border-radius:var(--r-md)}
+  .headline{grid-template-columns:1fr;gap:2px}
+  .h-side.right{text-align:left}
+  .h-mid{display:none}
+  .slab{grid-template-columns:1fr;padding:32px 22px 38px;border-radius:var(--r-md) var(--r-md) 0 0;text-align:center}
+  .slab-copy p{max-width:none}
+  .phone{margin:8px auto 4px;order:-1;width:min(60vw,232px)}
+  .slab-side{order:1}
+  .proof{margin-inline:auto}
+  .eq{justify-content:center}
+  .strip{padding:14px;margin-top:16px;grid-template-columns:1fr 1fr;gap:9px}
+  .strip div{padding:11px 12px;font-size:13px;gap:9px;flex-direction:column;
+             align-items:flex-start;text-align:left}
+  .strip .ic{width:19px;height:19px}
+  .feat{grid-template-columns:1fr 1fr;gap:11px}
+  .f{padding:17px 15px}
+  .f h4{font-size:15px;margin-bottom:5px}
+  .f p{font-size:12.8px;line-height:1.5}
+  .f .ic{width:24px;height:24px;margin-bottom:10px}
+  .band{padding:40px 22px;border-radius:var(--r-md)}
+  section{padding:76px 0}
+  .shot{width:72vw;max-width:290px}
+  .wide{width:88vw;max-width:none}
+  .sub{margin:32px 0 14px}
+  .rail{-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);
+        mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+/* ── comparison table ─────────────────────────────────── */
+.cmp{
+  margin-top:34px;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--coal);overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.cmp table{border-collapse:collapse;width:100%;min-width:720px;font-size:15px}
+.cmp th,.cmp td{
+  padding:15px 18px;text-align:left;border-bottom:1px solid rgba(255,167,38,.09);
+  white-space:nowrap;
+}
+.cmp thead th{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;letter-spacing:.02em;
+  color:var(--dim);background:rgba(255,167,38,.04);position:sticky;top:0;
+}
+.cmp thead th.us{color:var(--amber)}
+/* the row label stays put while the competitor columns scroll under it,
+   otherwise you swipe right on a phone and lose which row you are reading */
+.cmp tbody th,.cmp thead th:first-child{
+  position:sticky;left:0;z-index:2;background:var(--coal);
+}
+.cmp thead th:first-child{z-index:3;background:#191413}
+.cmp tbody th{font-weight:400;color:var(--cream);white-space:normal;min-width:210px}
+.cmp td{color:var(--dim)}
+.cmp td.us{color:var(--cream);font-weight:500;background:rgba(255,167,38,.055)}
+.cmp thead th.us{background:rgba(255,167,38,.10)}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp .y{color:var(--amber);font-weight:600}
+.cmp .n{color:#8C7F73}
+@media (max-width:640px){
+  .cmp th,.cmp td{padding:12px 14px;font-size:14px}
+  .cmp tbody th{min-width:170px}
+}
+/* ── why it exists ────────────────────────────────────── */
+.prose{max-width:74ch;margin-top:26px;display:flex;flex-direction:column;gap:18px}
+.prose p{margin:0;color:var(--dim);font-size:16.5px;line-height:1.72}
+.prose p b{color:var(--cream);font-weight:600}
+.prose a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,167,38,.35)}
+.prose a:hover{border-bottom-color:var(--amber)}
+</style>
+<!-- Tells a search engine this is a free Android music player rather than
+     a page of text about one, and hands it the questions it already sees
+     people asking. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Blazify",
+      "applicationCategory": "MultimediaApplication",
+      "applicationSubCategory": "Music Player",
+      "operatingSystem": "Android 8.0+, Windows, Linux, iOS",
+      "softwareVersion": "9.16.0",
+      "url": "https://rajendra7169.github.io/blazify/",
+      "downloadUrl": "https://github.com/rajendra7169/blazify/releases/latest",
+      "installUrl": "https://github.com/rajendra7169/blazify/releases/latest",
+      "fileSize": "25MB",
+      "screenshot": "https://rajendra7169.github.io/blazify/assets/share-card.png",
+      "image": "https://rajendra7169.github.io/blazify/assets/logo-512.png",
+      "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "isAccessibleForFree": true,
+      "description": "A free, open-source music player and YouTube Music client for Android, iPhone, Windows and Linux, with word-by-word synced lyrics and a ten-band equalizer. No advertising or tracking of its own, and no account required.",
+      "featureList": [
+        "Word-by-word synced lyrics",
+        "Ten-band equalizer with 13 presets",
+        "Offline downloads",
+        "Background playback",
+        "Colour taken from the album artwork",
+        "Optional Google sign-in with YouTube Music sync",
+        "Listen together in sync with friends"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Rajendra Pandey",
+        "url": "https://github.com/rajendra7169",
+        "sameAs": [
+          "https://github.com/rajendra7169",
+          "https://www.rajendrapandey.info.np/"
+        ]
+      },
+      "sameAs": [
+        "https://github.com/rajendra7169/blazify",
+        "https://github.com/rajendra7169/blazify-desktop",
+        "https://github.com/rajendra7169/blazify-ios",
+        "https://github.com/rajendra7169"
+      ],
+      "alternateName": "Blazify Music Player"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Blazify safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every line of it is public. You can read the source, build it yourself and check the file you downloaded against what the build produces. It contains no advertising or analytics library of any kind, and sends nothing anywhere except to the services you switch on yourself."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why isn't Blazify on the Google Play Store?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Apps that stream audio from YouTube are removed from it, which is why no player in this category is there. It is a rule about distribution, not a judgement about the app."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Blazify need root?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. It is an ordinary app and runs on any phone with Android 8.0 or newer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I have to sign in to use Blazify?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Search, playback, downloads, lyrics and the equalizer all work without an account. Signing in with Google adds your own YouTube Music library, playlists and history, and is entirely optional."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does Blazify cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nothing. There is no advertising, no subscription and no paid tier. It is free software under the GPL-3.0 licence."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "name": "Blazify",
+      "alternateName": "Blazify Music Player",
+      "url": "https://rajendra7169.github.io/blazify/",
+      "description": "The official website of Blazify, a free and open-source music player for Android, Windows, Linux and iPhone.",
+      "inLanguage": "en",
+      "publisher": {
+        "@type": "Person",
+        "name": "Rajendra Pandey",
+        "url": "https://github.com/rajendra7169"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gflame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC062"/><stop offset=".5" stop-color="#FFA726"/><stop offset="1" stop-color="#FF7043"/></linearGradient>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.2 16.2"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.2M8.6 21.2h6.8"/></symbol>
+<symbol id="i-eq" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.2"/><circle cx="15.5" cy="12" r="2.2"/><circle cx="7" cy="18" r="2.2"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3.5v11.5M7.8 10.8L12 15l4.2-4.2M4 20h16"/></symbol>
+<symbol id="i-gap" viewBox="0 0 24 24"><path d="M5 4.6l9.5 7.4L5 19.4z"/><path d="M19 4.6v14.8"/></symbol>
+<symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.2c-5 0-9 3.9-9 8.8s4 8.8 9 8.8c1.1 0 1.9-.8 1.9-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H16c2.8 0 5-2.2 5-4.9 0-3.7-4-6.7-9-6.7z"/><circle cx="7.6" cy="11" r="1.15"/><circle cx="12" cy="8" r="1.15"/><circle cx="16.4" cy="11" r="1.15"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9.2" cy="8" r="3.3"/><path d="M2.8 20.2c0-3.4 2.8-5.6 6.4-5.6s6.4 2.2 6.4 5.6"/><path d="M16.2 5.1a3.3 3.3 0 0 1 0 5.8M17.8 15.1c2 .8 3.4 2.6 3.4 5.1"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4.2" rx="1.2"/><path d="M5.2 8.2v10.6c0 .7.5 1.2 1.2 1.2h11.2c.7 0 1.2-.5 1.2-1.2V8.2"/><path d="M10 12.4h4"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M5.9 5.9l12.2 12.2"/></symbol>
+<symbol id="i-noeye" viewBox="0 0 24 24"><path d="M3 12s3.6-6.2 9-6.2 9 6.2 9 6.2-3.6 6.2-9 6.2S3 12 3 12z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
+<symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" stroke="none" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M8.8 18.4L2.8 12l6-6.4M15.2 5.6l6 6.4-6 6.4M13.6 3.6l-3.2 16.8"/></symbol>
+<symbol id="i-account" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9.6" r="3"/><path d="M5.9 19.2c.6-3 3.1-4.6 6.1-4.6s5.5 1.6 6.1 4.6"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 0 1-14.6 5.7"/><path d="M3.6 12a8.4 8.4 0 0 1 14.6-5.7"/><path d="M18.2 2.6v3.8h-3.8M5.8 21.4v-3.8h3.8"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3.5 6.5h11M3.5 12h11M3.5 17.5h7"/><path d="M18.5 9.5v8.2"/><circle cx="16.6" cy="17.9" r="1.9"/><path d="M18.5 9.5l3.2-1v3"/></symbol>
+<symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M8.4 15.6a5.1 5.1 0 0 1 0-7.2M15.6 8.4a5.1 5.1 0 0 1 0 7.2"/><path d="M5.6 18.4a9.1 9.1 0 0 1 0-12.8M18.4 5.6a9.1 9.1 0 0 1 0 12.8"/></symbol>
+<symbol id="i-devices" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="9.5" rx="1.4"/><path d="M6 18.2h6.2"/><path d="M9 14.5v3.7"/><rect x="16.5" y="9.5" width="5" height="9.5" rx="1.4"/><path d="M18.4 16.9h1.2"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.4-2.6 4"/><circle cx="12" cy="17.4" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19.5V5.2"/><path d="M5.6 11.6L12 5.2l6.4 6.4"/></symbol>
+<symbol id="i-bgplay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6l5.4 3.4-5.4 3.4z"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M4.2 14.4v-2.2a7.8 7.8 0 0 1 15.6 0v2.2"/><rect x="2.2" y="13.6" width="4.2" height="7.2" rx="2.1"/><rect x="17.6" y="13.6" width="4.2" height="7.2" rx="2.1"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.4 21.6c3.9 0 6.8-2.7 6.8-6.4 0-4.4-3.9-5.9-3.9-10.3-2.9 1.5-4.4 3.9-4.4 6.4 0 1-1 1.5-1.5 1-.9-1-.9-2.4-.9-2.4-1.4 1.6-2.3 3.6-2.3 5.9 0 3.5 2.6 5.8 6.2 5.8z"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18.2V5.4l10-2v12.4"/><circle cx="6.4" cy="18.2" r="2.6"/><circle cx="16.4" cy="15.8" r="2.6"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.5 6 .9-4.35 4.25 1.03 6L12 17l-5.38 2.85 1.03-6L3.3 9.6l6-.9z" stroke-linejoin="round"/></symbol>
+<symbol id="i-bug" viewBox="0 0 24 24"><rect x="7.2" y="8" width="9.6" height="12" rx="4.8"/><path d="M9.5 8V6.8a2.5 2.5 0 0 1 5 0V8M12 12.2V20M3.8 13.4h3.4M16.8 13.4h3.4M4.8 8.8l2.7 1.7M19.2 8.8l-2.7 1.7M4.8 18.6l2.8-1.6M19.2 18.6l-2.8-1.6"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.2 17.8h5.6M10 20.8h4"/><path d="M12 3.2a6 6 0 0 0-3.6 10.8c.6.5.9 1.1.9 1.9v1.9h5.4v-1.9c0-.8.3-1.4.9-1.9A6 6 0 0 0 12 3.2z"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="17.8" cy="5.6" r="2.6"/><circle cx="6.2" cy="12" r="2.6"/><circle cx="17.8" cy="18.4" r="2.6"/><path d="M8.5 10.8l7-3.9M8.5 13.2l7 3.9"/></symbol>
+</defs></svg>
+<div class="waves" aria-hidden="true">
+  <svg class="w1" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
+    <path d="M0 100 C 100 40 200 40 300 100 S 500 160 600 100 S 800 40 900 100 S 1100 160 1200 100 S 1400 40 1500 100 S 1700 160 1800 100"
+          stroke="currentColor" stroke-width="2"/>
+  </svg>
+  <svg class="w2" viewBox="0 0 1600 200" fill="none" preserveAspectRatio="none">
+    <path d="M0 100 C 130 150 260 150 390 100 S 650 50 780 100 S 1040 150 1170 100 S 1430 50 1560 100 S 1820 150 1950 100"
+          stroke="currentColor" stroke-width="2.5"/>
+  </svg>
+</div>
+<div class="glow"></div>
+
+<nav>
+  <div class="shell nav-in">
+    <a class="brand" href="#top"><picture><source srcset="../assets/logo-512.webp" type="image/webp"><img src="../assets/logo-512.png" alt="" width="512" height="512"></picture><span>BLAZIFY</span></a>
+    <div class="nav-links">
+      <a href="#get">डाउनलोड</a> <a href="#look">स्क्रीनशॉट</a> <a href="#features">फ़ीचर</a> <a href="#faq">सवाल-जवाब</a> <a href="#roadmap">रोडमैप</a> <a href="https://github.com/rajendra7169/blazify">सोर्स कोड</a>
+    </div>
+    <!-- Every language is its own page, so a search in Spanish finds the Spanish one.
+         A details element, so the list opens without any script at all. -->
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>HI</span></summary>
+      <ul id="langList">
+        <li><a href="../" hreflang="en" lang="en">English</a></li>
+        <li><a href="../es/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="../fr/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="../de/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="../it/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="../ru/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../tr/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="../ar/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="../hi/" hreflang="hi" lang="hi" aria-current="page">हिन्दी</a></li>
+        <li><a href="../id/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="../vi/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="../ja/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../ko/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh-CN/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="../zh-TW/" hreflang="zh-TW" lang="zh-TW">繁體中文</a></li>
+      </ul>
+    </details>
+    <a class="nav-cta" href="#get">Blazify पाएँ</a>
+  </div>
+  <div class="seek"><i id="seekBar"></i></div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="shell">
+    <div class="hero-frame">
+      <h1 class="sr">Blazify: Android, iPhone, Windows और Linux के लिए एक मुफ़्त, ओपन-सोर्स म्यूज़िक प्लेयर और YouTube Music क्लाइंट, शब्द-दर-शब्द सिंक लिरिक्स के साथ, और अपनी तरफ़ से न कोई विज्ञापन, न कोई ट्रैकिंग। Spotify और YouTube Music का एक ओपन-सोर्स विकल्प।</h1>
+      <span class="eyebrow">कोई विज्ञापन नहीं · ऑफ़लाइन डाउनलोड · बैकग्राउंड में प्ले</span>
+
+      <div class="headline">
+        <div class="h-side">
+          <p class="h-soft">सुनिए।</p>
+          <p class="h-shout">दिल से!</p>
+        </div>
+        <div class="h-mid"></div>
+        <div class="h-side right">
+          <p class="h-soft">आपकी धुन,</p>
+          <p class="h-shout">आपका अंदाज़।</p>
+        </div>
+      </div>
+
+      <div class="slab">
+        <div class="slab-copy">
+          <h2>लाखों गाने, और उनके बोल ठीक वैसे ही जैसे गाए जा रहे हैं।</h2>
+          <p>एक म्यूज़िक प्लेयर जो कुछ भी स्ट्रीम करता है, जो आप चाहें उसे ऑफ़लाइन रखता है, और न कभी साइन इन करने को कहता है, न विज्ञापन झेलने को।</p>
+          <a class="btn" href="#get">मुफ़्त डाउनलोड करें <i>↓</i></a>
+          <div class="proof">
+            <span class="dots"><b><svg class="ic"><use href="#i-head"/></svg></b><b><svg class="ic"><use href="#i-flame"/></svg></b><b><svg class="ic"><use href="#i-note"/></svg></b></span><small><strong id="dlCount">5,000+</strong> डाउनलोड<br>और बढ़ते जा रहे हैं</small>
+          </div>
+          <div class="eq" aria-hidden="true"></div>
+        </div>
+
+        <div class="phone">
+          <a class="star-gh" href="https://github.com/rajendra7169/blazify" rel="noopener">
+            <svg class="ic gh" aria-hidden="true"><use href="#i-github"/></svg>
+            <span>GitHub पर स्टार दें</span> <b id="starCount" hidden></b>
+          </a>
+          <div class="device">
+            <span class="vol"></span><span class="vol b"></span><span class="pwr"></span>
+            <div class="screen"><span class="notch"></span>
+              <picture><source srcset="../assets/home.webp" type="image/webp"><img src="../assets/home.png" alt="Android फ़ोन पर चलता हुआ Blazify" width="480" height="1040" fetchpriority="high"></picture>
+            </div>
+          </div>
+        </div>
+
+        <div class="slab-side">
+          <div class="mini"><svg class="ic"><use href="#i-mic"/></svg><span>शब्द-दर-शब्द सिंक लिरिक्स</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-eq"/></svg><span>दस-बैंड इक्वलाइज़र, 13 प्रीसेट</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-palette"/></svg><span>आर्टवर्क से लिया गया रंग</span></div>
+          <div class="mini"><svg class="ic"><use href="#i-users"/></svg><span>दोस्तों के साथ मिलकर सुनें</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div><svg class="ic"><use href="#i-ban"/></svg> No ads, ever</div>
+      <div><svg class="ic"><use href="#i-account"/></svg> Sign in with Google</div>
+      <div><svg class="ic"><use href="#i-bgplay"/></svg> Background playback</div>
+      <div><svg class="ic"><use href="#i-down"/></svg> Offline downloads</div>
+      <div><svg class="ic"><use href="#i-devices"/></svg> Phone and desktop</div>
+      <div><svg class="ic"><use href="#i-code"/></svg> Free and open source</div>
+    </div>
+  </div>
+</header>
+
+<section id="get">
+  <div class="shell">
+    <h2 class="title rise">जहाँ भी <em>आप सुनें</em></h2>
+    <p class="lede rise">एक ही प्लेयर, हर उस जगह के लिए अलग से बनाया गया जहाँ आप उसे इस्तेमाल करते हैं। अपना चुनें।</p>
+
+    <div class="plat">
+      <article class="card rise">
+        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
+<linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FE9B5"/><stop offset=".45" stop-color="#3DDC84"/><stop offset="1" stop-color="#1FA05C"/></linearGradient></defs>
+<path fill="url(#gflame)" d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.14-.52.38.38 0 0 0-.52.14l-1.86 3.23a11.5 11.5 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.52-.14.38.38 0 0 0-.14.52L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+        <button class="howto" type="button" data-guide="android"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
+        <h3>Android</h3>
+        <div class="ver" id="verAndroid">वर्शन 9.16.0 · 28 MB · Android 8+</div>
+        <p>Blazify का APK डाउनलोड करें: स्ट्रीमिंग, सिंक लिरिक्स, इक्वलाइज़र, Android Auto और होम-स्क्रीन विजेट।</p>
+        <button class="dl" type="button" data-pick="android">APK डाउनलोड करें</button>
+        <a id="dlAndroidCast" hidden href="https://github.com/rajendra7169/blazify/releases/latest"></a>
+        <a id="dlAndroidFoss" hidden href="https://github.com/rajendra7169/blazify/releases/latest"></a>
+      </article>
+
+      <article class="card rise">
+        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
+<linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5FD0FF"/><stop offset=".5" stop-color="#0FA0EF"/><stop offset="1" stop-color="#0067B8"/></linearGradient></defs>
+<path fill="url(#gflame)" d="M2.4 5.5l8.2-1.12v7.24H2.4zm9.3-1.27L22 2.8v8.82h-10.3zM2.4 12.62h8.2v7.25L2.4 18.6zm9.3 0H22v8.9l-10.3-1.5z"/></svg>
+        <button class="howto" type="button" data-guide="windows"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
+        <h3>Windows</h3>
+        <div class="ver" id="verWindows">वर्शन 1.0.5 · 164 MB · इंस्टॉलर</div>
+        <p>डेस्कटॉप प्लेयर, जिसमें ऑडियो लाइब्रेरी साथ में आती है। एडमिनिस्ट्रेटर पासवर्ड के बिना इंस्टॉल हो जाता है।</p>
+        <a class="dl" href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Windows के लिए डाउनलोड करें</a>
+      </article>
+
+      <article class="card rise">
+        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true">
+<!-- Tux as a single silhouette: body and head in the brand gradient, with the
+     belly, eyes and beak as lighter shapes. Built from primitives rather than a
+     traced path, so the proportions are tuned for 46px rather than for print. -->
+<ellipse cx="12" cy="9.1" rx="4.35" ry="4.6" fill="url(#gflame)"/>
+<ellipse cx="12" cy="14.6" rx="6.15" ry="6.6" fill="url(#gflame)"/>
+<ellipse cx="12" cy="15.8" rx="4.05" ry="5.05" fill="#FFE6C4"/>
+<ellipse cx="10.35" cy="8.5" rx="1.15" ry="1.5" fill="#FFF3E2"/>
+<ellipse cx="13.65" cy="8.5" rx="1.15" ry="1.5" fill="#FFF3E2"/>
+<circle cx="10.6" cy="8.75" r=".62" fill="#2E1500"/>
+<circle cx="13.4" cy="8.75" r=".62" fill="#2E1500"/>
+<path d="M12 9.9c1.02 0 1.72.52 1.72 1.06 0 .55-.73 1.06-1.72 1.06s-1.72-.51-1.72-1.06c0-.54.7-1.06 1.72-1.06z" fill="#FFC062"/>
+<ellipse cx="8.6" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(-13 8.6 20.9)"/>
+<ellipse cx="15.4" cy="20.9" rx="2.35" ry="1.15" fill="#FFC062" transform="rotate(13 15.4 20.9)"/>
+</svg>
+        <button class="howto" type="button" data-guide="linux"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
+        <h3>Linux</h3>
+        <div class="ver" id="verLinux">वर्शन 1.0.5 · deb · AppImage · tar.gz</div>
+        <p>पॉडकास्ट, चैप्टर, ट्रांसक्रिप्ट और मीडिया-की सपोर्ट। हर डिस्ट्रीब्यूशन के लिए तीन तरह के पैकेज।</p>
+        <button class="dl" type="button" data-pick="linux">Linux के लिए डाउनलोड करें</button>
+      </article>
+
+      <article class="card rise">
+        <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><defs>
+<linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D8D8DE"/><stop offset="1" stop-color="#95959E"/></linearGradient></defs>
+<path fill="url(#gflame)" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <button class="howto" type="button" data-guide="ios"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>How to install</button>
+        <h3>iOS</h3>
+        <div class="ver" id="verIos">वर्शन 0.1.0 · 5 MB · साइडलोड</div>
+        <p>सर्च, लाइब्रेरी, प्लेलिस्ट और सिंक लिरिक्स, SideStore या AltStore से साइडलोड करें। App Store की ज़रूरत नहीं।</p>
+        <a class="dl" href="https://github.com/rajendra7169/blazify-ios/releases/latest">IPA डाउनलोड करें</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<section id="look">
+  <div class="shell">
+    <h2 class="title rise">इसे <em>चलते हुए</em> देखें</h2>
+    <p class="lede rise">असली स्क्रीन, सीधे ऐप से। रंग उसी से आता है जो उस समय बज रहा हो।</p>
+
+    <div class="rail rise">
+      <div class="track" style="--dur:80s">
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/home.webp" type="image/webp"><img src="../assets/home.png" alt="होम स्क्रीन" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>होम, आर्टवर्क से लिए गए रंग के साथ</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/search.webp" type="image/webp"><img src="../assets/search.png" alt="हाल की खोजों के साथ सर्च" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>सर्च, आपकी हाल की खोजों के साथ</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player.webp" type="image/webp"><img src="../assets/player.png" alt="क्लासिक प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>क्लासिक प्लेयर, छह डिज़ाइनों में से एक</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/lyrics.webp" type="image/webp"><img src="../assets/lyrics.png" alt="सिंक लिरिक्स" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>लिरिक्स, शब्द-दर-शब्द हाइलाइट होते हुए</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-ring.webp" type="image/webp"><img src="../assets/player-ring.png" alt="रिंग प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रिंग प्लेयर, आर्ट के चारों ओर समय</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/yours.webp" type="image/webp"><img src="../assets/yours.png" alt="आपका टैब" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>आपका: हाल में सुने गए और सुझाए गए गाने</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-record.webp" type="image/webp"><img src="../assets/player-record.png" alt="रिकॉर्ड प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रिकॉर्ड प्लेयर, घूमता हुआ विनाइल</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/equalizer.webp" type="image/webp"><img src="../assets/equalizer.png" alt="इक्वलाइज़र" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>इक्वलाइज़र, दस बैंड और 13 प्रीसेट</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-cassette.webp" type="image/webp"><img src="../assets/player-cassette.png" alt="कैसेट प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>कैसेट प्लेयर, चलती हुई टेप</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/look-and-feel.webp" type="image/webp"><img src="../assets/look-and-feel.png" alt="रूप-रंग" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रूप-रंग, लाइव प्रीव्यू के साथ</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-video-art.webp" type="image/webp"><img src="../assets/player-video-art.png" alt="वीडियो कवर प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>वीडियो कवर, कंट्रोल के पीछे म्यूज़िक वीडियो</p></figure>
+      <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/settings.webp" type="image/webp"><img src="../assets/settings.png" alt="सेटिंग्स" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>सेटिंग्स</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/home.webp" type="image/webp"><img src="../assets/home.png" alt="होम स्क्रीन" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>होम, आर्टवर्क से लिए गए रंग के साथ</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/search.webp" type="image/webp"><img src="../assets/search.png" alt="हाल की खोजों के साथ सर्च" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>सर्च, आपकी हाल की खोजों के साथ</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player.webp" type="image/webp"><img src="../assets/player.png" alt="क्लासिक प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>क्लासिक प्लेयर, छह डिज़ाइनों में से एक</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/lyrics.webp" type="image/webp"><img src="../assets/lyrics.png" alt="सिंक लिरिक्स" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>लिरिक्स, शब्द-दर-शब्द हाइलाइट होते हुए</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-ring.webp" type="image/webp"><img src="../assets/player-ring.png" alt="रिंग प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रिंग प्लेयर, आर्ट के चारों ओर समय</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/yours.webp" type="image/webp"><img src="../assets/yours.png" alt="आपका टैब" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>आपका: हाल में सुने गए और सुझाए गए गाने</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-record.webp" type="image/webp"><img src="../assets/player-record.png" alt="रिकॉर्ड प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रिकॉर्ड प्लेयर, घूमता हुआ विनाइल</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/equalizer.webp" type="image/webp"><img src="../assets/equalizer.png" alt="इक्वलाइज़र" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>इक्वलाइज़र, दस बैंड और 13 प्रीसेट</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-cassette.webp" type="image/webp"><img src="../assets/player-cassette.png" alt="कैसेट प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>कैसेट प्लेयर, चलती हुई टेप</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/look-and-feel.webp" type="image/webp"><img src="../assets/look-and-feel.png" alt="रूप-रंग" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>रूप-रंग, लाइव प्रीव्यू के साथ</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/player-video-art.webp" type="image/webp"><img src="../assets/player-video-art.png" alt="वीडियो कवर प्लेयर" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>वीडियो कवर, कंट्रोल के पीछे म्यूज़िक वीडियो</p></figure>
+      <figure aria-hidden="true" class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/settings.webp" type="image/webp"><img src="../assets/settings.png" alt="सेटिंग्स" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>सेटिंग्स</p></figure>
+      </div>
+    </div>
+
+    <h3 class="sub rise">डेस्कटॉप पर</h3>
+    <div class="rail rise">
+      <div class="track" style="--dur:46s">
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><picture><source srcset="../assets/desktop/home.webp" type="image/webp"><img src="../assets/desktop/home.png" alt="Blazify डेस्कटॉप होम" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>होम</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - अभी चल रहा है</span></div><picture><source srcset="../assets/desktop/player-and-audio.webp" type="image/webp"><img src="../assets/desktop/player-and-audio.png" alt="डेस्कटॉप प्लेयर" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>प्लेयर और ऑडियो</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - लिरिक्स</span></div><picture><source srcset="../assets/desktop/lyrics.webp" type="image/webp"><img src="../assets/desktop/lyrics.png" alt="डेस्कटॉप पर लिरिक्स" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>फ़ुल-स्क्रीन लिरिक्स</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - पॉडकास्ट</span></div><picture><source srcset="../assets/desktop/podcasts.webp" type="image/webp"><img src="../assets/desktop/podcasts.png" alt="पॉडकास्ट" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>पॉडकास्ट, चैप्टर और ट्रांसक्रिप्ट</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - लाइब्रेरी</span></div><picture><source srcset="../assets/desktop/kept-as-you-listen.webp" type="image/webp"><img src="../assets/desktop/kept-as-you-listen.png" alt="सुनते-सुनते सहेजा गया" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>सुनते-सुनते सहेजा गया</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - सेटिंग्स</span></div><picture><source srcset="../assets/desktop/look-and-feel.webp" type="image/webp"><img src="../assets/desktop/look-and-feel.png" alt="डेस्कटॉप पर रूप-रंग" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>रूप-रंग</p></figure>
+      <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - प्लेयर</span></div><picture><source srcset="../assets/desktop/player-looks.webp" type="image/webp"><img src="../assets/desktop/player-looks.png" alt="प्लेयर डिज़ाइन" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>पाँच प्लेयर डिज़ाइन</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><picture><source srcset="../assets/desktop/home.webp" type="image/webp"><img src="../assets/desktop/home.png" alt="Blazify डेस्कटॉप होम" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>होम</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - अभी चल रहा है</span></div><picture><source srcset="../assets/desktop/player-and-audio.webp" type="image/webp"><img src="../assets/desktop/player-and-audio.png" alt="डेस्कटॉप प्लेयर" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>प्लेयर और ऑडियो</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - लिरिक्स</span></div><picture><source srcset="../assets/desktop/lyrics.webp" type="image/webp"><img src="../assets/desktop/lyrics.png" alt="डेस्कटॉप पर लिरिक्स" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>फ़ुल-स्क्रीन लिरिक्स</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - पॉडकास्ट</span></div><picture><source srcset="../assets/desktop/podcasts.webp" type="image/webp"><img src="../assets/desktop/podcasts.png" alt="पॉडकास्ट" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>पॉडकास्ट, चैप्टर और ट्रांसक्रिप्ट</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - लाइब्रेरी</span></div><picture><source srcset="../assets/desktop/kept-as-you-listen.webp" type="image/webp"><img src="../assets/desktop/kept-as-you-listen.png" alt="सुनते-सुनते सहेजा गया" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>सुनते-सुनते सहेजा गया</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - सेटिंग्स</span></div><picture><source srcset="../assets/desktop/look-and-feel.webp" type="image/webp"><img src="../assets/desktop/look-and-feel.png" alt="डेस्कटॉप पर रूप-रंग" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>रूप-रंग</p></figure>
+      <figure aria-hidden="true" class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - प्लेयर</span></div><picture><source srcset="../assets/desktop/player-looks.webp" type="image/webp"><img src="../assets/desktop/player-looks.png" alt="प्लेयर डिज़ाइन" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>पाँच प्लेयर डिज़ाइन</p></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="lyrics">
+  <div class="shell">
+    <h2 class="title rise">बोल, <em>ठीक वैसे ही जैसे गाए जाते हैं</em></h2>
+    <p class="lede rise">आगे खिसकता हुआ कोई टेक्स्ट का ढेर नहीं। हर शब्द अपनी बीट पर जगमगाता है। और रंग आर्टवर्क से आता है, इसलिए हर गाने पर ऐप अलग दिखता है।</p>
+    <div class="stage rise" id="stage">
+      <div class="now">
+        <div class="art"><span class="vinyl"></span></div>
+        <div>
+          <p class="t" id="dTitle">Ember</p>
+          <p class="a" id="dArtist">Blazify डेमो</p>
+        </div>
+        <div>
+          <div class="bar"><i id="dBar"></i></div>
+          <div class="times"><span id="dNow">0:00</span><span id="dEnd">0:18</span></div>
+        </div>
+      </div>
+      <div class="words">
+        <span class="tag">लाइव डेमो</span>
+        <div class="lines" id="dLines"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="faq">
+  <div class="shell">
+    <h2 class="title rise">जायज़ <em>सवाल</em></h2>
+    <p class="lede rise">आपसे इंटरनेट पर किसी अनजान व्यक्ति की बनाई चीज़ इंस्टॉल करने को कहा जा रहा है। ये रहे जवाब।</p>
+
+    <div class="qa">
+      <details class="rise"><summary>क्या यह सुरक्षित है?</summary>
+        <p>इसकी हर लाइन सबके सामने है। आप सोर्स कोड पढ़ सकते हैं, उसे खुद बिल्ड कर सकते हैं, और डाउनलोड की गई फ़ाइल को बिल्ड से बनी फ़ाइल से मिलाकर जाँच सकते हैं। Play Store के लगभग किसी भी ऐप के साथ आप इतना नहीं कर सकते।</p>
+        <p>यह ऐसी कोई अनुमति नहीं माँगता जिसका इस्तेमाल न करता हो, इसमें किसी भी तरह की विज्ञापन या एनालिटिक्स लाइब्रेरी नहीं है, और यह आपकी खुद चालू की गई सेवाओं के सिवा कहीं कुछ नहीं भेजता।</p>
+        <p>हर रिलीज़ में उस की (key) का फ़िंगरप्रिंट होता है जिससे वह साइन हुई है, और हर फ़ाइल का चेकसम भी, ताकि आप जाँच सकें कि आपने जो इंस्टॉल किया वह यहीं से आया है।</p></details>
+
+      <details class="rise"><summary>यह Play Store पर क्यों नहीं है?</summary>
+        <p>YouTube से ऑडियो स्ट्रीम करने वाले ऐप वहाँ से हटा दिए जाते हैं। इसी वजह से इस कैटेगरी का कोई भी प्लेयर वहाँ नहीं है। यह डिस्ट्रीब्यूशन का नियम है, ऐप के बारे में कोई फ़ैसला नहीं।</p></details>
+
+      <details class="rise"><summary>Android मुझे चेतावनी क्यों देता है?</summary>
+        <p>Android यह चेतावनी हर उस ऐप के लिए दिखाता है जो किसी स्टोर से इंस्टॉल नहीं हुआ, चाहे उसे किसी ने भी बनाया हो। वह आपको बता रहा है कि फ़ाइल की किसी ने जाँच नहीं की। यह सच है, और ठीक इसीलिए सोर्स कोड का सबके सामने होना मायने रखता है।</p></details>
+
+      <details class="rise"><summary>क्या इसके लिए रूट चाहिए?</summary>
+        <p>नहीं। यह एक आम ऐप है और Android 8.0 या उससे नए किसी भी फ़ोन पर चलता है।</p></details>
+
+      <details class="rise"><summary>अपडेट कैसे मिलेंगे?</summary>
+        <p>Blazify खुद अपडेट देखता है, और नया वर्शन आने पर उसे डाउनलोड और इंस्टॉल करने का विकल्प देता है। नए वर्शन सबसे पहले आज़माने के लिए सेटिंग्स › अपडेटर में बीटा अपडेट पाएँ चालू करें।</p>
+        <p>अगर आप चाहते हैं कि आपके सभी साइडलोड किए गए ऐप एक ही ऐप संभाले, तो <a href="https://github.com/ImranR98/Obtainium">Obtainium</a> इस प्रोजेक्ट पर नज़र रखता है और आपके लिए इसे अपडेट करता है।</p></details>
+
+      <details class="rise"><summary>क्या साइन इन करना ज़रूरी है?</summary>
+        <p>नहीं। सर्च, प्लेबैक, डाउनलोड, लिरिक्स और इक्वलाइज़र, सब बिना अकाउंट के चलते हैं।</p>
+        <p>Google से साइन इन करने पर आपकी अपनी YouTube Music लाइब्रेरी, प्लेलिस्ट और हिस्ट्री जुड़ जाती है, और सुझाव उसी पर आधारित होते हैं जो आप सच में सुनते हैं। यह पूरी तरह वैकल्पिक है और आप कभी भी साइन आउट कर सकते हैं।</p></details>
+
+      <details class="rise"><summary>क्या इससे बैटरी जल्दी खत्म होगी?</summary>
+        <p>किसी भी म्यूज़िक प्लेयर से ज़्यादा नहीं। यह सिर्फ़ ऑडियो स्ट्रीम करता है, वीडियो कभी नहीं, इसलिए YouTube पर वही गाना देखने के मुकाबले कम डेटा और कम बैटरी खर्च होती है।</p></details>
+
+      <details class="rise"><summary>इसकी कीमत क्या है?</summary>
+        <p>कुछ नहीं, और इसके अंदर खरीदने को भी कुछ नहीं है। न विज्ञापन, न सब्सक्रिप्शन, न कोई पेड प्लान। यह GPL-3.0 लाइसेंस के तहत फ़्री सॉफ़्टवेयर है।</p></details>
+    </div>
+  </div>
+</section>
+
+
+<section id="features">
+  <div class="shell">
+    <h2 class="title rise">सब कुछ, <em>फ़ालतू कुछ नहीं</em></h2>
+    <p class="lede rise">वो सब जो एक म्यूज़िक प्लेयर को करना चाहिए, और अच्छे से। बिना साइन इन के चलता है; जब आप चाहें, तब साइन इन करता है।</p>
+
+    <div class="feat">
+      <div class="f rise"><svg class="ic"><use href="#i-search"/></svg><h4>लाखों गाने</h4><p>नाम से खोजें, या गाने, एल्बम, कलाकार और प्लेलिस्ट ब्राउज़ करें।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-devices"/></svg><h4>आपके फ़ोन में पहले से मौजूद संगीत</h4><p>एक फ़ोल्डर चुनें और आपकी अपनी फ़ाइलें बाकी सब के साथ, उसी कतार में, उसी इक्वलाइज़र के साथ चलेंगी। जिन ट्रैक का कवर नहीं है, उनके लिए कवर ढूँढ़ लिया जाता है।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-mic"/></svg><h4>सिंक लिरिक्स</h4><p>शब्द-दर-शब्द हाइलाइटिंग, अनुवाद और रोमन लिपि के साथ।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-eq"/></svg><h4>दस-बैंड इक्वलाइज़र</h4><p>तेरह प्रीसेट, लाइव रिस्पॉन्स कर्व, बेस बूस्ट और रिवर्ब।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-down"/></svg><h4>ऑफ़लाइन डाउनलोड</h4><p>कुछ भी बाद के लिए रख लें, या गाने चलाते-चलाते सहेजने दें। चाहें तो सिर्फ़ Wi-Fi पर।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-gap"/></svg><h4>बिना रुकावट प्लेबैक</h4><p>मौजूदा गाना खत्म होने से पहले ही अगला ट्रैक तैयार रहता है।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-palette"/></svg><h4>आपके रंग</h4><p>Material You, या सीधे एल्बम आर्टवर्क से लिया गया रंग।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-users"/></svg><h4>साथ में सुनें</h4><p>एक रूम कोड शेयर करें और दोस्तों के साथ सिंक में सुनें।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-save"/></svg><h4>बैकअप और रीस्टोर</h4><p>आपकी पूरी लाइब्रेरी एक ही फ़ाइल में। उसे किसी भी डिवाइस पर ले जाएँ।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-account"/></svg><h4>चाहें तो साइन इन करें</h4><p>वैकल्पिक। Google से साइन इन करें, और सुझाव समझने लगेंगे कि आप असल में क्या सुनते हैं।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-sync"/></svg><h4>YouTube Music के साथ सिंक</h4><p>आपकी लाइब्रेरी, प्लेलिस्ट, लाइक और हिस्ट्री, आपके फ़ोन, डेस्कटॉप और वेब पर एक जैसी।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-list"/></svg><h4>साथ चलने वाली प्लेलिस्ट</h4><p>नई बनाएँ, उन्हें एडिट करें, या जो पहले से हैं उन्हें चलाएँ। बदलाव दोनों तरफ़ लागू होते हैं।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-radio"/></svg><h4>किसी से भी रेडियो</h4><p>जब आप चाहें कि संगीत चलता रहे, तो किसी भी गाने, कलाकार या एल्बम से कभी न रुकने वाला स्टेशन शुरू करें।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-ban"/></svg><h4>जो गाने आप छोड़ना चाहें</h4><p>एक बार यह गाना न चलाएँ पर टैप करें, और वह आपकी कतारों, रेडियो और सुझावों से दूर रहेगा।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-bgplay"/></svg><h4>डबल-टैप से आगे-पीछे</h4><p>हर प्लेयर डिज़ाइन में, आगे या पीछे, जितना आप चाहें।</p></div>
+      <div class="f rise"><svg class="ic"><use href="#i-head"/></svg><h4>पॉडकास्ट आपकी रफ़्तार से</h4><p>हर शो अपनी प्लेबैक स्पीड याद रखता है, जबकि संगीत सामान्य स्पीड पर ही चलता है।</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="shell">
+    <h2 class="title rise"><em>पैसे वाले ऐप्स</em> के मुकाबले</h2>
+    <p class="lede rise">Blazify कहाँ आगे है और कहाँ नहीं। कुछ भी इंस्टॉल करने से पहले दोनों जानना ज़रूरी है।</p>
+
+    <div class="cmp rise">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col" class="us">Blazify</th>
+            <th scope="col">Spotify Free</th>
+            <th scope="col">Spotify Premium</th>
+            <th scope="col">YouTube Music Premium</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">कीमत</th><td class="us"><span class="y">मुफ़्त</span></td><td>मुफ़्त</td><td>हर महीने भुगतान</td><td>हर महीने भुगतान</td></tr>
+          <tr><th scope="row">विज्ञापन</th><td class="us"><span class="y">कोई नहीं</span></td><td>गानों के बीच में</td><td>कोई नहीं</td><td>कोई नहीं</td></tr>
+          <tr><th scope="row">कोई भी गाना जब चाहें चलाएँ</th><td class="us"><span class="y">हाँ</span></td><td>मोबाइल पर ज़्यादातर शफ़ल</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">ऑफ़लाइन डाउनलोड</th><td class="us"><span class="y">हाँ</span></td><td><span class="n">नहीं</span></td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">स्क्रीन बंद होने पर भी चलता है</th><td class="us"><span class="y">हाँ</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">सिंक लिरिक्स</th><td class="us"><span class="y">शब्द-दर-शब्द</span></td><td>लाइन-दर-लाइन</td><td>लाइन-दर-लाइन</td><td>लाइन-दर-लाइन</td></tr>
+          <tr><th scope="row">इक्वलाइज़र</th><td class="us"><span class="y">दस बैंड, 13 प्रीसेट</span></td><td>पाँच बैंड</td><td>पाँच बैंड</td><td><span class="n">कोई नहीं</span></td></tr>
+          <tr><th scope="row">अकाउंट ज़रूरी</th><td class="us"><span class="y">नहीं</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">ट्रैकिंग और एनालिटिक्स</th><td class="us"><span class="y">कोई नहीं</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">पढ़ने लायक सोर्स कोड</th><td class="us"><span class="y">हाँ, GPL-3.0</span></td><td><span class="n">नहीं</span></td><td><span class="n">नहीं</span></td><td><span class="n">नहीं</span></td></tr>
+          <tr><th scope="row">Google Play पर</th><td class="us"><span class="n">नहीं, साइडलोड</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">TV, वॉच और स्पीकर ऐप</th><td class="us"><span class="n">सिर्फ़ Android Auto</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+          <tr><th scope="row">डेस्कटॉप और iPhone पर भी</th><td class="us"><span class="y">हाँ</span></td><td>हाँ</td><td>हाँ</td><td>हाँ</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section id="why">
+  <div class="shell">
+    <h2 class="title rise"><em>एक और</em> क्यों</h2>
+    <p class="lede rise">ओपन-सोर्स म्यूज़िक प्लेयर तो दर्जनों हैं। यह रहा जो इस प्लेयर को सच में अलग बनाता है, उस हिस्से समेत जो बहुत तारीफ़ के लायक नहीं है।</p>
+
+    <div class="prose rise">
+      <p>YouTube से स्ट्रीम करने वाला लगभग हर ओपन-सोर्स म्यूज़िक प्लेयर एक ही नींव पर बना है, और उसके साथ उसकी सबसे बड़ी खामी भी विरासत में पाता है: जब भी YouTube अपनी तरफ़ कुछ बदलता है, <b>गाने बीच में रुक जाते हैं, या शुरू ही नहीं होते</b>। अगर आपने इनमें से कोई ऐप आज़माया और चुपचाप छोड़ दिया, तो लगभग पक्का यही हुआ था।</p>
+
+      <p>यहाँ ज़्यादातर मेहनत इसी पर लगी है। प्लेयर ऐसी ऑडियो स्ट्रीम माँग रहा था जिन्हें डिकोड करने का उसके पास कोई तरीका ही नहीं था, और इससे एक ऐसे चरण पर इनकार तय था जो कोई एरर दिखाता ही नहीं था। तीन बैकअप रास्तों में से दो हर गाने के लिए चुपचाप खाली लौट रहे थे, क्योंकि जिस कंपोनेंट पर वे टिके थे, उसे डेटा लाने के लिए कभी कुछ दिया ही नहीं गया था। दोनों ठीक कर दिए गए हैं। यह कोई एक बग नहीं, बल्कि लगातार चलने वाली होड़ है, इसलिए असली बात यह नहीं कि आज यह चल रहा है, बल्कि यह कि अगली बार टूटने पर यह कितनी जल्दी ठीक होता है।</p>
+
+      <p>दूसरा फ़र्क है पहुँच। <b>इनमें से लगभग सभी सिर्फ़ एक प्लेटफ़ॉर्म पर चलते हैं।</b> Blazify, Android, Windows, Linux और iPhone पर एक ही प्रोजेक्ट है, जिसे काठमांडू में एक ही व्यक्ति लिखता है, जहाँ कनेक्शन का टूटना आम बात है और मोबाइल डेटा सस्ता नहीं है। इसीलिए आपके फ़ोन का संगीत स्ट्रीम होने वाली हर चीज़ के साथ चलता है, और इसीलिए ऑफ़लाइन कभी बाद का ख्याल नहीं रहा।</p>
+
+      <p>यह <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" rel="noopener">GPL-3.0</a> के तहत है, इसलिए आप इसकी हर लाइन पढ़ सकते हैं। प्लेबैक <a href="https://developer.android.com/media/media3" rel="noopener">Media3</a> पर चलता है, लिरिक्स दूसरे स्रोतों के साथ <a href="https://lrclib.net" rel="noopener">LrcLib</a> से आते हैं, और इसे <a href="https://f-droid.org" rel="noopener">F-Droid</a> पर भेजा गया है, जिसके बिल्ड सर्वर इसे सोर्स से कंपाइल करते हैं और जाँचते हैं कि नतीजा यहाँ प्रकाशित फ़ाइल से मेल खाता है।</p>
+    </div>
+  </div>
+</section>
+<section id="roadmap">
+  <div class="shell">
+    <h2 class="title rise"><em>आगे क्या आ रहा है</em></h2>
+    <p class="lede rise">Blazify सबके सामने बनता है, और आगे क्या आएगा, यह इसे इस्तेमाल करने वाले तय करते हैं। नीचे के हर आइडिया की अपनी पोस्ट है। जो आप चाहते हैं उन्हें अपवोट करें, और सबसे ज़्यादा माँगे गए पहले बनेंगे।</p>
+
+    <div class="rm-lanes">
+      <div class="rm-lane next rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>अभी-अभी रिलीज़<small>9.16.0</small></h3>
+        <p>अब उपलब्ध। सेटिंग्स › अपडेटर से अपडेट करें, या ऊपर से डाउनलोड करें।</p>
+        <ul>
+          <li><div class="rm-row"><span><b>वीडियो कवर प्लेयर</b><small>प्लेयर के पीछे गाने का अपना वीडियो, ताल से ताल मिलाता और म्यूट</small></span></div></li>
+          <li><div class="rm-row"><span><b>Spotify से इम्पोर्ट</b><small>शेयर लिंक पेस्ट करें और प्लेलिस्ट फिर से बन जाएगी</small></span></div></li>
+          <li><div class="rm-row"><span><b>बातचीत छोड़ें</b><small>SponsorBlock, लिरिक्स भी उसी हिसाब से खिसकते हैं</small></span></div></li>
+          <li><div class="rm-row"><span><b>रेडियो स्टेशन चलते हैं</b><small>लाइव प्रसारण, ऑन एयर रहते हुए "लाइव" लिखा दिखता है</small></span></div></li>
+          <li><div class="rm-row"><span><b>कलाकार को ब्लॉक करें</b><small>होम, सर्च, सुझावों और रेडियो से बाहर</small></span></div></li>
+          <li><div class="rm-row"><span><b>स्वाइप करके अगला चलाएँ</b><small>एक फ़्लिक में गाना कतार में ऊपर</small></span></div></li>
+          <li><div class="rm-row"><span><b>प्लेलिस्ट शेयर करें</b><small>लिंक या QR कोड के रूप में</small></span></div></li>
+          <li><div class="rm-row"><span><b>लैंडस्केप, ठीक से</b><small>हर प्लेयर डिज़ाइन आड़े पकड़े फ़ोन के लिए सजाया गया</small></span></div></li>
+          <li><div class="rm-row"><span><b>15 और भाषाएँ</b><small>स्पैनिश, पुर्तगाली, हिंदी, अरबी, चीनी और भी बहुत कुछ</small></span></div></li>
+        </ul>
+      </div>
+
+      <div class="rm-lane planned rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>तय है<small>3 आइडिया</small></h3>
+        <p>तय हो चुके हैं, अपनी बारी का इंतज़ार कर रहे हैं। क्रम वोट तय करते हैं।</p>
+        <ul>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/14" rel="noopener"><span><b>Search inside lyrics</b><small>Find a line and jump to it</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/9" rel="noopener"><span><b>New release alerts</b><small>From artists you follow</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/11" rel="noopener"><span><b>More than one account</b><small>Switch without signing out</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+        </ul>
+      </div>
+
+      <div class="rm-lane considering rise">
+        <h3 class="rm-h"><span class="rm-dot" aria-hidden="true"></span>विचाराधीन<small>3 आइडिया</small></h3>
+        <p>अभी तय नहीं हुआ। पर्याप्त वोट मिलने पर आइडिया "तय है" में पहुँच जाता है।</p>
+        <ul>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/8" rel="noopener"><span><b>Animated art and video</b><small>Moving covers, and the music video</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/7" rel="noopener"><span><b>Android TV</b><small>Big-screen, remote-friendly</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+          <li><a class="rm-row" href="https://github.com/rajendra7169/blazify/discussions/6" rel="noopener"><span><b>Your own music server</b><small>Jellyfin, Navidrome, Subsonic</small></span><span class="rm-vote"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rm-cta rise">
+      <a class="rm-primary" href="https://github.com/rajendra7169/blazify/discussions/categories/ideas" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>Vote on ideas</a><a href="https://github.com/rajendra7169/blazify/discussions/17" rel="noopener">चुनें कि पहले क्या बने</a> <a href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml" rel="noopener">फ़ीचर सुझाएँ</a> <a href="https://github.com/rajendra7169/blazify/blob/main/ROADMAP.md" rel="noopener">पूरा रोडमैप</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <div class="band rise">
+      <h2>न विज्ञापन। न ट्रैकिंग।</h2>
+      <p>Blazify में किसी भी तरह का विज्ञापन, एनालिटिक्स या ट्रैकिंग लाइब्रेरी नहीं है। आपकी खुद चालू की गई सेवाओं के सिवा कहीं कुछ नहीं भेजा जाता। साइन इन करना वैकल्पिक है। लगभग सब कुछ बिना अकाउंट के काम करता है।</p>
+    </div>
+  </div>
+</section>
+
+
+<section style="padding-top:0">
+  <div class="shell">
+    <div class="maker rise">
+      <div class="por"><picture><source srcset="../assets/dev.webp" type="image/webp"><img src="../assets/dev.jpg" alt="Rajendra Pandey" width="460" height="460" loading="lazy" decoding="async"></picture></div>
+      <div>
+        <h3>Rajendra Pandey</h3>
+        <div class="role">डेवलपर · काठमांडू, नेपाल</div>
+        <p>मैंने Blazify इसलिए बनाया क्योंकि जो भी म्यूज़िक ऐप मैंने आज़माया, वह मेरा पैसा, मेरा ध्यान या मेरा डेटा चाहता था। अक्सर तीनों। यह इनमें से कुछ नहीं माँगता। यह सबके सामने लिखा जाता है, हमेशा मुफ़्त रहेगा, और हर रिलीज़ किसी और तक पहुँचने से पहले मेरे अपने फ़ोन पर टेस्ट होती है।</p>
+        <div class="links">
+          <a href="https://github.com/rajendra7169">GitHub</a> <a href="https://www.rajendrapandey.info.np/">वेबसाइट</a> <a href="https://www.instagram.com/raja.indra7169">Instagram</a> <a href="https://github.com/rajendra7169/blazify/blob/main/ROADMAP.md">रोडमैप</a> <a href="https://github.com/rajendra7169/blazify/issues">बग रिपोर्ट करें</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="grow" class="hg">
+  <div class="shell">
+    <h2 class="title rise">Blazify को <em>आगे बढ़ाइए</em></h2>
+    <p class="lede rise">Blazify पसंद आ रहा है? इसे एक ही व्यक्ति बनाता है और यह लोगों की ज़ुबानी फैलता है, इसलिए इनमें से हर कदम सच में फ़र्क डालता है। ज़्यादातर में एक मिनट से भी कम लगता है।</p>
+
+    <div class="feat">
+      <a class="f rise" href="https://github.com/rajendra7169/blazify" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>
+        <h4>GitHub पर स्टार दें<span class="hg-count" id="helpStars" hidden></span></h4>
+        <p>बस एक टैप। स्टार देखकर ही नए लोग तय करते हैं कि कोई ओपन-सोर्स ऐप आज़माने लायक है या नहीं।</p>
+        <span class="hg-go">Star Blazify</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify/issues/new?template=bug_report.yml" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-bug"/></svg>
+        <h4>बग रिपोर्ट करें</h4>
+        <p>कुछ गड़बड़ है? फ़ॉर्म में एक मिनट लगता है, और सिर्फ़ एक खाना भरना ज़रूरी है।</p>
+        <span class="hg-go">Report a bug</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg>
+        <h4>फ़ीचर सुझाएँ</h4>
+        <p>बताइए क्या कमी है, या रोडमैप पर पहले से मौजूद किसी आइडिया को अपवोट करें।</p>
+        <span class="hg-go">Suggest a feature</span>
+      </a>
+      <a class="f rise" href="https://rajendra7169.github.io/blazify/" id="shareBlazify" role="button">
+        <svg class="ic" aria-hidden="true"><use href="#i-share"/></svg>
+        <h4>Blazify शेयर करें</h4>
+        <p>इसे उस दोस्त को भेजें जो विज्ञापनों से तंग आ चुका है। ज़्यादातर लोग Blazify तक ऐसे ही पहुँचते हैं।</p>
+        <span class="hg-go" id="shareLabel" aria-live="polite">Share the link</span>
+      </a>
+      <a class="f rise" href="https://github.com/rajendra7169/blazify" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-code"/></svg>
+        <h4>योगदान दें</h4>
+        <p>कोई बग ठीक करें, किसी स्क्रीन को निखारें या नए बिल्ड टेस्ट करने में मदद करें। पुल रिक्वेस्ट और UI/UX आइडिया, दोनों का स्वागत है।</p>
+        <span class="hg-go">सोर्स कोड देखें</span>
+      </a>
+      <div class="f rise">
+        <svg class="ic" aria-hidden="true"><use href="#i-users"/></svg>
+        <h4>हमारी कम्युनिटी से जुड़ें</h4>
+        <p>खबरों के लिए WhatsApp चैनल फ़ॉलो करें, और कुछ भी पूछना हो तो चर्चाओं में पूछें।</p>
+        <div class="hg-links">
+          <a href="https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y" rel="noopener">WhatsApp चैनल</a> <a href="https://github.com/rajendra7169/blazify/discussions" rel="noopener">चर्चाएँ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mp" id="mp" role="complementary" aria-label="Blazify पाएँ">
+  <span class="cover" aria-hidden="true"></span> <span class="txt"><b>Blazify</b><span>सुनिए। महसूस कीजिए। धूम मचाइए।</span></span> <span class="wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span> <a class="go" href="#get">मुफ़्त पाएँ</a>
+</div>
+
+<dialog class="guide" id="guide">
+  <div class="guide-head">
+    <svg class="mark" id="guideMark" viewBox="0 0 24 24" aria-hidden="true"></svg>
+    <h3 id="guideTitle"></h3>
+    <button type="button" id="guideClose" aria-label="बंद करें">&times;</button>
+  </div>
+  <div class="guide-body" id="guideBody"></div>
+</dialog>
+
+<button class="totop" id="toTop" type="button" aria-label="ऊपर जाएँ"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg></button>
+
+<footer>
+  <div class="shell">
+    <div class="f-grid">
+      <div class="f-col" style="max-width:300px">
+        <a class="brand" href="#top" style="margin-bottom:14px"><picture><source srcset="../assets/logo-512.webp" type="image/webp"><img src="../assets/logo-512.png" alt="" width="512" height="512"></picture><span>BLAZIFY</span></a>
+        <p style="color:var(--dim);font-size:15px;margin:0">सुनिए। महसूस कीजिए। धूम मचाइए।<br>नेपाल में बना।</p>
+      </div>
+      <div class="f-col">
+        <h5>डाउनलोड</h5>
+        <a href="https://github.com/rajendra7169/blazify/releases/latest">Android</a> <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Windows</a> <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest">Linux</a> <a href="https://github.com/rajendra7169/blazify-ios">iPhone</a> <a href="https://apkpure.com/blazify/com.blazify.music" rel="noopener">APKPure</a> <a href="https://appteka.store/app/b16r317210" rel="noopener">Appteka</a>
+      </div>
+      <div class="f-col">
+        <h5>प्रोजेक्ट</h5>
+        <a href="https://github.com/rajendra7169/blazify">सोर्स कोड</a> <a href="https://github.com/rajendra7169/blazify/blob/main/LICENSE">लाइसेंस</a> <a href="../privacy/">गोपनीयता नीति</a> <a href="https://github.com/rajendra7169/blazify/issues">बग रिपोर्ट करें</a>
+      </div>
+      <div class="f-col">
+        <h5>कम्युनिटी</h5>
+        <a href="https://whatsapp.com/channel/0029VbDTBZy8F2pEkp0ERZ2Y" rel="noopener">WhatsApp चैनल</a> <a href="https://github.com/rajendra7169/blazify/discussions">चर्चाएँ</a> <a href="https://github.com/rajendra7169/blazify/discussions/categories/ideas">आइडिया पर वोट करें</a> <a href="#grow">Blazify को आगे बढ़ाइए</a>
+      </div>
+      <div class="f-col">
+        <h5>लेखक</h5>
+        <a href="https://www.rajendrapandey.info.np/">वेबसाइट</a> <a href="https://github.com/rajendra7169">GitHub</a> <a href="https://www.instagram.com/raja.indra7169">Instagram</a>
+      </div>
+    </div>
+    <div class="f-bot">
+      <span>© 2026 Rajendra Pandey · GPL-3.0</span> <span>फ़्री सॉफ़्टवेयर, और बिल्कुल मुफ़्त, जब तक यह है।</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// equaliser bars, varied in height and offset so it reads as sound, not a loader
+const eq = document.querySelector('.eq');
+if (eq) {
+  for (let i = 0; i < 22; i++) {
+    const b = document.createElement('b');
+    b.style.animationDelay = (Math.random() * -1.1) + 's';
+    b.style.animationDuration = (0.7 + Math.random() * 0.8) + 's';
+    eq.appendChild(b);
+  }
+}
+
+
+/* ── the lyrics demo ───────────────────────────────────────────────
+   Original lines, deliberately: reproducing real song lyrics on a public
+   page is somebody else's copyright, and what this shows off is the
+   timing, not the writing. Three "tracks" so the colour change, which
+   is how the app treats real album art, is visible without waiting. */
+(function () {
+  const stage = document.getElementById('stage');
+  if (!stage) return;
+
+  const tracks = [
+    { title: 'Ember',        artist: 'Blazify demo', accent: '#FFA726',
+      lines: [['Turn','the','night','a','little','louder'],
+              ['every','ember','finds','its','air'],
+              ['and','the','quiet','gets','a','colour'],
+              ['when','you','put','the','music','there']] },
+    { title: 'Kathmandu Blue', artist: 'Blazify demo', accent: '#5AA9E6',
+      lines: [['Rain','across','the','valley','floor'],
+              ['a','city','humming','in','the','grey'],
+              ['every','rooftop','keeping','time'],
+              ['until','the','morning','finds','its','way']] },
+    { title: 'Slow Green',   artist: 'Blazify demo', accent: '#4FD18B',
+      lines: [['Nothing','here','is','in','a','hurry'],
+              ['let','the','record','take','its','turn'],
+              ['there','is','no','one','left','to','answer'],
+              ['and','no','minute','left','to','earn']] },
+  ];
+
+  const linesEl = document.getElementById('dLines');
+  const bar = document.getElementById('dBar');
+  const tNow = document.getElementById('dNow');
+  const tEnd = document.getElementById('dEnd');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const WORD = 0.30, LINE_GAP = 0.55, LEAD = 1.1;
+  let ti = -1, t0 = 0, total = 0, plan = [];
+
+  const clock = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+  function load(i) {
+    const tr = tracks[i];
+    stage.style.setProperty('--accent', tr.accent);
+    document.getElementById('dTitle').textContent = tr.title;
+    document.getElementById('dArtist').textContent = tr.artist;
+
+    linesEl.innerHTML = '';
+    plan = [];
+    let clockAt = LEAD;
+    tr.lines.forEach(words => {
+      const div = document.createElement('div');
+      div.className = 'ln';
+      const spans = words.map((w, k) => {
+        const el = document.createElement('w');
+        el.textContent = w + (k < words.length - 1 ? ' ' : '');
+        div.appendChild(el);
+        return el;
+      });
+      linesEl.appendChild(div);
+      plan.push({ el: div, spans, start: clockAt, end: clockAt + words.length * WORD });
+      clockAt += words.length * WORD + LINE_GAP;
+    });
+    total = clockAt + 1.2;
+    tEnd.textContent = clock(total);
+    t0 = performance.now();
+  }
+
+  function frame(now) {
+    const t = (now - t0) / 1000;
+    if (t >= total) { ti = (ti + 1) % tracks.length; load(ti); requestAnimationFrame(frame); return; }
+
+    bar.style.width = Math.min(100, (t / total) * 100) + '%';
+    tNow.textContent = clock(t);
+
+    let active = -1;
+    plan.forEach((ln, i) => {
+      const on = t >= ln.start && t < ln.end + LINE_GAP;
+      ln.el.classList.toggle('on', on);
+      if (on) active = i;
+      ln.spans.forEach((sp, k) => sp.classList.toggle('lit', t >= ln.start + k * WORD));
+    });
+
+    // keep the sung line in the middle, the way the app does
+    if (active >= 0) {
+      const box = linesEl.children[active];
+      const shift = box.offsetTop + box.offsetHeight / 2 - linesEl.offsetHeight / 2;
+      linesEl.style.transform = 'translateY(' + (-shift) + 'px)';
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // only run while it is on screen. An animation nobody is looking at is
+  // just a phone getting warm
+  let running = false;
+  new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting && !running) {
+      running = true;
+      ti = 0; load(0);
+      if (still) { plan.forEach(l => { l.el.classList.add('on'); l.spans.forEach(s => s.classList.add('lit')); }); }
+      else requestAnimationFrame(frame);
+    }
+  }), { threshold: .25 }).observe(stage);
+})();
+
+
+/* ── the galleries ─────────────────────────────────────────────────
+   Always drifting, on every screen. A pointer resting on it stops it so
+   a screenshot can be read; a drag takes it over and throws it, and the
+   throw decays back into the drift. On a phone the previous version just
+   stopped being a loop, which is the one place a loop is most useful:
+   there is no hover there to reveal that the rail moves at all. */
+document.querySelectorAll('.rail').forEach(rail => {
+  const track = rail.querySelector('.track');
+  if (!track) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const DRIFT = parseFloat(rail.dataset.speed || 0.75);
+  let x = 0, vel = 0, held = false, hover = false;
+  let lastPointer = 0, lastAt = 0;
+
+  const span = () => (track.scrollWidth + 22) / 2;   // one copy of the set
+
+  function frame() {
+    if (!held) {
+      if (Math.abs(vel) > 0.06) { x += vel; vel *= 0.945; }
+      else if (!hover) { x -= DRIFT; vel = 0; }
+    }
+    const w = span();
+    if (w > 0) { while (x <= -w) x += w; while (x > 0) x -= w; }
+    track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    curve();
+    requestAnimationFrame(frame);
+  }
+  /* Positions are worked out arithmetically rather than measured: every
+     card in a rail is the same width, so reading 26 bounding boxes a frame
+     would buy nothing but layout thrash. */
+  const kids = [...track.children];
+  let step = 0, half = 0;
+  const remeasure = () => {
+    step = kids.length > 1 ? kids[1].offsetLeft - kids[0].offsetLeft : kids[0].offsetWidth;
+    half = kids[0].offsetWidth / 2;
+  };
+  remeasure();
+  addEventListener('resize', remeasure);
+
+  function curve() {
+    if (!step) return;
+    const mid = rail.clientWidth / 2;
+    const reach = mid * 1.25;
+    for (let i = 0; i < kids.length; i++) {
+      const c = x + i * step + half;              // this card's centre in the rail
+      const d = Math.min(1, Math.abs(c - mid) / reach);
+      // Smoothstep rather than a straight line: a card holds its full size
+      // through the middle and falls away toward the edges, so passing the
+      // centre reads as a swell instead of a constant resize. No rotation:
+      // a tilt makes a screenshot harder to actually look at.
+      const e = d * d * (3 - 2 * d);
+      kids[i].style.transform = 'scale(' + (1 - e * 0.15).toFixed(3) + ')';
+      kids[i].style.opacity = (1 - e * 0.34).toFixed(3);
+    }
+  }
+
+  requestAnimationFrame(frame);
+
+  // Hover-to-pause only where a hover actually exists. On a touch screen a
+  // finger scrolling past fires pointerenter and frequently never fires
+  // pointerleave, which left the rail stopped for good after the first
+  // scroll, on the one device where the drift is the only hint it moves.
+  if (matchMedia('(hover: hover)').matches) {
+    rail.addEventListener('pointerenter', () => { hover = true; });
+    rail.addEventListener('pointerleave', () => { hover = false; });
+  }
+
+  rail.addEventListener('pointerdown', e => {
+    held = true; vel = 0; rail.classList.add('dragging');
+    lastPointer = e.clientX; lastAt = performance.now();
+    // a pointer can be gone before this runs; losing capture is survivable,
+    // an exception here would leave the rail stuck mid-drag
+    try { rail.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  rail.addEventListener('pointermove', e => {
+    if (!held) return;
+    const dx = e.clientX - lastPointer;
+    const now = performance.now();
+    const dt = Math.max(1, now - lastAt);
+    x += dx;
+    vel = dx / dt * 16;                    // carry the speed of the flick
+    lastPointer = e.clientX; lastAt = now;
+  });
+
+  const release = () => {
+    if (!held) return;
+    held = false; hover = false;
+    rail.classList.remove('dragging');
+    vel = Math.max(-42, Math.min(42, vel));
+  };
+  rail.addEventListener('pointerup', release);
+  rail.addEventListener('pointercancel', release);
+});
+
+
+/* the page's own seek bar, and a mini player that arrives once the hero
+   is behind you: the same two things the app puts on screen */
+(function () {
+  const bar = document.getElementById('seekBar');
+  const mp  = document.getElementById('mp');
+  const gate = document.getElementById('lyrics');
+  const top = document.getElementById('toTop');
+  const wave = mp && mp.querySelector('.wave');
+  if (wave) [...wave.children].forEach(b => {
+    b.style.animationDelay = (Math.random() * -1) + 's';
+    b.style.animationDuration = (0.6 + Math.random() * 0.7) + 's';
+  });
+  let ticking = false;
+  function paint() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const pct = max > 0 ? (scrollY / max) * 100 : 0;
+    if (bar) bar.style.width = pct.toFixed(2) + '%';
+    // only once the lyrics demo is behind you. Before that the page is
+    // still making its case and a floating button is just in the way
+    if (mp && gate) mp.classList.toggle('up', gate.getBoundingClientRect().bottom < 72);
+    // near the end of the page, where there is nothing left to scroll to
+    if (top) top.classList.toggle('up', scrollY + innerHeight > document.documentElement.scrollHeight - 420);
+    ticking = false;
+  }
+  if (top) top.addEventListener('click', () => {
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+  });
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+
+  // The page grows as deferred images arrive, which moves the bottom away from
+  // under a reader who has already stopped scrolling. No scroll event follows
+  // that, so without this the back-to-top button never appears for anyone who
+  // scrolls straight to the end and waits.
+  if (window.ResizeObserver) new ResizeObserver(paint).observe(document.body);
+  addEventListener('resize', paint, { passive: true });
+  paint();
+})();
+
+
+/* cards lean toward the cursor: depth you feel rather than notice */
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover)').matches) {
+  document.querySelectorAll('.card, .f').forEach(el => {
+    let raf = 0;
+    el.addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        el.style.transform =
+          'perspective(1100px) rotateY(' + (x * 7).toFixed(2) + 'deg) rotateX(' +
+          (-y * 7).toFixed(2) + 'deg) translateY(-6px)';
+        raf = 0;
+      });
+    });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+}
+
+
+/* ── install guides ────────────────────────────────────────────────
+   Written out per platform because the answers genuinely differ. The
+   iPhone one is four times the length of the Android one, which is the
+   whole reason these live behind a button rather than on the cards. */
+(function () {
+  const dlg = document.getElementById('guide');
+  if (!dlg) return;
+
+  const guides = {
+    android: {
+      title: 'Install on Android',
+      mark: '#ga-wrap',
+      steps: [
+        'Tap <b>Download APK</b>. The file saves to your Downloads folder.',
+        'Open the downloaded file.',
+        'Android warns you it came from outside the Play Store. That warning appears for <b>every</b> app installed this way, whoever made it.',
+        'Choose <b>Settings</b> in that prompt, turn on <b>Allow from this source</b>, then go back and tap <b>Install</b>.',
+        'Using <b>Obtainium</b>? Add <code>github.com/rajendra7169/blazify</code> instead and it tracks every release for you.',
+      ],
+      note: 'You only do this once. From then on Blazify checks for new versions itself and installs them for you.',
+    },
+    windows: {
+      title: 'Install on Windows',
+      steps: [
+        'Tap <b>Download for Windows</b>. The installer saves to your Downloads folder.',
+        'Run it. Windows may show a <b>SmartScreen</b> warning because the file is new and unsigned. Click <b>More info</b>, then <b>Run anyway</b>.',
+        'Choose a folder. No administrator password is needed.',
+        'It adds a Start menu entry and a desktop shortcut.',
+      ],
+      note: 'Everything it needs travels inside the package, including the audio library. Installing a newer version upgrades the old one rather than sitting beside it.',
+    },
+    linux: {
+      title: 'Install on Linux',
+      steps: [
+        'Pick the shape that suits your distribution.',
+        '<b>Debian, Ubuntu, Mint, Pop!_OS</b> use the .deb: <code>sudo apt install ./Blazify.deb</code>',
+        '<b>Anywhere else</b> use the AppImage: <code>chmod +x Blazify.AppImage</code> then run it. Nothing is installed.',
+        'The .tar.gz is the same application as a plain folder, if you would rather unpack it yourself.',
+      ],
+      note: 'Use <b>apt</b> rather than <code>dpkg -i</code> for the .deb. Both install the package; only apt resolves what it depends on. The AppImage needs nothing at all, since its audio library travels inside it.',
+    },
+    ios: {
+      title: 'Install on iPhone',
+      steps: [
+        'Blazify is not on the App Store and cannot be, so it is <b>sideloaded</b>. This takes longer than the other platforms, but it is a one-time setup.',
+        'Install <b>SideStore</b> (sidestore.io) or <b>AltStore</b> (altstore.io) and follow their own setup. You sign in with an Apple ID; a free one works.',
+        'Download the Blazify <b>.ipa</b> file.',
+        'Open the .ipa with SideStore or AltStore, and let it install.',
+        'On first launch, go to <b>Settings &rsaquo; General &rsaquo; VPN &amp; Device Management</b> and trust the developer profile.',
+      ],
+      note: 'An app signed with a <b>free</b> Apple ID stops working after <b>seven days</b> and has to be refreshed. SideStore and AltStore do that for you in the background, but only while they can reach your computer. A paid Apple Developer account raises that to a year.',
+    },
+  };
+
+  const body = document.getElementById('guideBody');
+  const title = document.getElementById('guideTitle');
+  let mark = document.getElementById('guideMark');
+
+  document.querySelectorAll('.howto').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = guides[btn.dataset.guide];
+      if (!g) return;
+      title.textContent = g.title;
+      // The platform marks are inline paths, not symbol references, so the
+      // real one is cloned across rather than pointed at.
+      const cardMark = btn.closest('.card').querySelector('svg.mark');
+      if (cardMark) {
+        const copy = cardMark.cloneNode(true);
+        copy.id = 'guideMark';
+        mark.replaceWith(copy);
+        mark = copy;
+      }
+      body.innerHTML =
+        '<ol>' + g.steps.map(x => '<li>' + x + '</li>').join('') + '</ol>' +
+        (g.note ? '<p class="guide-note">' + g.note + '</p>' : '');
+      dlg.showModal();
+    });
+  });
+
+  document.getElementById('guideClose').addEventListener('click', () => dlg.close());
+  // clicking the dark area outside the panel closes it, which is what people try
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+})();
+
+
+/* Where there is more than one file and no sensible default, the button asks
+   rather than guessing: Linux has three package shapes, and Android has the
+   build that can cast to a television and the build with no Google code in it.
+   Windows and iPhone each have one file and go straight to it. */
+(function () {
+  const dlg = document.getElementById('guide');
+  const title = document.getElementById('guideTitle');
+  const body = document.getElementById('guideBody');
+  if (!dlg || !title || !body) return;
+
+  const href = id => {
+    const el = document.getElementById(id);
+    return el ? el.getAttribute('href') : '#';
+  };
+
+  /* The two Android builds, worded for somebody who has never heard of Google
+     Play services. Casting comes first: it is the one people go looking for. */
+  const sizeOf = id => {
+    const el = document.getElementById(id);
+    const size = el && el.getAttribute('data-size');
+    return size ? `<em>${size}</em>` : '';
+  };
+
+  const androidChoices = (castId, plainId) => `
+      <div class="pick">
+        <a href="../${href(castId)}"><span style="flex:1"><b>The usual one</b>
+          <span>For any ordinary phone. Plays your music to a Chromecast, a smart
+          speaker or a television, and carries one small piece of Google's software
+          to do it.</span></span>${sizeOf(castId)}</a>
+        <a href="../${href(plainId)}"><span style="flex:1"><b>Without Google</b>
+          <span>For a phone with no Google services (de-Googled, LineageOS, a Huawei).
+          The same app, without playing to a television.</span></span>${sizeOf(plainId)}</a>
+      </div>
+      <p class="guide-note">Not sure? Take <b>the usual one</b>. Take <b>Without Google</b> only if
+      your phone has no Google services, or you would rather keep them out of it.</p>`;
+
+  const openPicker = (btn, heading, html) => {
+    title.textContent = heading;
+    const card = btn.closest('.card');
+    const src = card && card.querySelector('svg.mark');
+    const mk = document.getElementById('guideMark');
+    if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
+    body.innerHTML = html;
+    dlg.showModal();
+  };
+
+  const android = document.querySelector('[data-pick="android"]');
+  if (android) {
+    android.addEventListener('click', () =>
+      openPicker(android, 'Which Android build?', androidChoices('dlAndroidCast', 'dlAndroidFoss')));
+  }
+
+  /* What is in this beta, taken from the release itself rather than typed here, so the page can
+     never describe a beta that has been replaced. The headings are the release's own. */
+  const betaNotes = document.querySelector('[data-pick="betanotes"]');
+  if (betaNotes) {
+    betaNotes.addEventListener('click', () => {
+      const notes = window.__blazifyBetaNotes;
+      const heading = window.__blazifyBetaName || 'the beta';
+      openPicker(
+        betaNotes,
+        'What has changed',
+        notes && notes.length
+          ? notes.map(part =>
+              `<h4 class="notes-head">${part.title}</h4><ul class="notes">` +
+              part.points.map(point => `<li>${point}</li>`).join('') + '</ul>').join('') +
+            `<p class="guide-note">All of it is coming to the next stable release. ` +
+            `<a href="https://github.com/rajendra7169/blazify/releases/tag/${heading}">Read the full notes</a>.</p>`
+          : `<p class="guide-note">The list lives with the release: ` +
+            `<a href="https://github.com/rajendra7169/blazify/releases">see what has changed</a>.</p>`,
+      );
+    });
+  }
+
+  const btn = document.querySelector('[data-pick="linux"]');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.card');
+    document.getElementById('guideTitle').textContent = 'Choose a package';
+    const src = card.querySelector('svg.mark');
+    let mk = document.getElementById('guideMark');
+    if (src && mk) { const c = src.cloneNode(true); c.id = 'guideMark'; mk.replaceWith(c); }
+    document.getElementById('guideBody').innerHTML = `
+      <div class="pick">
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.deb</b>
+          <span>Debian, Ubuntu, Mint, Pop!_OS. Install with
+          <code>sudo apt install ./Blazify.deb</code></span></span><em>most people</em></a>
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.AppImage</b>
+          <span>Fedora, Arch, openSUSE, or anywhere else. One file, nothing
+          installed, and its audio library travels inside it</span></span><em>any distro</em></a>
+        <a href="https://github.com/rajendra7169/blazify-desktop/releases/latest"><span style="flex:1"><b>.tar.gz</b>
+          <span>The same application as a plain folder, if you would rather
+          unpack it yourself</span></span></a>
+      </div>
+      <p class="guide-note">Not sure? Take the <b>.deb</b> if you are on Ubuntu or
+      anything based on it, and the <b>AppImage</b> otherwise.</p>`;
+    dlg.showModal();
+  });
+})();
+
+
+/* ── the download count, from GitHub rather than from memory ───────
+   A number typed into a page is out of date the day after it is typed.
+   This asks GitHub for the real one across all three projects and counts
+   up to it. If the request fails, or the rate limit is reached, the
+   number already in the markup stays: a slightly stale figure is better
+   than a blank space or a zero.
+
+   Sixty requests an hour is the unauthenticated limit, and it is counted
+   per visitor's own address rather than per site, so a page this size
+   will never approach it. The answer is kept for the session so moving
+   around the page does not re-ask. */
+(function () {
+  const el = document.getElementById('dlCount');
+  if (!el) return;
+
+  const REPOS = ['blazify', 'blazify-desktop', 'blazify-ios'];
+  const KEY = 'blazify-downloads-v2';
+  /* What the page says until GitHub answers, and the least it ever says. GitHub
+     allows each visitor 60 questions an hour and then answers nothing, and a repo
+     that fails counts as none, so a low total here means a refusal, not fewer downloads. */
+  const FLOOR = 5000;
+
+  const show = n => {
+    if (typeof n !== 'number' || !isFinite(n) || n <= FLOOR) return;  // never paint NaN or less over the fallback
+    const from = parseInt(el.textContent.replace(/\D/g, ''), 10) || 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || n === from) {
+      el.textContent = n.toLocaleString();
+      return;
+    }
+    const start = performance.now(), span = 900;
+    const step = now => {
+      const t = Math.min(1, (now - start) / span);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (n - from) * eased).toLocaleString();
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  /* The version on each card used to be typed in by hand, so it was wrong
+     within a day of every release. It is in the same response the counter
+     already asks for, so reading it costs nothing extra. */
+  const setText = (id, text) => { const n = document.getElementById(id); if (n) n.textContent = text; };
+  const mb = bytes => bytes ? Math.round(bytes / 1048576) + ' MB' : null;
+  const newest = set => (set || []).find(r => !r.draft && !r.prerelease) || (set || [])[0];
+
+  /**
+   * Whether tag a is newer than tag b, counting 9.15.0 above 9.15.0-beta.2 and beta.2 above
+   * beta.1: the order the app itself uses when it decides what to offer.
+   */
+  const newerTag = (a, b) => {
+    const split = tag => {
+      const clean = String(tag || '').trim().replace(/^v/, '');
+      const dash = clean.indexOf('-');
+      const core = (dash >= 0 ? clean.slice(0, dash) : clean).split('.').map(n => parseInt(n, 10) || 0);
+      return [core, dash >= 0 ? clean.slice(dash + 1) : null];
+    };
+    const [coreA, preA] = split(a), [coreB, preB] = split(b);
+    for (let i = 0; i < Math.max(coreA.length, coreB.length); i++) {
+      const x = coreA[i] || 0, y = coreB[i] || 0;
+      if (x !== y) return x > y;
+    }
+    if (!preA && !preB) return false;
+    if (!preA) return true;
+    if (!preB) return false;
+    const partsA = preA.split('.'), partsB = preB.split('.');
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      const x = partsA[i], y = partsB[i];
+      if (x === undefined) return false;
+      if (y === undefined) return true;
+      const nx = parseInt(x, 10), ny = parseInt(y, 10);
+      const same = !isNaN(nx) && !isNaN(ny) ? nx === ny : x === y;
+      if (!same) return !isNaN(nx) && !isNaN(ny) ? nx > ny : x > y;
+    }
+    return false;
+  };
+  const asset = (rel, name) => ((rel && rel.assets) || []).find(a => a.name === name);
+
+  /* The count is the whole point of the button: "Star" alone is an ask,
+     "Star 16" is an ask with a number somebody can move. */
+  const applyStars = n => {
+    const el = document.getElementById('starCount');
+    if (!el || typeof n !== 'number' || n <= 0) return;
+    el.textContent = n.toLocaleString();
+    el.hidden = false;
+    const help = document.getElementById('helpStars');
+    if (help) {
+      help.textContent = n.toLocaleString() + (n === 1 ? ' star' : ' stars');
+      help.hidden = false;
+    }
+  };
+
+  /* Two builds of the same release: the one that can cast, and the one with no
+     Google code in it. Their file names carry the version, so the addresses are
+     taken from the release itself rather than guessed. */
+  const setHref = (id, url, size) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url) el.href = url;
+    if (size) el.setAttribute('data-size', size);
+  };
+  const assetLike = (rel, test) => ((rel && rel.assets) || []).find(a => test(a.name));
+  const isGms = n => /-gms/i.test(n) && /\.apk$/i.test(n);
+  const isPlain = n => /\.apk$/i.test(n) && !/-gms|-izzy/i.test(n);
+
+  const buildsOf = rel => {
+    const gms = assetLike(rel, isGms), plain = assetLike(rel, isPlain);
+    return {
+      cast: gms && gms.browser_download_url,
+      castSize: mb(gms && gms.size),
+      plain: plain && plain.browser_download_url,
+      plainSize: mb(plain && plain.size),
+    };
+  };
+
+  /* The beta card only makes sense while a beta is ahead of the stable release. */
+  /* The release notes are written for the release page: headings, bold, links. This keeps the
+     bullets under the headings that list things, and leaves the words plain. */
+  const readNotes = body => {
+    if (!body) return [];
+    const parts = [];
+    let current = null;
+    const raw = [];
+    // A bullet in the release notes can run over several lines; the lines after it belong to it.
+    body.split('\n').forEach(line => {
+      const text = line.trim();
+      if (/^##\s+/.test(text) || /^[-*]\s+/.test(text) || !text) {
+        raw.push(text);
+      } else if (raw.length && /^[-*]\s+/.test(raw[raw.length - 1])) {
+        raw[raw.length - 1] += ' ' + text;
+      } else {
+        raw.push(text);
+      }
+    });
+
+    const plain = text =>
+      text
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/`/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    raw.forEach(line => {
+      const heading = line.match(/^##\s+(.*)$/);
+      if (heading) {
+        const title = heading[1].trim();
+        current = /new|fix|highlight|change/i.test(title) ? { title, points: [] } : null;
+        if (current) parts.push(current);
+        return;
+      }
+      const bullet = line.match(/^[-*]\s+(.*)$/);
+      if (!bullet || !current) return;
+      // One line each: the first sentence, which in these notes is the point itself.
+      const short = plain(bullet[1]).split(/\.\s/)[0].replace(/[.,;:]\s*$/, '').trim();
+      if (!short) return;
+      // Long ones stop at a word, not in the middle of one.
+      const clipped =
+        short.length <= 150
+          ? short
+          : short.slice(0, short.lastIndexOf(' ', 150)).replace(/[.,;:]$/, '') + '…';
+      current.points.push(clipped);
+    });
+    return parts.filter(part => part.points.length);
+  };
+
+  const applyBeta = beta => {
+    const card = document.getElementById('betaCard');
+    if (!card || !beta || !beta.tag || (!beta.cast && !beta.plain)) return;
+    setHref('dlBetaCast', beta.cast || beta.plain, beta.castSize);
+    setHref('dlBetaFoss', beta.plain || beta.cast, beta.plainSize);
+    window.__blazifyBetaNotes = beta.notes || [];
+    window.__blazifyBetaName = beta.tag;
+    const line = document.getElementById('betaVer');
+    if (line) {
+      line.textContent = 'Beta ' + beta.tag.replace(/^v/, '') + ' carries what is coming to '
+        + 'Android next. It is tested, but not yet lived with, so keep the stable version if you '
+        + 'would rather nothing surprised you.';
+    }
+    card.hidden = false;
+  };
+
+  const applyVersions = v => {
+    setHref('dlAndroidCast', v.androidCast, v.androidCastSize);
+    setHref('dlAndroidFoss', v.androidPlain, v.androidPlainSize);
+    applyBeta(v.beta);
+    if (v.android) setText('verAndroid', 'Version ' + v.android + (v.androidSize ? ' · ' + v.androidSize : '') + ' · Android 8+');
+    if (v.desktop) {
+      setText('verWindows', 'Version ' + v.desktop + (v.winSize ? ' · ' + v.winSize : '') + ' · installer');
+      setText('verLinux', 'Version ' + v.desktop + ' · deb · AppImage · tar.gz');
+    }
+    if (v.ios) setText('verIos', 'Version ' + v.ios + (v.iosSize ? ' · ' + v.iosSize : '') + ' · sideload');
+  };
+
+  const readVersions = sets => {
+    const a = newest(sets[0]), d = newest(sets[1]), i = newest(sets[2]);
+    const apk = asset(a, 'Blazify.apk'), exe = asset(d, 'Blazify-setup.exe'), ipa = asset(i, 'Blazify.ipa');
+    const android = buildsOf(a);
+    // The newest release of any kind: a beta only when it is ahead of the stable one.
+    // The newest beta by its version, not by where it happens to sit in the list: a release that
+    // is published again (as beta 1 was, after being taken down) comes back with a new date and
+    // would otherwise look like the newest thing there is.
+    const ahead = (sets[0] || [])
+      .filter(r => !r.draft && r.prerelease)
+      .filter(r => !a || newerTag(r.tag_name, a.tag_name))
+      .sort((x, y) => (newerTag(x.tag_name, y.tag_name) ? -1 : 1))[0] || null;
+    const betaBuilds = ahead ? buildsOf(ahead) : {};
+    return {
+      android: a && a.tag_name ? a.tag_name.replace(/^v/, '') : null,
+      androidSize: mb((assetLike(a, isGms) || apk)?.size),
+      androidCast: android.cast,
+      androidCastSize: android.castSize,
+      androidPlain: android.plain,
+      androidPlainSize: android.plainSize,
+      beta: ahead
+        ? {
+            tag: ahead.tag_name,
+            cast: betaBuilds.cast,
+            castSize: betaBuilds.castSize,
+            plain: betaBuilds.plain,
+            plainSize: betaBuilds.plainSize,
+            notes: readNotes(ahead.body),
+          }
+        : null,
+      desktop: d && d.tag_name ? d.tag_name.replace(/^v/, '') : null,
+      winSize: mb(exe && exe.size),
+      ios: i && i.tag_name ? i.tag_name.replace(/^v/, '') : null,
+      iosSize: mb(ipa && ipa.size),
+    };
+  };
+
+  /* Parsing is not validation: an earlier build cached the bare number, and
+     JSON.parse('504') returns 504 rather than throwing, so a shape check is
+     the only thing that catches it. */
+  /* Held for ten minutes rather than the whole session. Moving between pages
+     should not re-ask GitHub every time, but a tab left open all afternoon was
+     showing a number from hours ago. */
+  const MAX_AGE = 10 * 60 * 1000;
+  let cached = null;
+  try { cached = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+  if (cached && cached.at && Date.now() - cached.at > MAX_AGE) cached = null;
+  if (cached && typeof cached.total === 'number' && cached.total > 0) {
+    show(cached.total);
+    applyVersions(cached.versions || {});
+    applyStars(cached.stars);
+    return;
+  }
+
+  Promise.all([
+    ...REPOS.map(r =>
+      fetch('https://api.github.com/repos/rajendra7169/' + r + '/releases')
+        .then(res => res.ok ? res.json() : [])
+        .catch(() => [])
+    ),
+    fetch('https://api.github.com/repos/rajendra7169/blazify')
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null),
+  ]).then(all => {
+    const repo = all.pop();
+    const sets = all;
+    const stars = repo && typeof repo.stargazers_count === 'number' ? repo.stargazers_count : null;
+    const total = sets.flat().reduce(
+      (sum, rel) => sum + (rel.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
+    const versions = readVersions(sets);
+    if (total > 0) {
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify({ total: total, versions: versions, stars: stars, at: Date.now() }));
+      } catch (e) {}
+      show(total);
+    }
+    applyVersions(versions);
+    applyStars(stars);
+  });
+})();
+
+// reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.style.transitionDelay = (i * 55) + 'ms';
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px' });
+document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+/* Share: the phone's own share sheet where there is one, so the link goes
+   straight into WhatsApp or Messenger; on a computer, copy it instead. */
+(function () {
+  const btn = document.getElementById('shareBlazify');
+  const label = document.getElementById('shareLabel');
+  if (!btn || !label) return;
+  const url = 'https://rajendra7169.github.io/blazify/';
+  const idle = label.textContent;
+  const say = t => {
+    label.textContent = t;
+    setTimeout(() => { label.textContent = idle; }, 2400);
+  };
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    if (navigator.share) {
+      navigator.share({ title: 'Blazify', text: 'A free music player with no ads and no tracking.', url: url }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => say('Link copied'), () => say(url));
+    } else {
+      say(url);
+    }
+  });
+})();
+</script>
+</body>
+</html>
