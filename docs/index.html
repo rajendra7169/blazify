@@ -160,6 +160,21 @@ nav{
   box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform .25s,background .25s;
 }
 .star-gh:hover{transform:translateY(-2px);background:rgba(14,11,9,.95)}
+/* Little GitHub marks and stars drifting up off the button, so the one thing on
+   this page that asks for nothing but a click is easy to notice. */
+.gh-fx{
+  position:absolute;bottom:55%;left:var(--x);width:var(--s);height:var(--s);
+  pointer-events:none;opacity:0;color:var(--c);z-index:-1;
+  animation:ghRise var(--d) cubic-bezier(.2,.7,.3,1) forwards;
+}
+.gh-fx svg{width:100%;height:100%;display:block}
+.gh-fx.star svg{fill:currentColor;stroke:none}
+@keyframes ghRise{
+  0%{opacity:0;transform:translate(-50%,0) scale(.6) rotate(0deg)}
+  18%{opacity:.95}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-1 * var(--rise))) scale(1) rotate(var(--rot))}
+}
+@media (prefers-reduced-motion:reduce){.gh-fx{display:none}}
 /* On a wide screen the phone stands in the gap between the two headlines, and
    the button sits exactly centred above it rather than wherever the phone's
    narrower box happens to put it. */
@@ -2390,6 +2405,32 @@ document.querySelectorAll('.rise').forEach(el => io.observe(el));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   let wait;
   addEventListener('resize', () => { clearTimeout(wait); wait = setTimeout(fit, 120); });
+})();
+</script>
+<script>
+/* The particles for the star button: one every second or so while it is on
+   screen, a small burst when a pointer comes over it, none at all for anyone
+   who has asked their device for less motion. */
+(() => {
+  const chip = document.querySelector('.star-gh');
+  if (!chip || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let seen = false;
+  new IntersectionObserver(e => { seen = e[0].isIntersecting; }).observe(chip);
+  const spawn = () => {
+    const fx = document.createElement('span');
+    const star = Math.random() < 0.6;
+    fx.className = 'gh-fx' + (star ? ' star' : '');
+    fx.innerHTML = '<svg aria-hidden="true"><use href="#' + (star ? 'i-star' : 'i-github') + '"/></svg>';
+    const r = (a, b) => a + Math.random() * (b - a);
+    fx.style.cssText =
+      '--x:' + r(10, 90) + '%;--s:' + r(12, 19) + 'px;--d:' + r(1.6, 2.4) + 's;' +
+      '--dx:' + r(-22, 22) + 'px;--rise:' + r(42, 78) + 'px;--rot:' + r(-40, 40) + 'deg;' +
+      '--c:' + (star ? '#FFA726' : '#FFF4E6');
+    fx.addEventListener('animationend', () => fx.remove());
+    chip.appendChild(fx);
+  };
+  setInterval(() => { if (seen && !document.hidden) spawn(); }, 950);
+  chip.addEventListener('pointerenter', () => { for (let i = 0; i < 6; i++) setTimeout(spawn, i * 70); });
 })();
 </script>
 </body>
