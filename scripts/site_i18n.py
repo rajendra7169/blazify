@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 # Every page that has a copy in each language, as its folder under docs/ ("" is the
 # home page). A page not written yet is simply skipped.
-PAGES = ["", "spotify-alternative/", "youtube-music-no-ads/", "iphone/", "windows/", "linux/", "compare/"]
+PAGES = ["", "spotify-alternative/", "iphone/", "windows/", "linux/", "compare/"]
 STRINGS = ROOT / "website-i18n"
 SITE = "https://rajendra7169.github.io/blazify/"
 
@@ -330,7 +330,9 @@ def sitemap():
             entries.append(f"  <url>\n    <loc>{url_of(c, path)}</loc>\n{links}\n  </url>")
     old = (DOCS / "sitemap.xml").read_text(encoding="utf-8")
     for loc in re.findall(r"<loc>([^<]+)</loc>", old):
-        if loc not in ours and loc.rstrip("/") + "/" not in ours:
+        rest = loc.removeprefix(SITE).split("#")[0]
+        alive = (DOCS / rest / "index.html").exists() if rest.endswith("/") or not rest else (DOCS / rest).exists()
+        if alive and loc not in ours and loc.rstrip("/") + "/" not in ours:
             entries.append(f"  <url>\n    <loc>{loc}</loc>\n  </url>")
     (DOCS / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
