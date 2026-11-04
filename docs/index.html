@@ -99,7 +99,7 @@ nav{
 }
 .nav-in{display:flex;align-items:center;gap:28px;padding:16px 0}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto}
-.brand img{width:36px;height:36px}
+.brand img{width:36px;height:36px;flex:0 0 36px;object-fit:contain}
 .brand span{font-family:'Anton',sans-serif;font-size:25px;letter-spacing:.4px;
   background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent}
 .nav-links{display:flex;gap:26px;font-size:15px;font-weight:400}
@@ -111,23 +111,48 @@ nav{
   transition:transform .25s, box-shadow .25s;
 }
 .nav-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,140,50,.36)}
-/* Outlined on purpose: the amber pill next to it is the thing to press. */
-.nav-star{
-  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
-  padding:9px 15px;border-radius:99px;border:1px solid var(--line);
-  color:var(--cream);text-decoration:none;font-size:14px;font-weight:500;
+/* The language picker: quiet, outlined, so the amber pill stays the thing to press. */
+.lang{position:relative;border:0;padding:0;margin:0;background:none;border-radius:0}
+.lang[open]{border-color:transparent}
+.lang summary::after,.lang[open] summary::after{content:none}
+.lang summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  padding:9px 14px;border-radius:99px;border:1px solid var(--line);
+  color:var(--cream);font-size:14px;font-weight:600;letter-spacing:.3px;
   transition:border-color .25s,color .25s,background .25s;
 }
-.nav-star:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,167,38,.07)}
-.nav-star .gh{width:17px;height:17px}
-.nav-star b{
-  font-weight:600;font-variant-numeric:tabular-nums;color:var(--amber);
-  padding-left:8px;border-left:1px solid var(--line);
+.lang summary::-webkit-details-marker{display:none}
+.lang summary .ic{width:17px;height:17px}
+.lang summary:hover,.lang[open] summary{border-color:var(--amber);color:var(--amber);background:rgba(255,167,38,.07)}
+.lang summary:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.lang ul{
+  position:absolute;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;z-index:60;
+  min-width:190px;max-height:min(70vh,460px);overflow:auto;
+  background:#151210;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.5);
 }
-.nav-star:hover b{border-left-color:rgba(255,167,38,.4)}
+.lang li a{display:block;padding:9px 12px;border-radius:10px;color:var(--cream);text-decoration:none;font-size:14.5px}
+.lang li a:hover,.lang li a:focus-visible{background:rgba(255,167,38,.1);color:var(--amber);outline:none}
+.lang li a[aria-current]{color:var(--amber);font-weight:600}
+
+/* Starring, asked for beside the thing being starred rather than in the menu bar. */
+.star-gh{
+  display:inline-flex;align-items:center;gap:9px;white-space:nowrap;align-self:center;
+  margin:0 auto 18px;padding:10px 18px;border-radius:99px;
+  background:rgba(14,11,9,.82);border:1px solid rgba(255,255,255,.14);
+  color:#FFF6EC;text-decoration:none;font-size:14.5px;font-weight:600;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform .25s,background .25s;
+}
+.star-gh:hover{transform:translateY(-2px);background:rgba(14,11,9,.95)}
+.star-gh .gh{width:18px;height:18px}
+.star-gh b{font-variant-numeric:tabular-nums;color:var(--amber);padding-left:9px;border-left:1px solid rgba(255,255,255,.18)}
+
 @media (max-width:520px){
-  .nav-star .lbl{display:none}
-  .nav-star{padding:9px 12px;gap:7px}
+  .nav-in{gap:10px}
+  .brand{gap:8px;min-width:0}
+  .brand span{font-size:22px}
+  .lang summary{padding:8px 11px}
+  .nav-cta{padding:9px 16px;font-size:14px}
+  .star-gh{font-size:13.5px;padding:9px 15px}
 }
 
 /* ── hero ─────────────────────────────────────────────── */
@@ -925,6 +950,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
 <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M5.9 5.9l12.2 12.2"/></symbol>
 <symbol id="i-noeye" viewBox="0 0 24 24"><path d="M3 12s3.6-6.2 9-6.2 9 6.2 9 6.2-3.6 6.2-9 6.2S3 12 3 12z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
 <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" stroke="none" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
 <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.8 18.4L2.8 12l6-6.4M15.2 5.6l6 6.4-6 6.4M13.6 3.6l-3.2 16.8"/></symbol>
 <symbol id="i-account" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9.6" r="3"/><path d="M5.9 19.2c.6-3 3.1-4.6 6.1-4.6s5.5 1.6 6.1 4.6"/></symbol>
@@ -966,11 +992,14 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <a href="#roadmap">Roadmap</a>
       <a href="https://github.com/rajendra7169/blazify">Source</a>
     </div>
-    <a class="nav-star" href="https://github.com/rajendra7169/blazify" rel="noopener">
-      <svg class="ic gh" aria-hidden="true"><use href="#i-github"/></svg>
-      <span class="lbl">Star</span>
-      <b id="starCount" hidden></b>
-    </a>
+    <!-- Every language is its own page, so a search in Spanish finds the Spanish one.
+         A details element, so the list opens without any script at all. -->
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>EN</span></summary>
+      <ul id="langList">
+        <li><a href="./" hreflang="en" aria-current="page">English</a></li>
+      </ul>
+    </details>
     <a class="nav-cta" href="#get">Get Blazify</a>
   </div>
   <div class="seek"><i id="seekBar"></i></div>
@@ -1007,6 +1036,11 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         </div>
 
         <div class="phone">
+          <a class="star-gh" href="https://github.com/rajendra7169/blazify" rel="noopener">
+            <svg class="ic gh" aria-hidden="true"><use href="#i-github"/></svg>
+            <span>Star Blazify on GitHub</span>
+            <b id="starCount" hidden></b>
+          </a>
           <div class="device">
             <span class="vol"></span><span class="vol b"></span><span class="pwr"></span>
             <div class="screen"><span class="notch"></span>
@@ -1098,32 +1132,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         <p>Search, library, playlists and synced lyrics, sideloaded with SideStore or AltStore. No App Store needed.</p>
         <a class="dl" href="https://github.com/rajendra7169/blazify-ios/releases/latest">Download IPA</a>
       </article>
-  </div>
-
-  <!-- The beta, for people who would rather find the bugs than wait for them to
-       be found. Hidden until there is a beta newer than the stable release. -->
-  <div class="beta rise" id="betaCard" hidden>
-    <div>
-      <span class="tag">Early access</span>
-      <h3>Try the next version first</h3>
-      <p id="betaVer">The beta carries what is coming to Android next. It is tested, but not yet
-        lived with, so keep the stable version if you would rather nothing surprised you.</p>
-      <p>Found something wrong, or something missing? Tell us and it gets fixed before the stable
-        release. That is what a beta is for.</p>
-      <div class="links">
-        <a href="https://github.com/rajendra7169/blazify/issues/new?template=bug_report.yml">Report a problem</a>
-        <a href="https://github.com/rajendra7169/blazify/issues/new?template=feature_request.yml">Ask for a feature</a>
-        <a href="https://github.com/rajendra7169/blazify/discussions">Say what you think</a>
-      </div>
-    </div>
-    <div class="betaget">
-      <a class="dl" id="dlBetaCast" href="https://github.com/rajendra7169/blazify/releases">Download the beta</a>
-      <small>For any ordinary phone. Plays to a Chromecast, a smart speaker or a television.</small>
-      <a class="dl ghost" id="dlBetaFoss" href="https://github.com/rajendra7169/blazify/releases">Beta without Google</a>
-      <small>For a phone with no Google services (de-Googled, LineageOS, a Huawei). No casting.</small>
-      <button class="dl ghost" type="button" data-pick="betanotes">What has changed</button>
-      <p>Already have Blazify? Turn on <b>Settings › About › Updater › Get beta updates</b> and it
-        will offer each beta by itself. Turn it off to go back to stable.</p>
     </div>
   </div>
 </section>
