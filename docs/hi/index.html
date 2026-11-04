@@ -196,14 +196,18 @@ nav{
 }
 .h-shout{
   font-family:'Anton',sans-serif;font-size:clamp(46px,8.4vw,118px);line-height:.86;
-  margin:0;letter-spacing:-.5px;
+  letter-spacing:-.5px;
+  /* The gradient only paints inside the box, and a line this tight leaves accents
+     (É, Ả, Ç) and marks below (Ạ) outside it, where they vanished. Room above and
+     below for them, given back by the margins so the layout does not move. */
+  padding:.2em 0 .14em;margin:-.2em 0 -.14em;
   background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;
 }
 /* Anton and Instrument Serif carry Latin and Cyrillic only. In other scripts the
    phone's own heaviest face stands in, a little smaller and with room for the
    taller letters, so the shout still shouts and nothing is cut off at the foot. */
 :lang(ja) .h-shout,:lang(ko) .h-shout,:lang(zh-CN) .h-shout,:lang(zh-TW) .h-shout,
-:lang(hi) .h-shout,:lang(ar) .h-shout{
+:lang(hi) .h-shout,:lang(ar) .h-shout,:lang(ru) .h-shout{
   font-family:system-ui,-apple-system,'Noto Sans','Noto Sans CJK JP','Noto Sans Devanagari','Noto Sans Arabic',sans-serif;
   font-weight:900;font-size:clamp(36px,6.4vw,92px);line-height:1.18;letter-spacing:0;padding-bottom:.06em;
 }
@@ -212,7 +216,11 @@ nav{
   font-family:system-ui,-apple-system,'Noto Sans',sans-serif;font-style:normal;font-weight:500;
   font-size:clamp(20px,2.6vw,36px);line-height:1.3;
 }
-.h-mid{width:clamp(60px,9vw,132px)}
+/* As wide as the star button that sits in this gap on a wide screen, so a long
+   headline in any language stops before it rather than running underneath. */
+.h-mid{width:clamp(60px,21vw,320px)}
+/* One line each; the script below brings a long word down until it fits. */
+.h-shout,.h-soft{white-space:nowrap}
 
 /* the amber slab, with the phone breaking out of its top edge */
 .slab{
@@ -1180,7 +1188,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     <h2 class="title rise">इसे <em>चलते हुए</em> देखें</h2>
     <p class="lede rise">असली स्क्रीन, सीधे ऐप से। रंग उसी से आता है जो उस समय बज रहा हो।</p>
 
-    <div class="rail rise">
+    <!-- Always left to right: the strip's motion is built for it, and a right-to-left
+         page would otherwise carry every screenshot out of view. -->
+    <div class="rail rise" dir="ltr">
       <div class="track" style="--dur:80s">
       <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/home.webp" type="image/webp"><img src="../assets/home.png" alt="होम स्क्रीन" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>होम, आर्टवर्क से लिए गए रंग के साथ</p></figure>
       <figure class="shot"><div class="device"><span class="vol"></span><span class="vol b"></span><span class="pwr"></span><div class="screen"><span class="notch"></span><picture><source srcset="../assets/search.webp" type="image/webp"><img src="../assets/search.png" alt="हाल की खोजों के साथ सर्च" width="480" height="1040" loading="lazy" decoding="async"></picture></div></div><p>सर्च, आपकी हाल की खोजों के साथ</p></figure>
@@ -1210,7 +1220,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
     </div>
 
     <h3 class="sub rise">डेस्कटॉप पर</h3>
-    <div class="rail rise">
+    <div dir="ltr" class="rail rise">
       <div class="track" style="--dur:46s">
       <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify</span></div><picture><source srcset="../assets/desktop/home.webp" type="image/webp"><img src="../assets/desktop/home.png" alt="Blazify डेस्कटॉप होम" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>होम</p></figure>
       <figure class="shot wide"><div class="win"><div class="bar"><i></i><i></i><i></i><span>Blazify - अभी चल रहा है</span></div><picture><source srcset="../assets/desktop/player-and-audio.webp" type="image/webp"><img src="../assets/desktop/player-and-audio.png" alt="डेस्कटॉप प्लेयर" width="960" height="540" loading="lazy" decoding="async"></picture></div><p>प्लेयर और ऑडियो</p></figure>
@@ -2312,6 +2322,26 @@ document.querySelectorAll('.rise').forEach(el => io.observe(el));
       say(url);
     }
   });
+})();
+</script>
+<script>
+/* Headlines that fit. "FEEL IT." and "ЧУВСТВУЙТЕ." cannot share one size, so each
+   line starts at its styled size and steps down until it fits its own column. */
+(() => {
+  const fit = () => document.querySelectorAll('.h-shout, .h-soft').forEach(el => {
+    el.style.fontSize = '';
+    const room = el.parentElement.clientWidth;
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    const floor = el.classList.contains('h-shout') ? 26 : 16;
+    while (el.scrollWidth > room + 1 && size > floor) {
+      size -= 2;
+      el.style.fontSize = size + 'px';
+    }
+  });
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  let wait;
+  addEventListener('resize', () => { clearTimeout(wait); wait = setTimeout(fit, 120); });
 })();
 </script>
 </body>
