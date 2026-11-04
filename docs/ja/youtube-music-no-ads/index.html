@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Musicを広告なしで無料で聴く：オープンソースのBlazify</title>
+<meta name="description" content="BlazifyはAndroid向けの無料でオープンソースのYouTube Musicアプリです。広告なし、バックグラウンド再生、オフライン再生、同期歌詞に対応し、アカウントもサブスクも不要です。">
+<link rel="canonical" href="https://rajendra7169.github.io/blazify/ja/youtube-music-no-ads/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/youtube-music-no-ads/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/youtube-music-no-ads/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/youtube-music-no-ads/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/youtube-music-no-ads/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/youtube-music-no-ads/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/youtube-music-no-ads/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/youtube-music-no-ads/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/youtube-music-no-ads/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/youtube-music-no-ads/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/youtube-music-no-ads/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/youtube-music-no-ads/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/youtube-music-no-ads/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/youtube-music-no-ads/">
+<meta property="og:url" content="https://rajendra7169.github.io/blazify/ja/youtube-music-no-ads/">
+<meta property="og:site_name" content="Blazify">
+<meta property="og:title" content="YouTube Musicを広告なしで、無料で">
+<meta property="og:description" content="広告なし、バックグラウンド再生、オフライン再生、同期歌詞。無料でオープンソースです。">
+<meta property="og:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0A09">
+<link rel="icon" href="../../assets/favicon-64.png" sizes="64x64">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/page.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav>
+  <div class="shell nav-in">
+    <a class="brand" href="../"><img src="../../assets/logo-512.png" alt="" width="512" height="512"><span>BLAZIFY</span></a>
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>JA</span></summary>
+      <ul id="langList">
+        <li><a href="../../youtube-music-no-ads/" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../es/youtube-music-no-ads/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt/youtube-music-no-ads/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="../../fr/youtube-music-no-ads/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="../../de/youtube-music-no-ads/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="../../it/youtube-music-no-ads/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="../../ru/youtube-music-no-ads/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../../tr/youtube-music-no-ads/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="../../ar/youtube-music-no-ads/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="../../hi/youtube-music-no-ads/" hreflang="hi" lang="hi">हिन्दी</a></li>
+        <li><a href="../../id/youtube-music-no-ads/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="../../vi/youtube-music-no-ads/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="../../ja/youtube-music-no-ads/" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../ko/youtube-music-no-ads/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh-CN/youtube-music-no-ads/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="../../zh-TW/youtube-music-no-ads/" hreflang="zh-TW" lang="zh-TW">繁體中文</a></li>
+      </ul>
+    </details>
+    <a class="nav-cta" href="../#get">Blazifyを入手</a>
+  </div>
+</nav>
+
+<main>
+  <header class="hero shell">
+    <span class="eyebrow">無料でオープンソース</span>
+    <h1>YouTube Musicを<em>広告なしで、無料で</em>聴く</h1>
+    <p class="lead">Blazifyは、YouTube Musicのカタログを曲間の広告なしで再生できる無料のAndroidアプリです。画面を消しても再生が続き、音楽をオフライン用に保存でき、アカウントやサブスクリプションなしで使えます。</p>
+    <div class="cta">
+      <a class="btn" href="../#get">Blazifyを無料でダウンロード</a> <a class="btn ghost" href="https://f-droid.org/packages/com.blazify.music/">F-Droidで入手</a>
+    </div>
+  </header>
+
+  <section class="shell">
+    <h2>お金を払わずに使えること</h2>
+    <div class="cards">
+      <div class="card"><h3>広告なし</h3><p>曲が終われば、次の曲へ。広告がそもそもないので、スキップするものも、広告を消すために買うプランもありません。</p></div>
+      <div class="card"><h3>バックグラウンド再生・画面オフ再生</h3><p>スマホをロックしても、別のアプリに切り替えても音楽は止まりません。ロック画面から操作もできます。</p></div>
+      <div class="card"><h3>オフライン再生</h3><p>曲、アルバム、プレイリストをダウンロードして、あとでネットにつながっていなくても再生できます。</p></div>
+      <div class="card"><h3>単語ごとに流れる歌詞</h3><p>複数のソースから取得した同期歌詞を単語ごとにハイライト。翻訳とローマ字表記にも対応しています。</p></div>
+      <div class="card"><h3>ギャップレス再生とイコライザー</h3><p>ライブアルバムも途切れずに続けて再生します。13種類のプリセット付き10バンドイコライザー、低音ブースト、音量の均一化で音を整えられます。</p></div>
+      <div class="card"><h3>ライブラリは、お好みで</h3><p>Googleでログインすると、あなたのYouTube Musicのライブラリ、プレイリスト、高評価した曲を使えます。それ以外の機能はすべてログインなしで使えます。</p></div>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>BlazifyとYouTube Music Premiumの比較</h2>
+    <div class="table">
+      <table>
+        <thead><tr><th></th><th>Blazify</th><th>YouTube Music Premium</th></tr></thead>
+        <tbody>
+          <tr><th>料金</th><td class="yes">無料</td><td>月額有料</td></tr>
+          <tr><th>広告</th><td class="yes">なし</td><td>なし</td></tr>
+          <tr><th>オフライン再生</th><td class="yes">はい</td><td>はい</td></tr>
+          <tr><th>同期歌詞</th><td class="yes">単語ごと</td><td>行ごと</td></tr>
+          <tr><th>イコライザー</th><td class="yes">10バンド、13プリセット</td><td>なし</td></tr>
+          <tr><th>アカウントが必要</th><td class="yes">いいえ</td><td>はい</td></tr>
+          <tr><th>トラッキングと分析</th><td class="yes">なし</td><td>はい</td></tr>
+          <tr><th>ソースコードを読める</th><td class="yes">はい、GPL-3.0</td><td>いいえ</td></tr>
+          <tr><th>TV、ウォッチ、スピーカー用アプリ</th><td>Android Autoのみ</td><td>はい</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>1分で聴きはじめられます</h2>
+    <ol class="steps">
+      <li>ソースからビルドされている<b>F-Droid</b>、またはGitHubページからBlazifyをインストールします。</li>
+      <li>アプリを開いて、曲、アーティスト、アルバムを検索します。ログインなしで、すぐに再生できます。</li>
+      <li>自分のプレイリストや高評価した曲を使いたい場合は、<b>Googleでログイン</b>を選びます。この手順はずっと飛ばしてもかまいません。</li>
+    </ol>
+  </section>
+
+  <section class="shell">
+    <h2>最初に知っておきたいこと</h2>
+    <p>BlazifyはGoogle Playにはないため、AndroidではF-DroidかGitHubからインストールします。Premiumにはテレビ、スマートウォッチ、スマートスピーカー向けのアプリがありますが、Blazifyにはそれらがなく、車で使えるAndroid Autoのみです。カタログはYouTube Musicのものなので、そこで見つかる曲が再生できる曲です。スマホに保存済みの曲も、ストリーミングの曲と同じキューで再生できます。</p>
+    <p class="note">Blazifyは独立したプロジェクトです。YouTubeやGoogleが開発したものではなく、これらの企業とは一切関係ありません。</p>
+  </section>
+
+  <section class="shell">
+    <h2>よくある質問</h2>
+    <details><summary>Blazifyは本当に無料ですか？</summary><p>はい。有料プランも、試用期間も、広告もありません。カトマンズに住む一人の開発者、Rajendra Pandeyが作っている、GPL-3.0ライセンスのオープンソースソフトウェアです。</p></details>
+    <details><summary>YouTube Music Premiumの登録は必要ですか？</summary><p>いいえ。Blazifyが登録を求めることはありません。アプリ内で自分のライブラリを使いたい場合を除き、Googleアカウントすら不要です。</p></details>
+    <details><summary>iPhoneやパソコンでも使えますか？</summary><p>はい。BlazifyはiPhone、Windows、Linuxでも動作します。iPhone版はApp Storeを使わず、SideStoreまたはAltStoreでインストールします。</p></details>
+    <details><summary>再生履歴は追跡されますか？</summary><p>いいえ。Blazifyには、広告、アナリティクス、トラッキングライブラリが一切含まれていません。</p></details>
+  </section>
+
+  <section class="shell">
+    <h2>Blazifyについてもっと見る</h2>
+    <div class="related">
+      <a href="../spotify-alternative/">無料のSpotify代替アプリ</a> <a href="../iphone/">iPhone版</a> <a href="../windows/">Windows版</a> <a href="../linux/">Linux版</a> <a href="../compare/">ほかのプレーヤーとの比較</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><a href="../">Blazify</a> · Android、iPhone、Windows、Linux向けの無料でオープンソースの音楽プレーヤー · <a href="https://github.com/rajendra7169/blazify">ソースコード</a> · <a href="../../privacy/">プライバシー</a></p>
+  </div>
+</footer>
+</body>
+</html>

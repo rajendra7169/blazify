@@ -17,12 +17,16 @@ page never breaks the other languages; it only shows up in `missing`.
 """
 import html
 import json
+import posixpath
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGE = ROOT / "docs" / "index.html"
+DOCS = ROOT / "docs"
+# Every page that has a copy in each language, as its folder under docs/ ("" is the
+# home page). A page not written yet is simply skipped.
+PAGES = ["", "spotify-alternative/", "youtube-music-no-ads/", "iphone/", "windows/", "linux/", "compare/"]
 STRINGS = ROOT / "website-i18n"
 SITE = "https://rajendra7169.github.io/blazify/"
 
@@ -176,8 +180,12 @@ def attr_units(page):
     return out
 
 
-def source_units():
-    page = PAGE.read_text(encoding="utf-8")
+def existing_pages():
+    return [p for p in PAGES if (DOCS / p / "index.html").exists()]
+
+
+def source_units(path=""):
+    page = (DOCS / path / "index.html").read_text(encoding="utf-8")
     masked, kept = mask(page)
     return page, masked, kept, units(masked) + attr_units(masked)
 
@@ -187,9 +195,11 @@ def tags_of(s):
 
 
 def extract():
-    _, _, _, found = source_units()
+    found = []
+    for path in existing_pages():
+        found += sorted(source_units(path)[3])
     seen, ordered = set(), []
-    for _, _, src in sorted(found):
+    for _, _, src in found:
         key = norm(src)
         if key not in seen:
             seen.add(key)
@@ -211,8 +221,13 @@ def check(code, table):
     return {k: v for k, v in table.items() if k not in bad and v.strip()}, bad
 
 
-def relocate(page):
-    """Relative addresses one folder deeper; in-page anchors and full addresses untouched."""
+def relocate(page, path=""):
+    """
+    Relative addresses one folder deeper, except links between pages that exist in
+    every language: those stay inside the language they were followed from.
+    """
+    translated = {norm_dir(p) for p in PAGES}
+
     def fix(m):
         attr, val = m.group(1), m.group(2)
         if attr == "srcset":
@@ -223,36 +238,49 @@ def relocate(page):
     def fix_one(v):
         if not v or v.startswith(("#", "http:", "https:", "//", "mailto:", "data:", "/", "tel:", "javascript:")):
             return v
+        target = posixpath.normpath(posixpath.join(path, re.split(r"[#?]", v)[0] or "."))
+        if norm_dir(target) in translated and not re.search(r"\.[a-z0-9]+$", re.split(r"[#?]", v)[0]):
+            return v
         return "../" + v
 
     return re.sub(r'\b(href|src|srcset|poster)="([^"]*)"', fix, page)
 
 
-def alternates():
-    lines = [f'<link rel="alternate" hreflang="{c}" href="{SITE}{"" if c == "en" else c + "/"}">' for c, _, _ in LANGUAGES]
-    lines.append(f'<link rel="alternate" hreflang="x-default" href="{SITE}">')
+def norm_dir(p):
+    p = posixpath.normpath(p or ".").strip("/")
+    return "" if p in (".", "index.html") else p.removesuffix("/index.html")
+
+
+def url_of(code, path):
+    return SITE + ("" if code == "en" else code + "/") + path
+
+
+def alternates(path):
+    lines = [f'<link rel="alternate" hreflang="{c}" href="{url_of(c, path)}">' for c, _, _ in LANGUAGES]
+    lines.append(f'<link rel="alternate" hreflang="x-default" href="{url_of("en", path)}">')
     return "\n".join(lines)
 
 
-def picker(current, deep):
+def picker(current, path):
+    depth = (current != "en") + path.count("/")
     items = []
     for c, name, _ in LANGUAGES:
-        target = ("../" if deep else "") + ("" if c == "en" else c + "/")
+        target = "../" * depth + ("" if c == "en" else c + "/") + path
         target = target or "./"
         cur = ' aria-current="page"' if c == current else ""
         items.append(f'        <li><a href="{target}" hreflang="{c}" lang="{c}"{cur}>{name}</a></li>')
     return "\n".join(items)
 
 
-def with_shell(page, code, direction, deep):
+def with_shell(page, code, direction, path=""):
     """The parts that differ by language besides the text: lang, address, picker."""
-    url = SITE if code == "en" else f"{SITE}{code}/"
+    url = url_of(code, path)
     page = re.sub(r'<html lang="[^"]*"[^>]*>', f'<html lang="{code}" dir="{direction}">', page, count=1)
     page = re.sub(r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{url}">', page, count=1)
     page = re.sub(r'<meta property="og:url" content="[^"]*">', f'<meta property="og:url" content="{url}">', page, count=1)
     page = re.sub(r'\n?(<link rel="alternate" hreflang="[^"]*" href="[^"]*">\n?)+', "\n", page)
-    page = page.replace(f'<link rel="canonical" href="{url}">', f'<link rel="canonical" href="{url}">\n' + alternates(), 1)
-    page = re.sub(r'(<ul id="langList">)\s*.*?(\s*</ul>)', lambda m: m.group(1) + "\n" + picker(code, deep) + m.group(2),
+    page = page.replace(f'<link rel="canonical" href="{url}">', f'<link rel="canonical" href="{url}">\n' + alternates(path), 1)
+    page = re.sub(r'(<ul id="langList">)\s*.*?(\s*</ul>)', lambda m: m.group(1) + "\n" + picker(code, path) + m.group(2),
                   page, count=1, flags=re.S)
     short = code.split("-")[0].upper() if code not in ("zh-CN", "zh-TW") else {"zh-CN": "简", "zh-TW": "繁"}[code]
     page = re.sub(r'(<summary aria-label=")[^"]*("><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>)[^<]*(</span>)',
@@ -261,49 +289,53 @@ def with_shell(page, code, direction, deep):
 
 
 def build():
-    page, masked, kept, found = source_units()
-    # The English page itself gets the picker and the alternate links too.
-    english = with_shell(page, "en", "ltr", deep=False)
-    if english != page:
-        PAGE.write_text(english, encoding="utf-8")
-        page, masked, kept, found = source_units()
-    report = []
-    for code, _, direction in LANGUAGES[1:]:
-        table, bad = check(code, load(code))
-        out, last = [], 0
-        hit = 0
-        for start, end, src in sorted(found):
-            out.append(masked[last:start])
-            done = table.get(norm(src))
-            if done is not None:
-                hit += 1
-            out.append(done if done is not None else src)
-            last = end
-        out.append(masked[last:])
-        translated = unmask("".join(out), kept)
-        translated = with_shell(relocate(translated), code, direction, deep=True)
-        target = ROOT / "docs" / code / "index.html"
-        target.parent.mkdir(exist_ok=True)
-        target.write_text(translated, encoding="utf-8")
-        report.append(f"{code:6} {hit}/{len(found)} units translated" + (f", {len(bad)} refused (tags changed)" if bad else ""))
-    print("\n".join(report))
+    report = {}
+    for path in existing_pages():
+        page, masked, kept, found = source_units(path)
+        # The English page itself gets the picker and the alternate links too.
+        english = with_shell(page, "en", "ltr", path)
+        if english != page:
+            (DOCS / path / "index.html").write_text(english, encoding="utf-8")
+            page, masked, kept, found = source_units(path)
+        for code, _, direction in LANGUAGES[1:]:
+            table, bad = check(code, load(code))
+            out, last, hit = [], 0, 0
+            for start, end, src in sorted(found):
+                out.append(masked[last:start])
+                done = table.get(norm(src))
+                if done is not None:
+                    hit += 1
+                out.append(done if done is not None else src)
+                last = end
+            out.append(masked[last:])
+            translated = unmask("".join(out), kept)
+            translated = with_shell(relocate(translated, path), code, direction, path)
+            target = DOCS / code / path / "index.html"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(translated, encoding="utf-8")
+            r = report.setdefault(code, [0, 0, len(bad)])
+            r[0] += hit
+            r[1] += len(found)
+    for code, (hit, total, bad) in report.items():
+        print(f"{code:6} {hit}/{total} units translated over {len(existing_pages())} pages" + (f", {bad} refused (tags changed)" if bad else ""))
     sitemap()
 
 
 def sitemap():
-    links = "\n".join(
-        f'    <xhtml:link rel="alternate" hreflang="{c}" href="{SITE}{"" if c == "en" else c + "/"}"/>' for c, _, _ in LANGUAGES)
-    entries = "\n".join(
-        f"  <url>\n    <loc>{SITE}{'' if c == 'en' else c + '/'}</loc>\n{links}\n  </url>" for c, _, _ in LANGUAGES)
-    extra = ""
-    old = (ROOT / "docs" / "sitemap.xml").read_text(encoding="utf-8")
+    entries, ours = [], set()
+    for path in existing_pages():
+        links = "\n".join(f'    <xhtml:link rel="alternate" hreflang="{c}" href="{url_of(c, path)}"/>' for c, _, _ in LANGUAGES)
+        for c, _, _ in LANGUAGES:
+            ours.add(url_of(c, path))
+            entries.append(f"  <url>\n    <loc>{url_of(c, path)}</loc>\n{links}\n  </url>")
+    old = (DOCS / "sitemap.xml").read_text(encoding="utf-8")
     for loc in re.findall(r"<loc>([^<]+)</loc>", old):
-        if loc.rstrip("/") + "/" not in [SITE + ("" if c == "en" else c + "/") for c, _, _ in LANGUAGES]:
-            extra += f"\n  <url>\n    <loc>{loc}</loc>\n  </url>"
-    (ROOT / "docs" / "sitemap.xml").write_text(
+        if loc not in ours and loc.rstrip("/") + "/" not in ours:
+            entries.append(f"  <url>\n    <loc>{loc}</loc>\n  </url>")
+    (DOCS / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-        f"{entries}{extra}\n</urlset>\n", encoding="utf-8")
+        + "\n".join(entries) + "\n</urlset>\n", encoding="utf-8")
 
 
 def missing():

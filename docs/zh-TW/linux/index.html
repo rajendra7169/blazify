@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>免費開源的 Linux 音樂播放器：Blazify</title>
+<meta name="description" content="Linux 版 Blazify 是免費開源、沒有廣告的音樂播放器：同步歌詞、你的播放清單與影片封面，提供 .deb、AppImage 和 tar.gz 壓縮檔。">
+<link rel="canonical" href="https://rajendra7169.github.io/blazify/zh-TW/linux/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/linux/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/linux/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/linux/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/linux/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/linux/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/linux/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/linux/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/linux/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/linux/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/linux/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/linux/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/linux/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/linux/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/linux/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/linux/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/linux/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/linux/">
+<meta property="og:url" content="https://rajendra7169.github.io/blazify/zh-TW/linux/">
+<meta property="og:site_name" content="Blazify">
+<meta property="og:title" content="免費開源的 Linux 音樂播放器">
+<meta property="og:description" content="沒有廣告、同步歌詞、帶上你的播放清單，提供 .deb、AppImage 和 tar.gz 壓縮檔。">
+<meta property="og:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0A09">
+<link rel="icon" href="../../assets/favicon-64.png" sizes="64x64">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/page.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav>
+  <div class="shell nav-in">
+    <a class="brand" href="../"><img src="../../assets/logo-512.png" alt="" width="512" height="512"><span>BLAZIFY</span></a>
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>繁</span></summary>
+      <ul id="langList">
+        <li><a href="../../linux/" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../es/linux/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt/linux/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="../../fr/linux/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="../../de/linux/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="../../it/linux/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="../../ru/linux/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../../tr/linux/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="../../ar/linux/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="../../hi/linux/" hreflang="hi" lang="hi">हिन्दी</a></li>
+        <li><a href="../../id/linux/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="../../vi/linux/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="../../ja/linux/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../ko/linux/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh-CN/linux/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="../../zh-TW/linux/" hreflang="zh-TW" lang="zh-TW" aria-current="page">繁體中文</a></li>
+      </ul>
+    </details>
+    <a class="nav-cta" href="../#get">取得 Blazify</a>
+  </div>
+</nav>
+
+<main>
+  <header class="hero shell">
+    <span class="eyebrow">Linux 版 Blazify</span>
+    <h1>一款<em>免費又開源</em>的 Linux 音樂播放器</h1>
+    <p class="lead">Linux 版 Blazify 在桌面上播放 YouTube Music 曲庫中的音樂，支援同步歌詞，登入後可以使用自己的播放清單，而且沒有廣告。它是 GPL-3.0 軟體，提供適合你所用發行版的套件格式。</p>
+    <div class="cta">
+      <a class="btn" href="https://rajendrapandey.info.np/projects/blazify">下載 Linux 版</a> <a class="btn ghost" href="../#get">其他裝置</a>
+    </div>
+  </header>
+
+  <section class="shell">
+    <h2>在桌面上能做什麼</h2>
+    <div class="cards">
+      <div class="card"><h3>首頁與搜尋</h3><p>從首頁開始，或搜尋歌曲、專輯、藝人，馬上播放。</p></div>
+      <div class="card"><h3>完整的播放器</h3><p>在以專輯封面為中心的播放器畫面中播放、暫停、跳過和拖曳進度。</p></div>
+      <div class="card"><h3>同步歌詞</h3><p>歌詞跟著歌曲走，工作時也能跟著看。</p></div>
+      <div class="card"><h3>影片封面</h3><p>開啟後，播放器後方播放的是這首歌本身的影片，而不是一張靜態圖片。</p></div>
+      <div class="card"><h3>外觀與風格設定</h3><p>調整應用程式的外觀，讓它和桌面上的其他東西搭配得宜。</p></div>
+      <div class="card"><h3>登入後帶上你的音樂庫</h3><p>用 Google 帳號登入，就能看到你自己的 YouTube Music 音樂庫和播放清單。不登入也照樣能搜尋和播放。</p></div>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>挑選你的套件</h2>
+    <p>音訊引擎已內建在應用程式中，不需要先另外安裝播放器。三種套件都在上方連結的 Blazify 頁面上，那裡提供目前的桌面版本 1.4.0。</p>
+    <div class="table">
+      <table>
+        <thead><tr><th>套件</th><th>適用情況</th></tr></thead>
+        <tbody>
+          <tr><th>.deb</th><td class="yes">你用的是 Debian、Ubuntu、Linux Mint 或以它們為基礎的其他發行版。可以用軟體中心或 apt 安裝。</td></tr>
+          <tr><th>AppImage</th><td class="yes">你想要一個檔案，不用安裝就能在大多數發行版上執行。先允許它以程式執行，再開啟即可。</td></tr>
+          <tr><th>tar.gz 壓縮檔</th><td class="yes">你比較喜歡把應用程式解壓縮到自己選的資料夾，再從那裡啟動。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>事先該知道的事</h2>
+    <p>桌面版比 Android 版起步晚，功能清單比較長的是 Android 版。它的音樂來自 YouTube Music 曲庫，所以需要網路連線，YouTube Music 上沒有的歌，Blazify 裡也不會有。如果你也用手機聽，Android 和 iPhone 版的連結都在 Blazify 首頁上。</p>
+  </section>
+
+  <section class="shell">
+    <h2>常見問題</h2>
+    <details><summary>真的免費嗎？</summary><p>是的。沒有付費方案、沒有試用期，也沒有廣告。Blazify 以 GPL-3.0 授權發布。</p></details>
+    <details><summary>需要帳號嗎？</summary><p>不需要。搜尋和播放不用登入就能使用。用 Google 帳號登入只是多帶入你自己的 YouTube Music 音樂庫和播放清單。</p></details>
+    <details><summary>我的收聽紀錄會被追蹤嗎？</summary><p>不會。Blazify 不含任何廣告、分析工具或追蹤程式庫。</p></details>
+    <details><summary>還能在其他地方執行嗎？</summary><p>可以。Blazify 也能在 Windows、Android 和 iPhone 上執行。它由尼泊爾加德滿都的一位開發者 Rajendra Pandey 製作。</p></details>
+  </section>
+
+  <section class="shell">
+    <h2>更多關於 Blazify</h2>
+    <div class="related">
+      <a href="../spotify-alternative/">免費的 Spotify 替代方案</a> <a href="../youtube-music-no-ads/">無廣告的 YouTube Music</a> <a href="../iphone/">iPhone 版</a> <a href="../windows/">Windows 版</a> <a href="../compare/">與其他播放器比較</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><a href="../">Blazify</a> · 適用於 Android、iPhone、Windows 和 Linux 的免費開源音樂播放器 · <a href="https://github.com/rajendra7169/blazify">原始碼</a> · <a href="../../privacy/">隱私權政策</a></p>
+  </div>
+</footer>
+</body>
+</html>

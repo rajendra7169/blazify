@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Music 免廣告，免費又開源：Blazify</title>
+<meta name="description" content="Blazify 是免費開源的 Android 版 YouTube Music 應用程式：沒有廣告，支援背景播放、離線下載和同步歌詞，不需要帳號，也不用訂閱。">
+<link rel="canonical" href="https://rajendra7169.github.io/blazify/zh-TW/youtube-music-no-ads/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/youtube-music-no-ads/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/youtube-music-no-ads/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/youtube-music-no-ads/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/youtube-music-no-ads/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/youtube-music-no-ads/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/youtube-music-no-ads/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/youtube-music-no-ads/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/youtube-music-no-ads/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/youtube-music-no-ads/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/youtube-music-no-ads/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/youtube-music-no-ads/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/youtube-music-no-ads/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/youtube-music-no-ads/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/youtube-music-no-ads/">
+<meta property="og:url" content="https://rajendra7169.github.io/blazify/zh-TW/youtube-music-no-ads/">
+<meta property="og:site_name" content="Blazify">
+<meta property="og:title" content="免費聽 YouTube Music，沒有廣告">
+<meta property="og:description" content="沒有廣告，背景播放、離線下載、同步歌詞，免費又開源。">
+<meta property="og:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0A09">
+<link rel="icon" href="../../assets/favicon-64.png" sizes="64x64">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/page.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav>
+  <div class="shell nav-in">
+    <a class="brand" href="../"><img src="../../assets/logo-512.png" alt="" width="512" height="512"><span>BLAZIFY</span></a>
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>繁</span></summary>
+      <ul id="langList">
+        <li><a href="../../youtube-music-no-ads/" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../es/youtube-music-no-ads/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt/youtube-music-no-ads/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="../../fr/youtube-music-no-ads/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="../../de/youtube-music-no-ads/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="../../it/youtube-music-no-ads/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="../../ru/youtube-music-no-ads/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../../tr/youtube-music-no-ads/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="../../ar/youtube-music-no-ads/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="../../hi/youtube-music-no-ads/" hreflang="hi" lang="hi">हिन्दी</a></li>
+        <li><a href="../../id/youtube-music-no-ads/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="../../vi/youtube-music-no-ads/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="../../ja/youtube-music-no-ads/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../ko/youtube-music-no-ads/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh-CN/youtube-music-no-ads/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="../../zh-TW/youtube-music-no-ads/" hreflang="zh-TW" lang="zh-TW" aria-current="page">繁體中文</a></li>
+      </ul>
+    </details>
+    <a class="nav-cta" href="../#get">取得 Blazify</a>
+  </div>
+</nav>
+
+<main>
+  <header class="hero shell">
+    <span class="eyebrow">免費又開源</span>
+    <h1><em>免費、無廣告</em>聽 YouTube Music</h1>
+    <p class="lead">Blazify 是一款免費的 Android 應用程式，播放 YouTube Music 曲庫中的音樂，歌與歌之間沒有廣告。關閉螢幕後照樣播放，可以把音樂存下來離線聆聽，不需要帳號，也不用訂閱。</p>
+    <div class="cta">
+      <a class="btn" href="../#get">免費下載 Blazify</a> <a class="btn ghost" href="https://f-droid.org/packages/com.blazify.music/">到 F-Droid 取得</a>
+    </div>
+  </header>
+
+  <section class="shell">
+    <h2>不用付錢也能享有的</h2>
+    <div class="cards">
+      <div class="card"><h3>沒有廣告</h3><p>一首接著一首。沒有要略過的廣告，也不用買方案來去掉廣告，因為根本就沒有廣告。</p></div>
+      <div class="card"><h3>背景播放、關閉螢幕也能播</h3><p>鎖定手機或切換到其他應用程式，音樂照樣繼續，鎖定畫面上也有播放控制項。</p></div>
+      <div class="card"><h3>離線下載</h3><p>下載歌曲、專輯和播放清單，之後沒有網路也能播放。</p></div>
+      <div class="card"><h3>逐字歌詞</h3><p>來自多個來源的同步歌詞，逐字醒目標示，支援翻譯與羅馬拼音。</p></div>
+      <div class="card"><h3>無縫播放，還有等化器</h3><p>現場專輯一氣呵成，中間不會停頓。10 頻段等化器、13 種預設集、低音強化與音量平衡，幫你調出想要的聲音。</p></div>
+      <div class="card"><h3>想要的話，帶上你的音樂庫</h3><p>用 Google 帳號登入，就能帶入你自己的 YouTube Music 音樂庫、播放清單和喜歡的內容。其他功能不登入也都能用。</p></div>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>Blazify 與 YouTube Music Premium 比一比</h2>
+    <div class="table">
+      <table>
+        <thead><tr><th></th><th>Blazify</th><th>YouTube Music Premium</th></tr></thead>
+        <tbody>
+          <tr><th>價格</th><td class="yes">免費</td><td>按月付費</td></tr>
+          <tr><th>廣告</th><td class="yes">無</td><td>無</td></tr>
+          <tr><th>離線下載</th><td class="yes">是</td><td>是</td></tr>
+          <tr><th>同步歌詞</th><td class="yes">逐字</td><td>逐行</td></tr>
+          <tr><th>等化器</th><td class="yes">10 頻段，13 種預設集</td><td>無</td></tr>
+          <tr><th>需要帳號</th><td class="yes">否</td><td>是</td></tr>
+          <tr><th>追蹤與分析</th><td class="yes">無</td><td>是</td></tr>
+          <tr><th>可閱讀的原始碼</th><td class="yes">是，GPL-3.0</td><td>否</td></tr>
+          <tr><th>電視、手錶和喇叭應用程式</th><td>僅 Android Auto</td><td>是</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>一分鐘就能開始聽</h2>
+    <ol class="steps">
+      <li>從 <b>F-Droid</b>（由原始碼建置）或它的 GitHub 頁面安裝 Blazify。</li>
+      <li>開啟應用程式，搜尋歌曲、藝人或專輯。不用登入，馬上就能播放。</li>
+      <li>如果想用自己的播放清單和喜歡的內容，選擇<b>使用 Google 帳號登入</b>。這一步也可以一直略過。</li>
+    </ol>
+  </section>
+
+  <section class="shell">
+    <h2>事先該知道的事</h2>
+    <p>Blazify 沒有上架 Google Play，所以在 Android 上要從 F-Droid 或 GitHub 安裝。Premium 有電視、手錶和智慧喇叭的應用程式；Blazify 都沒有，只支援車上的 Android Auto。曲庫就是 YouTube Music 的曲庫，在那裡找得到的歌，就是這裡能播放的歌。手機裡現有的歌也會和串流歌曲在同一個佇列中播放。</p>
+    <p class="note">Blazify 是獨立專案，並非由 YouTube 或 Google 製作，也與它們沒有任何關係。</p>
+  </section>
+
+  <section class="shell">
+    <h2>常見問題</h2>
+    <details><summary>Blazify 真的免費嗎？</summary><p>是的。沒有付費方案、沒有試用期，也沒有廣告。它是採用 GPL-3.0 授權的開源軟體，由加德滿都的一位開發者 Rajendra Pandey 製作。</p></details>
+    <details><summary>需要訂閱 YouTube Music Premium 嗎？</summary><p>不需要。Blazify 不會要求訂閱。除非你想在應用程式裡使用自己的音樂庫，否則連 Google 帳號都不需要。</p></details>
+    <details><summary>iPhone 和電腦也能用嗎？</summary><p>可以。Blazify 也能在 iPhone、Windows 和 Linux 上執行。iPhone 版是透過 SideStore 或 AltStore 安裝，不經過 App Store。</p></details>
+    <details><summary>我的收聽紀錄會被追蹤嗎？</summary><p>不會。Blazify 不含任何廣告、分析工具或追蹤程式庫。</p></details>
+  </section>
+
+  <section class="shell">
+    <h2>更多關於 Blazify</h2>
+    <div class="related">
+      <a href="../spotify-alternative/">免費的 Spotify 替代方案</a> <a href="../iphone/">iPhone 版</a> <a href="../windows/">Windows 版</a> <a href="../linux/">Linux 版</a> <a href="../compare/">與其他播放器比較</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><a href="../">Blazify</a> · 適用於 Android、iPhone、Windows 和 Linux 的免費開源音樂播放器 · <a href="https://github.com/rajendra7169/blazify">原始碼</a> · <a href="../../privacy/">隱私權政策</a></p>
+  </div>
+</footer>
+</body>
+</html>

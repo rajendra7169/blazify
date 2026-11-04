@@ -1,0 +1,88 @@
+/* The pages that answer one question each (a Spotify alternative, Blazify on an
+   iPhone, on Linux...). Same colours, type and top bar as the home page, laid out
+   for reading rather than for showing off. */
+:root{
+  --void:#0B0A09;--coal:#141110;--slate:#1E1917;
+  --line:rgba(255,167,38,.14);--amber:#FFA726;--ember:#FF7043;
+  --cream:#FFF4E6;--dim:#A89A8B;
+  --flame:linear-gradient(120deg,#FFA726 0%,#FF8A3D 45%,#FF7043 100%);
+  --shell:min(1100px,92vw);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--void);color:var(--cream);
+  font-family:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit}
+.shell{width:var(--shell);margin-inline:auto}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+
+/* Top bar: the home page's, so moving between pages feels like one site. */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);background:rgba(11,10,9,.78);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;gap:22px;padding:16px 0}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto;min-width:0}
+.brand img{width:34px;height:34px;flex:0 0 34px;object-fit:contain}
+.brand span{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.4px;background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-cta{padding:10px 20px;border-radius:99px;background:var(--flame);color:#1A0E00;font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap}
+.lang{position:relative}
+.lang summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:9px 14px;border-radius:99px;border:1px solid var(--line);color:var(--cream);font-size:14px;font-weight:600}
+.lang summary::-webkit-details-marker{display:none}
+.lang summary .ic{width:17px;height:17px}
+.lang summary:hover,.lang[open] summary{border-color:var(--amber);color:var(--amber)}
+.lang ul{position:absolute;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;z-index:60;min-width:190px;max-height:min(70vh,460px);overflow:auto;background:#151210;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.lang li a{display:block;padding:9px 12px;border-radius:10px;text-decoration:none;font-size:14.5px}
+.lang li a:hover{background:rgba(255,167,38,.1);color:var(--amber)}
+.lang li a[aria-current]{color:var(--amber);font-weight:600}
+[dir="rtl"] .lang ul{right:auto;left:0}
+
+/* The page itself. */
+.hero{padding:64px 0 28px}
+.eyebrow{display:inline-block;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);font-weight:500;margin-bottom:14px}
+h1{font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(32px,5vw,54px);line-height:1.12;margin:0 0 18px;text-wrap:balance}
+h1 em{font-style:normal;background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2vw,20px);color:var(--dim);max-width:62ch;margin:0 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:99px;background:var(--flame);color:#1A0E00;font-weight:600;text-decoration:none}
+.btn.ghost{background:none;color:var(--cream);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--amber);color:var(--amber)}
+section{padding:36px 0;border-top:1px solid var(--line)}
+h2{font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(24px,3vw,32px);line-height:1.2;margin:0 0 14px;text-wrap:balance}
+h3{font-weight:600;font-size:18px;margin:0 0 6px}
+p{max-width:68ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px;margin-top:20px}
+.card{background:var(--coal);border:1px solid var(--line);border-radius:20px;padding:20px 22px}
+.card p{margin:0;color:var(--dim);font-size:15.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px}
+.steps li{counter-increment:s;position:relative;padding:14px 18px 14px 58px;background:var(--coal);border:1px solid var(--line);border-radius:16px}
+.steps li::before{content:counter(s);position:absolute;left:16px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--flame);color:#1A0E00;font-weight:700;display:grid;place-items:center;font-size:14px}
+[dir="rtl"] .steps li{padding:14px 58px 14px 18px}
+[dir="rtl"] .steps li::before{left:auto;right:16px}
+.table{overflow-x:auto;margin-top:18px;border:1px solid var(--line);border-radius:18px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+th,td{padding:12px 16px;text-align:start;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{color:var(--amber);font-weight:600;background:var(--coal)}
+tbody th{font-weight:500;color:var(--cream)}
+td{color:var(--dim)}
+td.yes{color:var(--cream)}
+tr:last-child th,tr:last-child td{border-bottom:0}
+main details{background:var(--coal);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-top:10px}
+main details summary{cursor:pointer;font-weight:600;list-style:none}
+main details summary::-webkit-details-marker{display:none}
+main details p{color:var(--dim);margin:10px 0 0}
+.related{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.related a{padding:9px 16px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:14.5px}
+.related a:hover{border-color:var(--amber);color:var(--amber)}
+.note{font-size:14px;color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:36px 0 60px;color:var(--dim);font-size:14px}
+footer a{color:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media (max-width:520px){
+  .nav-in{gap:10px}
+  .brand span{font-size:21px}
+  .nav-cta{padding:9px 15px;font-size:14px}
+  .lang summary{padding:8px 11px}
+  .hero{padding:44px 0 20px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>免 App Store 的 iPhone YouTube Music 播放器：Blazify</title>
+<meta name="description" content="iPhone 版 Blazify 是免費開源的 YouTube Music 播放器，透過 SideStore 或 AltStore 安裝：不需要 App Store、沒有廣告，支援同步歌詞與背景播放。">
+<link rel="canonical" href="https://rajendra7169.github.io/blazify/zh-TW/iphone/">
+<link rel="alternate" hreflang="en" href="https://rajendra7169.github.io/blazify/iphone/">
+<link rel="alternate" hreflang="es" href="https://rajendra7169.github.io/blazify/es/iphone/">
+<link rel="alternate" hreflang="pt" href="https://rajendra7169.github.io/blazify/pt/iphone/">
+<link rel="alternate" hreflang="fr" href="https://rajendra7169.github.io/blazify/fr/iphone/">
+<link rel="alternate" hreflang="de" href="https://rajendra7169.github.io/blazify/de/iphone/">
+<link rel="alternate" hreflang="it" href="https://rajendra7169.github.io/blazify/it/iphone/">
+<link rel="alternate" hreflang="ru" href="https://rajendra7169.github.io/blazify/ru/iphone/">
+<link rel="alternate" hreflang="tr" href="https://rajendra7169.github.io/blazify/tr/iphone/">
+<link rel="alternate" hreflang="ar" href="https://rajendra7169.github.io/blazify/ar/iphone/">
+<link rel="alternate" hreflang="hi" href="https://rajendra7169.github.io/blazify/hi/iphone/">
+<link rel="alternate" hreflang="id" href="https://rajendra7169.github.io/blazify/id/iphone/">
+<link rel="alternate" hreflang="vi" href="https://rajendra7169.github.io/blazify/vi/iphone/">
+<link rel="alternate" hreflang="ja" href="https://rajendra7169.github.io/blazify/ja/iphone/">
+<link rel="alternate" hreflang="ko" href="https://rajendra7169.github.io/blazify/ko/iphone/">
+<link rel="alternate" hreflang="zh-CN" href="https://rajendra7169.github.io/blazify/zh-CN/iphone/">
+<link rel="alternate" hreflang="zh-TW" href="https://rajendra7169.github.io/blazify/zh-TW/iphone/">
+<link rel="alternate" hreflang="x-default" href="https://rajendra7169.github.io/blazify/iphone/">
+<meta property="og:url" content="https://rajendra7169.github.io/blazify/zh-TW/iphone/">
+<meta property="og:site_name" content="Blazify">
+<meta property="og:title" content="免 App Store 的 iPhone 版 YouTube Music 播放器">
+<meta property="og:description" content="免費開源，透過 SideStore 或 AltStore 安裝。沒有廣告，同步歌詞，背景播放。">
+<meta property="og:image" content="https://rajendra7169.github.io/blazify/assets/share-card.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0A09">
+<link rel="icon" href="../../assets/favicon-64.png" sizes="64x64">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/page.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" stroke-linejoin="round"/></symbol>
+</svg>
+
+<nav>
+  <div class="shell nav-in">
+    <a class="brand" href="../"><img src="../../assets/logo-512.png" alt="" width="512" height="512"><span>BLAZIFY</span></a>
+    <details class="lang" id="langPick">
+      <summary aria-label="Language"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>繁</span></summary>
+      <ul id="langList">
+        <li><a href="../../iphone/" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../es/iphone/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt/iphone/" hreflang="pt" lang="pt">Português</a></li>
+        <li><a href="../../fr/iphone/" hreflang="fr" lang="fr">Français</a></li>
+        <li><a href="../../de/iphone/" hreflang="de" lang="de">Deutsch</a></li>
+        <li><a href="../../it/iphone/" hreflang="it" lang="it">Italiano</a></li>
+        <li><a href="../../ru/iphone/" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../../tr/iphone/" hreflang="tr" lang="tr">Türkçe</a></li>
+        <li><a href="../../ar/iphone/" hreflang="ar" lang="ar">العربية</a></li>
+        <li><a href="../../hi/iphone/" hreflang="hi" lang="hi">हिन्दी</a></li>
+        <li><a href="../../id/iphone/" hreflang="id" lang="id">Bahasa Indonesia</a></li>
+        <li><a href="../../vi/iphone/" hreflang="vi" lang="vi">Tiếng Việt</a></li>
+        <li><a href="../../ja/iphone/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../ko/iphone/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh-CN/iphone/" hreflang="zh-CN" lang="zh-CN">简体中文</a></li>
+        <li><a href="../../zh-TW/iphone/" hreflang="zh-TW" lang="zh-TW" aria-current="page">繁體中文</a></li>
+      </ul>
+    </details>
+    <a class="nav-cta" href="../#get">取得 Blazify</a>
+  </div>
+</nav>
+
+<main>
+  <header class="hero shell">
+    <span class="eyebrow">iPhone 版 Blazify</span>
+    <h1>iPhone 上的 YouTube Music 播放器，<em>不需要 App Store</em></h1>
+    <p class="lead">iPhone 版 Blazify 免費又開源。你用 SideStore 或 AltStore 自行安裝，之後就能搜尋、播放、看同步歌詞，沒有廣告；離開應用程式後音樂也會繼續播放。</p>
+    <div class="cta">
+      <a class="btn" href="https://github.com/rajendra7169/blazify-ios/releases/latest">下載 iPhone 版</a> <a class="btn ghost" href="../#get">其他裝置</a>
+    </div>
+  </header>
+
+  <section class="shell">
+    <h2>iPhone 版能做什麼</h2>
+    <div class="cards">
+      <div class="card"><h3>搜尋與播放</h3><p>在 YouTube Music 曲庫中找歌曲、專輯和藝人並播放，中間沒有廣告。</p></div>
+      <div class="card"><h3>音樂庫與播放清單</h3><p>收藏喜歡的歌，建立你自己的播放清單。</p></div>
+      <div class="card"><h3>同步歌詞</h3><p>歌詞跟著歌曲走，方便你跟著看、跟著唱。</p></div>
+      <div class="card"><h3>背景播放</h3><p>鎖定手機或開啟其他應用程式，音樂照樣繼續。</p></div>
+      <div class="card"><h3>心情與曲風</h3><p>不知道想聽什麼的時候，可以依心情或曲風瀏覽。</p></div>
+      <div class="card"><h3>播放器設計</h3><p>多種播放器外觀可選，其中還有卡帶造型，選擇之前都能即時預覽。</p></div>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2>四個步驟完成安裝</h2>
+    <p>App Store 以外的應用程式要用側載工具安裝。SideStore 和 AltStore 都可以，兩者都會用你自己的 Apple ID 替應用程式簽署。</p>
+    <ol class="steps">
+      <li>依照官方網站上的說明，在 iPhone 上安裝 <b>SideStore</b> 或 <b>AltStore</b>。</li>
+      <li>在 iPhone 上開啟 GitHub 中的<b>最新 Blazify 版本</b>，下載 <b>Blazify.ipa</b>。</li>
+      <li>用 SideStore 或 AltStore 開啟下載的檔案，Blazify 就會安裝到主畫面上。</li>
+      <li>每週重新整理一次應用程式，做法見下方說明。</li>
+    </ol>
+  </section>
+
+  <section class="shell">
+    <h2>每週重新整理</h2>
+    <p>使用免費的 Apple ID 時，Apple 允許側載的應用程式執行七天，之後就必須重新簽署。重新整理只要在 SideStore 或 AltStore 點一下，你的音樂庫、播放清單和設定都會原封不動。SideStore 可以直接在手機上完成重新整理，身邊不需要電腦。如果過了一週忘記重新整理，應用程式只是在重新整理之前打不開而已。</p>
+  </section>
+
+  <section class="shell">
+    <h2>事先該知道的事</h2>
+    <p>iPhone 版目前是 0.4.0 版，比 Android 版起步晚，所以現階段功能比較少。它不在 App Store 上，因此更新方式和第一次安裝一樣：下載新版本，再用 SideStore 或 AltStore 開啟。它的音樂來自 YouTube Music 曲庫，YouTube Music 上沒有的歌，Blazify 裡也不會有。</p>
+  </section>
+
+  <section class="shell">
+    <h2>常見問題</h2>
+    <details><summary>iPhone 需要越獄嗎？</summary><p>不需要。SideStore 和 AltStore 安裝的是用你自己的 Apple ID 簽署的應用程式，手機系統完全不會被更動。</p></details>
+    <details><summary>要花錢嗎？</summary><p>不用。Blazify 免費，沒有付費方案，也沒有廣告。用免費的 Apple ID 就能安裝，唯一的代價是每七天重新整理一次。</p></details>
+    <details><summary>我的收聽紀錄會被追蹤嗎？</summary><p>不會。Blazify 不含任何廣告、分析工具或追蹤程式庫。原始碼以 GPL-3.0 授權公開。</p></details>
+    <details><summary>是誰做的？</summary><p>尼泊爾加德滿都的一位開發者 Rajendra Pandey。同一款應用程式也能在 Android、Windows 和 Linux 上執行。</p></details>
+  </section>
+
+  <section class="shell">
+    <h2>更多關於 Blazify</h2>
+    <div class="related">
+      <a href="../spotify-alternative/">免費的 Spotify 替代方案</a> <a href="../youtube-music-no-ads/">無廣告的 YouTube Music</a> <a href="../windows/">Windows 版</a> <a href="../linux/">Linux 版</a> <a href="../compare/">與其他播放器比較</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p><a href="../">Blazify</a> · 適用於 Android、iPhone、Windows 和 Linux 的免費開源音樂播放器 · <a href="https://github.com/rajendra7169/blazify">原始碼</a> · <a href="../../privacy/">隱私權政策</a></p>
+  </div>
+</footer>
+</body>
+</html>
