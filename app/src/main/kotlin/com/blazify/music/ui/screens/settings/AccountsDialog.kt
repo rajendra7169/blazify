@@ -5,6 +5,7 @@
 
 package com.blazify.music.ui.screens.settings
 
+import android.content.Context
 import android.webkit.CookieManager
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -56,6 +57,7 @@ import com.blazify.music.utils.SavedAccount
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.AccountSettingsViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * The channels of the account in use, then the other accounts on this phone, then adding one.
@@ -93,12 +95,35 @@ fun AccountsDialog(
  * forget one, or add another. Shown in its own dialog, and opened in place under
  * the account card, so the same list behaves the same wherever it is reached.
  */
+/** What the accounts list shows, read before it opens so it opens complete. */
+internal class AccountsPanelData(
+    val saved: List<SavedAccount>,
+    val channels: List<AccountChannel>,
+)
+
+/** The saved accounts, and the channels of the one in use; a slow answer for the channels counts as none. */
+internal suspend fun loadAccountsPanel(
+    context: Context,
+    isLoggedIn: Boolean,
+): AccountsPanelData {
+    AccountSwitcher.rememberCurrent(context)
+    val saved = AccountSwitcher.saved(context)
+    val channels =
+        if (isLoggedIn) {
+            withTimeoutOrNull(10_000) { YouTube.accountChannels().getOrNull() }.orEmpty()
+        } else {
+            emptyList()
+        }
+    return AccountsPanelData(saved, channels)
+}
+
 @Composable
 internal fun AccountsPanel(
     isLoggedIn: Boolean,
     onAddAccount: () -> Unit,
     onSwitching: (Boolean) -> Unit = {},
     showNote: Boolean = true,
+    preloaded: AccountsPanelData? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -108,14 +133,15 @@ internal fun AccountsPanel(
     val (currentSyncId) = rememberPreference(DataSyncIdKey, "")
     val currentKey = "$currentEmail|${currentSyncId.substringBefore("||")}|$currentName"
 
-    var saved by remember { mutableStateOf<List<SavedAccount>>(emptyList()) }
-    var channels by remember { mutableStateOf<List<AccountChannel>>(emptyList()) }
-    var loadingChannels by remember { mutableStateOf(isLoggedIn) }
+    var saved by remember { mutableStateOf(preloaded?.saved.orEmpty()) }
+    var channels by remember { mutableStateOf(preloaded?.channels.orEmpty()) }
+    var loadingChannels by remember { mutableStateOf(preloaded == null && isLoggedIn) }
     var switching by remember { mutableStateOf(false) }
     LaunchedEffect(switching) { onSwitching(switching) }
     val expired = stringResource(R.string.accounts_expired)
 
     LaunchedEffect(Unit) {
+        if (preloaded != null) return@LaunchedEffect
         AccountSwitcher.rememberCurrent(context)
         saved = AccountSwitcher.saved(context)
         if (isLoggedIn) {

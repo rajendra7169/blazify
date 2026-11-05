@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +55,7 @@ import com.blazify.music.constants.SavedAccountsKey
 import com.blazify.music.utils.AccountSwitcher
 import com.blazify.music.utils.SavedAccount
 import com.blazify.music.utils.rememberPreference
+import kotlinx.coroutines.launch
 
 /**
  * Who is signed in, at the top of the account sheet, and every other account on
@@ -85,6 +88,26 @@ internal fun AccountCard(
 
     var expanded by remember { mutableStateOf(false) }
     val turn by animateFloatAsState(if (expanded) 180f else 0f, label = "account_arrow")
+
+    // The list is read before it opens, with the arrow turning while it is, so it opens
+    // complete instead of opening on a spinner and jumping as the rows arrive.
+    val scope = rememberCoroutineScope()
+    var panelData by remember { mutableStateOf<AccountsPanelData?>(null) }
+    var loadingPanel by remember { mutableStateOf(false) }
+    val toggleList: () -> Unit = {
+        when {
+            expanded -> expanded = false
+            loadingPanel -> Unit
+            else -> {
+                loadingPanel = true
+                scope.launch {
+                    panelData = loadAccountsPanel(context, isLoggedIn)
+                    loadingPanel = false
+                    expanded = true
+                }
+            }
+        }
+    }
 
     // Adding starts from an empty sign-in page; otherwise Google sees the
     // account already in use and hands it straight back.
@@ -157,12 +180,19 @@ internal fun AccountCard(
                 }
 
                 if (isLoggedIn || others > 0) {
-                    IconButton(onClick = { expanded = !expanded }) {
-                        Icon(
-                            painter = painterResource(R.drawable.expand_more),
-                            contentDescription = stringResource(R.string.accounts_and_channels),
-                            modifier = Modifier.rotate(turn),
-                        )
+                    IconButton(onClick = toggleList) {
+                        if (loadingPanel) {
+                            CircularProgressIndicator(
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.expand_more),
+                                contentDescription = stringResource(R.string.accounts_and_channels),
+                                modifier = Modifier.rotate(turn),
+                            )
+                        }
                     }
                 }
             }
@@ -181,6 +211,7 @@ internal fun AccountCard(
                         isLoggedIn = isLoggedIn,
                         onAddAccount = onAddAccount,
                         showNote = false,
+                        preloaded = panelData,
                     )
                     // Inside the list rather than beside the name, where a button
                     // left room for only the first few letters of it.
