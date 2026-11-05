@@ -1351,7 +1351,6 @@
         <item quantity="other">Mais %1$d contas neste celular</item>
     </plurals>
     <string name="mini_player_buttons">Botões</string>
-    <string name="mini_player_buttons_desc">Escolha até %1$d, na ordem que quiser. Toque de novo para tirar.</string>
+    <string name="mini_player_buttons_desc">Três botões, da esquerda para a direita. Toque em um lugar e depois no que vai nele; se escolher um que já está em uso, os dois trocam.</string>
     <string name="mini_player_buttons_reset">Redefinir</string>
-    <string name="mini_player_buttons_full">Até %1$d botões. Tire um primeiro.</string>
 </resources>

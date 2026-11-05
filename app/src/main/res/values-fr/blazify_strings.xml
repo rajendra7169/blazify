@@ -1352,7 +1352,6 @@
         <item quantity="other">%1$d comptes supplémentaires</item>
     </plurals>
     <string name="mini_player_buttons">Boutons</string>
-    <string name="mini_player_buttons_desc">Choisissez-en jusqu’à %1$d, dans l’ordre voulu. Touchez-en un à nouveau pour le retirer.</string>
+    <string name="mini_player_buttons_desc">Trois boutons, de gauche à droite. Touchez un emplacement, puis ce qui doit y aller ; si vous choisissez un bouton déjà utilisé, les deux s’échangent.</string>
     <string name="mini_player_buttons_reset">Réinitialiser</string>
-    <string name="mini_player_buttons_full">%1$d boutons au maximum. Retirez-en un d’abord.</string>
 </resources>

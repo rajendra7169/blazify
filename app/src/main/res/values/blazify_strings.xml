@@ -1494,7 +1494,6 @@
     <string name="accounts_switching">Switching…</string>
     <string name="accounts_expired">That account is signed out. Add it again to use it.</string>
     <string name="mini_player_buttons">Buttons</string>
-    <string name="mini_player_buttons_desc">Choose up to %1$d, in the order you want them. Tap one again to take it off.</string>
+    <string name="mini_player_buttons_desc">Three buttons, left to right. Tap a place, then what goes there; tap one already in use and the two swap.</string>
     <string name="mini_player_buttons_reset">Reset</string>
-    <string name="mini_player_buttons_full">Up to %1$d buttons. Take one off first.</string>
 </resources>

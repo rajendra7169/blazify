@@ -1340,7 +1340,6 @@
         <item quantity="other">%1$d weitere Konten auf diesem Telefon</item>
     </plurals>
     <string name="mini_player_buttons">Schaltflächen</string>
-    <string name="mini_player_buttons_desc">Wähle bis zu %1$d, in der gewünschten Reihenfolge. Tippe erneut, um eine zu entfernen.</string>
+    <string name="mini_player_buttons_desc">Drei Schaltflächen, von links nach rechts. Tippe auf einen Platz und dann auf das, was dorthin soll; wählst du eine schon belegte, tauschen beide.</string>
     <string name="mini_player_buttons_reset">Zurücksetzen</string>
-    <string name="mini_player_buttons_full">Höchstens %1$d Schaltflächen. Entferne zuerst eine.</string>
 </resources>

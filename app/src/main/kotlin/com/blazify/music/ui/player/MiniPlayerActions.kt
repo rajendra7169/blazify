@@ -41,28 +41,30 @@ enum class MiniPlayerAction(
     val isTransport: Boolean get() = this == PREVIOUS || this == PLAY_PAUSE || this == NEXT
 
     companion object {
-        /** More than this and the song's title has no room left on a small phone. */
-        const val MAX = 3
+        /** Always this many: fewer leaves the bar looking empty, more leaves the title no room. */
+        const val COUNT = 3
 
         fun fromId(id: String): MiniPlayerAction? = entries.firstOrNull { it.id == id }
 
         /** What each design showed before there was a choice, so nobody's mini-player changes by itself. */
         fun defaultsFor(design: MiniPlayerDesign): List<MiniPlayerAction> =
             when (design) {
-                MiniPlayerDesign.FLAT -> listOf(PLAY_PAUSE, NEXT)
+                MiniPlayerDesign.FLAT -> listOf(PLAY_PAUSE, NEXT, LIKE)
                 MiniPlayerDesign.ROUNDED -> listOf(PREVIOUS, PLAY_PAUSE, NEXT)
                 MiniPlayerDesign.MODERN, MiniPlayerDesign.FLOATING -> listOf(SUBSCRIBE_ARTIST, ADD_TO_PLAYLIST, LIKE)
             }
 
         fun encode(actions: List<MiniPlayerAction>): String = actions.joinToString(",") { it.id }
 
-        /** Blank means "the design's own"; an id from a later version is skipped rather than failing. */
-        fun decode(text: String, design: MiniPlayerDesign): List<MiniPlayerAction> =
-            if (text.isBlank()) {
-                defaultsFor(design)
-            } else {
-                text.split(",").mapNotNull { fromId(it.trim()) }.distinct().take(MAX)
-            }
+        /**
+         * Always [COUNT] buttons. Blank means "the design's own"; an id from a later version is
+         * skipped, and any gap is filled from the design's own, so the bar is never short.
+         */
+        fun decode(text: String, design: MiniPlayerDesign): List<MiniPlayerAction> {
+            val chosen = text.split(",").mapNotNull { fromId(it.trim()) }.distinct().take(COUNT)
+            val fill = (defaultsFor(design) + entries).filterNot { it in chosen }
+            return chosen + fill.take(COUNT - chosen.size)
+        }
     }
 }
 

@@ -1340,7 +1340,6 @@
         <item quantity="other">इस फ़ोन पर %1$d और खाते</item>
     </plurals>
     <string name="mini_player_buttons">बटन</string>
-    <string name="mini_player_buttons_desc">अपनी पसंद के क्रम में %1$d तक चुनें। हटाने के लिए उसे फिर से टैप करें।</string>
+    <string name="mini_player_buttons_desc">बाएँ से दाएँ तीन बटन। कोई जगह टैप करें, फिर वह चुनें जो वहाँ जाए; पहले से लगे बटन को चुनने पर दोनों की जगह बदल जाती है।</string>
     <string name="mini_player_buttons_reset">रीसेट करें</string>
-    <string name="mini_player_buttons_full">ज़्यादा से ज़्यादा %1$d बटन। पहले एक हटाएँ।</string>
 </resources>

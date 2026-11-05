@@ -1328,7 +1328,6 @@
         <item quantity="other">この端末にほかに %1$d 個のアカウント</item>
     </plurals>
     <string name="mini_player_buttons">ボタン</string>
-    <string name="mini_player_buttons_desc">並べたい順に最大 %1$d 個まで選べます。もう一度タップすると外れます。</string>
+    <string name="mini_player_buttons_desc">左から順に3つのボタン。場所をタップしてから、そこに置くものを選びます。使用中のボタンを選ぶと入れ替わります。</string>
     <string name="mini_player_buttons_reset">リセット</string>
-    <string name="mini_player_buttons_full">ボタンは最大 %1$d 個です。先にどれかを外してください。</string>
 </resources>

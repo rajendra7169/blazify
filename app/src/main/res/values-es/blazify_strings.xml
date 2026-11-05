@@ -1351,7 +1351,6 @@
         <item quantity="other">Hay %1$d cuentas más en este teléfono</item>
     </plurals>
     <string name="mini_player_buttons">Botones</string>
-    <string name="mini_player_buttons_desc">Elige hasta %1$d, en el orden que quieras. Tócalo de nuevo para quitarlo.</string>
+    <string name="mini_player_buttons_desc">Tres botones, de izquierda a derecha. Toca un lugar y luego lo que va ahí; si eliges uno que ya está en uso, los dos se intercambian.</string>
     <string name="mini_player_buttons_reset">Restablecer</string>
-    <string name="mini_player_buttons_full">Hasta %1$d botones. Quita uno primero.</string>
 </resources>

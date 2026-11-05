@@ -159,6 +159,27 @@ private fun MiniPlayerActionButton(
                 SubscribeButton(artistId, mediaMetadata, colors.primary, colors.outline, colors.onSurface)
                 return
             }
+            // Plain arrows beside the play button, as the Rounded design always drew them; as
+            // outlined circles side by side they ran into each other.
+            MiniPlayerAction.PREVIOUS, MiniPlayerAction.NEXT -> {
+                val previous = action == MiniPlayerAction.PREVIOUS
+                val canSkip = if (previous) canSkipPrevious else canSkipNext
+                IconButton(
+                    onClick = {
+                        if (previous) playerConnection.player.seekToPreviousMediaItem() else playerConnection.player.seekToNext()
+                    },
+                    enabled = canSkip,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(action.iconRes),
+                        contentDescription = label,
+                        tint = colors.onSurface.copy(alpha = if (canSkip) 1f else 0.4f),
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+                return
+            }
             MiniPlayerAction.PLAY_PAUSE -> {
                 val isPlaying by playerConnection.isPlaying.collectAsState()
                 Box(

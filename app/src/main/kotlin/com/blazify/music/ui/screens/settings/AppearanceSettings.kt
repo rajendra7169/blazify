@@ -98,13 +98,21 @@ import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import kotlin.math.roundToInt
-import android.widget.Toast
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.ui.platform.LocalContext
 import com.blazify.music.ui.player.MiniPlayerAction
 import com.blazify.music.ui.player.miniPlayerButtonsKey
 import com.blazify.music.ui.player.rememberMiniPlayerActions
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.zIndex
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -950,11 +958,32 @@ internal fun MiniPlayerButtonsPicker(design: MiniPlayerDesign) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MiniPlayerButtonsPickerFor(design: MiniPlayerDesign) {
-    val context = LocalContext.current
     val (text, onTextChange) = rememberPreference(miniPlayerButtonsKey(design), "")
     val chosen = remember(text, design) { MiniPlayerAction.decode(text, design) }
-    val isOwn = text.isBlank() || chosen == MiniPlayerAction.defaultsFor(design)
-    val full = stringResource(R.string.mini_player_buttons_full, MiniPlayerAction.MAX)
+    val isOwn = chosen == MiniPlayerAction.defaultsFor(design)
+    // The place a pick goes into; it moves on after each pick, so three taps fill the bar.
+    var slot by remember { mutableIntStateOf(0) }
+    // A place being dragged sideways to a new position, and how far it has moved.
+    var dragging by remember { mutableIntStateOf(-1) }
+    var dragX by remember { mutableFloatStateOf(0f) }
+    var slotStep by remember { mutableFloatStateOf(0f) }
+    val haptic = LocalHapticFeedback.current
+    val gapPx = with(LocalDensity.current) { 8.dp.toPx() }
+    val dropAt = if (dragging >= 0 && slotStep > 0f) {
+        (dragging + (dragX / slotStep).roundToInt()).coerceIn(0, MiniPlayerAction.COUNT - 1)
+    } else {
+        -1
+    }
+
+    fun put(action: MiniPlayerAction) {
+        val next = chosen.toMutableList()
+        val from = next.indexOf(action)
+        // Already in another place: the two swap, which is also how the order is changed.
+        if (from >= 0) next[from] = next[slot]
+        next[slot] = action
+        onTextChange(MiniPlayerAction.encode(next))
+        slot = (slot + 1) % MiniPlayerAction.COUNT
+    }
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -966,26 +995,135 @@ private fun MiniPlayerButtonsPickerFor(design: MiniPlayerDesign) {
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = stringResource(R.string.mini_player_buttons_desc, MiniPlayerAction.MAX),
+                    text = stringResource(R.string.mini_player_buttons_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (!isOwn) {
-                TextButton(onClick = { onTextChange("") }) {
+                TextButton(
+                    onClick = {
+                        onTextChange("")
+                        slot = 0
+                    },
+                ) {
                     Text(stringResource(R.string.mini_player_buttons_reset))
                 }
             }
         }
         Spacer(Modifier.height(12.dp))
+
+        // The three places, left to right as on the mini-player. Drag one sideways to move it.
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            chosen.forEachIndexed { index, action ->
+                val selected = index == slot
+                val isDragged = index == dragging
+                // The others step aside as the dragged one passes them.
+                val shift =
+                    when {
+                        isDragged || dropAt < 0 -> 0f
+                        index in (dragging + 1)..dropAt -> -slotStep
+                        index in dropAt until dragging -> slotStep
+                        else -> 0f
+                    }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .onSizeChanged { slotStep = it.width + gapPx }
+                            .zIndex(if (isDragged) 1f else 0f)
+                            .graphicsLayer {
+                                translationX = if (isDragged) dragX else shift
+                                val grow = if (isDragged) 1.06f else 1f
+                                scaleX = grow
+                                scaleY = grow
+                            }.pointerInput(chosen) {
+                                detectHorizontalDragGestures(
+                                    onDragStart = {
+                                        dragging = index
+                                        dragX = 0f
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
+                                    onHorizontalDrag = { change, amount ->
+                                        change.consume()
+                                        dragX += amount
+                                    },
+                                    onDragEnd = {
+                                        // Worked out here, from where the finger let go: this
+                                        // block outlives the composition that set it up.
+                                        val to =
+                                            if (slotStep > 0f) {
+                                                (index + (dragX / slotStep).roundToInt()).coerceIn(0, MiniPlayerAction.COUNT - 1)
+                                            } else {
+                                                index
+                                            }
+                                        if (to != index) {
+                                            val next = chosen.toMutableList()
+                                            next.add(to, next.removeAt(index))
+                                            onTextChange(MiniPlayerAction.encode(next))
+                                            slot = to
+                                        }
+                                        dragging = -1
+                                        dragX = 0f
+                                    },
+                                    onDragCancel = {
+                                        dragging = -1
+                                        dragX = 0f
+                                    },
+                                )
+                            }.clip(RoundedCornerShape(16.dp))
+                            .background(
+                                if (selected) MaterialTheme.colorScheme.primaryContainer
+                                else MaterialTheme.colorScheme.surfaceContainerHigh,
+                            ).border(
+                                if (selected) 2.dp else 1.dp,
+                                if (selected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                RoundedCornerShape(16.dp),
+                            ).clickable { slot = index }
+                            .padding(vertical = 12.dp, horizontal = 6.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                ),
+                    ) {
+                        Icon(
+                            painter = painterResource(action.iconRes),
+                            contentDescription = null,
+                            tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(action.labelRes),
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+
+        // Everything that can go in the selected place.
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             MiniPlayerAction.entries.forEach { action ->
-                val order = chosen.indexOf(action)
-                val selected = order >= 0
+                val place = chosen.indexOf(action)
+                val inUse = place >= 0
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -993,30 +1131,20 @@ private fun MiniPlayerButtonsPickerFor(design: MiniPlayerDesign) {
                         Modifier
                             .clip(RoundedCornerShape(50))
                             .background(
-                                if (selected) MaterialTheme.colorScheme.primaryContainer
+                                if (inUse) MaterialTheme.colorScheme.secondaryContainer
                                 else MaterialTheme.colorScheme.surfaceContainerHigh,
-                            ).border(
-                                1.dp,
-                                if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                RoundedCornerShape(50),
-                            ).clickable {
-                                when {
-                                    selected -> onTextChange(MiniPlayerAction.encode(chosen - action))
-                                    chosen.size >= MiniPlayerAction.MAX ->
-                                        Toast.makeText(context, full, Toast.LENGTH_SHORT).show()
-                                    else -> onTextChange(MiniPlayerAction.encode(chosen + action))
-                                }
-                            }.padding(start = 10.dp, end = 14.dp, top = 8.dp, bottom = 8.dp),
+                            ).border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(50))
+                            .clickable { put(action) }
+                            .padding(start = 10.dp, end = 14.dp, top = 8.dp, bottom = 8.dp),
                 ) {
-                    if (selected) {
+                    if (inUse) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
+                            modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondary),
                         ) {
                             Text(
-                                text = "${order + 1}",
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                text = "${place + 1}",
+                                color = MaterialTheme.colorScheme.onSecondary,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -1032,7 +1160,7 @@ private fun MiniPlayerButtonsPickerFor(design: MiniPlayerDesign) {
                     Text(
                         text = stringResource(action.labelRes),
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                        color = if (inUse) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }

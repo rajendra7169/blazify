@@ -1328,7 +1328,6 @@
         <item quantity="other">%1$d akun lagi di ponsel ini</item>
     </plurals>
     <string name="mini_player_buttons">Tombol</string>
-    <string name="mini_player_buttons_desc">Pilih hingga %1$d, sesuai urutan yang kamu mau. Ketuk lagi untuk melepasnya.</string>
+    <string name="mini_player_buttons_desc">Tiga tombol, dari kiri ke kanan. Ketuk satu tempat, lalu pilih isinya; jika memilih tombol yang sudah dipakai, keduanya bertukar.</string>
     <string name="mini_player_buttons_reset">Atur ulang</string>
-    <string name="mini_player_buttons_full">Maksimal %1$d tombol. Lepas satu dulu.</string>
 </resources>

@@ -1386,7 +1386,6 @@
         <item quantity="other">%1$d حساب آخر على هذا الهاتف</item>
     </plurals>
     <string name="mini_player_buttons">الأزرار</string>
-    <string name="mini_player_buttons_desc">اختر حتى %1$d، بالترتيب الذي تريده. اضغط على الزر مرة أخرى لإزالته.</string>
+    <string name="mini_player_buttons_desc">ثلاثة أزرار من اليسار إلى اليمين. اضغط على مكان ثم على ما تريد وضعه فيه؛ وإذا اخترت زرًا مستخدمًا يتبادلان المكانين.</string>
     <string name="mini_player_buttons_reset">إعادة ضبط</string>
-    <string name="mini_player_buttons_full">حتى %1$d أزرار. أزل واحدًا أولًا.</string>
 </resources>

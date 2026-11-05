@@ -1364,7 +1364,6 @@
         <item quantity="other">Ещё %1$d аккаунтов на этом телефоне</item>
     </plurals>
     <string name="mini_player_buttons">Кнопки</string>
-    <string name="mini_player_buttons_desc">Выберите до %1$d в нужном порядке. Нажмите ещё раз, чтобы убрать.</string>
+    <string name="mini_player_buttons_desc">Три кнопки слева направо. Нажмите на место, затем выберите, что туда поставить; если выбрать уже занятую кнопку, они поменяются местами.</string>
     <string name="mini_player_buttons_reset">Сбросить</string>
-    <string name="mini_player_buttons_full">Не больше %1$d кнопок. Сначала уберите одну.</string>
 </resources>
