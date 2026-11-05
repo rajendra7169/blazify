@@ -48,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -85,11 +84,8 @@ import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import com.blazify.music.viewmodels.HomeViewModel
 import com.blazify.innertube.utils.parseCookieString
-import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.layout.fillMaxSize
 
 private class SettingRow(
     val icon: Int,
@@ -223,11 +219,13 @@ fun SettingsScreen(
         Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top)))
         Spacer(Modifier.height(8.dp))
 
-        ProfileHeader(
-            name = accountName.takeIf { it.isNotBlank() && isLoggedIn } ?: stringResource(R.string.guest),
-            imageUrl = accountImageUrl.takeIf { isLoggedIn },
+        // The same card as the account sheet: the accounts on this phone, adding one and
+        // logging out, all from here.
+        AccountCard(
             isLoggedIn = isLoggedIn,
-            onClick = { navController.navigate(if (isLoggedIn) "account" else "login") },
+            name = accountName,
+            photo = accountImageUrl,
+            onAddAccount = { navController.navigate("login") },
         )
         Spacer(Modifier.height(12.dp))
 
@@ -401,74 +399,6 @@ private fun BlazeSettingRow(row: SettingRow, colorIndex: Int) {
             }
             Text(
                 text = row.subtitle,
-                fontSize = 12.5.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Icon(
-            painter = painterResource(R.drawable.navigate_next),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            modifier = Modifier.size(20.dp),
-        )
-    }
-}
-
-@Composable
-private fun ProfileHeader(name: String, imageUrl: String?, isLoggedIn: Boolean, onClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick)
-            .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.06f),
-                    ),
-                ),
-            )
-            .padding(14.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(46.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (imageUrl != null) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Icon(
-                    painter = painterResource(R.drawable.person),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        }
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(if (isLoggedIn) R.string.manage_account else R.string.tap_to_sign_in),
                 fontSize = 12.5.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

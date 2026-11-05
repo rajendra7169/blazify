@@ -28,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,16 +47,22 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.blazify.music.R
 import com.blazify.music.constants.AccountEmailKey
 import com.blazify.music.constants.AccountNameKey
 import com.blazify.music.constants.DataSyncIdKey
+import com.blazify.music.constants.InnerTubeCookieKey
 import com.blazify.music.constants.SavedAccountsKey
+import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.utils.AccountSwitcher
 import com.blazify.music.utils.SavedAccount
 import com.blazify.music.utils.rememberPreference
+import com.blazify.music.utils.reportException
+import com.blazify.music.viewmodels.AccountSettingsViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Who is signed in, at the top of the account sheet, and every other account on
@@ -71,11 +78,20 @@ internal fun AccountCard(
     isLoggedIn: Boolean,
     name: String,
     photo: String?,
-    onOpen: () -> Unit,
-    onLogout: () -> Unit,
     onAddAccount: () -> Unit,
+    onLoggedOut: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    var showLogout by remember { mutableStateOf(false) }
+    if (showLogout) {
+        LogoutDialog(
+            onDismiss = { showLogout = false },
+            onDone = {
+                showLogout = false
+                onLoggedOut()
+            },
+        )
+    }
     val (savedText) = rememberPreference(SavedAccountsKey, "")
     val (currentName) = rememberPreference(AccountNameKey, "")
     val (currentEmail) = rememberPreference(AccountEmailKey, "")
@@ -129,7 +145,9 @@ internal fun AccountCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .clickable { if (isLoggedIn) onOpen() else addAccount() }
+                        // Signed in, the card itself opens the list, as its arrow does;
+                        // it used to leave for the account's library page instead.
+                        .clickable { if (isLoggedIn) toggleList() else addAccount() }
                         .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
             ) {
                 Box {
@@ -222,7 +240,7 @@ internal fun AccountCard(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = onLogout)
+                                    .clickable { showLogout = true }
                                     .padding(horizontal = 18.dp, vertical = 12.dp),
                         ) {
                             Icon(
@@ -242,4 +260,59 @@ internal fun AccountCard(
             }
         }
     }
+}
+
+/**
+ * Logging out, asked first: keep what was synced from the account in the library, or
+ * clear it. Downloads stay either way.
+ */
+@Composable
+private fun LogoutDialog(
+    onDismiss: () -> Unit,
+    onDone: () -> Unit,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val viewModel: AccountSettingsViewModel = hiltViewModel()
+    val (_, onInnerTubeCookieChange) = rememberPreference(InnerTubeCookieKey, "")
+    DefaultDialog(
+        onDismiss = onDismiss,
+        title = { Text(stringResource(R.string.logout_dialog_title)) },
+        content = {
+            Text(
+                text = stringResource(R.string.logout_dialog_message),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(horizontal = 18.dp),
+            )
+        },
+        buttons = {
+            TextButton(
+                onClick = {
+                    scope.launch {
+                        try {
+                            // Forget the account first, so no sync puts songs back while clearing.
+                            viewModel.logoutAndClearLibraryData(context)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Logout: clearing library data failed, logging out anyway")
+                            reportException(e)
+                        }
+                        onInnerTubeCookieChange("")
+                        onDone()
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.logout_clear))
+            }
+            TextButton(
+                onClick = {
+                    scope.launch {
+                        viewModel.logoutKeepData(context, onInnerTubeCookieChange)
+                        onDone()
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.logout_keep))
+            }
+        },
+    )
 }

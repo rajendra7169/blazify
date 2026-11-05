@@ -85,11 +85,9 @@ import com.blazify.music.ui.theme.BlazeThemeColor
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.Updater
 import com.blazify.music.utils.rememberPreference
-import com.blazify.music.utils.reportException
 import com.blazify.music.viewmodels.AccountSettingsViewModel
 import com.blazify.music.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun AccountSettings(
@@ -159,7 +157,6 @@ fun AccountSettings(
 
     var showToken by remember { mutableStateOf(false) }
     var showTokenEditor by remember { mutableStateOf(false) }
-    var showLogoutDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -206,60 +203,6 @@ fun AccountSettings(
                 },
             )
             Spacer(Modifier.height(12.dp))
-        }
-
-        // Logout confirmation dialog
-        if (showLogoutDialog) {
-            DefaultDialog(
-                onDismiss = { showLogoutDialog = false },
-                title = { Text(stringResource(R.string.logout_dialog_title)) },
-                content = {
-                    Text(
-                        text = stringResource(R.string.logout_dialog_message),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(horizontal = 18.dp)
-                    )
-                },
-                buttons = {
-                    TextButton(
-                        onClick = {
-                            Timber.d("[LOGOUT_CLEAR] User chose to clear data")
-                            scope.launch {
-                                try {
-                                    Timber.d("[LOGOUT_CLEAR] Starting clear and logout process")
-                                    // Forget account first (stops all sync), then clear data.
-                                    // This prevents background syncs from re-adding songs.
-                                    accountSettingsViewModel.logoutAndClearLibraryData(context)
-                                    Timber.d("[LOGOUT_CLEAR] Library data cleared and account forgotten")
-                                } catch (e: Exception) {
-                                    Timber.e(e, "[LOGOUT_CLEAR] Error clearing library data, proceeding with logout")
-                                    reportException(e)
-                                }
-                                onInnerTubeCookieChange("")
-                                Timber.d("[LOGOUT_CLEAR] Logout complete")
-                                showLogoutDialog = false
-                                onClose()
-                            }
-                        }
-                    ) {
-                        Text(stringResource(R.string.logout_clear))
-                    }
-                    TextButton(
-                        onClick = {
-                            Timber.d("[LOGOUT_KEEP] User chose to keep data")
-                            scope.launch {
-                                Timber.d("[LOGOUT_KEEP] Starting logout process (keeping data)")
-                                accountSettingsViewModel.logoutKeepData(context, onInnerTubeCookieChange)
-                                Timber.d("[LOGOUT_KEEP] Logout complete")
-                                showLogoutDialog = false
-                                onClose()
-                            }
-                        }
-                    ) {
-                        Text(stringResource(R.string.logout_keep))
-                    }
-                }
-            )
         }
 
         if (showTokenEditor) {
@@ -329,18 +272,11 @@ fun AccountSettings(
             isLoggedIn = isLoggedIn,
             name = accountName,
             photo = accountImageUrl,
-            onOpen = {
-                onClose()
-                navController.navigate("account")
-            },
-            onLogout = {
-                Timber.d("[LOGOUT] User clicked logout button, showing dialog")
-                showLogoutDialog = true
-            },
             onAddAccount = {
                 onClose()
                 navController.navigate("login")
             },
+            onLoggedOut = onClose,
         )
 
         Spacer(Modifier.height(8.dp))
