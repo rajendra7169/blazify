@@ -2389,6 +2389,17 @@ class MusicService :
     }
 
     fun playNext(items: List<MediaItem>) {
+        // From a song's menu this can arrive before the player exists, or on a service Android
+        // stopped before it had one; touching the player then crashed the app. Wait for it,
+        // as playQueue does.
+        if (!playerInitialized.value) {
+            Timber.tag(TAG).w("playNext called before player initialization, queuing request")
+            scope.launch {
+                playerInitialized.first { it }
+                playNext(items)
+            }
+            return
+        }
         @Suppress("NAME_SHADOWING")
         val items = withoutBroadcasts(items)
         if (items.isEmpty()) return
@@ -2503,6 +2514,15 @@ class MusicService :
     }
 
     fun addToQueue(items: List<MediaItem>) {
+        // Same as playNext: never touch a player that does not exist yet.
+        if (!playerInitialized.value) {
+            Timber.tag(TAG).w("addToQueue called before player initialization, queuing request")
+            scope.launch {
+                playerInitialized.first { it }
+                addToQueue(items)
+            }
+            return
+        }
         @Suppress("NAME_SHADOWING")
         val items = withoutBroadcasts(items)
         if (items.isEmpty()) return
