@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -43,10 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.blazify.music.R
 import com.blazify.music.constants.AccountEmailKey
@@ -61,7 +58,7 @@ import com.blazify.music.utils.rememberPreference
  * Who is signed in, at the top of the account sheet, and every other account on
  * the phone one tap away beneath it.
  *
- * The photo carries a small "+1" when other accounts are saved, so it is plain
+ * The line under the name says how many other accounts are saved, so it is plain
  * there is somewhere to switch to. The arrow opens the list in place: the other
  * accounts, the channels of this one, and a row to add another. Signed out, the
  * card offers to add an account, and still lists any saved ones to go back to.
@@ -133,25 +130,6 @@ internal fun AccountCard(
                                 painter = painterResource(if (isLoggedIn) R.drawable.person else R.drawable.add),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                        }
-                    }
-                    if (others > 0) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier =
-                                Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .offset(x = 6.dp, y = 4.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .padding(horizontal = 5.dp, vertical = 1.dp),
-                        ) {
-                            Text(
-                                text = "+$others",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
                             )
                         }
                     }
