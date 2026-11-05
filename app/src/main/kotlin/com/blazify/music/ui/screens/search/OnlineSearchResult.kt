@@ -402,7 +402,13 @@ fun OnlineSearchResult(
                 if (query.text.isNotEmpty()) {
                     IconButton(
                         onClick = {
+                            // Emptied, the box is asking for new words: show the suggestions and the
+                            // keyboard, as deleting the words one by one does. Left unfocused it
+                            // showed an empty box above the old results (issue 35).
                             query = TextFieldValue("")
+                            isSearchFocused = true
+                            runCatching { focusRequester.requestFocus() }
+                            keyboardController?.show()
                         },
                     ) {
                         Icon(
