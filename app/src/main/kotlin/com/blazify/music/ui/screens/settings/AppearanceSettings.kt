@@ -46,6 +46,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -942,6 +943,13 @@ internal fun MiniPlayerDesignPicker(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun MiniPlayerButtonsPicker(design: MiniPlayerDesign) {
+    // rememberPreference keeps the first key it is given, so each design gets its own.
+    key(design) { MiniPlayerButtonsPickerFor(design) }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MiniPlayerButtonsPickerFor(design: MiniPlayerDesign) {
     val context = LocalContext.current
     val (text, onTextChange) = rememberPreference(miniPlayerButtonsKey(design), "")
     val chosen = remember(text, design) { MiniPlayerAction.decode(text, design) }

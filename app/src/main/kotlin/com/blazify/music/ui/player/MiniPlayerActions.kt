@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.blazify.music.R
@@ -41,7 +42,7 @@ enum class MiniPlayerAction(
 
     companion object {
         /** More than this and the song's title has no room left on a small phone. */
-        const val MAX = 4
+        const val MAX = 3
 
         fun fromId(id: String): MiniPlayerAction? = entries.firstOrNull { it.id == id }
 
@@ -49,7 +50,7 @@ enum class MiniPlayerAction(
         fun defaultsFor(design: MiniPlayerDesign): List<MiniPlayerAction> =
             when (design) {
                 MiniPlayerDesign.FLAT -> listOf(PLAY_PAUSE, NEXT)
-                MiniPlayerDesign.ROUNDED -> listOf(PREVIOUS, PLAY_PAUSE, NEXT, LIKE)
+                MiniPlayerDesign.ROUNDED -> listOf(PREVIOUS, PLAY_PAUSE, NEXT)
                 MiniPlayerDesign.MODERN, MiniPlayerDesign.FLOATING -> listOf(SUBSCRIBE_ARTIST, ADD_TO_PLAYLIST, LIKE)
             }
 
@@ -69,7 +70,9 @@ fun miniPlayerButtonsKey(design: MiniPlayerDesign) = stringPreferencesKey("miniP
 
 /** The buttons chosen for [design], or the design's own when none were chosen. */
 @Composable
-fun rememberMiniPlayerActions(design: MiniPlayerDesign): List<MiniPlayerAction> {
-    val text by rememberPreference(miniPlayerButtonsKey(design), "")
-    return remember(text, design) { MiniPlayerAction.decode(text, design) }
-}
+fun rememberMiniPlayerActions(design: MiniPlayerDesign): List<MiniPlayerAction> =
+    // rememberPreference keeps the first key it is given, so each design gets its own.
+    key(design) {
+        val text by rememberPreference(miniPlayerButtonsKey(design), "")
+        remember(text) { MiniPlayerAction.decode(text, design) }
+    }
