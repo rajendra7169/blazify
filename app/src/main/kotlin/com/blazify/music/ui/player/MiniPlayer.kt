@@ -657,6 +657,21 @@ private fun NewMiniPlayerPlayButton(
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
+            } else {
+                // Playing: a fainter pause, so the cover still reads as the button that stops it
+                // without hiding the art the way the paused state does.
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.18f), CircleShape),
+                )
+                Icon(
+                    painter = painterResource(if (isListenTogetherGuest) R.drawable.volume_up else R.drawable.pause),
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp),
+                )
             }
         }
     }
