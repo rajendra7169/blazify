@@ -30,9 +30,10 @@ object PlayerConfigStore {
     /**
      * Where remote tables come from, in the order they are asked.
      *
-     * [OWN] is our copy on the player-configs branch, kept in step with the upstream registry
-     * by a scheduled job, so playback doesn't depend on someone else's repository staying where
-     * it is. [MIRROR] is the same file through a CDN, for networks that block raw GitHub.
+     * [OWN] is our copy on the player-configs branch on GitLab, kept in step with the upstream
+     * registry by a scheduled job there, so playback doesn't depend on someone else's repository
+     * staying where it is. [MIRROR] is the older copy on GitHub, through a CDN: no job updates it
+     * any more, but it still knows every player up to the move, for networks that block GitLab.
      * [UPSTREAM] is the registry itself, asked when our copy can't be read or doesn't know the
      * player yet: the hours before the job catches up, or if the job ever stops.
      *
@@ -42,7 +43,7 @@ object PlayerConfigStore {
      */
     internal enum class Source(val url: String, val cacheName: String) {
         OWN(
-            "https://raw.githubusercontent.com/rajendra7169/blazify/player-configs/player_configs.json",
+            "https://gitlab.com/hackerraja7169/blazify/-/raw/player-configs/player_configs.json",
             "configs_own",
         ),
         MIRROR(

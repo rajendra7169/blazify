@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Bring our copy of the player config table and player registry up to date.
 
-Usage: sync_player_configs.py <upstream configs> <upstream registry> <player-configs branch dir>
+Usage: sync_player_configs.py <upstream configs> <upstream registry> <directory holding our copy>
 
-The app reads these files straight from the player-configs branch, so nothing
+The app reads these files straight from the player-configs branch (on GitLab,
+where a scheduled job runs this script every three hours), so nothing
 written here may ever be worse than what is already there:
 
 - a download that doesn't look like a real table (bad JSON, wrong schema, too
-  few players) changes nothing and fails the run, so GitHub reports it
+  few players) changes nothing and fails the run, so GitLab sends an email
 - entries are checked with the same rules the app uses, and bad ones are dropped
 - players upstream has are taken from upstream; players only we have are kept,
   so a player can never disappear from our copy
