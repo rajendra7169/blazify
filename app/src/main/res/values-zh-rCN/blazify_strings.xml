@@ -1327,4 +1327,8 @@
     <plurals name="accounts_more_saved">
         <item quantity="other">此手机上还有 %1$d 个账号</item>
     </plurals>
+    <string name="mini_player_buttons">按钮</string>
+    <string name="mini_player_buttons_desc">按你想要的顺序最多选 %1$d 个。再点一次即可移除。</string>
+    <string name="mini_player_buttons_reset">重置</string>
+    <string name="mini_player_buttons_full">最多 %1$d 个按钮。请先移除一个。</string>
 </resources>

@@ -1351,4 +1351,8 @@
         <item quantity="many">%1$d comptes supplémentaires</item>
         <item quantity="other">%1$d comptes supplémentaires</item>
     </plurals>
+    <string name="mini_player_buttons">Boutons</string>
+    <string name="mini_player_buttons_desc">Choisissez-en jusqu’à %1$d, dans l’ordre voulu. Touchez-en un à nouveau pour le retirer.</string>
+    <string name="mini_player_buttons_reset">Réinitialiser</string>
+    <string name="mini_player_buttons_full">%1$d boutons au maximum. Retirez-en un d’abord.</string>
 </resources>

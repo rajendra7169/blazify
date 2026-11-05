@@ -206,9 +206,9 @@ private fun NewMiniPlayer(
     val playerConnection = LocalPlayerConnection.current ?: return
     val menuState = LocalMenuState.current
     // Floating = boxier corners + a drop shadow so the card lifts off the page.
-    // Rounded = same pill but with an explicit prev / play / next cluster.
+    // Each design has its own buttons until some are chosen for it.
     val isFloating = variant == MiniPlayerDesign.FLOATING
-    val isRoundedControls = variant == MiniPlayerDesign.ROUNDED
+    val miniActions = rememberMiniPlayerActions(variant)
     val cardShape = RoundedCornerShape(if (isFloating) 18.dp else 32.dp)
 
     // Theme settings - these rarely change
@@ -516,115 +516,20 @@ private fun NewMiniPlayer(
                     Spacer(modifier = Modifier.width(12.dp))
                 }
 
-                if (isRoundedControls) {
-                    // Explicit transport controls for the Rounded design.
-                    MiniPlayerTransportCluster(
-                        playerConnection = playerConnection,
+                // The buttons this design shows, or the ones chosen for it in Look & Feel.
+                mediaMetadata?.let { metadata ->
+                    MiniPlayerActionRow(
+                        actions = miniActions,
+                        mediaMetadata = metadata,
+                        isOnAir = isOnAir,
                         canSkipPrevious = canSkipPrevious,
                         canSkipNext = canSkipNext,
-                        onSurfaceColor = onSurfaceColor,
-                        primaryColor = primaryColor,
+                        colors = MiniPlayerColors(primaryColor, outlineColor, onSurfaceColor, errorColor),
+                        flat = false,
+                        flatPlayButton = {},
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                } else {
-// Subscribe button - isolated composable
-                    mediaMetadata?.artists?.firstOrNull()?.id?.let { artistId ->
-                        SubscribeButton(
-                            artistId = artistId,
-                            metadata = mediaMetadata!!,
-                            primaryColor = primaryColor,
-                            outlineColor = outlineColor,
-                            onSurfaceColor = onSurfaceColor,
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-// Add to playlist button - isolated composable
-                    mediaMetadata?.let { metadata ->
-                        AddToPlaylistButton(
-                            onClick = {
-                                menuState.show {
-                                    AddToPlaylistDialog(
-                                        isVisible = true,
-                                        onGetSong = { listOf(metadata.id) },
-                                        onDismiss = menuState::dismiss,
-                                    )
-                                }
-                            },
-                            outlineColor = outlineColor,
-                            onSurfaceColor = onSurfaceColor,
-                            // A broadcast cannot sit in a playlist: there is nothing of it to keep.
-                            enabled = !isOnAir,
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-
-// Favorite button - isolated composable
-                mediaMetadata?.let { FavoriteButton(
-                    songId = it.id,
-                    errorColor = errorColor,
-                    outlineColor = outlineColor,
-                    onSurfaceColor = onSurfaceColor,
-                    enabled = !isOnAir,
-                )
                 }
             }
-        }
-    }
-}
-
-/** Prev · Play/Pause · Next cluster used by the Rounded mini-player design. */
-@Composable
-private fun MiniPlayerTransportCluster(
-    playerConnection: PlayerConnection,
-    canSkipPrevious: Boolean,
-    canSkipNext: Boolean,
-    onSurfaceColor: Color,
-    primaryColor: Color,
-) {
-    val isPlaying by playerConnection.isPlaying.collectAsState()
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-            onClick = { playerConnection.player.seekToPreviousMediaItem() },
-            enabled = canSkipPrevious,
-            modifier = Modifier.size(32.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.skip_previous),
-                contentDescription = null,
-                tint = onSurfaceColor.copy(alpha = if (canSkipPrevious) 1f else 0.4f),
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(primaryColor)
-                .clickable { playerConnection.togglePlayPause() },
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        IconButton(
-            onClick = { playerConnection.player.seekToNext() },
-            enabled = canSkipNext,
-            modifier = Modifier.size(32.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.skip_next),
-                contentDescription = null,
-                tint = onSurfaceColor.copy(alpha = if (canSkipNext) 1f else 0.4f),
-                modifier = Modifier.size(22.dp),
-            )
         }
     }
 }
@@ -843,6 +748,7 @@ private fun LegacyMiniPlayer(
     val isOnAir = mediaMetadata?.id in liveBroadcasts
     val canSkipNext by playerConnection.canSkipNext.collectAsStateWithLifecycle()
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
+    val miniActions = rememberMiniPlayerActions(MiniPlayerDesign.FLAT)
 
     val castHandler =
         remember(playerConnection) {
@@ -1014,19 +920,33 @@ private fun LegacyMiniPlayer(
                 }
             }
 
-            LegacyPlayPauseButton(
-                playbackState = playbackState,
-                isCasting = isCasting,
-                castHandler = castHandler,
-                playerConnection = playerConnection,
-                listenTogetherManager = listenTogetherManager,
-            )
-
-            IconButton(
-                enabled = canSkipNext && !isListenTogetherGuest,
-                onClick = if (isListenTogetherGuest) ({}) else ({ playerConnection.seekToNext() }),
-            ) {
-                Icon(painter = painterResource(R.drawable.skip_next), contentDescription = null)
+            // The flat bar's buttons, or the ones chosen for it; its own play button stays,
+            // as it also handles casting and Blaze Together.
+            mediaMetadata?.let { metadata ->
+                MiniPlayerActionRow(
+                    actions = miniActions,
+                    mediaMetadata = metadata,
+                    isOnAir = isOnAir,
+                    canSkipPrevious = canSkipPrevious && !isListenTogetherGuest,
+                    canSkipNext = canSkipNext && !isListenTogetherGuest,
+                    colors =
+                        MiniPlayerColors(
+                            primary = primaryColor,
+                            outline = MaterialTheme.colorScheme.outline,
+                            onSurface = MaterialTheme.colorScheme.onSurface,
+                            error = MaterialTheme.colorScheme.error,
+                        ),
+                    flat = true,
+                    flatPlayButton = {
+                        LegacyPlayPauseButton(
+                            playbackState = playbackState,
+                            isCasting = isCasting,
+                            castHandler = castHandler,
+                            playerConnection = playerConnection,
+                            listenTogetherManager = listenTogetherManager,
+                        )
+                    },
+                )
             }
         }
 
@@ -1035,7 +955,7 @@ private fun LegacyMiniPlayer(
 }
 
 @Composable
-private fun LegacyPlayPauseButton(
+internal fun LegacyPlayPauseButton(
     playbackState: Int,
     isCasting: Boolean,
     castHandler: CastConnectionHandler?,
@@ -1181,7 +1101,7 @@ private fun LegacyMiniMediaInfo(
 // ============================================================================
 
 @Composable
-private fun SubscribeButton(
+internal fun SubscribeButton(
     artistId: String,
     metadata: MediaMetadata,
     primaryColor: Color,
@@ -1236,7 +1156,7 @@ private fun SubscribeButton(
 }
 
 @Composable
-private fun AddToPlaylistButton(
+internal fun AddToPlaylistButton(
     onClick: () -> Unit,
     outlineColor: Color,
     onSurfaceColor: Color,
@@ -1272,7 +1192,7 @@ private fun AddToPlaylistButton(
 }
 
 @Composable
-private fun FavoriteButton(
+internal fun FavoriteButton(
     songId: String,
     errorColor: Color,
     outlineColor: Color,

@@ -1350,4 +1350,8 @@
         <item quantity="one">Hay %1$d cuenta más en este teléfono</item>
         <item quantity="other">Hay %1$d cuentas más en este teléfono</item>
     </plurals>
+    <string name="mini_player_buttons">Botones</string>
+    <string name="mini_player_buttons_desc">Elige hasta %1$d, en el orden que quieras. Tócalo de nuevo para quitarlo.</string>
+    <string name="mini_player_buttons_reset">Restablecer</string>
+    <string name="mini_player_buttons_full">Hasta %1$d botones. Quita uno primero.</string>
 </resources>

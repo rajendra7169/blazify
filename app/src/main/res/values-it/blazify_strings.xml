@@ -857,4 +857,8 @@
     <string name="discord_status_not_initialized">Non inizializzato</string>
     <string name="discord_error_loopback_timeout">Discord non ha inviato la risposta in tempo. Per favore riprova.</string>
     <string name="discord_error_loopback_unbound">Non è stato possibile aprire una porta callback locale. Per favore liberane una e riprova.</string>
+    <string name="mini_player_buttons">Pulsanti</string>
+    <string name="mini_player_buttons_desc">Scegline fino a %1$d, nell’ordine che preferisci. Toccane uno di nuovo per toglierlo.</string>
+    <string name="mini_player_buttons_reset">Ripristina</string>
+    <string name="mini_player_buttons_full">Al massimo %1$d pulsanti. Prima togline uno.</string>
 </resources>

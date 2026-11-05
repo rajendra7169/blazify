@@ -1327,4 +1327,8 @@
     <plurals name="accounts_more_saved">
         <item quantity="other">Thêm %1$d tài khoản trên điện thoại này</item>
     </plurals>
+    <string name="mini_player_buttons">Nút</string>
+    <string name="mini_player_buttons_desc">Chọn tối đa %1$d nút, theo thứ tự bạn muốn. Chạm lại để bỏ.</string>
+    <string name="mini_player_buttons_reset">Đặt lại</string>
+    <string name="mini_player_buttons_full">Tối đa %1$d nút. Hãy bỏ bớt một nút trước.</string>
 </resources>

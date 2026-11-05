@@ -1339,4 +1339,8 @@
         <item quantity="one">Bu telefonda %1$d hesap daha</item>
         <item quantity="other">Bu telefonda %1$d hesap daha</item>
     </plurals>
+    <string name="mini_player_buttons">Düğmeler</string>
+    <string name="mini_player_buttons_desc">İstediğin sırayla en fazla %1$d tane seç. Kaldırmak için tekrar dokun.</string>
+    <string name="mini_player_buttons_reset">Sıfırla</string>
+    <string name="mini_player_buttons_full">En fazla %1$d düğme. Önce birini kaldır.</string>
 </resources>

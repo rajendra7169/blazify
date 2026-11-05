@@ -97,6 +97,13 @@ import com.blazify.music.ui.utils.backToMain
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
 import kotlin.math.roundToInt
+import android.widget.Toast
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.ui.platform.LocalContext
+import com.blazify.music.ui.player.MiniPlayerAction
+import com.blazify.music.ui.player.miniPlayerButtonsKey
+import com.blazify.music.ui.player.rememberMiniPlayerActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -928,6 +935,103 @@ internal fun MiniPlayerDesignPicker(
     }
 }
 
+/**
+ * The buttons on the mini-player, for the design in use: up to four, in the order they are
+ * tapped, and tapped again to take one off. The real mini-player below changes as they are.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun MiniPlayerButtonsPicker(design: MiniPlayerDesign) {
+    val context = LocalContext.current
+    val (text, onTextChange) = rememberPreference(miniPlayerButtonsKey(design), "")
+    val chosen = remember(text, design) { MiniPlayerAction.decode(text, design) }
+    val isOwn = text.isBlank() || chosen == MiniPlayerAction.defaultsFor(design)
+    val full = stringResource(R.string.mini_player_buttons_full, MiniPlayerAction.MAX)
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.mini_player_buttons),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.mini_player_buttons_desc, MiniPlayerAction.MAX),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (!isOwn) {
+                TextButton(onClick = { onTextChange("") }) {
+                    Text(stringResource(R.string.mini_player_buttons_reset))
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            MiniPlayerAction.entries.forEach { action ->
+                val order = chosen.indexOf(action)
+                val selected = order >= 0
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(
+                                if (selected) MaterialTheme.colorScheme.primaryContainer
+                                else MaterialTheme.colorScheme.surfaceContainerHigh,
+                            ).border(
+                                1.dp,
+                                if (selected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                RoundedCornerShape(50),
+                            ).clickable {
+                                when {
+                                    selected -> onTextChange(MiniPlayerAction.encode(chosen - action))
+                                    chosen.size >= MiniPlayerAction.MAX ->
+                                        Toast.makeText(context, full, Toast.LENGTH_SHORT).show()
+                                    else -> onTextChange(MiniPlayerAction.encode(chosen + action))
+                                }
+                            }.padding(start = 10.dp, end = 14.dp, top = 8.dp, bottom = 8.dp),
+                ) {
+                    if (selected) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
+                        ) {
+                            Text(
+                                text = "${order + 1}",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(action.iconRes),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                    Text(
+                        text = stringResource(action.labelRes),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun MiniPlayerDesignCard(
     design: MiniPlayerDesign,
@@ -1035,24 +1139,16 @@ private fun MiniPlayerDesignPreview(design: MiniPlayerDesign) {
                 Box(Modifier.fillMaxWidth(0.46f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(barFill.copy(alpha = 0.7f)))
             }
             Spacer(Modifier.width(6.dp))
-            when (design) {
-                MiniPlayerDesign.ROUNDED -> {
-                    MockGlyph(R.drawable.skip_previous, onColor, 12)
-                    Spacer(Modifier.width(2.dp))
+            // The buttons chosen for this design, or its own.
+            rememberMiniPlayerActions(design).forEachIndexed { i, action ->
+                if (i > 0) Spacer(Modifier.width(if (action == MiniPlayerAction.PLAY_PAUSE || design == MiniPlayerDesign.FLAT) 2.dp else 5.dp))
+                if (action == MiniPlayerAction.PLAY_PAUSE && design != MiniPlayerDesign.FLAT) {
                     Box(
                         Modifier.size(18.dp).clip(CircleShape).background(onColor.copy(alpha = 0.92f)),
                         contentAlignment = Alignment.Center,
                     ) { MockGlyph(R.drawable.play, Color.Black, 11) }
-                    Spacer(Modifier.width(2.dp))
-                    MockGlyph(R.drawable.skip_next, onColor, 12)
-                }
-                MiniPlayerDesign.FLAT -> {
-                    MockGlyph(R.drawable.favorite_border, onColor, 13)
-                }
-                else -> {
-                    MockGlyph(R.drawable.playlist_add, onColor.copy(alpha = 0.9f), 13)
-                    Spacer(Modifier.width(6.dp))
-                    MockGlyph(R.drawable.favorite_border, onColor.copy(alpha = 0.9f), 13)
+                } else {
+                    MockGlyph(action.iconRes, onColor.copy(alpha = 0.9f), 12)
                 }
             }
         }

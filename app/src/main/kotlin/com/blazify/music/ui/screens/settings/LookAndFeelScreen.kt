@@ -302,6 +302,8 @@ fun LookAndFeelScreen(
                                 selected = selectedMiniPlayerDesign,
                                 onSelect = { onMiniPlayerDesignChange(it.id) },
                             )
+                            Spacer(Modifier.height(8.dp))
+                            MiniPlayerButtonsPicker(design = selectedMiniPlayerDesign)
                         }
                 }
             }

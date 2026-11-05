@@ -1327,4 +1327,8 @@
     <plurals name="accounts_more_saved">
         <item quantity="other">이 휴대폰에 계정 %1$d개 더 있음</item>
     </plurals>
+    <string name="mini_player_buttons">버튼</string>
+    <string name="mini_player_buttons_desc">원하는 순서대로 최대 %1$d개까지 고르세요. 다시 누르면 빠집니다.</string>
+    <string name="mini_player_buttons_reset">초기화</string>
+    <string name="mini_player_buttons_full">버튼은 최대 %1$d개예요. 먼저 하나를 빼 주세요.</string>
 </resources>

@@ -1339,4 +1339,8 @@
         <item quantity="one">%1$d weiteres Konto auf diesem Telefon</item>
         <item quantity="other">%1$d weitere Konten auf diesem Telefon</item>
     </plurals>
+    <string name="mini_player_buttons">Schaltflächen</string>
+    <string name="mini_player_buttons_desc">Wähle bis zu %1$d, in der gewünschten Reihenfolge. Tippe erneut, um eine zu entfernen.</string>
+    <string name="mini_player_buttons_reset">Zurücksetzen</string>
+    <string name="mini_player_buttons_full">Höchstens %1$d Schaltflächen. Entferne zuerst eine.</string>
 </resources>
