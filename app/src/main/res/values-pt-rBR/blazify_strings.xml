@@ -257,7 +257,7 @@
     <string name="wrapped_ready_title">SUA RETROSPECTIVA ESTÁ PRONTA!</string>
     <string name="wrapped_ready_subtitle">Hora de checar o que você adorou em todo esse ano…</string>
     <string name="wrapped_thank_you">Obrigado por ouvir!</string>
-    <string name="wrapped_special_thanks">Agradecimentos especiais ao MO Agamy por criar o Blazify</string>
+    <string name="wrapped_special_thanks">Feito com ❤️ para quem ama música</string>
     <string name="wrapped_close">Fechar Retrospectiva</string>
     <string name="wrapped_playlist_title">Sua Retrospectiva %s</string>
     <string name="wrapped_create_playlist">Criar playlist</string>
@@ -337,8 +337,8 @@
     <string name="tap_to_play">Clique para abrir o Blazify</string>
     <string name="widget_music_player">Reprodutor de música</string>
     <string name="widget_turntable">Toca-discos</string>
-    <string name="together">Juntos</string>
-    <string name="listen_together">Ouvir juntos</string>
+    <string name="together">Blaze Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL do servidor</string>
     <string name="listen_together_choose_server">Escolher servidor</string>
     <string name="listen_together_custom_server">Servidor personalizado</string>
@@ -376,11 +376,11 @@
     <string name="listen_together_auto_approval_joins_desc">Aprovar pedidos de entrada automaticamente sem analisá-los manualmente</string>
     <string name="listen_together_sync_volume">Sincronizar volume do anfitrião</string>
     <string name="listen_together_sync_volume_desc">Os Participantes irão combinar o nível de volume ao do anfitrião</string>
-    <string name="listen_together_in_top_bar">Ouvir juntos na barra superior</string>
-    <string name="listen_together_in_top_bar_desc">Mostrar o Ouvir Juntos na barra superior do aplicativo em vez de na barra de navegação</string>
+    <string name="listen_together_in_top_bar">Blaze Together na barra superior</string>
+    <string name="listen_together_in_top_bar_desc">Mostrar o Blaze Together na barra superior do aplicativo em vez de na barra de navegação</string>
     <string name="listen_together_description">Ouça a músicas em tempo real com seus amigos. Crie uma sala para hospedar, ou junte-se a uma sala existente com um código</string>
-    <string name="listen_together_background_disconnect_note">OBSERVAÇÃO: Quando você estiver conectado, mas não estiver em uma sala, o \"Ouvir juntos\" se desconecta após 30 minutos em segundo plano para economizar bateria</string>
-    <string name="listen_together_not_configured">Ouvir Juntos não está configurado. Por favor configure o URL do servidor em: Ouvir Juntos &gt; Configurações &gt; URL do servidor</string>
+    <string name="listen_together_background_disconnect_note">OBSERVAÇÃO: Quando você estiver conectado, mas não estiver em uma sala, o \"Blaze Together\" se desconecta após 30 minutos em segundo plano para economizar bateria</string>
+    <string name="listen_together_not_configured">Blaze Together não está configurado. Por favor configure o URL do servidor em: Blaze Together &gt; Configurações &gt; URL do servidor</string>
     <string name="listen_together_room_created">Sala criada: %s</string>
     <string name="hide_youtube_shorts">Ocultar Shorts do YouTube</string>
     <string name="listen_together_view_logs_desc">Depurar eventos de conexão e mensagens</string>
@@ -388,8 +388,8 @@
     <string name="listen_together_suggestion_received">%1$s sugerido %2$s</string>
     <string name="listen_together_suggestion_sent">Solicitação enviada ao dono!</string>
     <string name="listen_together_join_request_notification">%1$s quer se juntar a sala</string>
-    <string name="listen_together_notification_channel_name">Ouvir Juntos</string>
-    <string name="listen_together_notification_channel_desc">Notificações para eventos de Ouvir Juntos</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notificações para eventos de Blaze Together</string>
     <string name="listen_together_cannot_edit_username_in_room">O nome de usuário não pode ser alterado enquanto você está em uma sala</string>
     <string name="waiting_for_approval">Esperando o anfitrião aprovar…</string>
     <string name="invalid_room_code">Código de sala invalido</string>
@@ -531,7 +531,7 @@
     <string name="discord_activity_listening">Ouvindo</string>
     <string name="discord_activity_watching">Assistindo</string>
     <string name="discord_activity_competing">Competindo</string>
-    <string name="discord_information_warning">Blazify envia a música tocando no momento para a Gateway do Discord para atualizar a sua Rich Presence. Todos os fatos vão diretamente do seu dispositivo para o Discord — nenhum servidor de terceiros está envolvido. Seu token continua no dispositivo e não é compartilhado. De qualquer maneira, usar um token para conexões de Gateway não é suportado oficialmente e pode violar os termos de serviço do Discord. Prossiga por sua responsabilidade!</string>
+    <string name="discord_information_warning">O Blazify usa as APIs públicas OAuth2 e Gateway do Discord para compartilhar o que você está ouvindo. A autorização acontece por uma sessão de navegador local que se fecha sozinha depois de capturar o código, e nada é enviado a servidores de terceiros. Seu token fica guardado neste dispositivo em preferências criptografadas e nunca é compartilhado. O Blazify se conecta diretamente a wss://gateway.discord.gg para publicar sua atividade e pede apenas o escopo mínimo necessário (sdk.social_layer_presence).</string>
     <string name="discord_rpc_preview">Visualização de Rich Presence</string>
     <string name="discord_presence">Presença</string>
     <string name="discord_connect_description">Entre com o Discord para compartilhar o que você está ouvindo</string>
@@ -762,7 +762,7 @@
     <string name="recognition_notification_processing">Identificando…</string>
     <string name="recognition_notification_no_match">Nenhuma correspondência encontrada</string>
     <string name="recognition_notification_failed">Reconhecimento falhou</string>
-    <string name="listen_on_blazify">Ouvir no blazify</string>
+    <string name="listen_on_blazify">Ouvir no Blazify</string>
     <string name="android_auto">Android Auto</string>
     <string name="android_auto_visible_sections">Seções visíveis</string>
     <string name="android_auto_reorder_hint">Toque em uma seção para ativar ou desativá-la.\nPressione e segure o botão de arrastar para reordenar. A primeira seção será mostrada como padrão</string>
@@ -1112,7 +1112,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Conexões</string>
     <string name="hint_integrations">Discord Rich Presence, scrobbling do Last.fm</string>
-    <string name="hint_together_settings">Sincronização e configurações de sala do Ouvir juntos</string>
+    <string name="hint_together_settings">Sincronização e configurações de sala do Blaze Together</string>
     <string name="guest">Convidado</string>
     <string name="manage_account">Gerenciar sua conta</string>
     <string name="tap_to_sign_in">Toque para entrar</string>

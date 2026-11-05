@@ -258,7 +258,7 @@
     <string name="wrapped_ready_title">WRAPPED-UL TĂU ESTE GATA!</string>
     <string name="wrapped_ready_subtitle">Este timpul să vedem ce ai apreciat în tot acest an…</string>
     <string name="wrapped_thank_you">Mulțumim pentru ascultare!</string>
-    <string name="wrapped_special_thanks">Mulțumire speciale lui MO Agamy pentru crearea Blazify</string>
+    <string name="wrapped_special_thanks">Creat cu ❤️ pentru iubitorii de muzică</string>
     <string name="wrapped_close">Închide Wrapped</string>
     <string name="wrapped_playlist_title">Wrapped-ul tău %s</string>
     <string name="wrapped_create_playlist">Creează playlist</string>
@@ -324,7 +324,7 @@
     <string name="error_eq_apply_failed">Nu s-a putut aplica profilul pentru egalizator: %1$s</string>
     <string name="error_playback_failed">Redarea a eșuat</string>
     <string name="keep_screen_on_when_player_is_expanded">Menține ecranul pornit atunci când playerul este extins</string>
-    <string name="listen_together">Ascultă împreună</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL server</string>
     <string name="listen_together_username">Nume de utilizator</string>
     <string name="listen_together_connected">Conectat</string>
@@ -344,13 +344,13 @@
     <string name="listen_together_logs">Jurnale de conectare</string>
     <string name="listen_together_no_logs">Niciun jurnal încă</string>
     <string name="listen_together_description">Ascultă muzică cu prietenii tăi în timp real. Creează o cameră pentru a găzdui sau alătură-te unei camere existente cu un cod</string>
-    <string name="listen_together_background_disconnect_note">NOTĂ: Atunci când ești conectat, dar nu ești într-o cameră, funcția Ascultă împreună te va deconecta după 30 de minute în fundal pentru a economisi baterie</string>
-    <string name="listen_together_not_configured">Funcția Ascultă împreună nu este configurată. Te rugăm să setezi adresa URL a serverului în: Ascultă împreună &gt; Setări &gt; URL-ul serverului</string>
+    <string name="listen_together_background_disconnect_note">NOTĂ: Atunci când ești conectat, dar nu ești într-o cameră, funcția Blaze Together te va deconecta după 30 de minute în fundal pentru a economisi baterie</string>
+    <string name="listen_together_not_configured">Funcția Blaze Together nu este configurată. Te rugăm să setezi adresa URL a serverului în: Blaze Together &gt; Setări &gt; URL-ul serverului</string>
     <string name="listen_together_suggestion_received">%1$s a sugerat %2$s</string>
     <string name="listen_together_suggestion_sent">Sugestie trimisă gazdei!</string>
     <string name="listen_together_join_request_notification">%1$s vrea să se alăture camerei</string>
-    <string name="listen_together_notification_channel_name">Ascultă împreună</string>
-    <string name="listen_together_notification_channel_desc">Notificări pentru evenimentele funcției Ascultă împreună</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notificări pentru evenimentele funcției Blaze Together</string>
     <string name="listen_together_room_created">Cameră creată: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Numele de utilizator nu poate fi modificat în timp ce ești într-o cameră</string>
     <string name="waiting_for_approval">Se așteaptă aprobarea de la gazdă…</string>
@@ -424,7 +424,7 @@
     <string name="copy_code">Copiază codul</string>
     <string name="kick_user_desc">Elimină această persoană din sesiune</string>
     <string name="permanently_kick_user">Blochează permanent</string>
-    <string name="together">Împreună</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Introdu un cod de cameră</string>
     <string name="listen_together_settings_desc">Configurează serverul, numele de utilizator și altele</string>
     <string name="permanently_kick_user_desc">Blochează cererile de alăturare ale acestei persoane și ascunde-i sugestiile</string>
@@ -503,8 +503,8 @@
     <string name="prevent_duplicate_tracks_in_queue">Previne piesele duplicate în coadă</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">Atunci când adaugi o piesă care este deja în coadă, aceasta va fi mutată din poziția ei anterioară în loc să fie adăugată din nou</string>
     <string name="hide_youtube_shorts">Ascunde YouTube Shorts</string>
-    <string name="listen_together_in_top_bar">Ascultă împreună în bara de sus</string>
-    <string name="listen_together_in_top_bar_desc">Arată funcția Ascultă împreună în bara de sus în loc de bara de navigare</string>
+    <string name="listen_together_in_top_bar">Blaze Together în bara de sus</string>
+    <string name="listen_together_in_top_bar_desc">Arată funcția Blaze Together în bara de sus în loc de bara de navigare</string>
     <string name="ai_translation_literal_desc">Traduce sensul în limba țintă</string>
     <string name="ai_translation_transcribed_desc">Convertește punctuația în alfabetul țintă</string>
     <string name="ai_provider_help">Obține chei API</string>

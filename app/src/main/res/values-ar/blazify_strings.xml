@@ -252,12 +252,12 @@
     <string name="wrapped_total_songs_subtitle">أغاني فريدة!</string>
     <string name="wrapped_intro_subtitle">حان الوقت لمعرفة ما كنت تستمع إليه طوال هذا العام…</string>
     <string name="wrapped_intro_button">هيا بنا!</string>
-    <string name="wrapped_logo_content_description">شعار متروليست</string>
+    <string name="wrapped_logo_content_description">شعار Blazify</string>
     <string name="wrapped_year">2025</string>
     <string name="wrapped_ready_title">ملخصك السنوي جاهز!</string>
     <string name="wrapped_ready_subtitle">حان الوقت لنرى ما أحببته طوال هذا العام…</string>
     <string name="wrapped_thank_you">شكراً لكم على الإستماع!</string>
-    <string name="wrapped_special_thanks">شكر خاص لمصطفي العجمي لإنشاء متروليست</string>
+    <string name="wrapped_special_thanks">صُنع بـ ❤️ لمحبي الموسيقى</string>
     <string name="wrapped_close">اغلاق ملخص السنة</string>
     <string name="wrapped_top_artist_image_content_description">صورة الفنان الرئيسي</string>
     <string name="wrapped_top_artist_listening_time">لقد إستمعت إليهم لمدة %d دقيقة!</string>
@@ -269,7 +269,7 @@
     <string name="wrapped_playlist_saved">تم حفظ قائمة التشغيل</string>
     <string name="casting_to">التحويل إلى %s</string>
     <string name="progress_percent">التقدم %s%%</string>
-    <string name="listening_to_blazify">الاستماع إلى متروليست</string>
+    <string name="listening_to_blazify">الاستماع إلى Blazify</string>
     <string name="open">فتح</string>
     <string name="failed_to_create_image">فشل إنشاء الصورة: %s</string>
     <string name="failed_to_parse_proxy">فشل تحليل عنوان URL للوكيل.</string>
@@ -321,7 +321,7 @@
     <string name="system_equalizer">معادل النظام</string>
     <string name="album_art">صورة الالبوم</string>
     <string name="no_song_playing">لا اغنية حاليا</string>
-    <string name="tap_to_open">اضغط لفتح تطبيق متروليست</string>
+    <string name="tap_to_open">اضغط لفتح تطبيق Blazify</string>
     <string name="previous">السابق</string>
     <string name="play_pause">تشغيل\\ايقاف مؤقت</string>
     <string name="next">التالي</string>
@@ -336,7 +336,7 @@
     <string name="crop_album_art">اقتصاص غلاف الألبوم</string>
     <string name="crop_album_art_desc">فرض نسبة عرض إلى ارتفاع مربعة عن طريق اقتصاص صور معاينة الفيديو</string>
     <string name="keep_screen_on_when_player_is_expanded">إبقاء الشاشة مفتوحة عند توسيع مشغل الفيديو</string>
-    <string name="listen_together">استمعوا معًا</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">عنوان URL للخادم</string>
     <string name="listen_together_username">اسم المستخدم</string>
     <string name="listen_together_connected">متصل</string>
@@ -358,13 +358,13 @@
     <string name="listen_together_logs">سجلات الاتصال</string>
     <string name="listen_together_no_logs">لا توجد سجلات حتى الآن</string>
     <string name="listen_together_description">استمع إلى الموسيقى مع أصدقائك في الوقت الفعلي. أنشئ غرفة لتكون المضيف أو انضم إلى غرفة موجودة باستخدام رمز</string>
-    <string name="listen_together_background_disconnect_note">ملاحظة: قد يتم قطع اتصالك إذا أنشأت غرفة أثناء عدم تشغيل أي موسيقى ثم انتقلت إلى تطبيق آخر.</string>
-    <string name="listen_together_not_configured">لم يتم تكوين ميزة \"الاستماع معًا\". يُرجى إعداد عنوان URL للخادم في الإعدادات ← التكاملات ← الاستماع معًا.</string>
+    <string name="listen_together_background_disconnect_note">ملاحظة: عندما تكون متصلًا ولكن لست في غرفة، ينقطع اتصال Blaze Together بعد 30 دقيقة في الخلفية لتوفير البطارية</string>
+    <string name="listen_together_not_configured">لم يتم تكوين ميزة \"الاستماع Blaze Together\". يُرجى إعداد عنوان URL للخادم في الإعدادات ← التكاملات ← الاستماع Blaze Together.</string>
     <string name="listen_together_suggestion_received">%1$s طلب %2$s</string>
     <string name="listen_together_suggestion_sent">تم إرسال اقتراح إلى المضيف!</string>
     <string name="listen_together_join_request_notification">يريد %1$s الانضمام إلى الغرفة</string>
-    <string name="listen_together_notification_channel_name">استمعوا معًا</string>
-    <string name="listen_together_notification_channel_desc">إشعارات الاستماع أحداث معًا</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">إشعارات الاستماع أحداث Blaze Together</string>
     <string name="listen_together_room_created">تم إنشاء الغرفة: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">لا يمكن تعديل اسم المستخدم أثناء التواجد في غرفة</string>
     <string name="waiting_for_approval">في انتظار موافقة المضيف</string>
@@ -476,7 +476,7 @@
     <string name="ai_lyrics_translation">ترجمة كلمات الأغاني باستخدام الذكاء الاصطناعي</string>
     <string name="ai_error_translation_failed">فشلت الترجمة</string>
     <string name="map_csv_columns">تعيين خانات CSV</string>
-    <string name="together">معًا</string>
+    <string name="together">Blaze Together</string>
     <string name="ai_error_no_lyrics">لا توجد كلمات للترجمة</string>
     <string name="ai_lyrics_translated">تمت ترجمة كلمات الأغنية</string>
     <string name="column_label">خانة %d</string>
@@ -513,8 +513,8 @@
     <string name="crossfade_beta_message">خاصية التلاشي التدريجي هي ميزة جديدة وقد تحتوي على بعض الأخطاء. في حال واجهت أي مشكلة، يُرجى الإبلاغ عنها.\nملاحظة: هذه الخاصية تُعطّل خاصية نقل الصوت إلى مصدر آخر بسبب قيود تقنية</string>
     <string name="audio_offload_disabled_by_crossfade">تم تعطيله لأن خاصية التلاشي التدريجي نشطة</string>
     <string name="hide_youtube_shorts">إخفاء مقاطع يوتيوب القصيرة</string>
-    <string name="listen_together_in_top_bar">استمع معًا من شريط الأعلى</string>
-    <string name="listen_together_in_top_bar_desc">عرض استمعوا معًا في شريط التطبيق العلوي بدلاً من شريط التنقل</string>
+    <string name="listen_together_in_top_bar">استمع Blaze Together من شريط الأعلى</string>
+    <string name="listen_together_in_top_bar_desc">عرض Blaze Together في شريط التطبيق العلوي بدلاً من شريط التنقل</string>
     <string name="player_background_solid">ثابت</string>
     <string name="prevent_duplicate_tracks_in_queue">منع المسارات المكررة في قائمة الانتظار</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">عند إضافة مسار موجود بالفعل في قائمة الانتظار، سيتم نقله من موقعه السابق بدلاً من إضافته مرة أخرى</string>
@@ -543,7 +543,7 @@
     <string name="discord_buttons">أزرار</string>
     <string name="discord_button_1">الزر 1</string>
     <string name="discord_button_2">الزر 2</string>
-    <string name="discord_information_warning">تستخدم هذه الميزة مكتبة KizzyRPC للاتصال ببوابة ديسكورد وتعيين حالة حضورك الغني. على الرغم من عدم وجود حالات تعليق حسابات معروفة ناتجة عن استخدام مماثل، إلا أن هذه الطريقة غير مدعومة رسميًا من قبل ديسكورد وقد تُعتبر انتهاكًا لشروط الخدمة. يتم استخراج رمزك محليًا ولا يتم إرساله أبدًا إلى خوادم جهات خارجية. تابع على مسؤوليتك الخاصة.</string>
+    <string name="discord_information_warning">يستخدم Blazify واجهات OAuth2 وGateway العامة من Discord لمشاركة ما تستمع إليه. يتم التفويض عبر جلسة متصفح محلية تُغلق تلقائيًا بعد التقاط الرمز، ولا يُرسل أي شيء إلى خوادم جهات خارجية. يُحفظ رمزك على هذا الجهاز في تفضيلات مشفّرة ولا تتم مشاركته أبدًا. يتصل Blazify مباشرة بـ wss://gateway.discord.gg لنشر نشاطك، ولا يطلب إلا أقل صلاحية لازمة (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">نوع النشاط</string>
     <string name="discord_activity_playing">جارٍ التشغيل</string>
     <string name="discord_activity_listening">الاستماع</string>
@@ -1134,7 +1134,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">الاتصالات</string>
     <string name="hint_integrations">Discord Rich Presence، تسجيل الاستماع في Last.fm</string>
-    <string name="hint_together_settings">مزامنة الاستماع معًا وإعدادات الغرفة</string>
+    <string name="hint_together_settings">مزامنة الاستماع Blaze Together وإعدادات الغرفة</string>
     <string name="guest">ضيف</string>
     <string name="manage_account">إدارة حسابك</string>
     <string name="tap_to_sign_in">انقر لتسجيل الدخول</string>

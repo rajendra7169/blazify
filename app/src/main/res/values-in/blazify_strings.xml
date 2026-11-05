@@ -233,7 +233,7 @@
     <string name="wrapped_ready_title">WRAPPED ANDA SUDAH SIAP!</string>
     <string name="wrapped_ready_subtitle">Saatnya melihat apa yang Anda sukai sepanjang tahun ini…</string>
     <string name="wrapped_thank_you">Terima kasih telah mendengarkan!</string>
-    <string name="wrapped_special_thanks">Terima kasih khusus kepada MO Agamy karena telah membuat Blazify</string>
+    <string name="wrapped_special_thanks">Dibuat dengan ❤️ untuk para pencinta musik</string>
     <string name="wrapped_close">Tutup Wrapped</string>
     <string name="wrapped_playlist_title">Wrapped %s Anda</string>
     <string name="wrapped_create_playlist">Buat playlist</string>
@@ -332,12 +332,12 @@
     <string name="listen_together_logs">Log koneksi</string>
     <string name="listen_together_no_logs">Belum ada log</string>
     <string name="listen_together_description">Dengarkan musik bersama teman Anda secara real time. Buat ruangan untuk menjadi host, atau bergabung ke ruangan yang ada dengan kode</string>
-    <string name="listen_together_background_disconnect_note">CATATAN: Saat Anda terhubung tetapi tidak berada di ruangan, Listen Together memutus koneksi setelah 30 menit di latar belakang untuk menghemat baterai</string>
-    <string name="listen_together_not_configured">Listen Together belum dikonfigurasi. Harap atur URL server di: Listen Together &gt; Pengaturan &gt; URL Server</string>
+    <string name="listen_together_background_disconnect_note">CATATAN: Saat Anda terhubung tetapi tidak berada di ruangan, Blaze Together memutus koneksi setelah 30 menit di latar belakang untuk menghemat baterai</string>
+    <string name="listen_together_not_configured">Blaze Together belum dikonfigurasi. Harap atur URL server di: Blaze Together &gt; Pengaturan &gt; URL Server</string>
     <string name="listen_together_suggestion_sent">Saran terkirim ke host!</string>
     <string name="listen_together_join_request_notification">%1$s ingin bergabung ke sesi</string>
-    <string name="listen_together_notification_channel_name">Dengar bersama</string>
-    <string name="listen_together_notification_channel_desc">Notifikasi untuk acara Listen Together</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notifikasi untuk acara Blaze Together</string>
     <string name="listen_together_room_created">Sesi dibuat: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Nama pengguna tidak dapat diubah saat berada di dalam ruangan</string>
     <string name="waiting_for_approval">Menunggu persetujuan host…</string>
@@ -361,7 +361,7 @@
     <string name="copied_to_clipboard">Disalin ke papan klip</string>
     <string name="not_set">Belum diatur</string>
     <string name="listen_together_connected">Terhubung</string>
-    <string name="listen_together">Dengar bersama</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL Server</string>
     <string name="listen_together_username">Nama pengguna</string>
     <string name="listen_together_suggestion_received">%1$s menyarankan %2$s</string>
@@ -416,7 +416,7 @@
     <string name="tap_to_play">Ketuk untuk membuka Blazify</string>
     <string name="widget_music_player">Pemutar Musik</string>
     <string name="widget_turntable">Meja putar</string>
-    <string name="together">Bersama</string>
+    <string name="together">Blaze Together</string>
     <string name="listen_together_choose_server">Pilih server</string>
     <string name="listen_together_custom_server">Server kustom</string>
     <string name="listen_together_use_custom_server">Gunakan server kustom</string>
@@ -468,8 +468,8 @@
     <string name="crossfade_beta_message">Crossfade adalah fitur baru dan mungkin memiliki bug. Jika Anda mengalami masalah apa pun, harap laporkan.\n\nCATATAN: Fitur ini menonaktifkan audio offload karena keterbatasan teknis</string>
     <string name="audio_offload_disabled_by_crossfade">Dinonaktifkan karena crossfade aktif</string>
     <string name="hide_youtube_shorts">Sembunyikan YouTube Shorts</string>
-    <string name="listen_together_in_top_bar">Listen Together di bilah atas</string>
-    <string name="listen_together_in_top_bar_desc">Tampilkan Listen Together di bilah aplikasi atas alih-alih bilah navigasi</string>
+    <string name="listen_together_in_top_bar">Blaze Together di bilah atas</string>
+    <string name="listen_together_in_top_bar_desc">Tampilkan Blaze Together di bilah aplikasi atas alih-alih bilah navigasi</string>
     <string name="ai_translation_literal_desc">Menerjemahkan makna ke dalam bahasa target</string>
     <string name="ai_translation_transcribed_desc">Mengonversi pengucapan ke dalam aksara target</string>
     <string name="ai_provider_help">Dapatkan kunci API</string>
@@ -515,7 +515,7 @@
     <string name="discord_buttons">Tombol</string>
     <string name="discord_button_1">Tombol 1</string>
     <string name="discord_button_2">Tombol 2</string>
-    <string name="discord_information_warning">Blazify mengirimkan lagu yang sedang Anda putar ke Gateway Discord untuk memperbarui Rich Presence Anda. Semua data dikirim langsung dari perangkat Anda ke Discord — tanpa melibatkan server pihak ketiga. Token Anda tetap tersimpan di perangkat dan tidak pernah dibagikan. Namun, penggunaan token pengguna untuk koneksi Gateway tidak didukung secara resmi dan mungkin melanggar Ketentuan Layanan Discord. Lanjutkan dengan risiko Anda sendiri!</string>
+    <string name="discord_information_warning">Blazify menggunakan API OAuth2 dan Gateway publik dari Discord untuk membagikan apa yang sedang kamu dengarkan. Otorisasi dilakukan melalui sesi browser lokal yang menutup sendiri setelah kodenya didapat, dan tidak ada yang dikirim ke server pihak ketiga. Token kamu disimpan di perangkat ini dalam preferensi terenkripsi dan tidak pernah dibagikan. Blazify terhubung langsung ke wss://gateway.discord.gg untuk memublikasikan aktivitasmu, dan hanya meminta cakupan minimum yang diperlukan (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Jenis aktivitas</string>
     <string name="discord_activity_playing">Bermain</string>
     <string name="discord_activity_listening">Mendengarkan</string>
@@ -1096,7 +1096,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Koneksi</string>
     <string name="hint_integrations">Discord Rich Presence, scrobbling Last.fm</string>
-    <string name="hint_together_settings">Sinkronisasi dan pengaturan ruang Dengar bersama</string>
+    <string name="hint_together_settings">Sinkronisasi dan pengaturan ruang Blaze Together</string>
     <string name="guest">Tamu</string>
     <string name="manage_account">Kelola akun Anda</string>
     <string name="tap_to_sign_in">Ketuk untuk masuk</string>

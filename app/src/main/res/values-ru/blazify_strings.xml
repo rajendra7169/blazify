@@ -260,7 +260,7 @@
     <string name="wrapped_ready_title">ВАШ WRAPPED ГОТОВ!</string>
     <string name="wrapped_ready_subtitle">Время узнать, что вам понравилось за весь этот год…</string>
     <string name="wrapped_thank_you">Спасибо за прослушивание!</string>
-    <string name="wrapped_special_thanks">Особая благодарность MO Agamy за создание Blazify</string>
+    <string name="wrapped_special_thanks">Сделано с ❤️ для любителей музыки</string>
     <string name="wrapped_close">Закрыть Wrapped</string>
     <string name="wrapped_playlist_title">Ваш Wrapped %s</string>
     <string name="wrapped_create_playlist">Создать плейлист</string>
@@ -328,7 +328,7 @@
     <string name="crop_album_art">Обрезать обложку альбома</string>
     <string name="crop_album_art_desc">Принудительно использовать квадратное соотношение сторон, обрезая миниатюры видео</string>
     <string name="keep_screen_on_when_player_is_expanded">Не выключать экран при развернутом плеере</string>
-    <string name="listen_together">Слушать вместе</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">Адрес сервера</string>
     <string name="listen_together_username">Имя пользователя</string>
     <string name="listen_together_connected">Подключено</string>
@@ -348,13 +348,13 @@
     <string name="listen_together_logs">Логи подключения</string>
     <string name="listen_together_no_logs">Логов пока нет</string>
     <string name="listen_together_description">Слушайте музыку с друзьями в реальном времени. Создайте комнату, чтобы стать ведущим, или присоединитесь к существующей по коду</string>
-    <string name="listen_together_background_disconnect_note">ПРИМЕЧАНИЕ: Когда вы подключены, но не находитесь в комнате, «Слушать вместе» отключается через 30 минут работы в фоновом режиме для экономии заряда батареи</string>
-    <string name="listen_together_not_configured">«Слушать вместе» не настроено. Пожалуйста, укажите адрес сервера в: Слушать вместе &gt; Настройки &gt; Адрес сервера</string>
+    <string name="listen_together_background_disconnect_note">ПРИМЕЧАНИЕ: Когда вы подключены, но не находитесь в комнате, «Blaze Together» отключается через 30 минут работы в фоновом режиме для экономии заряда батареи</string>
+    <string name="listen_together_not_configured">«Blaze Together» не настроено. Пожалуйста, укажите адрес сервера в: Blaze Together &gt; Настройки &gt; Адрес сервера</string>
     <string name="listen_together_suggestion_received">%1$s предложил(а): %2$s</string>
     <string name="listen_together_suggestion_sent">Предложение отправлено ведущему!</string>
     <string name="listen_together_join_request_notification">%1$s хочет присоединиться к комнате</string>
-    <string name="listen_together_notification_channel_name">Слушать вместе</string>
-    <string name="listen_together_notification_channel_desc">Уведомления о событиях «Слушать вместе»</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Уведомления о событиях «Blaze Together»</string>
     <string name="listen_together_room_created">Комната создана: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Имя пользователя нельзя изменить, находясь в комнате</string>
     <string name="waiting_for_approval">Ожидание одобрения ведущего…</string>
@@ -447,7 +447,7 @@
     <string name="tap_to_play">Нажмите, чтобы открыть Blazify</string>
     <string name="widget_music_player">Музыкальный плеер</string>
     <string name="widget_turntable">Виниловый проигрыватель</string>
-    <string name="together">Вместе</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Введите код комнаты</string>
     <string name="listen_together_settings_desc">Настройка сервера, имени пользователя и прочего</string>
     <string name="ai_lyrics_translation">ИИ-перевод текста</string>
@@ -505,8 +505,8 @@
     <string name="crossfade_beta_message">Кроссфейд - новая функция, которая может работать нестабильно. Пожалуйста, сообщите нам, если столкнётесь с ошибками.\n\nПРИМЕЧАНИЕ: Эта функция отключает аппаратное ускорение аудио из-за технических ограничений</string>
     <string name="audio_offload_disabled_by_crossfade">Отключено, так как включён кроссфейд</string>
     <string name="hide_youtube_shorts">Скрыть YouTube Shorts</string>
-    <string name="listen_together_in_top_bar">«Слушать вместе» в верхней панели</string>
-    <string name="listen_together_in_top_bar_desc">Показывать «Слушать вместе» в верхней панели вместо панели навигации</string>
+    <string name="listen_together_in_top_bar">«Blaze Together» в верхней панели</string>
+    <string name="listen_together_in_top_bar_desc">Показывать «Blaze Together» в верхней панели вместо панели навигации</string>
     <string name="discord_advanced_mode_description">Настраивайте каждое поле Rich Presence с помощью плейсхолдеров</string>
     <string name="discord_activity_playing">Играет</string>
     <string name="discord_activity_listening">Слушает</string>
@@ -1120,7 +1120,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Подключения</string>
     <string name="hint_integrations">Discord Rich Presence, скробблинг в Last.fm</string>
-    <string name="hint_together_settings">Синхронизация и настройки комнаты «Слушать вместе»</string>
+    <string name="hint_together_settings">Синхронизация и настройки комнаты «Blaze Together»</string>
     <string name="guest">Гость</string>
     <string name="manage_account">Управление аккаунтом</string>
     <string name="tap_to_sign_in">Нажмите, чтобы войти</string>

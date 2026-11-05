@@ -260,7 +260,7 @@
     <string name="wrapped_ready_title">ВАШ АУДІОПІДСУМОК ЗА РІК ГОТОВИЙ!</string>
     <string name="wrapped_ready_subtitle">Час подивитися, що вам сподобалося цього року…</string>
     <string name="wrapped_thank_you">Дякую, що вислухали!</string>
-    <string name="wrapped_special_thanks">Особлива подяка MO Agamy за створення Blazify</string>
+    <string name="wrapped_special_thanks">Створено з ❤️ для поціновувачів музики</string>
     <string name="wrapped_close">Закрити обгорнуте</string>
     <string name="wrapped_playlist_title">Ваш Wrapped %s</string>
     <string name="wrapped_create_playlist">Створити список відтворення</string>
@@ -483,8 +483,8 @@
     <string name="widget_recognizer_channel_name">Розпізнавання музики</string>
     <string name="widget_recognizer_channel_desc">Показує сповіщення під час пошуку пісні через віджет</string>
     <string name="widget_recognizer_notification_text">Запис аудіо для розпізнавання пісні…</string>
-    <string name="together">Разом</string>
-    <string name="listen_together">Слухати разом</string>
+    <string name="together">Blaze Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_choose_server">Виберіть сервер</string>
     <string name="listen_together_server_url">Адреса сервера</string>
     <string name="listen_together_custom_server">Свій сервер</string>
@@ -515,10 +515,10 @@
     <string name="listen_together_sync_volume">Синхронізувати гучність організатора</string>
     <string name="listen_together_sync_volume_desc">У гостей буде такий самий рівень гучності, як в організатора</string>
     <string name="listen_together_description">Слухайте музику разом із друзями в режимі реального часу. Створіть кімнату, щоб стати її організатором, або приєднайтеся до створеної за допомогою коду</string>
-    <string name="listen_together_background_disconnect_note">ПРИМІТКА: Якщо ви підключені, але не перебуваєте в кімнаті, функція «Слухати разом» вимикається після 30 хвилин роботи у фоновому режимі задля економії заряду акумулятора</string>
+    <string name="listen_together_background_disconnect_note">ПРИМІТКА: Якщо ви підключені, але не перебуваєте в кімнаті, функція «Blaze Together» вимикається після 30 хвилин роботи у фоновому режимі задля економії заряду акумулятора</string>
     <string name="listen_together_suggestion_received">%1$s запропонував(ла): %2$s</string>
     <string name="listen_together_join_request_notification">%1$s хоче приєднатися до кімнати</string>
-    <string name="listen_together_notification_channel_name">Слухати разом</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
     <string name="listen_together_room_created">Кімнату створено: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Ім\'я користувача не можна змінити, перебуваючи в кімнаті</string>
     <string name="waiting_for_approval">Очікується підтвердження від організатора…</string>
@@ -586,7 +586,7 @@
     <string name="error_episode_remove">Не вдалося видалити епізод</string>
     <string name="error_podcast_subscribe">Не вдалося підписатися на подкаст</string>
     <string name="error_podcast_unsubscribe">Не вдалося відписатись від подкаста</string>
-    <string name="listen_together_in_top_bar">«Слухати разом» у верхній панелі</string>
+    <string name="listen_together_in_top_bar">«Blaze Together» у верхній панелі</string>
     <string name="listen_together_suggestion_sent">Пропозицію надіслано організатору!</string>
     <string name="connect">Підключитись</string>
     <string name="disconnect">Відключитись</string>

@@ -261,7 +261,7 @@
     <string name="wrapped_ready_title">­TWOJE WRAPPED JEST GOTOWE!</string>
     <string name="wrapped_ready_subtitle">Czas sprawdzić, co pokochałeś/aś w tym roku.</string>
     <string name="wrapped_thank_you">Dziękujemy za słuchanie</string>
-    <string name="wrapped_special_thanks">Specjalne podziękowania dla MO Agamy za stworzenie Blazify</string>
+    <string name="wrapped_special_thanks">Stworzone z ❤️ dla miłośników muzyki</string>
     <string name="wrapped_close">Zamknij Wrapped</string>
     <string name="wrapped_playlist_title">Twoje %s Wrapped</string>
     <string name="wrapped_create_playlist">Utwórz playlistę</string>
@@ -379,12 +379,12 @@
     <string name="listen_together_logs">Logi połączenia</string>
     <string name="listen_together_no_logs">Na razie brak logów</string>
     <string name="listen_together_description">Słuchaj muzyki razem ze znajomymi w czasie rzeczywistym. Stwórz pokój aby stać się hostem lub dołącz do istniejącego pokoju za pomocą kodu.</string>
-    <string name="listen_together_background_disconnect_note">Uwaga: Możesz zostać rozłączony, jeśli utworzysz pokój, gdy nie gra żadna muzyka, a następnie przełączysz się na inną aplikację.</string>
-    <string name="listen_together_not_configured">\"Słuchaj razem\" nie zostało skonfigurowane. Proszę ustawić URL serwera w Ustawienia → Integracje → Słuchaj razem.</string>
+    <string name="listen_together_background_disconnect_note">Uwaga: gdy jesteś połączony, ale nie jesteś w pokoju, Blaze Together rozłącza się po 30 minutach w tle, aby oszczędzać baterię</string>
+    <string name="listen_together_not_configured">\"Blaze Together\" nie zostało skonfigurowane. Proszę ustawić URL serwera w Ustawienia → Integracje → Blaze Together.</string>
     <string name="listen_together_suggestion_received">%1$s poprosił %2$s</string>
     <string name="listen_together_suggestion_sent">Sugestia została wysłana do hosta!</string>
     <string name="listen_together_join_request_notification">%1$s chce dołączyć do pokoju</string>
-    <string name="listen_together_notification_channel_name">Słuchaj razem</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
     <string name="changelog">Lista zmian</string>
     <string name="changelog_empty">Brak dostępnych dzienników zmian</string>
     <string name="github_releases_url">https://github.com/BlazifyGroup/Blazify/releases</string>
@@ -465,8 +465,8 @@
     <string name="widget_recognizer_channel_name">Rozpoznawanie muzyki</string>
     <string name="widget_recognizer_channel_desc">Wyświetla powiadomienie podczas identyfikowania utworu z widżetu</string>
     <string name="widget_recognizer_notification_text">Nagrywanie dźwięku w celu identyfikacji utworu…</string>
-    <string name="together">Razem</string>
-    <string name="listen_together">Słuchaj Razem</string>
+    <string name="together">Blaze Together</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_choose_server">Wybierz serwer</string>
     <string name="listen_together_custom_server">Niestandardowy serwer</string>
     <string name="listen_together_use_custom_server">Użyj niestandardowego serwera</string>
@@ -478,9 +478,9 @@
     <string name="listen_together_auto_approval_suggestions_desc">Automatyczne zatwierdzanie i dodawanie do kolejki sugestii piosenek od gości</string>
     <string name="listen_together_sync_volume">Synchronizuj głośność hosta</string>
     <string name="listen_together_sync_volume_desc">Goście podążają za poziomem głośności gospodarza</string>
-    <string name="listen_together_in_top_bar">Słuchaj Razem na górnym pasku</string>
-    <string name="listen_together_in_top_bar_desc">Pokaż Słuchaj Razem na górnym pasku aplikacji zamiast na pasku nawigacyjnym</string>
-    <string name="listen_together_notification_channel_desc">Powiadomienia o wydarzeniach w Słuchaj Razem</string>
+    <string name="listen_together_in_top_bar">Blaze Together na górnym pasku</string>
+    <string name="listen_together_in_top_bar_desc">Pokaż Blaze Together na górnym pasku aplikacji zamiast na pasku nawigacyjnym</string>
+    <string name="listen_together_notification_channel_desc">Powiadomienia o wydarzeniach w Blaze Together</string>
     <string name="listen_together_room_created">Utworzono pokój: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Nie można edytować nazwy użytkownika będąc w pokoju</string>
     <string name="waiting_for_approval">Oczekiwanie na zatwierdzenie przez hosta</string>
@@ -630,7 +630,7 @@
     <string name="discord_buttons">Przyciski</string>
     <string name="discord_button_1">Przycisk 1</string>
     <string name="discord_button_2">Przycisk 2</string>
-    <string name="discord_information_warning">Ta funkcja wykorzystuje bibliotekę KizzyRPC do połączenia z bramą Discorda i ustawienia statusu Rich Presence. Chociaż nie odnotowano żadnych przypadków zawieszenia konta z powodu podobnego użycia, ta metoda nie jest oficjalnie obsługiwana przez Discord i może zostać uznana za naruszenie Warunków korzystania z usługi. Twój token jest pobierany lokalnie i nigdy nie jest wysyłany na serwery zewnętrzne. Postępuj według własnego uznania.</string>
+    <string name="discord_information_warning">Blazify korzysta z publicznych API OAuth2 i Gateway Discorda, aby udostępniać to, czego słuchasz. Autoryzacja odbywa się w lokalnej sesji przeglądarki, która zamyka się sama po pobraniu kodu, i nic nie jest wysyłane na serwery firm trzecich. Twój token jest przechowywany na tym urządzeniu w zaszyfrowanych ustawieniach i nigdy nie jest udostępniany. Blazify łączy się bezpośrednio z wss://gateway.discord.gg, aby publikować Twoją aktywność, i prosi tylko o minimalny wymagany zakres (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Rodzaj aktywności</string>
     <string name="discord_activity_playing">Gra</string>
     <string name="discord_activity_listening">Słucha</string>

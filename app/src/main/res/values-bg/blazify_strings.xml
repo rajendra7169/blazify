@@ -373,7 +373,7 @@
     <string name="wrapped_ready_title">ВАШИЯТ WRAPPED Е ГОТОВ!</string>
     <string name="wrapped_ready_subtitle">Време е да видим какво сте обичали цялата тази година…</string>
     <string name="wrapped_thank_you">Благодаря ви, че слушахте с нас!</string>
-    <string name="wrapped_special_thanks">Специални благодарности към MO Agamy за създаването на Blazify</string>
+    <string name="wrapped_special_thanks">Създадено с ❤️ за любителите на музиката</string>
     <string name="wrapped_playlist_saved">Плейлистът е запазен</string>
     <plurals name="profiles_count">
         <item quantity="one">%d профил</item>
@@ -432,13 +432,13 @@
     <string name="widget_recognizer_name">Разпознаване на музика</string>
     <string name="listen_together_sync_volume">Синхронизирай силата на звука на домакина</string>
     <string name="listen_together_sync_volume_desc">Звукът на гостите ще съвпада с този на домакина</string>
-    <string name="listen_together_in_top_bar">Слишайте Заедно в горния край</string>
-    <string name="listen_together_in_top_bar_desc">Покажи Слушайте Заедно в горната част на приложението вместо в навигационната лента</string>
+    <string name="listen_together_in_top_bar">Blaze Together в горния край</string>
+    <string name="listen_together_in_top_bar_desc">Покажи Blaze Together в горната част на приложението вместо в навигационната лента</string>
     <string name="listen_together_suggestion_received">%1$s предложи %2$s</string>
     <string name="listen_together_suggestion_sent">Предложението бе изпратено на домакина!</string>
     <string name="listen_together_join_request_notification">%1$s иска да влезне в стаята</string>
-    <string name="listen_together_notification_channel_name">Слушайте Заедно</string>
-    <string name="listen_together_notification_channel_desc">Нотификации за случващи се неща в Слишайте Заедно</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Нотификации за случващи се неща в Blaze Together</string>
     <string name="listen_together_room_created">Стаята е създадена от: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Не може да си сменяте потребителското име докато сте в стая</string>
     <string name="waiting_for_approval">Чакане за одобрение от домакина…</string>

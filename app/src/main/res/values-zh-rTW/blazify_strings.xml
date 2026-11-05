@@ -387,7 +387,7 @@
     <string name="discord_activity_listening">聆聽</string>
     <string name="discord_activity_playing">玩耍</string>
     <string name="discord_activity_type">活動類型</string>
-    <string name="discord_information_warning">此功能使用 KizzyRPC 庫連接到 Discord 網關並設定您的 Rich Presence 狀態。雖然目前尚未發現因類似使用而被封鎖的情況，但此方法並非 Discord 官方支持，可能被視為違反服務條款。您的令牌將在本地提取，絕不會發送到第三方伺服器。請自行斟酌是否繼續操作。</string>
+    <string name="discord_information_warning">Blazify 使用 Discord 公開的 OAuth2 與 Gateway API 來分享你正在聽的音樂。授權透過本機瀏覽器工作階段完成，取得代碼後會自動關閉，不會傳送任何內容到第三方伺服器。你的權杖以加密設定儲存在這部裝置上，絕不會被分享。Blazify 會直接連線到 wss://gateway.discord.gg 發布你的動態，且只要求最低必要的權限（sdk.social_layer_presence）。</string>
     <string name="discord_button_2">按鈕 2</string>
     <string name="discord_button_1">按鈕 1</string>
     <string name="discord_buttons">按鈕</string>
@@ -554,7 +554,7 @@
     <string name="wrapped_ready_title">你的年度總結已準備好！</string>
     <string name="wrapped_ready_subtitle">是時候看看你今年最喜歡什麼了…</string>
     <string name="wrapped_thank_you">謝謝聆聽!</string>
-    <string name="wrapped_special_thanks">特別感謝 MO Agamy 創建了 Blazify</string>
+    <string name="wrapped_special_thanks">用 ❤️ 為音樂愛好者打造</string>
     <string name="wrapped_close">關閉年度總結</string>
     <string name="wrapped_playlist_title">您的 %s 年度總結</string>
     <string name="wrapped_create_playlist">建立播放清單</string>
@@ -609,7 +609,7 @@
     <string name="widget_recognizer_channel_name">音樂識別</string>
     <string name="widget_recognizer_channel_desc">在小工具辨識歌曲時顯示通知</string>
     <string name="widget_recognizer_notification_text">錄製音訊以識別歌曲…</string>
-    <string name="listen_together">一起聆聽</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">伺服器 URL</string>
     <string name="listen_together_choose_server">選擇伺服器</string>
     <string name="listen_together_custom_server">自訂伺服器</string>
@@ -638,16 +638,16 @@
     <string name="listen_together_auto_approval_suggestions">自動批准歌曲推薦</string>
     <string name="listen_together_auto_approval_suggestions_desc">自動批准並接收客人並加入播列表</string>
     <string name="listen_together_sync_volume_desc">訪客的音量將與主持人的音量同步</string>
-    <string name="listen_together_in_top_bar">在頂部欄中一起聆聽</string>
-    <string name="listen_together_in_top_bar_desc">在頂部應用程式列中顯示“一起聆聽”，而不是在導覽列中顯示</string>
+    <string name="listen_together_in_top_bar">在頂部欄中Blaze Together</string>
+    <string name="listen_together_in_top_bar_desc">在頂部應用程式列中顯示“Blaze Together”，而不是在導覽列中顯示</string>
     <string name="listen_together_description">與好友即時一起聽音樂。創建房間成為主持人，或使用代碼加入現有房間</string>
-    <string name="listen_together_background_disconnect_note">注意：當您已連接但不在房間中時，Listen Together 會在背景運行 30 分鐘後斷開連接以節省電量</string>
-    <string name="listen_together_not_configured">Listen Together 尚未設定。請在「設定」→「整合」→「Listen Together」中設定伺服器 URL</string>
+    <string name="listen_together_background_disconnect_note">注意：當您已連接但不在房間中時，Blaze Together 會在背景運行 30 分鐘後斷開連接以節省電量</string>
+    <string name="listen_together_not_configured">Blaze Together 尚未設定。請在「Blaze Together」&gt;「設定」&gt;「伺服器 URL」中設定伺服器網址</string>
     <string name="listen_together_suggestion_received">%1$s 請求 %2$s</string>
     <string name="listen_together_suggestion_sent">建議已發送給主持人！</string>
     <string name="listen_together_join_request_notification">%1$s 想加入房間</string>
-    <string name="listen_together_notification_channel_name">一起聆聽</string>
-    <string name="listen_together_notification_channel_desc">「一起聆聽」活動通知</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">「Blaze Together」活動通知</string>
     <string name="listen_together_room_created">房間已建立：%s</string>
     <string name="listen_together_cannot_edit_username_in_room">在房間內無法編輯使用者名稱</string>
     <string name="waiting_for_approval">等待主持人批准</string>
@@ -706,7 +706,7 @@
     <string name="transparent">透明的</string>
     <string name="mini_player_background_not_available">停用新迷你播放器後，此功能無法使用</string>
     <string name="your_daily_discover">你的每天新發現</string>
-    <string name="together">一起聆聽</string>
+    <string name="together">Blaze Together</string>
     <string name="listen_together_sync_volume">同步主持人音量</string>
     <string name="copy_all_lyrics">複製所有歌詞</string>
     <string name="change">更改</string>
@@ -1096,7 +1096,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">連結</string>
     <string name="hint_integrations">Discord Rich Presence、Last.fm 記錄</string>
-    <string name="hint_together_settings">一起聆聽的同步和房間設定</string>
+    <string name="hint_together_settings">Blaze Together的同步和房間設定</string>
     <string name="guest">訪客</string>
     <string name="manage_account">管理你的帳戶</string>
     <string name="tap_to_sign_in">輕觸以登入</string>

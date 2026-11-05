@@ -340,8 +340,8 @@
     <string name="widget_description">再生コントロール付きのウィジェット</string>
     <string name="turntable_widget_description">再生と高評価の操作ができる円形のウィジェット</string>
     <string name="listen_together_create_room_desc">ルームを作成し、コードを友達と共有します</string>
-    <string name="listen_together_description">友達とリアルタイムで音楽を一緒に聴くことができます。ルームを作成してホストするか、コードを使って既存のルームに参加できます</string>
-    <string name="listen_together_background_disconnect_note">接続中でもルームに参加していない場合は、バッテリー節約のため、バックグラウンドで30分後にListen Togetherが切断されます</string>
+    <string name="listen_together_description">友達とリアルタイムで音楽をBlaze Togetherことができます。ルームを作成してホストするか、コードを使って既存のルームに参加できます</string>
+    <string name="listen_together_background_disconnect_note">接続中でもルームに参加していない場合は、バッテリー節約のため、バックグラウンドで30分後にBlaze Togetherが切断されます</string>
     <string name="join_request_denied">参加リクエストが拒否されました</string>
     <string name="join_existing_room">既存のルームに参加</string>
     <string name="creating_room">ルームを作成中…</string>
@@ -373,7 +373,7 @@
     <string name="wrapped_ready_title">あなたのWrappedが完成しました！</string>
     <string name="wrapped_ready_subtitle">今年あなたが夢中になった音楽を見てみましょう…</string>
     <string name="wrapped_thank_you">聴いてくれてありがとう！</string>
-    <string name="wrapped_special_thanks">Blazifyを制作したMO Agamyに特別な感謝を</string>
+    <string name="wrapped_special_thanks">音楽好きのために ❤️ を込めて</string>
     <string name="wrapped_close">Wrappedを閉じる</string>
     <string name="wrapped_playlist_title">あなたの%sWrapped</string>
     <plurals name="profiles_count">
@@ -407,14 +407,14 @@
     <string name="listen_together_auto_approval_joins_desc">参加リクエストを手動で確認せず、自動的に承認します</string>
     <string name="listen_together_sync_volume">ホストの音量と同期</string>
     <string name="cd_palette_item">%1$sパレット</string>
-    <string name="listen_together_not_configured">Listen Togetherが設定されていません。Listen Together → 設定 → サーバーURLでURLを設定してください</string>
+    <string name="listen_together_not_configured">Blaze Togetherが設定されていません。Blaze Together → 設定 → サーバーURLでURLを設定してください</string>
     <string name="listen_together_join_request_notification">%1$sがルームへの参加を希望しています</string>
     <string name="kick_user_desc">このユーザーをセッションから削除します</string>
     <string name="listen_together_blocked_users_count">%d人ブロックしています</string>
     <string name="transfer_ownership">所有権を譲渡</string>
     <string name="listen_together_cannot_edit_username_in_room">ルームに参加中はユーザー名を変更できません</string>
     <string name="clear">削除</string>
-    <string name="listen_together_notification_channel_desc">Listen Togetherのイベント通知</string>
+    <string name="listen_together_notification_channel_desc">Blaze Togetherのイベント通知</string>
     <string name="joining_room">ルーム %sに参加中…</string>
     <string name="crash_description">予期しないエラーが発生しました。問題の解決に役立てるため、クラッシュレポートを共有してください</string>
     <string name="in_room">ルームに参加中</string>
@@ -492,8 +492,8 @@
     <string name="recently_converted">最近変換した項目</string>
     <string name="column_label">列%d</string>
     <string name="hide_youtube_shorts">YouTubeショートを非表示</string>
-    <string name="listen_together_in_top_bar">トップバーにListen Togetherを表示</string>
-    <string name="listen_together_in_top_bar_desc">Listen Togetherをナビゲーションバーから非表示にし、トップバーに表示します</string>
+    <string name="listen_together_in_top_bar">トップバーにBlaze Togetherを表示</string>
+    <string name="listen_together_in_top_bar_desc">Blaze Togetherをナビゲーションバーから非表示にし、トップバーに表示します</string>
     <string name="prevent_duplicate_tracks_in_queue">キュー内の曲の重複を防止</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">すでにキューにある曲を追加すると、重複して追加せず、元の位置から移動します</string>
     <string name="ai_translation_literal_desc">意味を対象の言語に翻訳します</string>
@@ -518,7 +518,7 @@
     <string name="discord_buttons">ボタン</string>
     <string name="discord_button_1">ボタン 1</string>
     <string name="discord_button_2">ボタン 2</string>
-    <string name="discord_information_warning">Blazifyは、再生状況を更新するために、現在再生中の曲をDiscordのゲートウェイに送信します。すべてのデータはお使いのデバイスからDiscordに直接送信され、第三者のサーバーは使用されません。トークンはデバイス内に保持され、共有されることはありません。ただし、ゲートウェイ接続にユーザートークンを使用することはDiscordで正式にサポートされておらず、Discordの利用規約に違反する可能性があります。自己責任で使用してください。</string>
+    <string name="discord_information_warning">Blazify は Discord の公開 OAuth2 API と Gateway API を使って、聴いている曲を共有します。認証はローカルのブラウザセッションで行われ、コードを受け取ると自動で閉じます。第三者のサーバーには何も送信されません。トークンはこの端末の暗号化された設定に保存され、共有されることはありません。Blazify はアクティビティを公開するために wss://gateway.discord.gg に直接接続し、必要最小限の権限（sdk.social_layer_presence）だけを要求します。</string>
     <string name="discord_activity_type">アクティビティの種類</string>
     <string name="discord_activity_playing">プレイ中</string>
     <string name="discord_activity_listening">再生中</string>
@@ -1096,7 +1096,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">連携</string>
     <string name="hint_integrations">Discord Rich Presence、Last.fm の Scrobble</string>
-    <string name="hint_together_settings">一緒に聴くの同期とルーム設定</string>
+    <string name="hint_together_settings">Blaze Togetherの同期とルーム設定</string>
     <string name="guest">ゲスト</string>
     <string name="manage_account">アカウントを管理</string>
     <string name="tap_to_sign_in">タップしてログイン</string>

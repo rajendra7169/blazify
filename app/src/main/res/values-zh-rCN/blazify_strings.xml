@@ -254,7 +254,7 @@
     <string name="wrapped_ready_title">您的年度总结已准备好！</string>
     <string name="wrapped_ready_subtitle">是时候回顾这一年最喜欢什么了…</string>
     <string name="wrapped_thank_you">感谢您的收听！</string>
-    <string name="wrapped_special_thanks">特别感谢 MO Agamy 创建了 Blazify</string>
+    <string name="wrapped_special_thanks">用 ❤️ 为音乐爱好者打造</string>
     <string name="wrapped_close">关闭年度总结</string>
     <string name="wrapped_playlist_title">您的 %s 年度总结</string>
     <string name="wrapped_create_playlist">创建播放列表</string>
@@ -316,7 +316,7 @@
     <string name="crop_album_art">裁剪专辑封面</string>
     <string name="crop_album_art_desc">通过裁剪视频缩略图强制使用正方形宽高比</string>
     <string name="keep_screen_on_when_player_is_expanded">当播放页面最大化时保持屏幕打开</string>
-    <string name="listen_together">一起听</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">服务器网址</string>
     <string name="listen_together_username">用户名</string>
     <string name="listen_together_connected">已连接</string>
@@ -336,13 +336,13 @@
     <string name="listen_together_logs">连接日志</string>
     <string name="listen_together_no_logs">还没有日志</string>
     <string name="listen_together_description">与好友实时一起听音乐。创建房间成为房主，或使用邀请码加入现有房间</string>
-    <string name="listen_together_background_disconnect_note">注意：当您已连接但不在房间内时，“一起听”会在后台运行 30 分钟后断开连接以节省电量</string>
-    <string name="listen_together_not_configured">一起听未设置。请在“一起听”&gt;“设置”&gt;“服务器网址”中配置服务器网址</string>
+    <string name="listen_together_background_disconnect_note">注意：当您已连接但不在房间内时，“Blaze Together”会在后台运行 30 分钟后断开连接以节省电量</string>
+    <string name="listen_together_not_configured">Blaze Together未设置。请在“Blaze Together”&gt;“设置”&gt;“服务器网址”中配置服务器网址</string>
     <string name="listen_together_suggestion_received">%1$s 推荐了 %2$s</string>
     <string name="listen_together_suggestion_sent">推荐已发送给房主！</string>
     <string name="listen_together_join_request_notification">%1$s 人想要加入房间</string>
-    <string name="listen_together_notification_channel_name">一起听</string>
-    <string name="listen_together_notification_channel_desc">“一起听”活动通知</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">“Blaze Together”活动通知</string>
     <string name="listen_together_room_created">房间创建成功 编号:%s</string>
     <string name="listen_together_cannot_edit_username_in_room">进入房间后无法更改用户名</string>
     <string name="waiting_for_approval">正在等待房主批准…</string>
@@ -457,7 +457,7 @@
     <string name="ai_error_unknown">发生未知错误</string>
     <string name="ai_error_translation_failed">翻译失败</string>
     <string name="play_all">播放全部</string>
-    <string name="together">一起听</string>
+    <string name="together">Blaze Together</string>
     <string name="ai_translation_transcribed">转录</string>
     <string name="recognize_music">识别音乐</string>
     <string name="youtube_url_column">YouTube 网址列（可选）</string>
@@ -493,8 +493,8 @@
     <string name="crossfade_beta_message">淡入淡出是一项新功能，可能存在错误。如果您遇到任何问题，请及时反馈。\n\n注意：由于技术限制，此功能会禁用省电播放功能</string>
     <string name="audio_offload_disabled_by_crossfade">因淡入淡出功能已启用而被禁用</string>
     <string name="hide_youtube_shorts">隐藏 YouTube Shorts 短视频</string>
-    <string name="listen_together_in_top_bar">在顶部栏显示一起听</string>
-    <string name="listen_together_in_top_bar_desc">在顶部应用栏显示一起听，而非在导航栏中显示</string>
+    <string name="listen_together_in_top_bar">在顶部栏显示Blaze Together</string>
+    <string name="listen_together_in_top_bar_desc">在顶部应用栏显示Blaze Together，而非在导航栏中显示</string>
     <string name="prevent_duplicate_tracks_in_queue">防止待播列表中出现重复曲目</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">如果添加的曲目已在待播列表中，则会将其从先前位置移动，而不是再次添加</string>
     <string name="ai_translation_literal_desc">将含义翻译成目标语言</string>
@@ -1096,7 +1096,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">连接</string>
     <string name="hint_integrations">Discord Rich Presence、Last.fm 记录</string>
-    <string name="hint_together_settings">一起听的同步和房间设置</string>
+    <string name="hint_together_settings">Blaze Together的同步和房间设置</string>
     <string name="guest">访客</string>
     <string name="manage_account">管理你的账号</string>
     <string name="tap_to_sign_in">点按登录</string>

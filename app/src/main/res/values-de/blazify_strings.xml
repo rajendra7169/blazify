@@ -252,7 +252,7 @@
     <string name="wrapped_ready_title">Dein Wrapped ist bereit!</string>
     <string name="wrapped_ready_subtitle">Zeit, einen Blick auf das zu werfen, was dir das ganze Jahr über gefallen hat…</string>
     <string name="wrapped_thank_you">Vielen Dank fürs Zuhören!</string>
-    <string name="wrapped_special_thanks">Besonderer Dank gilt MO Agamy für die Erstellung von Blazify</string>
+    <string name="wrapped_special_thanks">Mit ❤️ für Musikliebhaber gemacht</string>
     <string name="wrapped_close">Wrapped schließen</string>
     <string name="wrapped_playlist_title">Dein %s Wrapped</string>
     <string name="wrapped_create_playlist">Playlist erstellen</string>
@@ -319,7 +319,7 @@
     <string name="persistent_shuffle_title">Permanentes shuffle</string>
     <string name="lyrics_offset">Songtext versatz</string>
     <string name="keep_screen_on_when_player_is_expanded">Display eingeschaltet lassen, wenn der Player erweitert ist</string>
-    <string name="listen_together">Gemeinsam hören</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">Server URL</string>
     <string name="listen_together_choose_server">Server auswählen</string>
     <string name="listen_together_custom_server">Benutzerdefinierter Server</string>
@@ -352,13 +352,13 @@
     <string name="listen_together_sync_volume">Lautstärke des Hosts synchronisieren</string>
     <string name="listen_together_sync_volume_desc">Die Gäste passen ihre Lautstärke der des Gastgebers an.</string>
     <string name="listen_together_description">Hör gemeinsam mit deinen Freunden in Echtzeit Musik. Erstelle einen Raum, um Gastgeber zu sein, oder tritt einem bestehenden Raum mit einem Code bei</string>
-    <string name="listen_together_background_disconnect_note">Hinweis: Wenn Sie verbunden sind, aber nicht in einem Raum, wird Listen Together nach 30 Minuten im Hintergrund getrennt, um den Akku zu schonen.</string>
-    <string name="listen_together_not_configured">„Gemeinsam hören“ ist nicht eingerichtet. Bitte konfigurieren Sie die Server-URL unter: Gemeinsam hören &gt; Einstellungen &gt; Server-URL</string>
+    <string name="listen_together_background_disconnect_note">Hinweis: Wenn Sie verbunden sind, aber nicht in einem Raum, wird Blaze Together nach 30 Minuten im Hintergrund getrennt, um den Akku zu schonen.</string>
+    <string name="listen_together_not_configured">„Blaze Together“ ist nicht eingerichtet. Bitte konfigurieren Sie die Server-URL unter: Blaze Together &gt; Einstellungen &gt; Server-URL</string>
     <string name="listen_together_suggestion_received">%1$s hat %2$s vorgeschlagen</string>
     <string name="listen_together_suggestion_sent">Vorschlag an den Host gesendet!</string>
     <string name="listen_together_join_request_notification">%1$s will den Raum beitreten</string>
-    <string name="listen_together_notification_channel_name">Gemeinsam zuhören</string>
-    <string name="listen_together_notification_channel_desc">Benachrichtigungen für Gemeinsam zuhören Ereignisse</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Benachrichtigungen für Blaze Together Ereignisse</string>
     <string name="listen_together_room_created">Raum erstellt: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Der Benutzername kann nicht geändert werden, solange man sich in einem Raum befindet</string>
     <string name="waiting_for_approval">Warten auf die Freigabe durch den Gastgeber…</string>
@@ -437,7 +437,7 @@
     <string name="tap_to_play">Tippen Sie hier, um Blazify zu öffnen</string>
     <string name="widget_music_player">Musik-Player</string>
     <string name="widget_turntable">Drehscheibe</string>
-    <string name="together">Gemeinsam</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Raum-Code eingeben</string>
     <string name="listen_together_settings_desc">Server, Benutzernamen und mehr konfigurieren</string>
     <string name="ai_lyrics_translation">KI-Song-Text-Übersetzung</string>
@@ -497,8 +497,8 @@
     <string name="crossfade_beta_message">Song-Überblendung (Crossfade) ist eine neue Funktion und kann Fehler enthalten. Sollten Sie Probleme feststellen, melden Sie diese bitte.\n\nACHTUNG: Diese Funktion deaktiviert die Audioauslagerung aus technischen Gründen.</string>
     <string name="audio_offload_disabled_by_crossfade">Deaktiviert, da Song-Überblendung (Crossfade) aktiv ist</string>
     <string name="hide_youtube_shorts">YouTube Shorts ausblenden</string>
-    <string name="listen_together_in_top_bar">Gemeinsam hören in der oberen Leiste anzeigen</string>
-    <string name="listen_together_in_top_bar_desc">„Gemeinsam hören“ in der oberen App-Leiste anstelle der Navigationsleiste anzeigen</string>
+    <string name="listen_together_in_top_bar">Blaze Together in der oberen Leiste anzeigen</string>
+    <string name="listen_together_in_top_bar_desc">„Blaze Together“ in der oberen App-Leiste anstelle der Navigationsleiste anzeigen</string>
     <string name="player_background_solid">Einfärbig</string>
     <string name="prevent_duplicate_tracks_in_queue">Doppelte Songs in der Warteschlange vermeiden</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">Wenn ein Titel zur Warteschlange hinzugefügt wird, der bereits in dieser ist, ihn von seiner vorherigen Position verschieben statt erneut hinzuzufügen</string>
@@ -507,7 +507,7 @@
     <string name="lyrics_romanize_punjabi">Punjabi-Texte romanisieren</string>
     <string name="lyrics_romanize_as_main">Romanisierten Songtext als Haupttext anzeigen</string>
     <string name="ai_translation_literal_desc">Übersetzt den Sinn in die Zielsprache</string>
-    <string name="discord_information_warning">Blazify sendet den aktuell abgespielten Titel an das Discord-Gateway, um deine Rich Presence zu aktualisieren. Alle Daten werden direkt von deinem Gerät an Discord übertragen – es sind keine Server von Drittanbietern beteiligt. Dein Token verbleibt auf deinem Gerät und wird niemals weitergegeben. Die Verwendung eines Benutzer-Tokens für Gateway-Verbindungen wird jedoch nicht offiziell unterstützt und kann gegen die Nutzungsbedingungen von Discord verstoßen. Handle nach eigenem Ermessen!</string>
+    <string name="discord_information_warning">Blazify nutzt die öffentlichen OAuth2- und Gateway-APIs von Discord, um zu teilen, was du hörst. Die Anmeldung läuft über eine lokale Browsersitzung, die sich nach dem Abrufen des Codes selbst schließt, und es wird nichts an Server von Drittanbietern gesendet. Dein Token wird auf diesem Gerät in verschlüsselten Einstellungen gespeichert und nie geteilt. Blazify verbindet sich direkt mit wss://gateway.discord.gg, um deine Aktivität zu veröffentlichen, und fordert nur den minimal nötigen Bereich an (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Aktivitätstyp</string>
     <string name="ai_translation_transcribed_desc">Wandelt die Aussprache in die Zielschrift um</string>
     <string name="ai_provider_help">API-Schlüssel abrufen</string>
@@ -1104,7 +1104,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Verbindungen</string>
     <string name="hint_integrations">Discord Rich Presence, Last.fm-Scrobbling</string>
-    <string name="hint_together_settings">Synchronisierung und Raumeinstellungen für Gemeinsam hören</string>
+    <string name="hint_together_settings">Synchronisierung und Raumeinstellungen für Blaze Together</string>
     <string name="guest">Gast</string>
     <string name="manage_account">Konto verwalten</string>
     <string name="tap_to_sign_in">Zum Anmelden tippen</string>

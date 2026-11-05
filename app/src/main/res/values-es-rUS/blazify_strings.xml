@@ -275,7 +275,7 @@
     <string name="wrapped_ready_title">¡TU RECAP ESTÁ LISTO!</string>
     <string name="wrapped_ready_subtitle">Hora de ver lo que te gustó este año.</string>
     <string name="wrapped_thank_you">Gracias por escuchar</string>
-    <string name="wrapped_special_thanks">Agradecimiento especial a MO Agamy por crear Blazify</string>
+    <string name="wrapped_special_thanks">Hecho con ❤️ para los amantes de la música</string>
     <string name="wrapped_close">Cerrar Recap</string>
     <string name="wrapped_playlist_title">Tu Recap %s</string>
     <string name="wrapped_create_playlist">Crear lista de reproducción</string>
@@ -324,7 +324,7 @@
     <string name="error_title">Error</string>
     <string name="error_eq_apply_failed">No se pudo aplicar el perfil de ecualización: %1$s</string>
     <string name="keep_screen_on_when_player_is_expanded">Mantener la pantalla encendida cuando el reproductor esté expandido</string>
-    <string name="listen_together">Escuchar juntos</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL del servidor</string>
     <string name="listen_together_username">Nombre de usuario</string>
     <string name="listen_together_connected">Conectado</string>
@@ -344,13 +344,13 @@
     <string name="listen_together_logs">Registros de conexión</string>
     <string name="listen_together_no_logs">Aún no hay registros</string>
     <string name="listen_together_description">Escucha música con tus amigos en tiempo real. Crea una sala para ser el anfitrión o únete a una sala existente con un código.</string>
-    <string name="listen_together_background_disconnect_note">Nota: Es posible que se te desconecte si creas una sala mientras no hay música reproduciéndose y luego cambias a otra aplicación.</string>
-    <string name="listen_together_not_configured">Escuchar juntos no está configurado. Por favor, configura la URL del servidor en Ajustes → Integraciones → Escuchar juntos.</string>
+    <string name="listen_together_background_disconnect_note">Nota: cuando estás conectado pero no estás en una sala, Blaze Together se desconecta tras 30 minutos en segundo plano para ahorrar batería</string>
+    <string name="listen_together_not_configured">Blaze Together no está configurado. Por favor, configura la URL del servidor en Ajustes → Integraciones → Blaze Together.</string>
     <string name="listen_together_suggestion_received">%1$s solicitó %2$s</string>
     <string name="listen_together_suggestion_sent">¡Sugerencia enviada al anfitrión!</string>
     <string name="listen_together_join_request_notification">%1$s quiere unirse a la sala</string>
-    <string name="listen_together_notification_channel_name">Escuchar juntos</string>
-    <string name="listen_together_notification_channel_desc">Notificaciones para eventos de Escuchar juntos</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notificaciones para eventos de Blaze Together</string>
     <string name="listen_together_room_created">Sala creada: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">No puedes editar el nombre de usuario mientras estás en una sala</string>
     <string name="waiting_for_approval">Esperando aprobación del anfitrión</string>
@@ -406,7 +406,7 @@
     <string name="tap_to_play">Toca para abrir Blazify</string>
     <string name="widget_music_player">Reproductor de Música</string>
     <string name="widget_turntable">Disco giratorio</string>
-    <string name="together">En compañia</string>
+    <string name="together">Blaze Together</string>
     <string name="listen_together_choose_server">Elije el servidor</string>
     <string name="listen_together_custom_server">Servidor personalizado</string>
     <string name="listen_together_use_custom_server">Usar servidor personalizado</string>
@@ -416,8 +416,8 @@
     <string name="listen_together_auto_approval_joins_desc">Aprobar automáticamente las solicitudes de ingreso en lugar de revisarlas manualmente</string>
     <string name="listen_together_sync_volume">Sincronizar volumen del anfitrión</string>
     <string name="listen_together_sync_volume_desc">Los invitados siguen el nivel de volumen del anfitrión</string>
-    <string name="listen_together_in_top_bar">Mover Escuchar Juntos a la barra superior</string>
-    <string name="listen_together_in_top_bar_desc">Mostrar Escuchar Juntos en la barra superior en lugar de la barra de navegación</string>
+    <string name="listen_together_in_top_bar">Mover Blaze Together a la barra superior</string>
+    <string name="listen_together_in_top_bar_desc">Mostrar Blaze Together en la barra superior en lugar de la barra de navegación</string>
     <string name="enter_room_code">Ingresa el código de la sala</string>
     <string name="listen_together_settings_desc">Configurar servidor, nombre de usuario y más</string>
     <string name="copy_code">Copiar código</string>
@@ -531,7 +531,7 @@
     <string name="discord_buttons">Botones</string>
     <string name="discord_button_1">Botón 1</string>
     <string name="discord_button_2">Botón 2</string>
-    <string name="discord_information_warning">Esta función utiliza la biblioteca KizzyRPC para conectarse a la puerta de enlace de Discord y configurar tu estado de presencia enriquecida. Aunque no se conoce ningún caso de suspensión de cuentas por un uso similar, este método no está oficialmente respaldado por Discord y puede considerarse una infracción de los Términos de servicio. Tu token se extrae localmente y nunca se envía a servidores de terceros. Procede bajo tu propia responsabilidad.</string>
+    <string name="discord_information_warning">Blazify usa las API públicas OAuth2 y Gateway de Discord para compartir lo que escuchas. La autorización se hace mediante una sesión de navegador local que se cierra sola después de capturar el código, y no se envía nada a servidores de terceros. Tu token se guarda en este dispositivo en preferencias cifradas y nunca se comparte. Blazify se conecta directamente a wss://gateway.discord.gg para publicar tu actividad y solo pide el alcance mínimo necesario (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Tipo de actividad</string>
     <string name="discord_activity_playing">Reproduciendo</string>
     <string name="discord_activity_listening">Escuchando</string>
@@ -1112,7 +1112,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Conexiones</string>
     <string name="hint_integrations">Discord Rich Presence, scrobbling de Last.fm</string>
-    <string name="hint_together_settings">Sincronización y configuración de sala de Escuchar juntos</string>
+    <string name="hint_together_settings">Sincronización y configuración de sala de Blaze Together</string>
     <string name="guest">Invitado</string>
     <string name="manage_account">Administrar tu cuenta</string>
     <string name="tap_to_sign_in">Toca para iniciar sesión</string>

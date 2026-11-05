@@ -256,7 +256,7 @@
     <string name="wrapped_ready_title">IL TUO WRAPPED È PRONTO!</string>
     <string name="wrapped_ready_subtitle">È ora di vedere cosa hai amato quest\'anno…</string>
     <string name="wrapped_thank_you">Grazie per l\'ascolto!</string>
-    <string name="wrapped_special_thanks">Un ringraziamento speciale a MO Agami per aver creato Blazify</string>
+    <string name="wrapped_special_thanks">Fatto con ❤️ per gli amanti della musica</string>
     <string name="wrapped_close">Chiudi Wrapped</string>
     <string name="wrapped_playlist_title">Il tuo Wrapped %s</string>
     <string name="wrapped_create_playlist">Crea playlist</string>
@@ -324,7 +324,7 @@
     <string name="crop_album_art">Ritaglia copertina album</string>
     <string name="crop_album_art_desc">Forza le proporzioni quadrate ritagliando le miniature dei video</string>
     <string name="keep_screen_on_when_player_is_expanded">Mantieni lo schermo acceso quando il lettore è espanso</string>
-    <string name="listen_together">Ascolta insieme</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL del server</string>
     <string name="listen_together_username">Nome utente</string>
     <string name="listen_together_connected">Connesso</string>
@@ -344,13 +344,13 @@
     <string name="listen_together_logs">Log di connessione</string>
     <string name="listen_together_no_logs">Non ci sono ancora log</string>
     <string name="listen_together_description">Ascolta la musica con i tuoi amici in tempo reale. Crea una stanza da ospitare o unisciti ad una stanza esistente con un codice</string>
-    <string name="listen_together_background_disconnect_note">NOTA: quando sei connesso ma non sei in una stanza, Ascolta Insieme si disconnette dopo 30 minuti in background per risparmiare batteria</string>
-    <string name="listen_together_not_configured">Ascolta Insieme non è configurato. Configura l\'URL del server in: Ascolta Insieme &gt; Impostazioni &gt; URL del server</string>
+    <string name="listen_together_background_disconnect_note">NOTA: quando sei connesso ma non sei in una stanza, Blaze Together si disconnette dopo 30 minuti in background per risparmiare batteria</string>
+    <string name="listen_together_not_configured">Blaze Together non è configurato. Configura l\'URL del server in: Blaze Together &gt; Impostazioni &gt; URL del server</string>
     <string name="listen_together_suggestion_received">%1$s suggerito %2$s</string>
     <string name="listen_together_suggestion_sent">Il suggerimento è stato inviato all\'ospitante!</string>
     <string name="listen_together_join_request_notification">%1$s vuole entrare nella stanza</string>
-    <string name="listen_together_notification_channel_name">Ascolta insieme</string>
-    <string name="listen_together_notification_channel_desc">Notifiche per Ascolta insieme</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notifiche per Blaze Together</string>
     <string name="listen_together_room_created">Stanza creata: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Il nome utente non può essere modificato mentre si è in una stanza</string>
     <string name="waiting_for_approval">In attesa dell\'approvazione dell\'host…</string>
@@ -443,7 +443,7 @@
     <string name="tap_to_play">Premi per aprire Blazify</string>
     <string name="widget_music_player">Riproduttore Musicale</string>
     <string name="widget_turntable">Giradischi</string>
-    <string name="together">Insieme</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Inserisci un codice stanza</string>
     <string name="listen_together_settings_desc">Configura server, nome utente e altro</string>
     <string name="ai_lyrics_translation">Traduzione testi AI</string>
@@ -501,8 +501,8 @@
     <string name="crossfade_beta_message">La dissolvenza incrociata è una nuova funzionalità e potrebbe contenere bug. Se riscontri problemi, segnalali.\n\nNOTA: Questa funzionalità disabilita lo scaricamento dell\'audio a causa di limitazioni tecniche</string>
     <string name="audio_offload_disabled_by_crossfade">Disabilitato perché la dissolvenza incrociata è attiva</string>
     <string name="hide_youtube_shorts">Nascondi gli Shorts di YouTube</string>
-    <string name="listen_together_in_top_bar">Ascolta Insieme nella barra in alto</string>
-    <string name="listen_together_in_top_bar_desc">Mostra Ascolta Insieme nella barra dell\'app in alto anziché nella barra di navigazione</string>
+    <string name="listen_together_in_top_bar">Blaze Together nella barra in alto</string>
+    <string name="listen_together_in_top_bar_desc">Mostra Blaze Together nella barra dell\'app in alto anziché nella barra di navigazione</string>
     <string name="ai_translation_literal_desc">Traduce il significato nella lingua di destinazione</string>
     <string name="ai_translation_transcribed_desc">Converte la pronuncia nello script di destinazione</string>
     <string name="ai_provider_help">Ottieni chiavi API</string>

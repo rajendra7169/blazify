@@ -254,7 +254,7 @@
     <string name="wrapped_ready_title">ÖZETİN HAZIR!</string>
     <string name="wrapped_ready_subtitle">Bu yıl neleri sevdiğini görme zamanı…</string>
     <string name="wrapped_thank_you">Dinlediğin için teşekkürler!</string>
-    <string name="wrapped_special_thanks">Blazify\'i oluşturduğu için MO Agamy\'ye özel teşekkürler</string>
+    <string name="wrapped_special_thanks">Müzik severler için ❤️ ile yapıldı</string>
     <string name="wrapped_close">Özeti kapat</string>
     <string name="wrapped_playlist_title">%s Özetin</string>
     <string name="wrapped_create_playlist">Oynatma listesi oluştur</string>
@@ -320,7 +320,7 @@
     <string name="crop_album_art">Albüm resmini kırp</string>
     <string name="crop_album_art_desc">Video küçük resimlerini kırparak kare en boy oranını zorlayın</string>
     <string name="keep_screen_on_when_player_is_expanded">Oynatıcı açıkken ekranı açık tut</string>
-    <string name="listen_together">Birlikte Dinle</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">Sunucu URL\'si</string>
     <string name="listen_together_username">Kullanıcı adı</string>
     <string name="listen_together_connected">Bağlanıldı</string>
@@ -340,13 +340,13 @@
     <string name="listen_together_logs">Bağlantı kayıtları</string>
     <string name="listen_together_no_logs">Henüz hiç kayıt yok</string>
     <string name="listen_together_description">Arkadaşlarınızla gerçek zamanlı olarak müzik dinleyin. Oda sahibi olmak için bir oda oluşturun veya bir kodla mevcut odaya katılın</string>
-    <string name="listen_together_background_disconnect_note">NOT: Bağlı olduğunuz halde bir odada değilseniz Birlikte Dinle özelliği, pil tasarrufu sağlamak için arka planda 30 dakika sonra bağlantıyı keser</string>
-    <string name="listen_together_not_configured">Birlikte Dinle özelliği ayarlanmadı. Lütfen sunucu URL\'sini şuradan yapılandırın: Birlikte Dinle &gt; Ayarlar &gt; Sunucu URL\'si</string>
+    <string name="listen_together_background_disconnect_note">NOT: Bağlı olduğunuz halde bir odada değilseniz Blaze Together özelliği, pil tasarrufu sağlamak için arka planda 30 dakika sonra bağlantıyı keser</string>
+    <string name="listen_together_not_configured">Blaze Together özelliği ayarlanmadı. Lütfen sunucu URL\'sini şuradan yapılandırın: Blaze Together &gt; Ayarlar &gt; Sunucu URL\'si</string>
     <string name="listen_together_suggestion_received">%1$s, %2$s şarkısını önerdi</string>
     <string name="listen_together_suggestion_sent">Öneri oda sahibine gönderildi!</string>
     <string name="listen_together_join_request_notification">%1$s odaya katılmak istiyor</string>
-    <string name="listen_together_notification_channel_name">Birlikte Dinle</string>
-    <string name="listen_together_notification_channel_desc">Birlikte Dinle etkinlikleri için bildirimler</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Blaze Together etkinlikleri için bildirimler</string>
     <string name="listen_together_room_created">Oda oluşturuldu: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Bir odadayken kullanıcı adı değiştirilemez</string>
     <string name="waiting_for_approval">Oda sahibinin onayı bekleniyor…</string>
@@ -439,7 +439,7 @@
     <string name="tap_to_play">Blazify\'i açmak için dokun</string>
     <string name="widget_music_player">Müzik Çalar</string>
     <string name="widget_turntable">Dönen plak</string>
-    <string name="together">Birlikte</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Bir oda kodu girin</string>
     <string name="listen_together_settings_desc">Sunucu, kullanıcı adı ve daha fazlasını yapılandırın</string>
     <string name="ai_lyrics_translation">Yapay zeka ile şarkı sözü çevirisi</string>
@@ -497,8 +497,8 @@
     <string name="crossfade_beta_message">Çapraz geçiş yeni bir özelliktir ve hatalar içerebilir. Sorun yaşarsanız lütfen bildirin.\n\nNOT: Bu özellik teknik kısıtlamalar nedeniyle ses offload özelliğini devre dışı bırakır</string>
     <string name="audio_offload_disabled_by_crossfade">Çapraz geçiş etkin olduğu için devre dışı bırakıldı</string>
     <string name="hide_youtube_shorts">YouTube Shorts\'u gizle</string>
-    <string name="listen_together_in_top_bar">Birlikte Dinle özelliği üst çubukta</string>
-    <string name="listen_together_in_top_bar_desc">Birlikte Dinle özelliğini gezinti çubuğu yerine üst uygulama çubuğunda göster</string>
+    <string name="listen_together_in_top_bar">Blaze Together özelliği üst çubukta</string>
+    <string name="listen_together_in_top_bar_desc">Blaze Together özelliğini gezinti çubuğu yerine üst uygulama çubuğunda göster</string>
     <string name="prevent_duplicate_tracks_in_queue">Sıradaki yinelenenleri önle</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">Sırada zaten bulunan bir parça eklendiğinde, tekrar eklenmek yerine önceki konumundan taşınır</string>
     <string name="ai_translation_literal_desc">Anlamı hedef dile çevirir</string>
@@ -1104,7 +1104,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Bağlantılar</string>
     <string name="hint_integrations">Discord Rich Presence, Last.fm scrobbling</string>
-    <string name="hint_together_settings">Birlikte Dinle senkronizasyonu ve oda ayarları</string>
+    <string name="hint_together_settings">Blaze Together senkronizasyonu ve oda ayarları</string>
     <string name="guest">Misafir</string>
     <string name="manage_account">Hesabınızı yönetin</string>
     <string name="tap_to_sign_in">Oturum açmak için dokunun</string>

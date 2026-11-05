@@ -253,7 +253,7 @@
     <string name="wrapped_ready_title">EL TEU RECOPILATORI ESTÀ PREPARAT!</string>
     <string name="wrapped_ready_subtitle">És hora de veure què t\'ha encantat enguany.</string>
     <string name="wrapped_thank_you">Gràcies per escoltar</string>
-    <string name="wrapped_special_thanks">Un especial agraïment a MO Agamy per crear Blazify</string>
+    <string name="wrapped_special_thanks">Fet amb ❤️ per als amants de la música</string>
     <string name="wrapped_close">Tancar Recopilatori</string>
     <string name="wrapped_playlist_title">El teu Recopilatori %s</string>
     <string name="wrapped_create_playlist">Crear llista de reproducció</string>
@@ -324,7 +324,7 @@
     <string name="crop_album_art_desc">Retalla les miniatures dels vídeos per forçar una relació d\'aspecte quadrada</string>
     <string name="skip_silence_instant_desc">Omet les parts silencioses de les cançons en comptes d\'avançar-les ràpidament</string>
     <string name="keep_screen_on_when_player_is_expanded">Amb reproductor expandit, mantén la pantalla encesa</string>
-    <string name="listen_together">Escoltar Junts</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL del servidor</string>
     <string name="listen_together_username">Nom d\'usuari</string>
     <string name="listen_together_connected">Connectat</string>
@@ -346,13 +346,13 @@
     <string name="listen_together_logs">Registres de connexió</string>
     <string name="listen_together_no_logs">Encara no hi ha registres</string>
     <string name="listen_together_description">Escolta música alhora amb els teus amics. Crea una sala per a ser l\'amfitrió o uneix-te a una sala existent amb un codi.</string>
-    <string name="listen_together_background_disconnect_note">Nota: Potser es desconnecte si crea una sala en que no s\'està reproduint música i canvia a altra aplicació.</string>
-    <string name="listen_together_not_configured">Escoltar Junts no està configurat. Per favor configura la URL del servidor en Configuració → Integracions → Escoltar Junts.</string>
+    <string name="listen_together_background_disconnect_note">Nota: quan estàs connectat però no ets en cap sala, Blaze Together es desconnecta després de 30 minuts en segon pla per estalviar bateria</string>
+    <string name="listen_together_not_configured">Blaze Together no està configurat. Per favor configura la URL del servidor en Configuració → Integracions → Blaze Together.</string>
     <string name="listen_together_suggestion_received">%1$s ha demanat %2$s</string>
     <string name="listen_together_suggestion_sent">Petició enviada a l\'amfitrió!</string>
     <string name="listen_together_join_request_notification">%1$s es vol unir a la sala</string>
-    <string name="listen_together_notification_channel_name">Escoltar Junts</string>
-    <string name="listen_together_notification_channel_desc">Notificacions per a esdeveniments d\'Escoltar Junts</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notificacions per a esdeveniments d\'Blaze Together</string>
     <string name="listen_together_room_created">Sala creada: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">No pot editar el nom d\'usuari estant a una sala</string>
     <string name="waiting_for_approval">Esperant l\'aprovació de l\'amfitrió</string>
@@ -398,7 +398,7 @@
     <string name="tap_to_play">Prem per obrir Blazify</string>
     <string name="widget_music_player">Reproductor de música</string>
     <string name="widget_turntable">Tocadiscs</string>
-    <string name="together">Junts</string>
+    <string name="together">Blaze Together</string>
     <string name="listen_together_choose_server">Escollir servidor</string>
     <string name="listen_together_custom_server">Servidor personalitzat</string>
     <string name="listen_together_use_custom_server">Utilitzar un servidor personalitzat</string>
@@ -479,8 +479,8 @@
     <string name="crossfade_beta_message">El transicionat suau es una nova funcionalitat que pot presentar errors. Si trobes cap problema, per favor, informa\'ns.\n\nAquesta funcionalitat deshabilita la descarrega d\'àudio a causa de limitacions tècniques.</string>
     <string name="audio_offload_disabled_by_crossfade">Deshabilitat per que el transicionat suau està actiu</string>
     <string name="hide_youtube_shorts">Amaga Youtube Shorts</string>
-    <string name="listen_together_in_top_bar">Escoltar Junts a la barra superior</string>
-    <string name="listen_together_in_top_bar_desc">Mostra l\'opció d\'Escoltar Junts a la barra superior de l\'aplicació en lloc de a la barra de navegació</string>
+    <string name="listen_together_in_top_bar">Blaze Together a la barra superior</string>
+    <string name="listen_together_in_top_bar_desc">Mostra l\'opció d\'Blaze Together a la barra superior de l\'aplicació en lloc de a la barra de navegació</string>
     <string name="ai_translation_literal_desc">Tradueix el significat a l\'idioma objectiu</string>
     <string name="ai_translation_transcribed_desc">Canvia la pronuncia a la llengua objectiu</string>
     <string name="ai_provider_help">Obtín Claus d\'API</string>
@@ -542,7 +542,7 @@
     <string name="lyrics_romanize_hindi">Romanitza lletra en Hindi</string>
     <string name="lyrics_romanize_punjabi">Romanitza lletra en Panjabi</string>
     <string name="lyrics_romanize_as_main">Mostra lletres romanitzades principalment</string>
-    <string name="discord_information_warning">Aquesta funcionalitat utilitza la llibreria KizzyRPC per a connectar-se als ports de Discord i configurar el vostre estatus de Rich Presence. Encara que no s\'ha informat de cap suspensió de comptes per aquest tipus d\'ús, aquest mètode no està oficialment acceptat per Discord i es podria considerar una violació dels seus Termes d\'ús. El vostre token s\'extrau localment i mai s\'envia a servidors de terceres parts. Actue sota la seua pròpia consideració.</string>
+    <string name="discord_information_warning">Blazify fa servir les API públiques OAuth2 i Gateway de Discord per compartir el que escoltes. L\'autorització es fa mitjançant una sessió de navegador local que es tanca sola després de capturar el codi, i no s\'envia res a servidors de tercers. El teu testimoni es desa en aquest dispositiu en preferències xifrades i mai no es comparteix. Blazify es connecta directament a wss://gateway.discord.gg per publicar la teva activitat i només demana l\'abast mínim necessari (sdk.social_layer_presence).</string>
     <string name="display_density">Densitat de pantalla</string>
     <string name="restart">Reinicia</string>
     <string name="restart_required">Cal reiniciar!</string>

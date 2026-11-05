@@ -248,7 +248,7 @@
     <string name="wrapped_ready_title">¡TU RECAP ESTÁ LISTO!</string>
     <string name="wrapped_ready_subtitle">Es hora de ver lo que te gustó este año…</string>
     <string name="wrapped_thank_you">¡Gracias por escuchar!</string>
-    <string name="wrapped_special_thanks">Un agradecimiento especial a MO Agamy por crear Blazify</string>
+    <string name="wrapped_special_thanks">Hecho con ❤️ para los amantes de la música</string>
     <string name="wrapped_close">Cerrar Recap</string>
     <string name="wrapped_playlist_title">Tu Recap %s</string>
     <string name="wrapped_create_playlist">Crear lista de reproducción</string>
@@ -324,7 +324,7 @@
     <string name="persistent_shuffle_title">Aleatorio persistente</string>
     <string name="persistent_shuffle_desc">Mantener la reproducción aleatoria habilitada al iniciar nuevas canciones o listas de reproducción</string>
     <string name="keep_screen_on_when_player_is_expanded">Mantener la pantalla encendida cuando el reproductor está expandido</string>
-    <string name="listen_together">Escuchar juntos</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_server_url">URL del servidor</string>
     <string name="listen_together_username">Nombre de usuario</string>
     <string name="listen_together_connected">Conectado</string>
@@ -344,13 +344,13 @@
     <string name="listen_together_logs">Registros de conexión</string>
     <string name="listen_together_no_logs">Aún no hay registros</string>
     <string name="listen_together_description">Escucha música con tus amigos en tiempo real. Crea una sala para ser el anfitrión o únete a una sala existente con un código</string>
-    <string name="listen_together_background_disconnect_note">Nota: Es posible que se desconecte si crea una sala mientras no se está reproduciendo música y luego cambia a otra aplicación</string>
-    <string name="listen_together_not_configured">Listen Together no está configurado. Configure la URL del servidor en Configuración → Integraciones → Listen Together</string>
+    <string name="listen_together_background_disconnect_note">Nota: cuando estás conectado pero no estás en una sala, Blaze Together se desconecta tras 30 minutos en segundo plano para ahorrar batería</string>
+    <string name="listen_together_not_configured">Blaze Together no está configurado. Configura la URL del servidor en: Blaze Together &gt; Ajustes &gt; URL del servidor</string>
     <string name="listen_together_suggestion_received">%1$s sugirió %2$s</string>
     <string name="listen_together_suggestion_sent">¡Sugerencia enviada al anfitrión!</string>
     <string name="listen_together_join_request_notification">%1$s quiere unirse a la sala</string>
-    <string name="listen_together_notification_channel_name">Escuchar juntos</string>
-    <string name="listen_together_notification_channel_desc">Notificaciones de eventos de Escuchar juntos</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Notificaciones de eventos de Blaze Together</string>
     <string name="listen_together_room_created">Sala creada: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">No se puede cambiar el nombre de usuario mientras estás en una sala</string>
     <string name="waiting_for_approval">Esperando la aprobación del anfitrión…</string>
@@ -443,7 +443,7 @@
     <string name="listen_together_no_blocked_users">No hay usuarios bloqueados</string>
     <string name="unblock">Desbloquear</string>
     <string name="user_blocked_by_host">Bloqueado por el anfitrión</string>
-    <string name="together">Juntos</string>
+    <string name="together">Blaze Together</string>
     <string name="enter_room_code">Introduce un código de sala</string>
     <string name="listen_together_settings_desc">Configurar servidor, nombre de usuario y más</string>
     <string name="ai_lyrics_translation">Traducción de letras con IA</string>
@@ -501,8 +501,8 @@
     <string name="audio_offload_disabled_by_crossfade">Desactivado porque la transición suave está activa</string>
     <string name="crossfade">Transición suave</string>
     <string name="hide_youtube_shorts">Ocultar YouTube Shorts</string>
-    <string name="listen_together_in_top_bar">Escuchar juntos en la barra superior</string>
-    <string name="listen_together_in_top_bar_desc">Mostrar «Escuchar juntos» en la barra superior en vez de en la barra de navegación</string>
+    <string name="listen_together_in_top_bar">Blaze Together en la barra superior</string>
+    <string name="listen_together_in_top_bar_desc">Mostrar «Blaze Together» en la barra superior en vez de en la barra de navegación</string>
     <string name="prevent_duplicate_tracks_in_queue">Evitar pistas duplicadas en la cola</string>
     <string name="prevent_duplicate_tracks_in_queue_desc">Al agregar una pista que ya está en la cola, se moverá desde su posición anterior en lugar de añadirse de nuevo</string>
     <string name="ai_translation_transcribed_desc">Convertir la pronunciación al sistema de escritura de destino</string>
@@ -1112,7 +1112,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Conexiones</string>
     <string name="hint_integrations">Discord Rich Presence, scrobbling de Last.fm</string>
-    <string name="hint_together_settings">Sincronización y ajustes de sala de Escuchar juntos</string>
+    <string name="hint_together_settings">Sincronización y ajustes de sala de Blaze Together</string>
     <string name="guest">Invitado</string>
     <string name="manage_account">Gestionar tu cuenta</string>
     <string name="tap_to_sign_in">Toca para iniciar sesión</string>

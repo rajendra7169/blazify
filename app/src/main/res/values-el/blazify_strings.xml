@@ -254,7 +254,7 @@
     <string name="wrapped_logo_content_description">Λογότυπο Blazify</string>
     <string name="wrapped_year">2025</string>
     <string name="wrapped_ready_subtitle">Ήρθε η ώρα να δείτε τι λατρέψατε φέτος.</string>
-    <string name="wrapped_special_thanks">Ιδιαίτερες ευχαριστίες στον MO Agamy για τη δημιουργία του Blazify</string>
+    <string name="wrapped_special_thanks">Φτιαγμένο με ❤️ για τους λάτρεις της μουσικής</string>
     <string name="wrapped_create_playlist">Δημιουργία λίστας αναπαραγωγής</string>
     <string name="wrapped_playlist_saved">Η λίστα αναπαραγωγής αποθηκεύτηκε</string>
     <plurals name="profiles_count">

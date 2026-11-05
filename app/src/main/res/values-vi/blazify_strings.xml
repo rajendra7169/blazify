@@ -223,7 +223,7 @@
     <string name="next">Bài tiếp</string>
     <string name="like">Thích</string>
     <string name="widget_description">Widget trình phát nhạc với các nút điều khiển</string>
-    <string name="listen_together">Nghe cùng nhau</string>
+    <string name="listen_together">Blaze Together</string>
     <string name="listen_together_view_logs_desc">Gỡ lỗi các sự kiện kết nối và tin nhắn</string>
     <string name="listen_together_logs">Nhật ký kết nối</string>
     <string name="listen_together_no_logs">Chưa có nhật ký nào</string>
@@ -232,13 +232,13 @@
     <string name="listen_together_sync_volume">Đồng bộ âm lượng của chủ phòng</string>
     <string name="listen_together_sync_volume_desc">Khách sẽ khớp với mức âm lượng của chủ phòng</string>
     <string name="listen_together_description">Nghe nhạc cùng bạn bè trong thời gian thực. Hãy tạo phòng để làm chủ trì, hoặc tham gia phòng có sẵn bằng mã</string>
-    <string name="listen_together_background_disconnect_note">LƯU Ý: Khi bạn đã được kết nối nhưng không ở trong cùng một phòng, tính năng Nghe Cùng Nhau sẽ tự động ngắt kết nối sau 30 phút chạy ngầm để tiết kiệm pin</string>
-    <string name="listen_together_not_configured">Listen Together chưa được thiết lập. Vui lòng cấu hình URL máy chủ tại: Listen Together &gt; Cài đặt &gt; URL máy chủ</string>
+    <string name="listen_together_background_disconnect_note">LƯU Ý: Khi bạn đã được kết nối nhưng không ở trong cùng một phòng, tính năng Blaze Together sẽ tự động ngắt kết nối sau 30 phút chạy ngầm để tiết kiệm pin</string>
+    <string name="listen_together_not_configured">Blaze Together chưa được thiết lập. Vui lòng cấu hình URL máy chủ tại: Blaze Together &gt; Cài đặt &gt; URL máy chủ</string>
     <string name="listen_together_suggestion_received">%1$s đã gợi ý %2$s</string>
     <string name="listen_together_suggestion_sent">Đã gửi gợi ý đến chủ phòng!</string>
     <string name="listen_together_join_request_notification">%1$s muốn tham gia phòng</string>
-    <string name="listen_together_notification_channel_name">Nghe cùng nhau</string>
-    <string name="listen_together_notification_channel_desc">Thông báo cho các sự kiện Nghe cùng nhau</string>
+    <string name="listen_together_notification_channel_name">Blaze Together</string>
+    <string name="listen_together_notification_channel_desc">Thông báo cho các sự kiện Blaze Together</string>
     <string name="listen_together_room_created">Phòng đã được tạo: %s</string>
     <string name="listen_together_cannot_edit_username_in_room">Không thể thay đổi tên người dùng khi đang ở trong phòng</string>
     <string name="waiting_for_approval">Đang chờ chủ phòng phê duyệt…</string>
@@ -518,7 +518,7 @@
     <string name="wrapped_ready_title">WRAPPED CỦA BẠN ĐÃ SẴN SÀNG!</string>
     <string name="wrapped_ready_subtitle">Đã đến lúc xem bạn đã yêu thích những gì trong suốt năm qua…</string>
     <string name="wrapped_thank_you">Cảm ơn vì đã nghe!</string>
-    <string name="wrapped_special_thanks">Trân trọng cảm ơn MO Agamy vì đã tạo ra Blazify</string>
+    <string name="wrapped_special_thanks">Được tạo bằng ❤️ dành cho người yêu âm nhạc</string>
     <string name="wrapped_close">Đóng Wrapped</string>
     <string name="wrapped_create_playlist">Tạo danh sách phát</string>
     <string name="wrapped_playlist_saved">Danh sách phát đã được lưu</string>
@@ -611,10 +611,10 @@
     <string name="widget_recognizer_channel_name">Nhận dạng Âm Nhạc</string>
     <string name="widget_recognizer_channel_desc">Hiển thị một thông báo trong khi đang nhân dạng bài hát từ widget</string>
     <string name="widget_recognizer_notification_text">Đang ghi âm để nhận dạng bài hát…</string>
-    <string name="together">Cùng nhau</string>
+    <string name="together">Blaze Together</string>
     <string name="listen_together_auto_approval_suggestions">Tự động chấp nhận gợi ý bài hát</string>
     <string name="listen_together_auto_approval_suggestions_desc">Tự động chấp nhận và xếp hàng gợi ý bài hát từ khách</string>
-    <string name="listen_together_in_top_bar">Nghe Cùng Nhau trên thanh trên cùng</string>
+    <string name="listen_together_in_top_bar">Blaze Together trên thanh trên cùng</string>
     <string name="copy_all_lyrics">Sao chép lời bài hát</string>
     <string name="change">Thay đổi</string>
     <string name="ai_provider">Nhà cung cấp</string>
@@ -693,7 +693,7 @@
     <string name="plays">phát</string>
     <string name="failed_to_parse_proxy">Không thể phân tích URL proxy</string>
     <string name="turntable_widget_description">Widget âm nhạc hình tròn có nút phát và nút thích</string>
-    <string name="listen_together_in_top_bar_desc">Hiển thị \"Nghe cùng nhau\" trên thanh ứng dụng trên cùng thay vì thanh điều hướng</string>
+    <string name="listen_together_in_top_bar_desc">Hiển thị \"Blaze Together\" trên thanh ứng dụng trên cùng thay vì thanh điều hướng</string>
     <string name="ai_setup_guide">Thông tin xác thực API</string>
     <string name="ai_system_prompt_placeholder">Sử dụng {lineCount} làm ký hiệu giữ chỗ cho số dòng cần dịch</string>
     <string name="palette_dynamic">Thích ứng</string>
@@ -733,7 +733,7 @@
     <string name="discord_buttons">Nút</string>
     <string name="discord_button_1">Nút 1</string>
     <string name="discord_button_2">Nút 2</string>
-    <string name="discord_information_warning">Blazify gửi thông tin bài hát bạn đang phát đến Discord Gateway để cập nhật Trạng thái hoạt động (Rich Presence). Mọi dữ liệu được truyền trực tiếp từ thiết bị của bạn đến Discord — không qua bất kỳ máy chủ bên thứ ba nào. Mã token của bạn được lưu trữ ngay trên thiết bị và không bao giờ bị chia sẻ. Tuy nhiên, việc sử dụng token người dùng (user token) để kết nối Gateway không được hỗ trợ chính thức và có thể vi phạm Điều khoản dịch vụ của Discord. Hãy cân nhắc trước khi tiếp tục!</string>
+    <string name="discord_information_warning">Blazify dùng các API công khai OAuth2 và Gateway của Discord để chia sẻ bài bạn đang nghe. Việc cấp quyền diễn ra qua một phiên trình duyệt cục bộ, tự đóng sau khi lấy được mã, và không có gì được gửi tới máy chủ bên thứ ba. Mã token của bạn được lưu trên thiết bị này trong phần cài đặt đã mã hóa và không bao giờ được chia sẻ. Blazify kết nối trực tiếp tới wss://gateway.discord.gg để đăng hoạt động của bạn, và chỉ yêu cầu quyền tối thiểu cần thiết (sdk.social_layer_presence).</string>
     <string name="discord_activity_type">Loại hoạt động</string>
     <string name="discord_activity_playing">Đang phát</string>
     <string name="discord_activity_listening">Đang nghe</string>
@@ -1096,7 +1096,7 @@
     <string name="social_instagram">Instagram</string>
     <string name="settings_group_connections">Kết nối</string>
     <string name="hint_integrations">Discord Rich Presence, scrobble Last.fm</string>
-    <string name="hint_together_settings">Đồng bộ và cài đặt phòng của Nghe cùng nhau</string>
+    <string name="hint_together_settings">Đồng bộ và cài đặt phòng của Blaze Together</string>
     <string name="guest">Khách</string>
     <string name="manage_account">Quản lý tài khoản</string>
     <string name="tap_to_sign_in">Chạm để đăng nhập</string>
