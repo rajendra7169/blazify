@@ -362,6 +362,11 @@ class MusicService :
 
     private val binder = MusicBinder()
 
+    /** True when Android refused to let this service start and it stopped without building a player. */
+    @Volatile
+    var gaveUpStarting = false
+        private set
+
     inner class MusicBinder : Binder() {
         val service: MusicService
             get() = this@MusicService
@@ -693,6 +698,11 @@ class MusicService :
             }
         }
 
+    /** When Bluetooth audio last arrived, so a headset's own play/pause on connecting can be told apart. */
+    @Volatile
+    var lastBluetoothConnectMs = 0L
+        private set
+
     private val audioDeviceCallback =
         object : AudioDeviceCallback() {
             override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
@@ -704,6 +714,7 @@ class MusicService :
                     } == true
 
                 if (hasBluetooth) {
+                    lastBluetoothConnectMs = SystemClock.uptimeMillis()
                     if (dataStore.get(ResumeOnBluetoothConnectKey, false)) {
                         if (player.playbackState == Player.STATE_READY && !player.isPlaying) {
                             player.play()
@@ -734,6 +745,11 @@ class MusicService :
         // enough to miss the window, so we promote before any I/O.
         ensureForegroundChannelExists()
         if (!ensureStartedAsForegroundOrStop()) {
+            // Android would not let the service run here (started from the background). It stops
+            // without a player; say so, so the app opening now starts a fresh one instead of
+            // holding on to this one and showing no player at all.
+            gaveUpStarting = true
+            isRunning = false
             return
         }
 
@@ -5463,6 +5479,13 @@ class MusicService :
             if (!ensureForegroundWithLatestNotificationOrStop()) {
                 return START_NOT_STICKY
             }
+        }
+
+        // This instance gave up in onCreate and has no player; a widget button reaching it would
+        // crash. It is in the foreground now, so it can stop cleanly and the next start is a new one.
+        if (!::player.isInitialized) {
+            stopSelf()
+            return START_NOT_STICKY
         }
 
         when (intent?.action) {

@@ -8,13 +8,18 @@ package com.blazify.music.playback
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.KeyEvent
 import androidx.annotation.DrawableRes
+import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -103,6 +108,47 @@ constructor(
                 .build(),
             connectionResult.availablePlayerCommands,
         )
+    }
+
+    private var lastPlayPauseKeyMs = 0L
+
+    /**
+     * Play/pause from a headset or a car is a plain play/pause.
+     *
+     * Left to itself the session reads two presses close together as "next song". Bluetooth
+     * headphones often send play/pause twice as they connect, so the song people meant to
+     * resume was skipped and left paused (issue 32). A press that follows another within
+     * [PLAY_PAUSE_REPEAT_MS] is taken as the same press. The single button on a wired
+     * headset (HEADSETHOOK) keeps the double press for "next", as that is its only way to skip.
+     */
+    override fun onMediaButtonEvent(
+        session: MediaSession,
+        controllerInfo: MediaSession.ControllerInfo,
+        intent: Intent,
+    ): Boolean {
+        val event = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+        if (event?.keyCode != KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+            return super.onMediaButtonEvent(session, controllerInfo, intent)
+        }
+        if (event.action != KeyEvent.ACTION_DOWN || event.repeatCount > 0) return true
+        val now = SystemClock.uptimeMillis()
+        if (now - lastPlayPauseKeyMs < PLAY_PAUSE_REPEAT_MS) return true
+        lastPlayPauseKeyMs = now
+
+        val player = session.player
+        // Headsets often press play/pause themselves as they connect. Just after one does, that
+        // press means "play": with resume on Bluetooth connect the song has already started, and
+        // a toggle would stop it again.
+        val connectedAt = if (::service.isInitialized) service.lastBluetoothConnectMs else 0L
+        val justConnected = connectedAt > 0 && now - connectedAt < BLUETOOTH_CONNECT_GRACE_MS
+        if (!justConnected && player.playWhenReady && player.playbackState != Player.STATE_ENDED && player.playbackState != Player.STATE_IDLE) {
+            player.pause()
+        } else {
+            if (player.playbackState == Player.STATE_IDLE) player.prepare()
+            if (player.playbackState == Player.STATE_ENDED) player.seekToDefaultPosition()
+            player.play()
+        }
+        return true
     }
 
     override fun onCustomCommand(
@@ -859,3 +905,9 @@ constructor(
             ).build()
     }
 }
+
+// Long enough to cover a headset sending play/pause twice as it connects; short enough that
+// pressing play, then pause, by hand is never mistaken for one press.
+private const val PLAY_PAUSE_REPEAT_MS = 500L
+
+private const val BLUETOOTH_CONNECT_GRACE_MS = 3_000L

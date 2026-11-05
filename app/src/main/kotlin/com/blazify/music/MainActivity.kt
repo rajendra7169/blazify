@@ -300,12 +300,28 @@ class MainActivity : ComponentActivity() {
 
     private var isServiceBound = false
 
+    // How many times a service that gave up starting has been replaced, so it can't go on forever.
+    private var serviceRestarts = 0
+
     private val serviceConnection =
         object : ServiceConnection {
             override fun onServiceConnected(
                 name: ComponentName?,
                 service: IBinder?,
             ) {
+                if (service is MusicBinder && service.service.gaveUpStarting && serviceRestarts < 2) {
+                    // Android stopped this service before it had a player (it was started from the
+                    // background). Holding on to it would keep it alive with nothing to play, and
+                    // the app would show no player until it was closed for good. Let it go and
+                    // start a fresh one now that the app is open.
+                    Timber.tag("MainActivity").w("Playback service gave up starting; starting a new one")
+                    serviceRestarts++
+                    safeUnbindService("service gave up starting")
+                    window.decorView.postDelayed({
+                        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) startAndBindService()
+                    }, 500)
+                    return
+                }
                 if (service is MusicBinder) {
                     playerConnection = PlayerConnection(this@MainActivity, service, database, lifecycleScope)
                     playerConnectionSnapshot = playerConnection
