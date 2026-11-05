@@ -68,6 +68,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
+import com.blazify.music.BuildConfig
 import com.blazify.music.R
 import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.DarkModeKey
@@ -655,9 +656,9 @@ internal fun LyricsSampleInterior(
             Spacer(Modifier.height(8.dp))
             // The player's bottom actions, with Lyrics lit because that's the page you're on.
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                listOf(
+                listOfNotNull(
                     R.drawable.queue_music to R.string.queue,
-                    R.drawable.cast to R.string.cast,
+                    (R.drawable.cast to R.string.cast).takeIf { BuildConfig.CAST_AVAILABLE },
                     R.drawable.bedtime to R.string.sleep_timer,
                     R.drawable.lyrics to R.string.lyrics,
                 ).forEach { (icon, label) ->

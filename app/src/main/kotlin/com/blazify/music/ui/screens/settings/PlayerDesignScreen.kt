@@ -112,6 +112,7 @@ import coil3.compose.AsyncImage
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerBottomSheetState
 import com.blazify.music.LocalPlayerConnection
+import com.blazify.music.BuildConfig
 import com.blazify.music.R
 import com.blazify.music.constants.PlayerDesignKey
 import com.blazify.music.models.MediaMetadata
@@ -661,7 +662,7 @@ private fun PreviewSlider(pc: PlayerConnection?, activeColor: Color, inactiveCol
 }
 
 @Composable
-private fun PreviewTransport(pc: PlayerConnection?, onColor: Color, ringOrder: Boolean = false) {
+private fun PreviewTransport(pc: PlayerConnection?, onColor: Color) {
     val cs = MaterialTheme.colorScheme
     val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
     // Circle while paused, rounded square while playing, like the real play button.
@@ -670,15 +671,12 @@ private fun PreviewTransport(pc: PlayerConnection?, onColor: Color, ringOrder: B
         animationSpec = tween(durationMillis = 90, easing = LinearEasing),
         label = "previewPlayRoundness",
     )
-    // Ring puts repeat first and shuffle last; the other designs do the opposite.
-    val first = if (ringOrder) R.drawable.repeat else R.drawable.shuffle
-    val last = if (ringOrder) R.drawable.shuffle else R.drawable.repeat
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MiniIcon(first, onColor, 18)
+        MiniIcon(R.drawable.shuffle, onColor, 18)
         MiniIcon(R.drawable.skip_previous, onColor, 22) { pc?.seekToPrevious() }
         Box(
             Modifier.size(46.dp).clip(RoundedCornerShape(roundness)).background(cs.primary).clickable { pc?.togglePlayPause() },
@@ -687,7 +685,7 @@ private fun PreviewTransport(pc: PlayerConnection?, onColor: Color, ringOrder: B
             Icon(painterResource(if (isPlaying) R.drawable.pause else R.drawable.play), null, tint = cs.onPrimary, modifier = Modifier.size(22.dp))
         }
         MiniIcon(R.drawable.skip_next, onColor, 22) { pc?.seekToNext() }
-        MiniIcon(last, onColor, 18)
+        MiniIcon(R.drawable.repeat, onColor, 18)
     }
 }
 
@@ -726,9 +724,10 @@ private fun PreviewHeader(meta: MediaMetadata?, textColor: Color) {
     }
 }
 
-private val PreviewBottomItems = listOf(
+// Cast only where the real player has it: the builds without Google services leave it out.
+private val PreviewBottomItems = listOfNotNull(
     R.drawable.queue_music to R.string.queue,
-    R.drawable.cast to R.string.cast,
+    (R.drawable.cast to R.string.cast).takeIf { BuildConfig.CAST_AVAILABLE },
     R.drawable.bedtime to R.string.sleep_timer,
     R.drawable.lyrics to R.string.lyrics,
 )
@@ -857,7 +856,7 @@ private fun RingPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: 
             PreviewTitleActions(pc, textColor)
         }
         Spacer(Modifier.height(12.dp))
-        PreviewTransport(pc, textColor, ringOrder = true)
+        PreviewTransport(pc, textColor)
         Spacer(Modifier.weight(0.3f))
         PreviewRingLyrics(pc, textColor)
         PreviewQueuePeek(textColor)
