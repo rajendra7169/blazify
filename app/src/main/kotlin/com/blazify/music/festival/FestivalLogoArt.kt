@@ -78,7 +78,6 @@ fun FestivalLogoArt(
     val logo = ImageBitmap.imageResource(if (isDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo)
     val headphones =
         ImageBitmap.imageResource(if (isDark) R.drawable.blaze_logo_headphones_white else R.drawable.blaze_logo_headphones)
-    val flame = ImageBitmap.imageResource(R.drawable.blaze_logo_flame_play)
 
     Canvas(modifier.size(size)) {
         val k = this.size.minDimension / 256f
@@ -87,11 +86,11 @@ fun FestivalLogoArt(
                 Festival.TIHAR -> {
                     image(headphones)
                     garland(t)
-                    diya(t, flame, rangoli = false)
+                    diya(t, rangoli = false)
                 }
                 Festival.DIWALI -> {
                     image(headphones)
-                    diya(t, flame, rangoli = true)
+                    diya(t, rangoli = true)
                     sparkle(44f, 48f, 9f, Gold, t, 0f)
                     sparkle(212f, 44f, 8f, PaleGold, t, 0.9f)
                     sparkle(30f, 92f, 5f, PaleGold, t, 1.7f)
@@ -186,30 +185,19 @@ private fun DrawScope.makhamali(x: Float, y: Float, r: Float) {
     drawCircle(Color(0xFFF48FB1).copy(alpha = 0.8f), r * 0.35f, Offset(x - r * 0.3f, y - r * 0.3f))
 }
 
-/** A clay diyo holding the Blazify flame, play button and all, flickering. */
-private fun DrawScope.diya(t: Float, flame: ImageBitmap, rangoli: Boolean) {
+/** A clay diyo with a real oil-lamp flame on its wick, flickering. */
+private fun DrawScope.diya(t: Float, rangoli: Boolean) {
     val glow = 0.55f + 0.45f * (0.5f + 0.5f * wave(t, 3f))
     drawOval(
         Brush.radialGradient(
             listOf(Color(0xFFFFB74D).copy(alpha = 0.55f * glow), Color.Transparent),
-            center = Offset(128f, 120f),
-            radius = 62f,
+            center = Offset(128f, 124f),
+            radius = 58f,
         ),
-        topLeft = Offset(70f, 58f),
-        size = Size(116f, 124f),
+        topLeft = Offset(70f, 66f),
+        size = Size(116f, 116f),
     )
     if (rangoli) rangoliDots()
-
-    val stretch = 1f + 0.045f * wave(t, 1.2f) + 0.02f * wave(t, 0.4f)
-    val narrow = 1f - 0.03f * wave(t, 1.2f, 0.35f)
-    withTransform({
-        rotate(1.6f * wave(t, 1.5f), pivot = Offset(128f, 175f))
-        scale(narrow, stretch, pivot = Offset(128f, 175f))
-        translate(38.4f, 39.9f)
-        scale(0.7f, 0.7f, pivot = Offset.Zero)
-    }) {
-        image(flame)
-    }
 
     val bowl =
         Path().apply {
@@ -246,7 +234,61 @@ private fun DrawScope.diya(t: Float, flame: ImageBitmap, rangoli: Boolean) {
         quadraticTo(128f, 181f, 155f, 172f)
     }
     drawPath(band, Color(0xFFE8894A).copy(alpha = 0.7f), style = Stroke(1.6f))
+    lampFlame(t)
 }
+
+/**
+ * The flame of an oil lamp standing on its wick: an orange outer flame, a yellow heart, a
+ * white-hot core and a touch of blue at the root. It stretches, narrows and leans like a
+ * real one; every period divides the 12 s loop, so it never jumps.
+ */
+private fun DrawScope.lampFlame(t: Float) {
+    val base = 162f
+    val height = 62f * (1f + 0.06f * wave(t, 0.75f) + 0.03f * wave(t, 0.4f))
+    val width = 13f * (1f - 0.05f * wave(t, 0.75f, 0.2f))
+    val lean = 3.2f * wave(t, 1.2f) + 1.4f * wave(t, 0.5f)
+
+    drawCircle(
+        Brush.radialGradient(
+            listOf(Color(0xFFFFE082).copy(alpha = 0.55f), Color(0xFFFF9800).copy(alpha = 0.18f), Color.Transparent),
+            center = Offset(128f + lean * 0.4f, base - height * 0.45f),
+            radius = height * 0.62f,
+        ),
+        radius = height * 0.62f,
+        center = Offset(128f + lean * 0.4f, base - height * 0.45f),
+    )
+    drawPath(
+        flameShape(128f, base, height, width, lean),
+        Brush.verticalGradient(
+            0f to Color(0xFFFF6D00),
+            0.55f to Color(0xFFFF9100),
+            1f to Color(0xFFFFB300),
+            startY = base - height,
+            endY = base,
+        ),
+    )
+    drawPath(
+        flameShape(128f, base - 1f, height * 0.72f, width * 0.68f, lean * 0.7f),
+        Brush.verticalGradient(
+            0f to Color(0xFFFFC107),
+            1f to Color(0xFFFFEE58),
+            startY = base - height * 0.72f,
+            endY = base,
+        ),
+    )
+    drawPath(flameShape(128f, base - 2f, height * 0.42f, width * 0.4f, lean * 0.4f), Color(0xFFFFFDE7))
+    drawOval(Color(0xFF64B5F6).copy(alpha = 0.55f), Offset(124f, base - 6f), Size(8f, 6f))
+    drawLine(Color(0xFF3E2723), Offset(128f, base - 3f), Offset(128.6f, base + 2f), strokeWidth = 2.2f, cap = StrokeCap.Round)
+}
+
+/** A teardrop standing on ([cx], [base]), [height] tall, its tip leaned sideways by [lean]. */
+private fun flameShape(cx: Float, base: Float, height: Float, width: Float, lean: Float) =
+    Path().apply {
+        moveTo(cx, base)
+        cubicTo(cx - width * 1.35f, base, cx - width * 0.75f + lean * 0.4f, base - height * 0.6f, cx + lean, base - height)
+        cubicTo(cx + width * 0.75f + lean * 0.4f, base - height * 0.6f, cx + width * 1.35f, base, cx, base)
+        close()
+    }
 
 private fun DrawScope.rangoliDots() {
     val colors = listOf(Color(0xFFE91E63), Color(0xFF26A69A), Gold, Color(0xFF7E57C2))
