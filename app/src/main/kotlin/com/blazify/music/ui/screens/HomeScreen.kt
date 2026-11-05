@@ -2863,6 +2863,12 @@ fun HomeScreen(
                 },
                 // Song recognition lives in the home search bar's mic icon now
             )
+            // Test copies only (-PforceFestival=all): steps the Home logo through every festival.
+            com.blazify.music.festival.FestivalTestButton(
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 16.dp, bottom = pageInsets.calculateBottomPadding() + 16.dp),
+            )
         }
     }
 }

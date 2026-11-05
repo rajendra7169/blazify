@@ -78,6 +78,7 @@ val UseNewPlayerDesignKey = booleanPreferencesKey("useNewPlayerDesign")
 val PlayerDesignKey = stringPreferencesKey("playerDesign")
 val UseNewMiniPlayerDesignKey = booleanPreferencesKey("useNewMiniPlayerDesign")
 val MiniPlayerDesignKey = stringPreferencesKey("miniPlayerDesign")
+val FestivalTouchesKey = booleanPreferencesKey("festivalTouches")
 val HidePlayerThumbnailKey = booleanPreferencesKey("hidePlayerThumbnail")
 val CropAlbumArtKey = booleanPreferencesKey("cropAlbumArt")
 

@@ -159,20 +159,28 @@ fun BlazeHomeHeader(
                     animationSpec = androidx.compose.animation.core.tween(160),
                     label = "headerLogo",
                 )
-                Image(
-                    painter = painterResource(
-                        if (isDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo,
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(if (compactHeader) 30.dp else 42.dp)
-                        .graphicsLayer { alpha = logoAlpha }
-                        .onGloballyPositioned { at ->
-                            val r = at.boundsInWindow()
-                            com.blazify.music.utils.LaunchSignal.headerLogo.value =
-                                android.graphics.RectF(r.left, r.top, r.right, r.bottom)
-                        },
-                )
+                val logoSize = if (compactHeader) 30.dp else 42.dp
+                val logoModifier = Modifier
+                    .size(logoSize)
+                    .graphicsLayer { alpha = logoAlpha }
+                    .onGloballyPositioned { at ->
+                        val r = at.boundsInWindow()
+                        com.blazify.music.utils.LaunchSignal.headerLogo.value =
+                            android.graphics.RectF(r.left, r.top, r.right, r.bottom)
+                    }
+                // On a festival day here, the logo dresses up and plays a celebration when tapped.
+                val festival = com.blazify.music.festival.rememberActiveFestival()
+                if (festival != null) {
+                    com.blazify.music.festival.FestivalLogo(festival, isDark, logoSize, logoModifier)
+                } else {
+                    Image(
+                        painter = painterResource(
+                            if (isDark) R.drawable.blaze_logo_white else R.drawable.blaze_logo,
+                        ),
+                        contentDescription = null,
+                        modifier = logoModifier,
+                    )
+                }
                 Spacer(Modifier.width(if (compactHeader) 6.dp else 10.dp))
                 Text(
                     text = "Blazify",

@@ -1496,4 +1496,17 @@
     <string name="mini_player_buttons">Buttons</string>
     <string name="mini_player_buttons_desc">Three buttons, left to right. Tap a place, then what goes there; tap one already in use and the two swap.</string>
     <string name="mini_player_buttons_reset">Reset</string>
+    <string name="festival_greeting_tihar">Happy Tihar</string>
+    <string name="festival_greeting_diwali">Happy Diwali</string>
+    <string name="festival_wish_lights">Light, love and music to you and yours</string>
+    <string name="festival_touches">Festival touches</string>
+    <string name="festival_touches_desc">A festive Blazify logo on major festivals in your country. Tap it to celebrate.</string>
+    <string name="festival_greeting_christmas">Merry Christmas</string>
+    <string name="festival_greeting_new_year">Happy New Year</string>
+    <string name="festival_greeting_music_day">Happy World Music Day</string>
+    <string name="festival_greeting_holi">Happy Holi</string>
+    <string name="festival_greeting_dashain">Happy Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Happy Lunar New Year</string>
+    <string name="festival_greeting_eid">Eid Mubarak</string>
+    <string name="festival_turn_off">Turn off festive mode</string>
 </resources>
