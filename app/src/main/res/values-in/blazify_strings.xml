@@ -1305,6 +1305,9 @@
     <string name="accounts_other_heading">Akun lain</string>
     <string name="accounts_add_another">Tambah akun lain</string>
     <string name="accounts_remove">Hapus dari ponsel ini</string>
+    <string name="accounts_remove_title">Hapus %1$s dari ponsel ini?</string>
+    <string name="accounts_remove_text">Untuk memakai akun ini di sini lagi, kamu perlu masuk lagi. Tidak ada yang berubah pada akun Google-nya.</string>
+    <string name="accounts_remove_confirm">Hapus</string>
     <string name="accounts_choose_channel">Pilih saluran</string>
     <string name="accounts_choose_channel_note">Playlist dan pustaka Anda berasal dari saluran yang Anda pilih. Anda bisa menggantinya nanti di akun Anda.</string>
     <string name="accounts_switching">Beralih…</string>

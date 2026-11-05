@@ -1358,6 +1358,9 @@
     <string name="accounts_other_heading">حسابات أخرى</string>
     <string name="accounts_add_another">إضافة حساب آخر</string>
     <string name="accounts_remove">إزالة من هذا الهاتف</string>
+    <string name="accounts_remove_title">هل تريد إزالة %1$s من هذا الهاتف؟</string>
+    <string name="accounts_remove_text">لاستخدام هذا الحساب هنا مرة أخرى، ستحتاج إلى تسجيل الدخول إليه من جديد. لا يتغير شيء في حساب Google نفسه.</string>
+    <string name="accounts_remove_confirm">إزالة</string>
     <string name="accounts_choose_channel">اختر قناة</string>
     <string name="accounts_choose_channel_note">تأتي قوائم التشغيل والمكتبة من القناة التي تختارها. يمكنك تغييرها لاحقًا من حسابك.</string>
     <string name="accounts_switching">جارٍ التبديل…</string>

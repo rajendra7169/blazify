@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -138,6 +139,35 @@ internal fun AccountsPanel(
     var loadingChannels by remember { mutableStateOf(preloaded == null && isLoggedIn) }
     var switching by remember { mutableStateOf(false) }
     LaunchedEffect(switching) { onSwitching(switching) }
+
+    // Removing is asked about first: it sits one tap from switching, and getting the account
+    // back means signing in to it again.
+    var confirmRemove by remember { mutableStateOf<SavedAccount?>(null) }
+    confirmRemove?.let { account ->
+        AlertDialog(
+            onDismissRequest = { confirmRemove = null },
+            title = { Text(stringResource(R.string.accounts_remove_title, account.name)) },
+            text = { Text(stringResource(R.string.accounts_remove_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmRemove = null
+                        scope.launch {
+                            AccountSwitcher.forget(context, account)
+                            saved = AccountSwitcher.saved(context)
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.accounts_remove_confirm), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRemove = null }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
+    }
     val expired = stringResource(R.string.accounts_expired)
 
     LaunchedEffect(Unit) {
@@ -222,12 +252,7 @@ internal fun AccountsPanel(
                             photo = account.photo,
                             selected = false,
                             onClick = { switchTo(account) },
-                            onRemove = {
-                                scope.launch {
-                                    AccountSwitcher.forget(context, account)
-                                    saved = AccountSwitcher.saved(context)
-                                }
-                            },
+                            onRemove = { confirmRemove = account },
                         )
                     }
                 }
@@ -348,8 +373,9 @@ internal fun AccountRow(
         if (onRemove != null) {
             IconButton(onClick = onRemove) {
                 Icon(
-                    painterResource(R.drawable.close),
+                    painterResource(R.drawable.delete),
                     contentDescription = stringResource(R.string.accounts_remove),
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp),
                 )
             }

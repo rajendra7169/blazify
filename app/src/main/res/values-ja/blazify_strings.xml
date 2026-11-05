@@ -1305,6 +1305,9 @@
     <string name="accounts_other_heading">その他のアカウント</string>
     <string name="accounts_add_another">別のアカウントを追加</string>
     <string name="accounts_remove">このスマートフォンから削除</string>
+    <string name="accounts_remove_title">%1$s をこのスマートフォンから削除しますか？</string>
+    <string name="accounts_remove_text">このアカウントをここで再び使うには、もう一度ログインする必要があります。Google アカウント自体は変わりません。</string>
+    <string name="accounts_remove_confirm">削除</string>
     <string name="accounts_choose_channel">チャンネルを選択</string>
     <string name="accounts_choose_channel_note">プレイリストとライブラリは選んだチャンネルのものになります。後からアカウント画面で変更できます。</string>
     <string name="accounts_switching">切り替え中…</string>

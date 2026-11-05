@@ -1305,6 +1305,9 @@
     <string name="accounts_other_heading">其他帳號</string>
     <string name="accounts_add_another">新增其他帳號</string>
     <string name="accounts_remove">從這支手機移除</string>
+    <string name="accounts_remove_title">要從這支手機移除 %1$s 嗎？</string>
+    <string name="accounts_remove_text">若要在這裡再次使用此帳戶，需要重新登入。Google 帳戶本身不會有任何變更。</string>
+    <string name="accounts_remove_confirm">移除</string>
     <string name="accounts_choose_channel">選擇頻道</string>
     <string name="accounts_choose_channel_note">你的播放清單和媒體庫會來自所選的頻道。之後可以在帳號中變更。</string>
     <string name="accounts_switching">正在切換…</string>

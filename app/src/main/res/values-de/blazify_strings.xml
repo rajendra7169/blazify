@@ -1316,6 +1316,9 @@
     <string name="accounts_other_heading">Andere Konten</string>
     <string name="accounts_add_another">Weiteres Konto hinzufügen</string>
     <string name="accounts_remove">Von diesem Telefon entfernen</string>
+    <string name="accounts_remove_title">%1$s von diesem Handy entfernen?</string>
+    <string name="accounts_remove_text">Um dieses Konto hier wieder zu nutzen, musst du dich erneut anmelden. Am Google-Konto selbst ändert sich nichts.</string>
+    <string name="accounts_remove_confirm">Entfernen</string>
     <string name="accounts_choose_channel">Kanal auswählen</string>
     <string name="accounts_choose_channel_note">Deine Playlists und Bibliothek kommen vom gewählten Kanal. Du kannst ihn später in deinem Konto ändern.</string>
     <string name="accounts_switching">Wird gewechselt…</string>

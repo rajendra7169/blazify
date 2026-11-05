@@ -1327,6 +1327,9 @@
     <string name="accounts_other_heading">Otras cuentas</string>
     <string name="accounts_add_another">Agregar otra cuenta</string>
     <string name="accounts_remove">Quitar de este teléfono</string>
+    <string name="accounts_remove_title">¿Quitar %1$s de este teléfono?</string>
+    <string name="accounts_remove_text">Para volver a usar esta cuenta aquí, tendrás que iniciar sesión de nuevo. No cambia nada en la cuenta de Google.</string>
+    <string name="accounts_remove_confirm">Quitar</string>
     <string name="accounts_choose_channel">Elige un canal</string>
     <string name="accounts_choose_channel_note">Tus listas y tu biblioteca vienen del canal que elijas. Puedes cambiarlo después en tu cuenta.</string>
     <string name="accounts_switching">Cambiando…</string>

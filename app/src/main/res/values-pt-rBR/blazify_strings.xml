@@ -1327,6 +1327,9 @@
     <string name="accounts_other_heading">Outras contas</string>
     <string name="accounts_add_another">Adicionar outra conta</string>
     <string name="accounts_remove">Remover deste celular</string>
+    <string name="accounts_remove_title">Remover %1$s deste celular?</string>
+    <string name="accounts_remove_text">Para usar esta conta aqui de novo, você precisará entrar nela outra vez. Nada muda na própria conta do Google.</string>
+    <string name="accounts_remove_confirm">Remover</string>
     <string name="accounts_choose_channel">Escolha um canal</string>
     <string name="accounts_choose_channel_note">Suas playlists e sua biblioteca vêm do canal que você escolher. Dá para mudar depois na sua conta.</string>
     <string name="accounts_switching">Trocando…</string>

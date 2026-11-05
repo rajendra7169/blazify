@@ -1305,6 +1305,9 @@
     <string name="accounts_other_heading">다른 계정</string>
     <string name="accounts_add_another">다른 계정 추가</string>
     <string name="accounts_remove">이 휴대폰에서 삭제</string>
+    <string name="accounts_remove_title">이 휴대전화에서 %1$s 계정을 삭제할까요?</string>
+    <string name="accounts_remove_text">이 계정을 여기서 다시 사용하려면 다시 로그인해야 합니다. Google 계정 자체는 바뀌지 않습니다.</string>
+    <string name="accounts_remove_confirm">삭제</string>
     <string name="accounts_choose_channel">채널 선택</string>
     <string name="accounts_choose_channel_note">재생목록과 보관함은 선택한 채널에서 불러옵니다. 나중에 계정에서 변경할 수 있습니다.</string>
     <string name="accounts_switching">전환 중…</string>

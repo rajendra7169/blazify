@@ -1305,6 +1305,9 @@
     <string name="accounts_other_heading">Tài khoản khác</string>
     <string name="accounts_add_another">Thêm tài khoản khác</string>
     <string name="accounts_remove">Xoá khỏi điện thoại này</string>
+    <string name="accounts_remove_title">Xóa %1$s khỏi điện thoại này?</string>
+    <string name="accounts_remove_text">Để dùng lại tài khoản này ở đây, bạn cần đăng nhập lại. Tài khoản Google không bị thay đổi gì.</string>
+    <string name="accounts_remove_confirm">Xóa</string>
     <string name="accounts_choose_channel">Chọn kênh</string>
     <string name="accounts_choose_channel_note">Danh sách phát và thư viện của bạn lấy từ kênh bạn chọn. Bạn có thể đổi sau trong tài khoản.</string>
     <string name="accounts_switching">Đang chuyển…</string>

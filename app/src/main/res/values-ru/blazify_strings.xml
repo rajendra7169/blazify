@@ -1338,6 +1338,9 @@
     <string name="accounts_other_heading">Другие аккаунты</string>
     <string name="accounts_add_another">Добавить другой аккаунт</string>
     <string name="accounts_remove">Удалить с этого телефона</string>
+    <string name="accounts_remove_title">Удалить %1$s с этого телефона?</string>
+    <string name="accounts_remove_text">Чтобы снова использовать этот аккаунт здесь, нужно будет войти в него заново. В самом аккаунте Google ничего не изменится.</string>
+    <string name="accounts_remove_confirm">Удалить</string>
     <string name="accounts_choose_channel">Выберите канал</string>
     <string name="accounts_choose_channel_note">Плейлисты и библиотека берутся с выбранного канала. Его можно сменить позже в аккаунте.</string>
     <string name="accounts_switching">Переключение…</string>

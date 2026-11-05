@@ -1316,6 +1316,9 @@
     <string name="accounts_other_heading">Diğer hesaplar</string>
     <string name="accounts_add_another">Başka bir hesap ekle</string>
     <string name="accounts_remove">Bu telefondan kaldır</string>
+    <string name="accounts_remove_title">%1$s bu telefondan kaldırılsın mı?</string>
+    <string name="accounts_remove_text">Bu hesabı burada yeniden kullanmak için tekrar oturum açman gerekir. Google hesabının kendisinde hiçbir şey değişmez.</string>
+    <string name="accounts_remove_confirm">Kaldır</string>
     <string name="accounts_choose_channel">Bir kanal seçin</string>
     <string name="accounts_choose_channel_note">Çalma listeleriniz ve kitaplığınız seçtiğiniz kanaldan gelir. Bunu daha sonra hesabınızdan değiştirebilirsiniz.</string>
     <string name="accounts_switching">Geçiş yapılıyor…</string>

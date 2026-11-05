@@ -1325,6 +1325,9 @@
     <string name="accounts_other_heading">Autres comptes</string>
     <string name="accounts_add_another">Ajouter un autre compte</string>
     <string name="accounts_remove">Retirer de ce téléphone</string>
+    <string name="accounts_remove_title">Retirer %1$s de ce téléphone ?</string>
+    <string name="accounts_remove_text">Pour réutiliser ce compte ici, vous devrez vous reconnecter. Rien ne change sur le compte Google lui-même.</string>
+    <string name="accounts_remove_confirm">Retirer</string>
     <string name="accounts_choose_channel">Choisir une chaîne</string>
     <string name="accounts_choose_channel_note">Vos playlists et votre bibliothèque viennent de la chaîne choisie. Vous pourrez la changer plus tard dans votre compte.</string>
     <string name="accounts_switching">Changement…</string>

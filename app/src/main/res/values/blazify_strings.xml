@@ -1476,6 +1476,9 @@
     <string name="accounts_other_heading">Other accounts</string>
     <string name="accounts_add_another">Add another account</string>
     <string name="accounts_remove">Remove from this phone</string>
+    <string name="accounts_remove_title">Remove %1$s from this phone?</string>
+    <string name="accounts_remove_text">To use this account here again, you will need to sign in to it again. Nothing changes on the Google account itself.</string>
+    <string name="accounts_remove_confirm">Remove</string>
     <string name="accounts_choose_channel">Choose a channel</string>
     <string name="accounts_choose_channel_note">Your playlists and library come from the channel you pick. You can change it later in your account.</string>
     <string name="signing_in">Signing in…</string>

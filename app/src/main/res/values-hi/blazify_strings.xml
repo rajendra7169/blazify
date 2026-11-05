@@ -1316,6 +1316,9 @@
     <string name="accounts_other_heading">दूसरे खाते</string>
     <string name="accounts_add_another">एक और खाता जोड़ें</string>
     <string name="accounts_remove">इस फ़ोन से हटाएँ</string>
+    <string name="accounts_remove_title">%1$s को इस फ़ोन से हटाएँ?</string>
+    <string name="accounts_remove_text">इस खाते को यहाँ फिर से इस्तेमाल करने के लिए आपको दोबारा साइन इन करना होगा। Google खाते में कुछ नहीं बदलता।</string>
+    <string name="accounts_remove_confirm">हटाएँ</string>
     <string name="accounts_choose_channel">चैनल चुनें</string>
     <string name="accounts_choose_channel_note">आपकी प्लेलिस्ट और लाइब्रेरी आपके चुने हुए चैनल से आती हैं। आप इसे बाद में अपने खाते में बदल सकते हैं।</string>
     <string name="accounts_switching">बदला जा रहा है…</string>
