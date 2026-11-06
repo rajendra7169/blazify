@@ -92,6 +92,7 @@ import com.blazify.music.LocalListenTogetherManager
 import com.blazify.music.LocalPlayerAwareWindowInsets
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.extensions.isInternetConnected
 import com.blazify.music.constants.AppBarHeight
 import com.blazify.music.constants.HideExplicitKey
 import com.blazify.music.constants.ShowArtistDescriptionKey
@@ -194,7 +195,30 @@ fun ArtistScreen(
             state = lazyListState,
             contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
         ) {
-            if (artistPage == null && !showLocal) {
+            if (artistPage == null && !showLocal && viewModel.loadFailed) {
+                item(key = "load_failed") {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    Column(
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (context.isInternetConnected()) R.string.error_unknown else R.string.error_no_internet,
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        androidx.compose.material3.TextButton(onClick = { viewModel.fetchArtistsFromYTM() }) {
+                            Text(stringResource(R.string.retry))
+                        }
+                    }
+                }
+            } else if (artistPage == null && !showLocal) {
                 item(key = "shimmer") {
                     ShimmerHost(
                         modifier =
@@ -215,7 +239,7 @@ fun ArtistScreen(
                                     Modifier
                                         .fillMaxSize()
                                         .shimmer()
-                                        .background(MaterialTheme.colorScheme.onSurface)
+                                        .background(com.blazify.music.ui.component.shimmer.skeletonBlockColor)
                                         .fadingEdge(
                                             top = systemBarsTopPadding + AppBarHeight,
                                             bottom = 200.dp,
@@ -273,7 +297,7 @@ fun ArtistScreen(
                                                 .size(48.dp)
                                                 .shimmer()
                                                 .background(
-                                                    MaterialTheme.colorScheme.onSurface,
+                                                    com.blazify.music.ui.component.shimmer.skeletonBlockColor,
                                                     RoundedCornerShape(24.dp),
                                                 ),
                                     )

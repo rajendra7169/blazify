@@ -987,23 +987,25 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
             }
         }
         Spacer(Modifier.height(10.dp))
-        // Shuffle · previous · play · next · repeat, the middle three as keys.
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            MiniIcon(R.drawable.shuffle, textColor, 15)
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(width = 40.dp, height = 32.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToPrevious() }, contentAlignment = Alignment.Center) {
+        // Shuffle · previous · play · next · repeat, the middle three as keys. The keys share
+        // the width by weight, so all five fit however narrow the preview is; with fixed
+        // sizes the row ran wider than the phone and repeat fell off the edge.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
+        ) {
+            Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) { MiniIcon(R.drawable.shuffle, textColor, 15) }
+            Box(Modifier.weight(1f).height(30.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToPrevious() }, contentAlignment = Alignment.Center) {
                 MiniIcon(R.drawable.skip_previous, PreviewRetroInk, 17)
             }
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(width = 50.dp, height = 36.dp).clip(RoundedCornerShape(9.dp)).background(cs.primary).clickable { pc?.togglePlayPause() }, contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1.3f).height(34.dp).clip(RoundedCornerShape(9.dp)).background(cs.primary).clickable { pc?.togglePlayPause() }, contentAlignment = Alignment.Center) {
                 MiniIcon(if (isPlaying) R.drawable.pause else R.drawable.play, Color.White, 19)
             }
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(width = 40.dp, height = 32.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToNext() }, contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1f).height(30.dp).clip(RoundedCornerShape(9.dp)).background(PreviewRetroCream).clickable { pc?.seekToNext() }, contentAlignment = Alignment.Center) {
                 MiniIcon(R.drawable.skip_next, PreviewRetroInk, 17)
             }
-            Spacer(Modifier.width(8.dp))
-            MiniIcon(R.drawable.repeat, textColor, 15)
+            Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) { MiniIcon(R.drawable.repeat, textColor, 15) }
         }
         Spacer(Modifier.weight(0.3f))
         // The dark tape-shell strip with Queue · Cast · Sleep timer · Lyrics.

@@ -67,6 +67,9 @@ class ArtistViewModel @Inject constructor(
     private val isPodcastChannel = savedStateHandle.get<Boolean>("isPodcastChannel") ?: false
     var artistPage by mutableStateOf<ArtistPage?>(null)
 
+    /** Set when the page could not be loaded and there is nothing to show instead. */
+    var loadFailed by mutableStateOf(false)
+
     // Track API subscription state separately
     private val _apiSubscribed = MutableStateFlow<Boolean?>(null)
 
@@ -145,8 +148,20 @@ class ArtistViewModel @Inject constructor(
             val hideExplicit = context.dataStore.get(HideExplicitKey, false)
             val hideVideoSongs = context.dataStore.get(HideVideoSongsKey, false)
             val hideYoutubeShorts = context.dataStore.get(HideYoutubeShortsKey, false)
+            loadFailed = false
             YouTube.artist(artistId)
                 .onSuccess { page ->
+                    // Show the page as soon as YouTube answers. Naming the artists on each
+                    // card and fetching song lengths take further requests, which used to
+                    // keep the skeleton up the whole time; the page now fills them in after.
+                    if (artistPage == null) {
+                        artistPage = page.copy(
+                            sections = page.sections
+                                .map { section ->
+                                    section.copy(items = section.items.filterExplicit(hideExplicit).filterVideoSongs(hideVideoSongs).filterYoutubeShorts(hideYoutubeShorts))
+                                }.filter { it.items.isNotEmpty() },
+                        )
+                    }
                     // Collect all items from all sections and resolve artist IDs once
                     val allItems = page.sections.flatMap { it.items }
                     val resolvedIdMap = if (allItems.isNotEmpty()) {
@@ -257,6 +272,9 @@ class ArtistViewModel @Inject constructor(
                     _apiSubscribed.value = resolvedPage.isSubscribed
                 }.onFailure {
                     reportException(it)
+                    // With nothing kept from an earlier visit, say so instead of a skeleton
+                    // that never ends.
+                    if (artistPage == null) loadFailed = true
                 }
         }
     }
