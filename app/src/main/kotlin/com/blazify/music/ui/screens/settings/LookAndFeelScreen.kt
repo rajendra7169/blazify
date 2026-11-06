@@ -181,6 +181,8 @@ fun LookAndFeelScreen(
     val (navBarStyle, onNavBarStyleChange) = rememberEnumPreference(NavBarStyleKey, NavBarStyle.PILL)
     var showNavBarStyleDialog by rememberSaveable { mutableStateOf(false) }
     val (showHomeGreeting, onShowHomeGreetingChange) = rememberPreference(ShowHomeGreetingKey, defaultValue = true)
+    val (festivalTouches, onFestivalTouchesChange) =
+        rememberPreference(com.blazify.music.constants.FestivalTouchesKey, defaultValue = true)
     val (showHomeSearchBar, onShowHomeSearchBarChange) = rememberPreference(ShowHomeSearchBarKey, defaultValue = true)
 
     var tab by rememberSaveable { mutableStateOf(LookFeelTab.THEME) }
@@ -291,6 +293,15 @@ fun LookAndFeelScreen(
                                             Switch(checked = showHomeSearchBar, onCheckedChange = onShowHomeSearchBarChange)
                                         },
                                         onClick = { onShowHomeSearchBarChange(!showHomeSearchBar) },
+                                    ),
+                                    Material3SettingsItem(
+                                        icon = painterResource(R.drawable.celebration),
+                                        title = { Text(stringResource(R.string.festival_touches)) },
+                                        description = { Text(stringResource(R.string.festival_touches_desc)) },
+                                        trailingContent = {
+                                            Switch(checked = festivalTouches, onCheckedChange = onFestivalTouchesChange)
+                                        },
+                                        onClick = { onFestivalTouchesChange(!festivalTouches) },
                                     ),
                                 ),
                             )

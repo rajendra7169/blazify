@@ -1509,4 +1509,6 @@
     <string name="festival_greeting_lunar_new_year">Happy Lunar New Year</string>
     <string name="festival_greeting_eid">Eid Mubarak</string>
     <string name="festival_turn_off">Turn off festive mode</string>
+    <string name="festival_wish_joy">Joy, love and music to you and yours</string>
+    <string name="festival_turned_off">Festive mode is off. Turn it back on in Look &amp; Feel › Home.</string>
 </resources>
