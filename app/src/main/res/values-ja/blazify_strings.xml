@@ -1345,4 +1345,6 @@
     <string name="festival_turn_off">お祝いモードをオフ</string>
     <string name="festival_wish_joy">あなたと大切な人に、喜びと愛と音楽を</string>
     <string name="festival_turned_off">お祝いモードをオフにしました。デザイン › ホーム でまたオンにできます。</string>
+    <string name="artist_latest_release">最新リリース</string>
+    <string name="artist_you_and">あなたと%1$s</string>
 </resources>

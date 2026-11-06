@@ -1357,4 +1357,6 @@
     <string name="festival_turn_off">Bayram modunu kapat</string>
     <string name="festival_wish_joy">Sana ve sevdiklerine neşe, sevgi ve müzik</string>
     <string name="festival_turned_off">Bayram modu kapalı. Görünüm › Ana Sayfa\'dan yeniden açabilirsin.</string>
+    <string name="artist_latest_release">En yeni çıkış</string>
+    <string name="artist_you_and">Sen ve %1$s</string>
 </resources>

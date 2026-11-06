@@ -12,6 +12,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,6 +65,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -152,6 +154,15 @@ fun ArtistScreen(
     val artistPage = viewModel.artistPage
     val libraryArtist by viewModel.libraryArtist.collectAsStateWithLifecycle()
     val librarySongs by viewModel.librarySongs.collectAsStateWithLifecycle()
+    val yourSongs by viewModel.yourSongs.collectAsStateWithLifecycle()
+    // Their newest single or album: YouTube lists newest first, so the first of the latest year.
+    val latestRelease = remember(artistPage) {
+        artistPage?.sections
+            ?.flatMap { it.items }
+            ?.filterIsInstance<AlbumItem>()
+            ?.filter { it.year != null }
+            ?.maxByOrNull { it.year!! }
+    }
     val libraryAlbums by viewModel.libraryAlbums.collectAsStateWithLifecycle()
     val isChannelSubscribed by viewModel.isChannelSubscribed.collectAsStateWithLifecycle()
     val hideExplicit by rememberPreference(key = HideExplicitKey, defaultValue = false)
@@ -470,6 +481,56 @@ fun ArtistScreen(
                     }
                 }
 
+                // Latest release: their newest single or album, first on the page.
+                if (!showLocal && latestRelease != null) {
+                    val release = latestRelease!!
+                    item(key = "latest_release") {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier =
+                                Modifier
+                                    .animateItem()
+                                    .padding(horizontal = 16.dp)
+                                    .padding(bottom = 16.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .clickable { navController.navigate("album/${release.id}") }
+                                    .padding(10.dp),
+                        ) {
+                            AsyncImage(
+                                model = release.thumbnail,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)),
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.artist_latest_release).uppercase(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp,
+                                )
+                                Text(
+                                    text = release.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = release.year.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Icon(painterResource(R.drawable.navigate_next), contentDescription = null)
+                        }
+                    }
+                }
+
                 // About Artist Section
                 if (!showLocal && (showArtistDescription || showArtistSubscriberCount || showMonthlyListeners)) {
                     val description = artistPage?.description
@@ -542,6 +603,68 @@ fun ArtistScreen(
                                 }
                             }
                         }
+                    }
+                }
+
+                // You and this artist: your own songs by them, from this phone, so it shows
+                // offline too.
+                if (!showLocal && yourSongs.isNotEmpty()) {
+                    item(key = "you_and_title") {
+                        NavigationTitle(
+                            title = stringResource(
+                                R.string.artist_you_and,
+                                artistPage?.artist?.title ?: libraryArtist?.artist?.name.orEmpty(),
+                            ),
+                            modifier = Modifier.animateItem(),
+                        )
+                    }
+                    itemsIndexed(
+                        items = yourSongs,
+                        key = { _, item -> "your_song_${item.id}" },
+                    ) { index, song ->
+                        SongListItem(
+                            song = song,
+                            showInLibraryIcon = true,
+                            isActive = song.id == mediaMetadata?.id,
+                            isPlaying = isPlaying,
+                            trailingContent = {
+                                IconButton(
+                                    onClick = {
+                                        menuState.show {
+                                            SongMenu(originalSong = song, onDismiss = menuState::dismiss)
+                                        }
+                                    },
+                                ) {
+                                    Icon(painter = painterResource(R.drawable.more_vert), contentDescription = null)
+                                }
+                            },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .combinedClickable(
+                                        onClick = {
+                                            if (!isGuest) {
+                                                if (song.id == mediaMetadata?.id) {
+                                                    playerConnection.togglePlayPause()
+                                                } else {
+                                                    playerConnection.playQueue(
+                                                        ListQueue(
+                                                            title = artistPage?.artist?.title ?: libraryArtist?.artist?.name ?: "",
+                                                            items = yourSongs.map { it.toMediaItem() },
+                                                            startIndex = index,
+                                                        ),
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        onLongClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            menuState.show {
+                                                SongMenu(originalSong = song, onDismiss = menuState::dismiss)
+                                            }
+                                        },
+                                    ).animateItem(),
+                        )
                     }
                 }
 
@@ -1044,6 +1167,29 @@ fun ArtistScreen(
             }
         },
         actions = {
+            // Once the header has scrolled away, play and shuffle stay at hand up here.
+            if (!transparentAppBar && !isGuest) {
+                val topSongs = viewModel.artistPage?.sections?.firstOrNull()?.items?.filterIsInstance<SongItem>().orEmpty()
+                if (topSongs.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            playerConnection.playQueue(
+                                ListQueue(
+                                    title = viewModel.artistPage?.artist?.title ?: "",
+                                    items = topSongs.map { it.toMediaItem() },
+                                ),
+                            )
+                        },
+                    ) {
+                        Icon(painterResource(R.drawable.play), contentDescription = stringResource(R.string.play))
+                    }
+                }
+                viewModel.artistPage?.artist?.shuffleEndpoint?.let { shuffleEndpoint ->
+                    IconButton(onClick = { playerConnection.playQueue(YouTubeQueue(shuffleEndpoint)) }) {
+                        Icon(painterResource(R.drawable.shuffle), contentDescription = stringResource(R.string.shuffle))
+                    }
+                }
+            }
             IconButton(
                 onClick = {
                     viewModel.artistPage?.artist?.shareLink?.let { link ->

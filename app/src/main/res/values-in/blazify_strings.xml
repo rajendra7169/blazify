@@ -1345,4 +1345,6 @@
     <string name="festival_turn_off">Matikan mode perayaan</string>
     <string name="festival_wish_joy">Kebahagiaan, cinta, dan musik untukmu dan orang-orang tersayang</string>
     <string name="festival_turned_off">Mode perayaan dimatikan. Aktifkan lagi di Tampilan &amp; Nuansa › Beranda.</string>
+    <string name="artist_latest_release">Rilisan terbaru</string>
+    <string name="artist_you_and">Kamu dan %1$s</string>
 </resources>

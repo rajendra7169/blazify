@@ -1345,4 +1345,6 @@
     <string name="festival_turn_off">關閉節日模式</string>
     <string name="festival_wish_joy">願歡樂、愛與音樂伴你和家人</string>
     <string name="festival_turned_off">節日模式已關閉。可在 外觀與風格 › 首頁 中重新開啟。</string>
+    <string name="artist_latest_release">最新發行</string>
+    <string name="artist_you_and">你和%1$s</string>
 </resources>

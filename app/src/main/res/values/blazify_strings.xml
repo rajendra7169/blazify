@@ -1511,4 +1511,6 @@
     <string name="festival_turn_off">Turn off festive mode</string>
     <string name="festival_wish_joy">Joy, love and music to you and yours</string>
     <string name="festival_turned_off">Festive mode is off. Turn it back on in Look &amp; Feel › Home.</string>
+    <string name="artist_latest_release">Latest release</string>
+    <string name="artist_you_and">You and %1$s</string>
 </resources>

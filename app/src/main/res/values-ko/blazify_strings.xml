@@ -1345,4 +1345,6 @@
     <string name="festival_turn_off">축제 모드 끄기</string>
     <string name="festival_wish_joy">당신과 소중한 사람들에게 기쁨과 사랑과 음악을</string>
     <string name="festival_turned_off">축제 모드를 껐어요. 디자인 › 홈에서 다시 켤 수 있어요.</string>
+    <string name="artist_latest_release">최신 발매</string>
+    <string name="artist_you_and">나와 %1$s</string>
 </resources>

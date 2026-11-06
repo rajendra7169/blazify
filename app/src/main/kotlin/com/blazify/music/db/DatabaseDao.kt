@@ -282,6 +282,18 @@ interface DatabaseDao {
         previewSize: Int = 3,
     ): Flow<List<Song>>
 
+    /** Your songs by an artist: the ones you have listened to most, then liked and downloaded ones. */
+    @Transaction
+    @Query(
+        "SELECT song.* FROM song_artist_map JOIN song ON song_artist_map.songId = song.id " +
+            "WHERE artistId = :artistId AND (song.totalPlayTime > 0 OR song.liked OR song.dateDownload IS NOT NULL) " +
+            "ORDER BY song.totalPlayTime DESC, song.liked DESC LIMIT :limit",
+    )
+    fun artistYourSongs(
+        artistId: String,
+        limit: Int = 5,
+    ): Flow<List<Song>>
+
     // Quick picks start from what someone listens to most, measured in time
     // listened. A single three-hour podcast outweighs a week of songs by that
     // measure, so episodes and anything over half an hour were steering the

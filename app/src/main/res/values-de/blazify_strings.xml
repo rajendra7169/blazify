@@ -1357,4 +1357,6 @@
     <string name="festival_turn_off">Festmodus ausschalten</string>
     <string name="festival_wish_joy">Freude, Liebe und Musik für dich und deine Lieben</string>
     <string name="festival_turned_off">Festmodus ist aus. Unter Aussehen › Startseite kannst du ihn wieder einschalten.</string>
+    <string name="artist_latest_release">Neueste Veröffentlichung</string>
+    <string name="artist_you_and">Du und %1$s</string>
 </resources>

@@ -91,6 +91,14 @@ class ArtistViewModel @Inject constructor(
             database.artistSongsPreview(artistId).map { it.filterExplicit(hideExplicit).filterVideoSongsLocal(hideVideoSongs) }
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    /** Your own songs by this artist, from this phone: most listened, liked, downloaded. */
+    val yourSongs = context.dataStore.data
+        .map { (it[HideExplicitKey] ?: false) to (it[HideVideoSongsKey] ?: false) }
+        .distinctUntilChanged()
+        .flatMapLatest { (hideExplicit, hideVideoSongs) ->
+            database.artistYourSongs(artistId).map { it.filterExplicit(hideExplicit).filterVideoSongsLocal(hideVideoSongs) }
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     val libraryAlbums = context.dataStore.data
         .map { it[HideExplicitKey] ?: false }
         .distinctUntilChanged()

@@ -1357,4 +1357,6 @@
     <string name="festival_turn_off">त्योहारी मोड बंद करें</string>
     <string name="festival_wish_joy">आपको और आपके अपनों को खुशी, प्यार और संगीत</string>
     <string name="festival_turned_off">त्योहारी मोड बंद है। इसे रूप-रंग › मुख्य स्थान में फिर से चालू करें।</string>
+    <string name="artist_latest_release">नई रिलीज़</string>
+    <string name="artist_you_and">आप और %1$s</string>
 </resources>

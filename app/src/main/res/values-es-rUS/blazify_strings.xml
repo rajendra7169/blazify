@@ -1368,4 +1368,6 @@
     <string name="festival_turn_off">Desactivar el modo festivo</string>
     <string name="festival_wish_joy">Alegría, amor y música para ti y los tuyos</string>
     <string name="festival_turned_off">El modo festivo está desactivado. Vuelve a activarlo en Aspecto › Inicio.</string>
+    <string name="artist_latest_release">Último lanzamiento</string>
+    <string name="artist_you_and">Tú y %1$s</string>
 </resources>

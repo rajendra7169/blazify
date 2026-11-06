@@ -1381,4 +1381,6 @@
     <string name="festival_turn_off">Выключить праздничный режим</string>
     <string name="festival_wish_joy">Радости, любви и музыки вам и вашим близким</string>
     <string name="festival_turned_off">Праздничный режим выключен. Включить его снова можно в разделе Оформление › Главная.</string>
+    <string name="artist_latest_release">Последний релиз</string>
+    <string name="artist_you_and">Вы и %1$s</string>
 </resources>

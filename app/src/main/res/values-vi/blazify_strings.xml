@@ -1345,4 +1345,6 @@
     <string name="festival_turn_off">Tắt chế độ lễ hội</string>
     <string name="festival_wish_joy">Niềm vui, yêu thương và âm nhạc đến bạn và người thân</string>
     <string name="festival_turned_off">Đã tắt chế độ lễ hội. Bật lại trong Giao diện › Trang chủ.</string>
+    <string name="artist_latest_release">Phát hành mới nhất</string>
+    <string name="artist_you_and">Bạn và %1$s</string>
 </resources>
