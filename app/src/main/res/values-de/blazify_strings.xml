@@ -1359,4 +1359,6 @@
     <string name="festival_turned_off">Festmodus ist aus. Unter Aussehen › Startseite kannst du ihn wieder einschalten.</string>
     <string name="artist_latest_release">Neueste Veröffentlichung</string>
     <string name="artist_you_and">Du und %1$s</string>
+    <string name="star_prompt_title_short">Gefällt dir Blazify?</string>
+    <string name="star_prompt_body_short">Ein Stern auf GitHub hilft anderen, es zu finden. Kostenlos und ohne Werbung.</string>
 </resources>

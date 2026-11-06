@@ -133,6 +133,8 @@ android {
         // Test copies only: -PforceFestival=tihar shows that festival on any day. Release builds
         // (and F-Droid's, which must match them byte for byte) never pass it.
         buildConfigField("String", "FORCE_FESTIVAL", "\"${project.findProperty("forceFestival") ?: ""}\"")
+        // Test copies only: show the star prompt on every launch (-PforceStarPrompt=true).
+        buildConfigField("boolean", "FORCE_STAR_PROMPT", "${project.findProperty("forceStarPrompt") == "true"}")
         // Blazify's own Discord application, so friends see "Blazify" in your status
         buildConfigField("Long", "DISCORD_APP_ID", "1564500874733297664L")
     }

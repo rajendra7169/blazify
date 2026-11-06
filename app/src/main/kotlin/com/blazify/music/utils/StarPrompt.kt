@@ -7,81 +7,69 @@ package com.blazify.music.utils
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
-import com.blazify.music.constants.StarPromptAsksKey
 import com.blazify.music.constants.StarPromptDoneKey
-import com.blazify.music.constants.StarPromptNextAtKey
+import com.blazify.music.constants.StarPromptFirstSeenKey
+import com.blazify.music.constants.StarPromptLastShownKey
+import com.blazify.music.constants.StarPromptShownKey
 import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 
 /**
- * Asking for a star: once a day after the first launch, then weekly for two
- * months, and then never again.
+ * Asking for a star, on a fixed schedule: 3 days, a week, 15 days and a month after the
+ * app was first opened, and after that every two months.
  *
- * The rules matter more than the feature. A prompt that returns forever is
- * how an app earns a one-star review from someone who liked it, so:
- *
- * - The clock starts on first launch and the first ask is a day later, so an
- *   app opened once and abandoned never asks at all.
- * - Later means later: a week each time, and after the last of them it stops
- *   on its own rather than carrying on.
- * - No thanks means never, permanently, with no way back into the schedule.
- * - It is never shown over the player or while anything is playing, which the
- *   caller enforces, because interrupting music to ask a favour is worse than
- *   not asking.
- *
- * The button in About stays regardless, for anyone who says no and changes
- * their mind.
+ * - The clock starts on first launch, so an app opened once and abandoned never asks.
+ * - "Later" waits for the next date. "No thanks" or starring ends it for good, with no
+ *   way back into the schedule; the button in About stays for anyone who changes their mind.
+ * - Never shown over music: the caller only asks when nothing is playing.
+ * - Reopening the app many times in a day still asks once: the next date only moves when
+ *   an ask is actually shown.
  */
 object StarPrompt {
     const val REPO = "https://github.com/rajendra7169/blazify"
 
-    private const val HOURS_BEFORE_FIRST_ASK = 24L
-    private const val DAYS_BETWEEN_ASKS = 7L
+    /** Days after the first launch for the first asks; after the last, every [REPEAT_DAYS]. */
+    private val FIRST_ASKS_DAYS = listOf(3L, 7L, 15L, 30L)
+    private const val REPEAT_DAYS = 60L
 
-    /** The first ask a day in, then one a week: the last lands just short of two months. */
-    private const val MAX_ASKS = 9
+    /** Test copies built with -PforceStarPrompt=true ask on every launch. */
+    private val forced get() = com.blazify.music.BuildConfig.FORCE_STAR_PROMPT
 
-    /**
-     * Records the launch and says whether to ask.
-     *
-     * Safe to call on every launch: the schedule only moves when an ask is
-     * actually shown, so reopening the app ten times in an evening still gets
-     * asked once.
-     */
+    /** Records the launch and says whether to ask now. */
     suspend fun onOpened(context: Context): Boolean {
+        if (forced) return true
         val prefs = context.dataStore.data.first()
         if (prefs[StarPromptDoneKey] == true) return false
-        if ((prefs[StarPromptAsksKey] ?: 0) >= MAX_ASKS) return false
-
-        val nextAt = prefs[StarPromptNextAtKey] ?: 0L
-        if (nextAt == 0L) {
-            // First launch. Start the clock and ask nothing yet — an app that
-            // begs for a star before it has played a song has not earned one.
-            context.dataStore.edit {
-                it[StarPromptNextAtKey] =
-                    System.currentTimeMillis() + TimeUnit.HOURS.toMillis(HOURS_BEFORE_FIRST_ASK)
-            }
+        val now = System.currentTimeMillis()
+        val firstSeen = prefs[StarPromptFirstSeenKey]
+        if (firstSeen == null) {
+            // First launch with this schedule: start the clock, ask nothing yet.
+            context.dataStore.edit { it[StarPromptFirstSeenKey] = now }
             return false
         }
-        return System.currentTimeMillis() >= nextAt
+        val shown = prefs[StarPromptShownKey] ?: 0
+        val due =
+            if (shown < FIRST_ASKS_DAYS.size) {
+                firstSeen + TimeUnit.DAYS.toMillis(FIRST_ASKS_DAYS[shown])
+            } else {
+                (prefs[StarPromptLastShownKey] ?: firstSeen) + TimeUnit.DAYS.toMillis(REPEAT_DAYS)
+            }
+        return now >= due
     }
 
-    /** Shown once. A week until the next, and after the last one it stops. */
+    /** Shown once: the schedule moves on to the next date. */
     suspend fun onShown(context: Context) {
-        val asks = (context.dataStore.data.first()[StarPromptAsksKey] ?: 0) + 1
+        if (forced) return
+        val shown = (context.dataStore.data.first()[StarPromptShownKey] ?: 0) + 1
         context.dataStore.edit {
-            it[StarPromptAsksKey] = asks
-            if (asks >= MAX_ASKS) {
-                it[StarPromptDoneKey] = true
-            } else {
-                it[StarPromptNextAtKey] =
-                    System.currentTimeMillis() + TimeUnit.DAYS.toMillis(DAYS_BETWEEN_ASKS)
-            }
+            it[StarPromptShownKey] = shown
+            it[StarPromptLastShownKey] = System.currentTimeMillis()
         }
     }
 
-    /** Starred, or declined. Either way there is nothing left to ask. */
+    /** Starred, or "No thanks". Either way it never asks again. */
     suspend fun stop(context: Context) {
+        if (forced) return
         context.dataStore.edit { it[StarPromptDoneKey] = true }
     }
 }

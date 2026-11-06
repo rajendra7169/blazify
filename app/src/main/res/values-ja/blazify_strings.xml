@@ -1347,4 +1347,6 @@
     <string name="festival_turned_off">お祝いモードをオフにしました。デザイン › ホーム でまたオンにできます。</string>
     <string name="artist_latest_release">最新リリース</string>
     <string name="artist_you_and">あなたと%1$s</string>
+    <string name="star_prompt_title_short">Blazify を楽しんでいますか？</string>
+    <string name="star_prompt_body_short">GitHub でスターを付けると、ほかの人が見つけやすくなります。無料で広告もありません。</string>
 </resources>

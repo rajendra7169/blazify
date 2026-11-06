@@ -1347,4 +1347,6 @@
     <string name="festival_turned_off">节日模式已关闭。可在 外观与体验 › 首页 中重新开启。</string>
     <string name="artist_latest_release">最新发行</string>
     <string name="artist_you_and">你和%1$s</string>
+    <string name="star_prompt_title_short">喜欢 Blazify 吗？</string>
+    <string name="star_prompt_body_short">在 GitHub 上点个星，能帮更多人发现它。免费，无广告。</string>
 </resources>

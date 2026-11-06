@@ -829,9 +829,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Asked at most three times over about six weeks and then never
-                // again. Not while anything is playing: interrupting music to
-                // ask a favour is worse than not asking.
+                // Asked 3 days, a week, 15 days and a month in, then every two months,
+                // until starred or declined. Not while anything is playing:
+                // interrupting music to ask a favour is worse than not asking.
                 var showStarPrompt by remember { mutableStateOf(false) }
                 val starUriHandler = LocalUriHandler.current
                 val starScope = rememberCoroutineScope()
@@ -844,28 +844,16 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (showStarPrompt) {
-                    AlertDialog(
-                        onDismissRequest = { showStarPrompt = false },
-                        icon = { Icon(painterResource(R.drawable.star), null) },
-                        title = { Text(stringResource(R.string.star_prompt_title)) },
-                        text = { Text(stringResource(R.string.star_prompt_body)) },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                showStarPrompt = false
-                                starScope.launch { StarPrompt.stop(this@MainActivity) }
-                                starUriHandler.openUri(StarPrompt.REPO)
-                            }) { Text(stringResource(R.string.star_prompt_yes)) }
+                    com.blazify.music.ui.component.StarPromptDialog(
+                        onStar = {
+                            showStarPrompt = false
+                            starScope.launch { StarPrompt.stop(this@MainActivity) }
+                            starUriHandler.openUri(StarPrompt.REPO)
                         },
-                        dismissButton = {
-                            Row {
-                                TextButton(onClick = {
-                                    showStarPrompt = false
-                                    starScope.launch { StarPrompt.stop(this@MainActivity) }
-                                }) { Text(stringResource(R.string.star_prompt_never)) }
-                                TextButton(onClick = { showStarPrompt = false }) {
-                                    Text(stringResource(R.string.star_prompt_later))
-                                }
-                            }
+                        onLater = { showStarPrompt = false },
+                        onNever = {
+                            showStarPrompt = false
+                            starScope.launch { StarPrompt.stop(this@MainActivity) }
                         },
                     )
                 }

@@ -1371,4 +1371,6 @@
     <string name="festival_turned_off">Le mode festif est désactivé. Réactivez-le dans Apparence › Accueil.</string>
     <string name="artist_latest_release">Dernière sortie</string>
     <string name="artist_you_and">Vous et %1$s</string>
+    <string name="star_prompt_title_short">Vous aimez Blazify ?</string>
+    <string name="star_prompt_body_short">Une étoile sur GitHub aide d’autres personnes à le trouver. Gratuit et sans pub.</string>
 </resources>

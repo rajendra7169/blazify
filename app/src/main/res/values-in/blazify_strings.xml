@@ -1347,4 +1347,6 @@
     <string name="festival_turned_off">Mode perayaan dimatikan. Aktifkan lagi di Tampilan &amp; Nuansa › Beranda.</string>
     <string name="artist_latest_release">Rilisan terbaru</string>
     <string name="artist_you_and">Kamu dan %1$s</string>
+    <string name="star_prompt_title_short">Suka Blazify?</string>
+    <string name="star_prompt_body_short">Bintang di GitHub membantu orang lain menemukannya. Gratis, tanpa iklan.</string>
 </resources>

@@ -1347,4 +1347,6 @@
     <string name="festival_turned_off">축제 모드를 껐어요. 디자인 › 홈에서 다시 켤 수 있어요.</string>
     <string name="artist_latest_release">최신 발매</string>
     <string name="artist_you_and">나와 %1$s</string>
+    <string name="star_prompt_title_short">Blazify 마음에 드세요?</string>
+    <string name="star_prompt_body_short">GitHub에 별을 남기면 다른 사람들이 찾기 쉬워져요. 무료이고 광고가 없어요.</string>
 </resources>

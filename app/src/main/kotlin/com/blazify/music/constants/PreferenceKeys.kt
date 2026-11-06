@@ -24,6 +24,9 @@ val StarPromptLastDayKey = stringPreferencesKey("starPromptLastDay")
 val StarPromptNextAtKey = longPreferencesKey("starPromptNextAt")
 val StarPromptAsksKey = intPreferencesKey("starPromptAsks")
 val StarPromptDoneKey = booleanPreferencesKey("starPromptDone")
+val StarPromptFirstSeenKey = longPreferencesKey("starPromptFirstSeen")
+val StarPromptShownKey = intPreferencesKey("starPromptShown")
+val StarPromptLastShownKey = longPreferencesKey("starPromptLastShown")
 // Empty means every folder, which is what someone means before they have said otherwise.
 val LocalMusicFoldersKey = stringSetPreferencesKey("localMusicFolders")
 

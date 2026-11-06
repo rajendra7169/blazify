@@ -1347,4 +1347,6 @@
     <string name="festival_turned_off">Đã tắt chế độ lễ hội. Bật lại trong Giao diện › Trang chủ.</string>
     <string name="artist_latest_release">Phát hành mới nhất</string>
     <string name="artist_you_and">Bạn và %1$s</string>
+    <string name="star_prompt_title_short">Bạn thích Blazify chứ?</string>
+    <string name="star_prompt_body_short">Một ngôi sao trên GitHub giúp người khác tìm thấy nó. Miễn phí, không quảng cáo.</string>
 </resources>

@@ -1005,7 +1005,13 @@ fun ArtistScreen(
         }
 
         val isScrollingUp = lazyListState.isScrollingUp()
-        val showLocalFab = librarySongs.isNotEmpty() && libraryArtist?.artist?.isLocal != true
+        // The round buttons float over whatever is under them; over the About text they covered
+        // the words. They stay away while it is on screen (play and shuffle are in the header
+        // and the top bar meanwhile) and come back once it has scrolled past.
+        val aboutOnScreen by remember {
+            derivedStateOf { lazyListState.layoutInfo.visibleItemsInfo.any { it.key == "about_artist" } }
+        }
+        val showLocalFab = librarySongs.isNotEmpty() && libraryArtist?.artist?.isLocal != true && !aboutOnScreen
 
         // Library/Local Toggle FAB
         HideOnScrollFAB(
@@ -1031,7 +1037,7 @@ fun ArtistScreen(
 
         if (canPlayAll) {
             androidx.compose.animation.AnimatedVisibility(
-                visible = isScrollingUp,
+                visible = isScrollingUp && !aboutOnScreen,
                 enter = androidx.compose.animation.slideInVertically { it * 2 },
                 exit = androidx.compose.animation.slideOutVertically { it * 2 },
                 modifier =

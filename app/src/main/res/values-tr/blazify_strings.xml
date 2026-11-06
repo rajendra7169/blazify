@@ -1359,4 +1359,6 @@
     <string name="festival_turned_off">Bayram modu kapalı. Görünüm › Ana Sayfa\'dan yeniden açabilirsin.</string>
     <string name="artist_latest_release">En yeni çıkış</string>
     <string name="artist_you_and">Sen ve %1$s</string>
+    <string name="star_prompt_title_short">Blazify hoşuna gidiyor mu?</string>
+    <string name="star_prompt_body_short">GitHub’da bir yıldız, başkalarının onu bulmasına yardım eder. Ücretsiz ve reklamsız.</string>
 </resources>

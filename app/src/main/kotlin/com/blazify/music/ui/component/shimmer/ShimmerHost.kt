@@ -62,7 +62,7 @@ fun ShimmerHost(
  * placeholder shares this so loading states look the same everywhere.
  */
 val skeletonBlockColor: Color
-    @Composable get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.13f)
+    @Composable get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f)
 
 /** Corner rounding shared by all skeleton blocks — softer than square placeholders. */
 val SkeletonCorner = 10.dp

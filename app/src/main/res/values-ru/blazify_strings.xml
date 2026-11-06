@@ -1383,4 +1383,6 @@
     <string name="festival_turned_off">Праздничный режим выключен. Включить его снова можно в разделе Оформление › Главная.</string>
     <string name="artist_latest_release">Последний релиз</string>
     <string name="artist_you_and">Вы и %1$s</string>
+    <string name="star_prompt_title_short">Нравится Blazify?</string>
+    <string name="star_prompt_body_short">Звезда на GitHub помогает другим найти его. Бесплатно и без рекламы.</string>
 </resources>
