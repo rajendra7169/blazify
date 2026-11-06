@@ -141,7 +141,7 @@ fun BlazeHomeHeader(
             IconButton(onClick = onAccountClick) {
                 Icon(
                     painter = painterResource(R.drawable.person),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.account),
                     tint = iconTint,
                     modifier = Modifier.size(28.dp),
                 )
@@ -200,7 +200,7 @@ fun BlazeHomeHeader(
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     painter = painterResource(R.drawable.settings),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.settings),
                     tint = iconTint,
                     modifier = Modifier.size(28.dp),
                 )
