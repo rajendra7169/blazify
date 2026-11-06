@@ -13,7 +13,7 @@
 
 package com.blazify.music.ui.player
 
-import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -30,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -65,6 +68,39 @@ private val WindowDark = Color(0xFF241D15)
 private val SpoolDark = Color(0xFF14100B)
 private val HubCream = Color(0xFFEFE6D2)
 private val InkBrown = Color(0xFF3A2F24)
+private val PenInk = Color(0xFF23395B)
+private val TapeBrown = Color(0xFF3B2416)
+private val TapeBrownLight = Color(0xFF5C3A22)
+private val HubWhite = Color(0xFFF4F1EA)
+
+/** Tape speed past the heads while playing, in hub radii per second: an empty hub turns about once a second. */
+private const val PLAY_SPEED = 6.3f
+
+/** The whole tape's length in hub radii: a jump across all of it winds the small reel round about 25 times. */
+private const val WIND_LENGTH = 160f
+
+/** Radius of the tape wound on a reel, in hub radii, holding [share] of the tape (area grows with the tape on it). */
+private const val FULL_PACK = 1.95f
+
+private fun packRadius(share: Float): Float =
+    kotlin.math.sqrt(1f + (FULL_PACK * FULL_PACK - 1f) * share.coerceIn(0f, 1f))
+
+/** Where each reel has turned to, and how far the tape has run, kept between frames. */
+private class ReelState {
+    var left by androidx.compose.runtime.mutableFloatStateOf(0f)
+    var right by androidx.compose.runtime.mutableFloatStateOf(0f)
+    var travel by androidx.compose.runtime.mutableFloatStateOf(0f)
+
+    /** The tape ran [length] hub radii: each reel turns by that over its own radius. */
+    fun advance(length: Float, leftRadius: Float, rightRadius: Float) {
+        if (length == 0f) return
+        val deg = 57.29578f
+        // Both reels turn the same way (anticlockwise from the front) as the tape runs left to right.
+        left = (left - length / leftRadius * deg) % 360f
+        right = (right - length / rightRadius * deg) % 360f
+        travel += length
+    }
+}
 
 @Composable
 fun CassetteTape(
@@ -75,24 +111,37 @@ fun CassetteTape(
     accent: Color = RetroOrange,
     // Album art: printed faintly across the label + a small preview beside "A".
     thumbnailUrl: String? = null,
+    // The song's title, handwritten on the label's line as people wrote on their tapes.
+    label: String? = null,
 ) {
-    // Reels spin while playing; freeze in place on pause.
-    val rotation = remember { Animatable(0f) }
-    LaunchedEffect(isPlaying) {
-        if (!isPlaying) return@LaunchedEffect
-        while (true) {
-            rotation.animateTo(
-                targetValue = rotation.value + 360f,
-                animationSpec = tween(durationMillis = 3000, easing = LinearEasing),
-            )
-        }
-    }
-    // Smooth tape transfer between spools.
+    // The tape moves the way a real one does. It runs past the heads at one steady speed, so
+    // each reel turns at that speed divided by the radius of the tape wound on it: the nearly
+    // empty reel spins fast, the full one slowly, and they trade places through the song. A
+    // jump in the song winds the tape there at speed, as fast-forward and rewind did. Paused,
+    // nothing moves, and nothing is drawn per frame.
     val tape by animateFloatAsState(
         targetValue = progress.coerceIn(0f, 1f),
-        animationSpec = tween(durationMillis = 600, easing = LinearEasing),
+        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
         label = "tapeTransfer",
     )
+    val reels = remember { ReelState() }
+    val latestTape by rememberUpdatedState(tape)
+    val target = progress.coerceIn(0f, 1f)
+    LaunchedEffect(isPlaying, target) {
+        var last = withFrameNanos { it }
+        var lastTape = latestTape
+        while (isPlaying || kotlin.math.abs(latestTape - target) > 0.0005f) {
+            withFrameNanos { now ->
+                val dt = ((now - last) / 1_000_000_000f).coerceIn(0f, 0.1f)
+                last = now
+                val tp = latestTape
+                var moved = (tp - lastTape) * WIND_LENGTH
+                lastTape = tp
+                if (isPlaying) moved += PLAY_SPEED * dt
+                reels.advance(moved, packRadius(1f - tp), packRadius(tp))
+            }
+        }
+    }
 
     BoxWithConstraints(modifier = modifier.aspectRatio(1.55f)) {
         val bw = maxWidth
@@ -116,7 +165,7 @@ fun CassetteTape(
         }
 
         // 3) Printed texture + window + reels on top of the art.
-        Canvas(modifier = Modifier.fillMaxSize()) { drawCassetteDetails(tape, rotation.value, accent) }
+        Canvas(modifier = Modifier.fillMaxSize()) { drawCassetteDetails(tape, reels.left, reels.right, reels.travel, accent) }
 
         // 4) Small full-opacity art preview, left of the "A" badge.
         if (thumbnailUrl != null) {
@@ -140,6 +189,30 @@ fun CassetteTape(
             fontSize = (bw.value * 0.045f).sp,
             modifier = Modifier.offset(x = bw * 0.182f, y = bh * 0.095f),
         )
+        // The title in pen on the label's ruled line, beside the "A".
+        if (!label.isNullOrBlank()) {
+            Text(
+                text = label,
+                color = PenInk,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Cursive,
+                fontWeight = FontWeight.Bold,
+                fontSize = (bw.value * 0.05f).sp,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .offset(x = bw * 0.255f, y = bh * 0.072f)
+                    .size(width = bw * 0.6f, height = bh * 0.085f),
+            )
+        }
+        // What is printed on a real stripe: the tape's type.
+        Text(
+            text = "TYPE I · NORMAL",
+            color = Color.White.copy(alpha = 0.9f),
+            fontWeight = FontWeight.Bold,
+            fontSize = (bw.value * 0.024f).sp,
+            letterSpacing = (bw.value * 0.003f).sp,
+            modifier = Modifier.offset(x = bw * 0.10f, y = bh * 0.478f),
+        )
         // Length mark "60" on the accent stripe.
         Text(
             text = "60",
@@ -149,6 +222,23 @@ fun CassetteTape(
             modifier = Modifier.offset(x = bw * 0.82f, y = bh * 0.465f),
         )
     }
+}
+
+/**
+ * Where a line from [from] touches the circle ([center], [radius]) on its outer side: the
+ * point the tape leaves the pack for the roller.
+ */
+private fun tangentPoint(center: Offset, radius: Float, from: Offset, outerIsLeft: Boolean): Offset {
+    val d = from - center
+    val dist = kotlin.math.sqrt(d.x * d.x + d.y * d.y)
+    if (dist <= radius) return Offset(center.x + if (outerIsLeft) -radius else radius, center.y)
+    val base = kotlin.math.atan2(d.y, d.x)
+    val off = kotlin.math.acos(radius / dist)
+    val a1 = base + off
+    val a2 = base - off
+    val p1 = Offset(center.x + radius * cos(a1), center.y + radius * sin(a1))
+    val p2 = Offset(center.x + radius * cos(a2), center.y + radius * sin(a2))
+    return if (outerIsLeft) (if (p1.x < p2.x) p1 else p2) else (if (p1.x > p2.x) p1 else p2)
 }
 
 /** Pass 1 — shadows, shell body and the cream label backing. */
@@ -224,6 +314,24 @@ private fun DrawScope.drawCassetteBase() {
         drawLine(Color(0xFF54463A), c - Offset(s * 0.008f, 0f), c + Offset(s * 0.008f, 0f), strokeWidth = s * 0.004f)
     }
 
+    // Write-protect notches along the top edge.
+    for (nx in listOf(0.13f, 0.82f)) {
+        drawRoundRect(
+            color = Color(0xFF15110D),
+            topLeft = Offset(s * nx, 0f),
+            size = Size(s * 0.05f, t * 0.03f),
+            cornerRadius = CornerRadius(s * 0.006f, s * 0.006f),
+        )
+    }
+    // Moulded grip ridges either side of the head opening.
+    for (side in listOf(0.085f, 0.745f)) {
+        for (i in 0 until 9) {
+            val x = s * (side + i * 0.019f)
+            drawLine(Color.Black.copy(alpha = 0.28f), Offset(x, t * 0.80f), Offset(x, t * 0.90f), strokeWidth = s * 0.004f)
+            drawLine(Color.White.copy(alpha = 0.07f), Offset(x + s * 0.004f, t * 0.80f), Offset(x + s * 0.004f, t * 0.90f), strokeWidth = s * 0.002f)
+        }
+    }
+
     /* --- cream label backing --- */
     drawRoundRect(
         brush = Brush.verticalGradient(listOf(LabelCream, LabelCreamDark)),
@@ -234,7 +342,7 @@ private fun DrawScope.drawCassetteBase() {
 }
 
 /** Pass 2 — printed texture, window, reels and gloss, drawn over the label art. */
-private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, accent: Color) {
+private fun DrawScope.drawCassetteDetails(progress: Float, leftDeg: Float, rightDeg: Float, travel: Float, accent: Color) {
     val s = size.width
     val t = size.height
 
@@ -254,6 +362,14 @@ private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, a
         size = Size(s * 0.055f, t * 0.085f),
         cornerRadius = CornerRadius(s * 0.008f, s * 0.008f),
         style = Stroke(width = s * 0.0045f),
+    )
+
+    // The ruled line the title is written on.
+    drawLine(
+        InkBrown.copy(alpha = 0.35f),
+        Offset(s * 0.255f, t * 0.148f),
+        Offset(s * 0.875f, t * 0.148f),
+        strokeWidth = s * 0.0025f,
     )
 
     // Accent stripe (dynamic colour) with print texture + a thinner echo line.
@@ -277,25 +393,16 @@ private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, a
         size = Size(s * 0.83f, t * 0.022f),
     )
 
-    /* --- reel window --- */
-    val winTL = Offset(s * 0.285f, t * 0.155f)
-    val winSize = Size(s * 0.43f, t * 0.27f)
+    /* --- reel window: smoked clear plastic --- */
+    val winTL = Offset(s * 0.285f, t * 0.165f)
+    val winSize = Size(s * 0.43f, t * 0.26f)
     val winRadius = s * 0.02f
     drawRoundRect(
-        color = WindowDark,
+        brush = Brush.verticalGradient(listOf(Color(0xFF2A2119), Color(0xFF43362A))),
         topLeft = winTL,
         size = winSize,
         cornerRadius = CornerRadius(winRadius, winRadius),
     )
-    drawRoundRect(
-        color = Color.Black.copy(alpha = 0.55f),
-        topLeft = winTL,
-        size = winSize,
-        cornerRadius = CornerRadius(winRadius, winRadius),
-        style = Stroke(width = s * 0.008f),
-    )
-
-    // Reels + tape, clipped inside the window.
     val windowPath = Path().apply {
         addRoundRect(
             RoundRect(
@@ -307,66 +414,166 @@ private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, a
             ),
         )
     }
-    val reelY = t * 0.29f
+    val reelY = winTL.y + winSize.height * 0.47f
     val leftC = Offset(s * 0.385f, reelY)
     val rightC = Offset(s * 0.615f, reelY)
-    val minSpool = s * 0.055f
-    val maxSpool = s * 0.115f
-    val leftSpool = minSpool + (maxSpool - minSpool) * (1f - progress)
-    val rightSpool = minSpool + (maxSpool - minSpool) * progress
+    val hub = s * 0.047f
+    val leftPack = hub * packRadius(1f - progress)
+    val rightPack = hub * packRadius(progress)
+    val winBottom = winTL.y + winSize.height
+    // Guide rollers in the window's lower corners; the tape runs round them and between them.
+    val roller = s * 0.011f
+    val leftRoller = Offset(winTL.x + winSize.width * 0.075f, winBottom - t * 0.04f)
+    val rightRoller = Offset(winTL.x + winSize.width * 0.925f, winBottom - t * 0.04f)
 
     clipPath(windowPath) {
-        // Tape bridge along the window bottom (connects the two spools).
-        drawLine(
-            SpoolDark,
-            Offset(leftC.x, winTL.y + winSize.height - t * 0.02f),
-            Offset(rightC.x, winTL.y + winSize.height - t * 0.02f),
-            strokeWidth = t * 0.028f,
+        // The tape: off the left pack, round the left roller, along the bottom, round the right
+        // roller and onto the right pack. Faint marks on it run along with it.
+        val leftTouch = tangentPoint(leftC, leftPack, Offset(leftRoller.x - roller, leftRoller.y), outerIsLeft = true)
+        val rightTouch = tangentPoint(rightC, rightPack, Offset(rightRoller.x + roller, rightRoller.y), outerIsLeft = false)
+        val path = Path().apply {
+            moveTo(leftTouch.x, leftTouch.y)
+            lineTo(leftRoller.x - roller, leftRoller.y)
+            quadraticTo(leftRoller.x - roller, leftRoller.y + roller, leftRoller.x, leftRoller.y + roller)
+            lineTo(rightRoller.x, rightRoller.y + roller)
+            quadraticTo(rightRoller.x + roller, rightRoller.y + roller, rightRoller.x + roller, rightRoller.y)
+            lineTo(rightTouch.x, rightTouch.y)
+        }
+        drawPath(path, Color(0xFF1C110A), style = Stroke(width = t * 0.016f))
+        drawPath(path, Color(0xFF6B4428), style = Stroke(width = t * 0.011f))
+        drawPath(
+            path,
+            Color(0xFFB98A5E).copy(alpha = 0.8f),
+            style = Stroke(
+                width = t * 0.005f,
+                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(
+                    floatArrayOf(s * 0.01f, s * 0.016f),
+                    phase = -(travel * hub) % (s * 0.026f),
+                ),
+            ),
         )
-        // Tape sheen (thin light line along the moving tape).
-        drawLine(
-            Color.White.copy(alpha = 0.10f),
-            Offset(leftC.x, winTL.y + winSize.height - t * 0.026f),
-            Offset(rightC.x, winTL.y + winSize.height - t * 0.026f),
-            strokeWidth = t * 0.006f,
-        )
+        for (r in listOf(leftRoller, rightRoller)) {
+            drawCircle(HubWhite, radius = roller, center = r)
+            drawCircle(Color.Black.copy(alpha = 0.3f), radius = roller * 0.45f, center = r)
+        }
 
-        for ((center, spool) in listOf(leftC to leftSpool, rightC to rightSpool)) {
-            // Wound tape spool (radius follows playback progress).
-            drawCircle(SpoolDark, radius = spool, center = center)
-            drawCircle(Color.White.copy(alpha = 0.05f), radius = spool * 0.85f, center = center, style = Stroke(width = 1.2f))
-            drawCircle(Color.White.copy(alpha = 0.05f), radius = spool * 0.65f, center = center, style = Stroke(width = 1.2f))
-
-            // Rotating cream hub with teeth.
-            rotate(degrees = rotationDeg, pivot = center) {
-                drawCircle(HubCream, radius = s * 0.042f, center = center, style = Stroke(width = s * 0.013f))
+        for ((center, pack, angle) in listOf(Triple(leftC, leftPack, leftDeg), Triple(rightC, rightPack, rightDeg))) {
+            // The wound tape: glossy brown, darker near the hub.
+            if (pack > hub * 1.02f) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        listOf(Color(0xFF24160D), TapeBrown, TapeBrownLight),
+                        center = center,
+                        radius = pack,
+                    ),
+                    radius = pack,
+                    center = center,
+                )
+            }
+            rotate(degrees = angle, pivot = center) {
+                // Uneven turns of tape and a few brighter bands, turning with the reel so the
+                // pack is seen going round, not only the hub.
+                if (pack > hub * 1.02f) {
+                    for (k in 1..5) {
+                        val rr = hub + (pack - hub) * k / 6f
+                        drawCircle(Color.Black.copy(alpha = 0.10f + 0.04f * (k % 2)), radius = rr, center = center, style = Stroke(width = s * 0.0015f))
+                    }
+                    for ((start, sweep) in listOf(15f to 50f, 140f to 25f, 230f to 60f)) {
+                        val rr = hub + (pack - hub) * 0.7f
+                        drawArc(
+                            color = Color.White.copy(alpha = 0.07f),
+                            startAngle = start,
+                            sweepAngle = sweep,
+                            useCenter = false,
+                            topLeft = center - Offset(rr, rr),
+                            size = Size(rr * 2, rr * 2),
+                            style = Stroke(width = (pack - hub) * 0.35f),
+                        )
+                    }
+                }
+                // The white plastic hub with its six inward teeth.
+                drawCircle(HubWhite, radius = hub, center = center)
+                drawCircle(Color.Black.copy(alpha = 0.18f), radius = hub, center = center, style = Stroke(width = s * 0.003f))
+                drawCircle(Color(0xFF120E0A), radius = s * 0.029f, center = center)
                 for (i in 0 until 6) {
                     val a = Math.toRadians(i * 60.0)
                     val dir = Offset(cos(a).toFloat(), sin(a).toFloat())
                     drawLine(
-                        HubCream,
-                        center + Offset(dir.x * s * 0.016f, dir.y * s * 0.016f),
-                        center + Offset(dir.x * s * 0.040f, dir.y * s * 0.040f),
-                        strokeWidth = s * 0.011f,
-                        cap = StrokeCap.Round,
+                        HubWhite,
+                        center + Offset(dir.x * s * 0.017f, dir.y * s * 0.017f),
+                        center + Offset(dir.x * s * 0.031f, dir.y * s * 0.031f),
+                        strokeWidth = s * 0.008f,
+                        cap = StrokeCap.Butt,
                     )
                 }
+                for (i in 0 until 3) {
+                    val a = Math.toRadians(i * 120.0 + 30.0)
+                    drawCircle(Color.Black.copy(alpha = 0.35f), radius = s * 0.005f, center = center + Offset(cos(a).toFloat() * s * 0.039f, sin(a).toFloat() * s * 0.039f))
+                }
             }
-            drawCircle(WindowDark, radius = s * 0.012f, center = center)
+            // Light catching the pack's edge, from the same side whatever the reel does.
+            if (pack > hub * 1.05f) {
+                drawArc(
+                    color = Color.White.copy(alpha = 0.16f),
+                    startAngle = 200f,
+                    sweepAngle = 70f,
+                    useCenter = false,
+                    topLeft = center - Offset(pack * 0.9f, pack * 0.9f),
+                    size = Size(pack * 1.8f, pack * 1.8f),
+                    style = Stroke(width = s * 0.006f, cap = StrokeCap.Round),
+                )
+            }
         }
 
-        // Glass gloss across the window (diagonal light band).
+        // Shadow under the window's rim, so the reels sit inside the shell.
+        drawRect(
+            brush = Brush.verticalGradient(
+                listOf(Color.Black.copy(alpha = 0.55f), Color.Transparent),
+                startY = winTL.y,
+                endY = winTL.y + winSize.height * 0.22f,
+            ),
+            topLeft = winTL,
+            size = Size(winSize.width, winSize.height * 0.22f),
+        )
+        // Tick scale moulded into the clear plastic.
+        for (i in 0..12) {
+            val x = winTL.x + winSize.width * (0.1f + 0.8f * i / 12f)
+            val h = if (i % 3 == 0) t * 0.03f else t * 0.016f
+            drawLine(Color.White.copy(alpha = 0.22f), Offset(x, winBottom - t * 0.012f - h), Offset(x, winBottom - t * 0.012f), strokeWidth = s * 0.0022f)
+        }
+        // Glass gloss: one broad reflection and a thin bright streak.
         drawRoundRect(
             brush = Brush.linearGradient(
-                listOf(Color.White.copy(alpha = 0.09f), Color.Transparent, Color.Transparent),
+                listOf(Color.White.copy(alpha = 0.16f), Color.White.copy(alpha = 0.04f), Color.Transparent),
                 start = Offset(winTL.x, winTL.y),
-                end = Offset(winTL.x + winSize.width * 0.8f, winTL.y + winSize.height),
+                end = Offset(winTL.x + winSize.width * 0.7f, winTL.y + winSize.height),
             ),
             topLeft = winTL,
             size = winSize,
             cornerRadius = CornerRadius(winRadius, winRadius),
         )
+        drawLine(
+            Color.White.copy(alpha = 0.05f),
+            Offset(winTL.x + winSize.width * 0.62f, winTL.y),
+            Offset(winTL.x + winSize.width * 0.42f, winBottom),
+            strokeWidth = s * 0.02f,
+        )
     }
+    // Clear plastic rim round the window.
+    drawRoundRect(
+        color = Color.White.copy(alpha = 0.18f),
+        topLeft = winTL,
+        size = winSize,
+        cornerRadius = CornerRadius(winRadius, winRadius),
+        style = Stroke(width = s * 0.006f),
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.5f),
+        topLeft = winTL - Offset(s * 0.004f, s * 0.004f),
+        size = Size(winSize.width + s * 0.008f, winSize.height + s * 0.008f),
+        cornerRadius = CornerRadius(winRadius * 1.2f, winRadius * 1.2f),
+        style = Stroke(width = s * 0.003f),
+    )
 
     /* --- bottom trapezoid with capstan holes --- */
     val trap = Path().apply {
@@ -383,6 +590,27 @@ private fun DrawScope.drawCassetteDetails(progress: Float, rotationDeg: Float, a
     }
     for (hx in listOf(0.375f, 0.625f)) {
         drawCircle(Color(0xFF17120D), radius = s * 0.009f, center = Offset(s * hx, t * 0.79f))
+    }
+    // The felt pressure pad in the middle of the head opening, and the two side openings.
+    drawRoundRect(
+        color = Color(0xFF17120D),
+        topLeft = Offset(s * 0.465f, t * 0.885f),
+        size = Size(s * 0.07f, t * 0.06f),
+        cornerRadius = CornerRadius(s * 0.006f, s * 0.006f),
+    )
+    drawRoundRect(
+        color = Color(0xFFCDBB98),
+        topLeft = Offset(s * 0.478f, t * 0.9f),
+        size = Size(s * 0.044f, t * 0.03f),
+        cornerRadius = CornerRadius(s * 0.004f, s * 0.004f),
+    )
+    for (ox in listOf(0.335f, 0.635f)) {
+        drawRoundRect(
+            color = Color(0xFF17120D),
+            topLeft = Offset(s * ox, t * 0.9f),
+            size = Size(s * 0.03f, t * 0.045f),
+            cornerRadius = CornerRadius(s * 0.004f, s * 0.004f),
+        )
     }
 
     /* --- soft diagonal sheen over the whole shell (plastic gloss) --- */

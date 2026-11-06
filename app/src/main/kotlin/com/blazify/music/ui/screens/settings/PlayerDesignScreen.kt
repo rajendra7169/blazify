@@ -941,6 +941,7 @@ private fun CassettePreview(meta: MediaMetadata?, pc: PlayerConnection?, textCol
             modifier = Modifier.fillMaxWidth(0.92f),
             accent = cs.primary,
             thumbnailUrl = meta?.thumbnailUrl,
+            label = meta?.title,
         )
         Spacer(Modifier.weight(0.4f))
         // Title on the left, the heart · theme · more keys on the right.

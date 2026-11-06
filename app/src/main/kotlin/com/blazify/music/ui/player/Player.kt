@@ -2299,6 +2299,7 @@ fun BottomSheetPlayer(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = PlayerHorizontalPadding),
                                 accent = MaterialTheme.colorScheme.primary,
                                 thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                label = mediaMetadata?.title,
                             )
                             SeekMessage(playerSeeker)
                         }
@@ -2960,6 +2961,7 @@ private fun BoxScope.LandscapePlayer(
                                             modifier = Modifier.fillMaxWidth(),
                                             accent = MaterialTheme.colorScheme.primary,
                                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                            label = mediaMetadata?.title,
                                         )
                                         SeekMessage(playerSeeker)
                                     }
