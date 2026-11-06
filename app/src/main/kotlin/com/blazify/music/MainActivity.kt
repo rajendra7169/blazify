@@ -468,7 +468,7 @@ class MainActivity : ComponentActivity() {
             object : android.view.ViewTreeObserver.OnPreDrawListener {
                 override fun onPreDraw(): Boolean {
                     val ready =
-                        com.blazify.music.utils.LaunchSignal.homeSettled.value ||
+                        com.blazify.music.utils.LaunchSignal.homeComposed.value ||
                             android.os.SystemClock.uptimeMillis() - startedAt > 1500
                     if (ready) content.viewTreeObserver.removeOnPreDrawListener(this)
                     return ready

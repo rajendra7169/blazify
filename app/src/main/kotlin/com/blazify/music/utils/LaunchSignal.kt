@@ -16,6 +16,12 @@ object LaunchSignal {
     /** Home has its shelves on screen; started any earlier, the glide stalls halfway. */
     val homeSettled = MutableStateFlow(false)
 
+    /**
+     * Home has been built (not yet drawn). The first frame waits for this; it cannot wait for
+     * [homeSettled], which needs frames drawn, so it always ran into its time limit instead.
+     */
+    val homeComposed = MutableStateFlow(false)
+
     /** Where the header's logo is drawn, in window pixels. */
     val headerLogo = MutableStateFlow<RectF?>(null)
 

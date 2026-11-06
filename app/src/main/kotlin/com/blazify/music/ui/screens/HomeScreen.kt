@@ -1217,6 +1217,7 @@ fun HomeScreen(
     // Your own shelves come off the phone in well under a second; YouTube's take as long
     // as the network does and always sit lower on the page. Home opens on the first.
     val localReady = firstLoadDone || (quickPicks != null && keepListening != null)
+    androidx.compose.runtime.SideEffect { com.blazify.music.utils.LaunchSignal.homeComposed.value = true }
     LaunchedEffect(Unit) {
         // Two frames of Home drawn — header, card and skeleton — and the launch logo may glide
         // in. It waits for nothing Home is still fetching.
