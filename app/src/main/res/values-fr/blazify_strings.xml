@@ -1354,4 +1354,19 @@
     <string name="mini_player_buttons">Boutons</string>
     <string name="mini_player_buttons_desc">Trois boutons, de gauche à droite. Touchez un emplacement, puis ce qui doit y aller ; si vous choisissez un bouton déjà utilisé, les deux s’échangent.</string>
     <string name="mini_player_buttons_reset">Réinitialiser</string>
+    <string name="festival_greeting_tihar">Joyeux Tihar</string>
+    <string name="festival_greeting_diwali">Joyeux Diwali</string>
+    <string name="festival_wish_lights">Lumière, amour et musique à vous et à vos proches</string>
+    <string name="festival_touches">Touches festives</string>
+    <string name="festival_touches_desc">Un logo Blazify festif lors des grandes fêtes de votre pays. Touchez-le pour fêter.</string>
+    <string name="festival_greeting_christmas">Joyeux Noël</string>
+    <string name="festival_greeting_new_year">Bonne année</string>
+    <string name="festival_greeting_music_day">Bonne Fête de la musique</string>
+    <string name="festival_greeting_holi">Joyeux Holi</string>
+    <string name="festival_greeting_dashain">Joyeux Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Joyeux Nouvel An lunaire</string>
+    <string name="festival_greeting_eid">Aïd Moubarak</string>
+    <string name="festival_turn_off">Désactiver le mode festif</string>
+    <string name="festival_wish_joy">Joie, amour et musique à vous et à vos proches</string>
+    <string name="festival_turned_off">Le mode festif est désactivé. Réactivez-le dans Apparence › Accueil.</string>
 </resources>

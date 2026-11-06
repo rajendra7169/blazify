@@ -1388,4 +1388,19 @@
     <string name="mini_player_buttons">الأزرار</string>
     <string name="mini_player_buttons_desc">ثلاثة أزرار من اليسار إلى اليمين. اضغط على مكان ثم على ما تريد وضعه فيه؛ وإذا اخترت زرًا مستخدمًا يتبادلان المكانين.</string>
     <string name="mini_player_buttons_reset">إعادة ضبط</string>
+    <string name="festival_greeting_tihar">تيهار سعيد</string>
+    <string name="festival_greeting_diwali">ديوالي سعيد</string>
+    <string name="festival_wish_lights">نور وحب وموسيقى لك ولأحبائك</string>
+    <string name="festival_touches">لمسات الأعياد</string>
+    <string name="festival_touches_desc">شعار Blazify بحلّة احتفالية في الأعياد الكبرى في بلدك. انقر عليه للاحتفال.</string>
+    <string name="festival_greeting_christmas">عيد ميلاد مجيد</string>
+    <string name="festival_greeting_new_year">سنة جديدة سعيدة</string>
+    <string name="festival_greeting_music_day">يوم موسيقى عالمي سعيد</string>
+    <string name="festival_greeting_holi">هولي سعيد</string>
+    <string name="festival_greeting_dashain">داشين سعيد</string>
+    <string name="festival_greeting_lunar_new_year">سنة قمرية جديدة سعيدة</string>
+    <string name="festival_greeting_eid">عيد مبارك</string>
+    <string name="festival_turn_off">إيقاف وضع الأعياد</string>
+    <string name="festival_wish_joy">فرح وحب وموسيقى لك ولأحبائك</string>
+    <string name="festival_turned_off">تم إيقاف وضع الأعياد. يمكنك تشغيله مجددًا من الشكل والمظهر › الرئيسية.</string>
 </resources>

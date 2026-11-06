@@ -1353,4 +1353,19 @@
     <string name="mini_player_buttons">Botões</string>
     <string name="mini_player_buttons_desc">Três botões, da esquerda para a direita. Toque em um lugar e depois no que vai nele; se escolher um que já está em uso, os dois trocam.</string>
     <string name="mini_player_buttons_reset">Redefinir</string>
+    <string name="festival_greeting_tihar">Feliz Tihar</string>
+    <string name="festival_greeting_diwali">Feliz Diwali</string>
+    <string name="festival_wish_lights">Luz, amor e música para você e os seus</string>
+    <string name="festival_touches">Toques festivos</string>
+    <string name="festival_touches_desc">Um logo do Blazify festivo nas grandes festas do seu país. Toque nele para comemorar.</string>
+    <string name="festival_greeting_christmas">Feliz Natal</string>
+    <string name="festival_greeting_new_year">Feliz Ano Novo</string>
+    <string name="festival_greeting_music_day">Feliz Dia Mundial da Música</string>
+    <string name="festival_greeting_holi">Feliz Holi</string>
+    <string name="festival_greeting_dashain">Feliz Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Feliz Ano Novo Lunar</string>
+    <string name="festival_greeting_eid">Eid Mubarak</string>
+    <string name="festival_turn_off">Desativar o modo festivo</string>
+    <string name="festival_wish_joy">Alegria, amor e música para você e os seus</string>
+    <string name="festival_turned_off">O modo festivo está desativado. Ative de novo em Aparência › Início.</string>
 </resources>

@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">Nút</string>
     <string name="mini_player_buttons_desc">Ba nút, từ trái sang phải. Chạm vào một vị trí, rồi chọn nút đặt vào đó; nếu chọn nút đang dùng, hai nút sẽ đổi chỗ.</string>
     <string name="mini_player_buttons_reset">Đặt lại</string>
+    <string name="festival_greeting_tihar">Chúc mừng lễ Tihar</string>
+    <string name="festival_greeting_diwali">Chúc mừng lễ Diwali</string>
+    <string name="festival_wish_lights">Ánh sáng, yêu thương và âm nhạc đến bạn và người thân</string>
+    <string name="festival_touches">Điểm xuyết lễ hội</string>
+    <string name="festival_touches_desc">Logo Blazify mang không khí lễ hội vào các dịp lễ lớn ở nước bạn. Chạm vào để cùng ăn mừng.</string>
+    <string name="festival_greeting_christmas">Giáng sinh vui vẻ</string>
+    <string name="festival_greeting_new_year">Chúc mừng năm mới</string>
+    <string name="festival_greeting_music_day">Chúc mừng Ngày Âm nhạc Thế giới</string>
+    <string name="festival_greeting_holi">Chúc mừng lễ Holi</string>
+    <string name="festival_greeting_dashain">Chúc mừng lễ Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Chúc mừng năm mới Âm lịch</string>
+    <string name="festival_greeting_eid">Eid Mubarak</string>
+    <string name="festival_turn_off">Tắt chế độ lễ hội</string>
+    <string name="festival_wish_joy">Niềm vui, yêu thương và âm nhạc đến bạn và người thân</string>
+    <string name="festival_turned_off">Đã tắt chế độ lễ hội. Bật lại trong Giao diện › Trang chủ.</string>
 </resources>

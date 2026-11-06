@@ -1342,4 +1342,19 @@
     <string name="mini_player_buttons">Düğmeler</string>
     <string name="mini_player_buttons_desc">Soldan sağa üç düğme. Bir yere dokun, sonra oraya ne geleceğini seç; kullanılan bir düğmeyi seçersen ikisi yer değiştirir.</string>
     <string name="mini_player_buttons_reset">Sıfırla</string>
+    <string name="festival_greeting_tihar">Tihar kutlu olsun</string>
+    <string name="festival_greeting_diwali">Diwali kutlu olsun</string>
+    <string name="festival_wish_lights">Sana ve sevdiklerine ışık, sevgi ve müzik</string>
+    <string name="festival_touches">Bayram süsleri</string>
+    <string name="festival_touches_desc">Ülkendeki büyük bayramlarda bayram havasında bir Blazify logosu. Kutlamak için dokun.</string>
+    <string name="festival_greeting_christmas">Mutlu Noeller</string>
+    <string name="festival_greeting_new_year">Mutlu yıllar</string>
+    <string name="festival_greeting_music_day">Dünya Müzik Günü kutlu olsun</string>
+    <string name="festival_greeting_holi">Holi kutlu olsun</string>
+    <string name="festival_greeting_dashain">Dashain kutlu olsun</string>
+    <string name="festival_greeting_lunar_new_year">Ay Yeni Yılı kutlu olsun</string>
+    <string name="festival_greeting_eid">Bayramın mübarek olsun</string>
+    <string name="festival_turn_off">Bayram modunu kapat</string>
+    <string name="festival_wish_joy">Sana ve sevdiklerine neşe, sevgi ve müzik</string>
+    <string name="festival_turned_off">Bayram modu kapalı. Görünüm › Ana Sayfa\'dan yeniden açabilirsin.</string>
 </resources>

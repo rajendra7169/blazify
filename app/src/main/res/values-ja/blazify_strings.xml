@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">ボタン</string>
     <string name="mini_player_buttons_desc">左から順に3つのボタン。場所をタップしてから、そこに置くものを選びます。使用中のボタンを選ぶと入れ替わります。</string>
     <string name="mini_player_buttons_reset">リセット</string>
+    <string name="festival_greeting_tihar">ハッピー・ティハール</string>
+    <string name="festival_greeting_diwali">ハッピー・ディワリ</string>
+    <string name="festival_wish_lights">あなたと大切な人に、光と愛と音楽を</string>
+    <string name="festival_touches">季節の演出</string>
+    <string name="festival_touches_desc">あなたの国の大きなお祝いの日に、Blazify のロゴがお祝い仕様に。タップしてお祝いしよう。</string>
+    <string name="festival_greeting_christmas">メリークリスマス</string>
+    <string name="festival_greeting_new_year">あけましておめでとう</string>
+    <string name="festival_greeting_music_day">世界音楽の日おめでとう</string>
+    <string name="festival_greeting_holi">ハッピー・ホーリー</string>
+    <string name="festival_greeting_dashain">ハッピー・ダサイン</string>
+    <string name="festival_greeting_lunar_new_year">春節おめでとう</string>
+    <string name="festival_greeting_eid">イード・ムバラク</string>
+    <string name="festival_turn_off">お祝いモードをオフ</string>
+    <string name="festival_wish_joy">あなたと大切な人に、喜びと愛と音楽を</string>
+    <string name="festival_turned_off">お祝いモードをオフにしました。デザイン › ホーム でまたオンにできます。</string>
 </resources>

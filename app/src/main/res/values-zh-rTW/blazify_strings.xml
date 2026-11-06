@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">按鈕</string>
     <string name="mini_player_buttons_desc">三個按鈕，由左至右。先點一個位置，再選要放在那裡的按鈕；選已在使用的按鈕時，兩者會互換位置。</string>
     <string name="mini_player_buttons_reset">重設</string>
+    <string name="festival_greeting_tihar">蒂哈爾節快樂</string>
+    <string name="festival_greeting_diwali">排燈節快樂</string>
+    <string name="festival_wish_lights">願光明、愛與音樂伴你和家人</string>
+    <string name="festival_touches">節日裝扮</string>
+    <string name="festival_touches_desc">在你所在國家的重大節日，Blazify 標誌會換上節日裝扮。輕觸它一起慶祝。</string>
+    <string name="festival_greeting_christmas">聖誕快樂</string>
+    <string name="festival_greeting_new_year">新年快樂</string>
+    <string name="festival_greeting_music_day">世界音樂日快樂</string>
+    <string name="festival_greeting_holi">灑紅節快樂</string>
+    <string name="festival_greeting_dashain">德賽節快樂</string>
+    <string name="festival_greeting_lunar_new_year">農曆新年快樂</string>
+    <string name="festival_greeting_eid">開齋節快樂</string>
+    <string name="festival_turn_off">關閉節日模式</string>
+    <string name="festival_wish_joy">願歡樂、愛與音樂伴你和家人</string>
+    <string name="festival_turned_off">節日模式已關閉。可在 外觀與風格 › 首頁 中重新開啟。</string>
 </resources>

@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">버튼</string>
     <string name="mini_player_buttons_desc">왼쪽부터 버튼 3개. 자리를 누른 다음 넣을 것을 고르세요. 이미 쓰는 버튼을 고르면 서로 자리가 바뀝니다.</string>
     <string name="mini_player_buttons_reset">초기화</string>
+    <string name="festival_greeting_tihar">즐거운 티하르 보내세요</string>
+    <string name="festival_greeting_diwali">즐거운 디왈리 보내세요</string>
+    <string name="festival_wish_lights">당신과 소중한 사람들에게 빛과 사랑과 음악을</string>
+    <string name="festival_touches">축제 꾸미기</string>
+    <string name="festival_touches_desc">우리나라 큰 명절에 Blazify 로고가 축제 분위기로 바뀌어요. 탭해서 함께 축하하세요.</string>
+    <string name="festival_greeting_christmas">메리 크리스마스</string>
+    <string name="festival_greeting_new_year">새해 복 많이 받으세요</string>
+    <string name="festival_greeting_music_day">세계 음악의 날을 축하해요</string>
+    <string name="festival_greeting_holi">즐거운 홀리 보내세요</string>
+    <string name="festival_greeting_dashain">즐거운 다사인 보내세요</string>
+    <string name="festival_greeting_lunar_new_year">새해 복 많이 받으세요 (설날)</string>
+    <string name="festival_greeting_eid">이드 무바라크</string>
+    <string name="festival_turn_off">축제 모드 끄기</string>
+    <string name="festival_wish_joy">당신과 소중한 사람들에게 기쁨과 사랑과 음악을</string>
+    <string name="festival_turned_off">축제 모드를 껐어요. 디자인 › 홈에서 다시 켤 수 있어요.</string>
 </resources>

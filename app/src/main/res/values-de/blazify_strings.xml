@@ -1342,4 +1342,19 @@
     <string name="mini_player_buttons">Schaltflächen</string>
     <string name="mini_player_buttons_desc">Drei Schaltflächen, von links nach rechts. Tippe auf einen Platz und dann auf das, was dorthin soll; wählst du eine schon belegte, tauschen beide.</string>
     <string name="mini_player_buttons_reset">Zurücksetzen</string>
+    <string name="festival_greeting_tihar">Frohes Tihar</string>
+    <string name="festival_greeting_diwali">Frohes Diwali</string>
+    <string name="festival_wish_lights">Licht, Liebe und Musik für dich und deine Lieben</string>
+    <string name="festival_touches">Festtagsschmuck</string>
+    <string name="festival_touches_desc">Ein festliches Blazify-Logo an großen Feiertagen in deinem Land. Tippe darauf, um mitzufeiern.</string>
+    <string name="festival_greeting_christmas">Frohe Weihnachten</string>
+    <string name="festival_greeting_new_year">Frohes neues Jahr</string>
+    <string name="festival_greeting_music_day">Frohen Welttag der Musik</string>
+    <string name="festival_greeting_holi">Frohes Holi</string>
+    <string name="festival_greeting_dashain">Frohes Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Frohes Mondneujahr</string>
+    <string name="festival_greeting_eid">Eid Mubarak</string>
+    <string name="festival_turn_off">Festmodus ausschalten</string>
+    <string name="festival_wish_joy">Freude, Liebe und Musik für dich und deine Lieben</string>
+    <string name="festival_turned_off">Festmodus ist aus. Unter Aussehen › Startseite kannst du ihn wieder einschalten.</string>
 </resources>

@@ -1366,4 +1366,19 @@
     <string name="mini_player_buttons">Кнопки</string>
     <string name="mini_player_buttons_desc">Три кнопки слева направо. Нажмите на место, затем выберите, что туда поставить; если выбрать уже занятую кнопку, они поменяются местами.</string>
     <string name="mini_player_buttons_reset">Сбросить</string>
+    <string name="festival_greeting_tihar">С праздником Тихар</string>
+    <string name="festival_greeting_diwali">С праздником Дивали</string>
+    <string name="festival_wish_lights">Света, любви и музыки вам и вашим близким</string>
+    <string name="festival_touches">Праздничное оформление</string>
+    <string name="festival_touches_desc">Праздничный логотип Blazify в главные праздники вашей страны. Нажмите на него, чтобы отпраздновать.</string>
+    <string name="festival_greeting_christmas">С Рождеством</string>
+    <string name="festival_greeting_new_year">С Новым годом</string>
+    <string name="festival_greeting_music_day">С Всемирным днём музыки</string>
+    <string name="festival_greeting_holi">С праздником Холи</string>
+    <string name="festival_greeting_dashain">С праздником Дашайн</string>
+    <string name="festival_greeting_lunar_new_year">С Новым годом по лунному календарю</string>
+    <string name="festival_greeting_eid">Ид Мубарак</string>
+    <string name="festival_turn_off">Выключить праздничный режим</string>
+    <string name="festival_wish_joy">Радости, любви и музыки вам и вашим близким</string>
+    <string name="festival_turned_off">Праздничный режим выключен. Включить его снова можно в разделе Оформление › Главная.</string>
 </resources>

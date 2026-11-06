@@ -1342,4 +1342,19 @@
     <string name="mini_player_buttons">बटन</string>
     <string name="mini_player_buttons_desc">बाएँ से दाएँ तीन बटन। कोई जगह टैप करें, फिर वह चुनें जो वहाँ जाए; पहले से लगे बटन को चुनने पर दोनों की जगह बदल जाती है।</string>
     <string name="mini_player_buttons_reset">रीसेट करें</string>
+    <string name="festival_greeting_tihar">तिहार की शुभकामनाएँ</string>
+    <string name="festival_greeting_diwali">दिवाली की शुभकामनाएँ</string>
+    <string name="festival_wish_lights">आपको और आपके अपनों को रोशनी, प्यार और संगीत</string>
+    <string name="festival_touches">त्योहारी रंग</string>
+    <string name="festival_touches_desc">आपके देश के बड़े त्योहारों पर Blazify का त्योहारी लोगो। जश्न मनाने के लिए उस पर टैप करें।</string>
+    <string name="festival_greeting_christmas">क्रिसमस की शुभकामनाएँ</string>
+    <string name="festival_greeting_new_year">नया साल मुबारक</string>
+    <string name="festival_greeting_music_day">विश्व संगीत दिवस की शुभकामनाएँ</string>
+    <string name="festival_greeting_holi">होली मुबारक</string>
+    <string name="festival_greeting_dashain">दशैं की शुभकामनाएँ</string>
+    <string name="festival_greeting_lunar_new_year">चंद्र नववर्ष की शुभकामनाएँ</string>
+    <string name="festival_greeting_eid">ईद मुबारक</string>
+    <string name="festival_turn_off">त्योहारी मोड बंद करें</string>
+    <string name="festival_wish_joy">आपको और आपके अपनों को खुशी, प्यार और संगीत</string>
+    <string name="festival_turned_off">त्योहारी मोड बंद है। इसे रूप-रंग › मुख्य स्थान में फिर से चालू करें।</string>
 </resources>

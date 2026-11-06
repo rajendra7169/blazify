@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">按钮</string>
     <string name="mini_player_buttons_desc">三个按钮，从左到右。先点一个位置，再选放在那里的按钮；选已在用的按钮时，两者会互换位置。</string>
     <string name="mini_player_buttons_reset">重置</string>
+    <string name="festival_greeting_tihar">蒂哈尔节快乐</string>
+    <string name="festival_greeting_diwali">排灯节快乐</string>
+    <string name="festival_wish_lights">愿光明、爱与音乐伴你和家人</string>
+    <string name="festival_touches">节日装扮</string>
+    <string name="festival_touches_desc">在你所在国家的重大节日，Blazify 标志会换上节日装扮。点按它一起庆祝。</string>
+    <string name="festival_greeting_christmas">圣诞快乐</string>
+    <string name="festival_greeting_new_year">新年快乐</string>
+    <string name="festival_greeting_music_day">世界音乐日快乐</string>
+    <string name="festival_greeting_holi">洒红节快乐</string>
+    <string name="festival_greeting_dashain">德赛节快乐</string>
+    <string name="festival_greeting_lunar_new_year">春节快乐</string>
+    <string name="festival_greeting_eid">开斋节快乐</string>
+    <string name="festival_turn_off">关闭节日模式</string>
+    <string name="festival_wish_joy">愿欢乐、爱与音乐伴你和家人</string>
+    <string name="festival_turned_off">节日模式已关闭。可在 外观与体验 › 首页 中重新开启。</string>
 </resources>

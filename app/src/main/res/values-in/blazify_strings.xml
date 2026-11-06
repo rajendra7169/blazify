@@ -1330,4 +1330,19 @@
     <string name="mini_player_buttons">Tombol</string>
     <string name="mini_player_buttons_desc">Tiga tombol, dari kiri ke kanan. Ketuk satu tempat, lalu pilih isinya; jika memilih tombol yang sudah dipakai, keduanya bertukar.</string>
     <string name="mini_player_buttons_reset">Atur ulang</string>
+    <string name="festival_greeting_tihar">Selamat Tihar</string>
+    <string name="festival_greeting_diwali">Selamat Diwali</string>
+    <string name="festival_wish_lights">Cahaya, cinta, dan musik untukmu dan orang-orang tersayang</string>
+    <string name="festival_touches">Sentuhan perayaan</string>
+    <string name="festival_touches_desc">Logo Blazify bernuansa perayaan pada hari raya besar di negaramu. Ketuk untuk merayakan.</string>
+    <string name="festival_greeting_christmas">Selamat Natal</string>
+    <string name="festival_greeting_new_year">Selamat Tahun Baru</string>
+    <string name="festival_greeting_music_day">Selamat Hari Musik Sedunia</string>
+    <string name="festival_greeting_holi">Selamat Holi</string>
+    <string name="festival_greeting_dashain">Selamat Dashain</string>
+    <string name="festival_greeting_lunar_new_year">Selamat Tahun Baru Imlek</string>
+    <string name="festival_greeting_eid">Selamat Idulfitri</string>
+    <string name="festival_turn_off">Matikan mode perayaan</string>
+    <string name="festival_wish_joy">Kebahagiaan, cinta, dan musik untukmu dan orang-orang tersayang</string>
+    <string name="festival_turned_off">Mode perayaan dimatikan. Aktifkan lagi di Tampilan &amp; Nuansa › Beranda.</string>
 </resources>
