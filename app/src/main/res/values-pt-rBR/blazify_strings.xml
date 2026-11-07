@@ -1372,4 +1372,5 @@
     <string name="artist_you_and">Você e %1$s</string>
     <string name="star_prompt_title_short">Curtindo o Blazify?</string>
     <string name="star_prompt_body_short">Uma estrela no GitHub ajuda outras pessoas a encontrá-lo. É grátis e sem anúncios.</string>
+    <string name="import_spotify_csv_tip">Para a lista completa, exporte como arquivo CSV (o Exportify faz isso com o seu próprio login do Spotify) e use Configurações › Backup e restauração › Importar uma playlist CSV.</string>
 </resources>

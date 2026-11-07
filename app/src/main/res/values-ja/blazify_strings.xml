@@ -1349,4 +1349,5 @@
     <string name="artist_you_and">あなたと%1$s</string>
     <string name="star_prompt_title_short">Blazify を楽しんでいますか？</string>
     <string name="star_prompt_body_short">GitHub でスターを付けると、ほかの人が見つけやすくなります。無料で広告もありません。</string>
+    <string name="import_spotify_csv_tip">全曲を入れるには CSV ファイルに書き出し（Exportify なら自分の Spotify ログインで書き出せます）、設定 › バックアップと復元 › CSV プレイリストを読み込む を使ってください。</string>
 </resources>

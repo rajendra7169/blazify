@@ -162,6 +162,7 @@ fun SpotifyImportDialog(
                     }
                     if (result.mayHaveMore) {
                         Note(stringResource(R.string.import_spotify_only_hundred))
+                        Note(stringResource(R.string.import_spotify_csv_tip))
                     }
                 }
 

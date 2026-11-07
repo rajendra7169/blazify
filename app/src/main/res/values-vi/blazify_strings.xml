@@ -1349,4 +1349,5 @@
     <string name="artist_you_and">Bạn và %1$s</string>
     <string name="star_prompt_title_short">Bạn thích Blazify chứ?</string>
     <string name="star_prompt_body_short">Một ngôi sao trên GitHub giúp người khác tìm thấy nó. Miễn phí, không quảng cáo.</string>
+    <string name="import_spotify_csv_tip">Để có cả danh sách, hãy xuất nó thành tệp CSV (Exportify làm việc này bằng đăng nhập Spotify của bạn), rồi dùng Cài đặt › Sao lưu và khôi phục › Nhập danh sách phát CSV.</string>
 </resources>

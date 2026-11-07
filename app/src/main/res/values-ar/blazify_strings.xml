@@ -1407,4 +1407,5 @@
     <string name="artist_you_and">أنت و%1$s</string>
     <string name="star_prompt_title_short">هل يعجبك Blazify؟</string>
     <string name="star_prompt_body_short">نجمة على GitHub تساعد الآخرين في العثور عليه. مجاني وبلا إعلانات.</string>
+    <string name="import_spotify_csv_tip">للحصول على القائمة كاملة، صدّرها كملف CSV (يقوم Exportify بذلك عبر تسجيل دخولك إلى Spotify)، ثم استخدم الإعدادات › النسخ الاحتياطي والاستعادة › استيراد قائمة CSV.</string>
 </resources>

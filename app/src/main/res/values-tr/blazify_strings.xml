@@ -1361,4 +1361,5 @@
     <string name="artist_you_and">Sen ve %1$s</string>
     <string name="star_prompt_title_short">Blazify hoşuna gidiyor mu?</string>
     <string name="star_prompt_body_short">GitHub’da bir yıldız, başkalarının onu bulmasına yardım eder. Ücretsiz ve reklamsız.</string>
+    <string name="import_spotify_csv_tip">Listenin tamamı için onu CSV dosyası olarak dışa aktar (Exportify bunu kendi Spotify girişinle yapar), sonra Ayarlar › Yedekle ve geri yükle › CSV çalma listesi içe aktar\'ı kullan.</string>
 </resources>

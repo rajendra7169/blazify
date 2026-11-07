@@ -1361,4 +1361,5 @@
     <string name="artist_you_and">आप और %1$s</string>
     <string name="star_prompt_title_short">Blazify पसंद आ रहा है?</string>
     <string name="star_prompt_body_short">GitHub पर एक स्टार दूसरों को इसे ढूँढने में मदद करता है। यह मुफ़्त है, बिना विज्ञापन।</string>
+    <string name="import_spotify_csv_tip">पूरी सूची के लिए उसे CSV फ़ाइल में एक्सपोर्ट करें (Exportify यह आपके अपने Spotify लॉगिन से करता है), फिर सेटिंग्स › बैकअप और रिस्टोर › CSV प्लेलिस्ट इम्पोर्ट करें इस्तेमाल करें।</string>
 </resources>

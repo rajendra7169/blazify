@@ -1349,4 +1349,5 @@
     <string name="artist_you_and">你和%1$s</string>
     <string name="star_prompt_title_short">喜欢 Blazify 吗？</string>
     <string name="star_prompt_body_short">在 GitHub 上点个星，能帮更多人发现它。免费，无广告。</string>
+    <string name="import_spotify_csv_tip">要导入完整列表，请先导出为 CSV 文件（Exportify 可用你自己的 Spotify 登录完成），然后使用 设置 › 备份与恢复 › 导入 CSV 播放列表。</string>
 </resources>
