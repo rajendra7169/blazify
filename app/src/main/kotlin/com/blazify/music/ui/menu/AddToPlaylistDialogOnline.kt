@@ -317,7 +317,19 @@ fun AddToPlaylistDialogOnline(
                                                     .onSuccess { result ->
                                                         val items = result.items.distinctBy { it.id }
                                                         if (items.isNotEmpty()) {
-                                                            val firstSong = items.firstOrNull() as? SongItem
+                                                            // The same check as the Spotify import: the first result
+                                                            // is often a cover or another song by the artist, and a gap
+                                                            // is better than the wrong song.
+                                                            val firstSong = com.blazify.music.utils.SpotifyImport.pickMatch(
+                                                                items.filterIsInstance<SongItem>(),
+                                                                com.blazify.music.utils.SpotifyPlaylist.Track(
+                                                                    title = song.title,
+                                                                    artists = song.artists.joinToString(", ") {
+                                                                        URLDecoder.decode(it.name, StandardCharsets.UTF_8.toString())
+                                                                    },
+                                                                    durationSeconds = 0,
+                                                                ),
+                                                            )
                                                             if (firstSong != null) {
                                                                 val firstSongMedia = firstSong.toMediaMetadata()
                                                                 val ids = listOf(firstSong.id)
@@ -380,7 +392,19 @@ fun AddToPlaylistDialogOnline(
                                                     .onSuccess { result ->
                                                         val items = result.items.distinctBy { it.id }
                                                         if (items.isNotEmpty()) {
-                                                            val firstSong = items.firstOrNull() as? SongItem
+                                                            // The same check as the Spotify import: the first result
+                                                            // is often a cover or another song by the artist, and a gap
+                                                            // is better than the wrong song.
+                                                            val firstSong = com.blazify.music.utils.SpotifyImport.pickMatch(
+                                                                items.filterIsInstance<SongItem>(),
+                                                                com.blazify.music.utils.SpotifyPlaylist.Track(
+                                                                    title = song.title,
+                                                                    artists = song.artists.joinToString(", ") {
+                                                                        URLDecoder.decode(it.name, StandardCharsets.UTF_8.toString())
+                                                                    },
+                                                                    durationSeconds = 0,
+                                                                ),
+                                                            )
                                                             if (firstSong != null) {
                                                                 val firstSongMedia = firstSong.toMediaMetadata()
                                                                 val firstSongEnt = firstSong.toMediaMetadata().toSongEntity()
