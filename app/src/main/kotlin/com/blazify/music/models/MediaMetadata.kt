@@ -42,12 +42,29 @@ data class MediaMetadata(
     data class Artist(
         val id: String?,
         val name: String,
-    ) : Serializable
+    ) : Serializable {
+        private companion object {
+            private const val serialVersionUID = -3238270470512752199L
+        }
+    }
 
     data class Album(
         val id: String,
         val title: String,
-    ) : Serializable
+    ) : Serializable {
+        private companion object {
+            private const val serialVersionUID = -98219356879346852L
+        }
+    }
+
+    // The saved queue is these objects written with Java serialization, which refuses to read
+    // them back when the class's ID differs. Left to itself the ID is worked out from the class's
+    // shape after R8 has trimmed it, so unrelated code elsewhere could change it and an update
+    // threw away everyone's queue (it did on the way to 9.19.0). The IDs are fixed to the ones
+    // 9.17.0 and 9.18.0 wrote; fields may come and go, Java leaves a missing one at its default.
+    private companion object {
+        private const val serialVersionUID = -4677162829590487290L
+    }
 
     fun toSongEntity() =
         SongEntity(

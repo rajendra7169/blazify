@@ -154,6 +154,7 @@
 
 # Keep serialization methods for queue persistence
 -keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
     private void writeObject(java.io.ObjectOutputStream);
     private void readObject(java.io.ObjectInputStream);
 }
