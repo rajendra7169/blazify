@@ -5460,11 +5460,21 @@ class MusicService :
             return
         }
         super.onTaskRemoved(rootIntent)
-        // User removed the task while paused: drop foreground promotion so the process can idle.
-        // Queue/state remain persisted; opening the app restores playback as usual.
-        if (::player.isInitialized && !player.isPlaying) {
-            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
+        // Swiped away while paused: Media3 has just asked the service to stop, but a service stays
+        // alive while anything is connected to it, and it holds a controller of its own. It lived
+        // on with its notification, and once cleared that notification came back. Let it go; the
+        // queue is saved in onDestroy and opening the app restores it as usual.
+        if (::player.isInitialized && !player.isPlaying && castConnectionHandler?.isCasting?.value != true) {
+            stopWhilePaused()
         }
+    }
+
+    /** Ends a paused service for good: the notification goes and nothing keeps the service alive. */
+    private fun stopWhilePaused() {
+        controllerFuture?.let { MediaController.releaseFuture(it) }
+        controllerFuture = null
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        runCatching { pauseAllPlayersAndStopSelf() }.onFailure { stopSelf() }
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) = mediaSession
@@ -5505,6 +5515,16 @@ class MusicService :
         // crash. It is in the foreground now, so it can stop cleanly and the next start is a new one.
         if (!::player.isInitialized) {
             stopSelf()
+            return START_NOT_STICKY
+        }
+
+        // No intent means Android brought the service back by itself after the app was killed,
+        // which MIUI and other battery savers do to an app swiped out of recents. A fresh player
+        // never starts on its own, so all the restart did was put a paused notification back, again
+        // each time it was cleared. Stop instead; opening the app restores the queue as usual.
+        if (intent == null && !player.isPlaying) {
+            Timber.tag(TAG).i("Restarted by the system with nothing playing; stopping")
+            stopWhilePaused()
             return START_NOT_STICKY
         }
 
