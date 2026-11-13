@@ -2,10 +2,11 @@
  * Blazify Project (C) 2026
  * Licensed under GPL-3.0 | See NOTICE for contributors
  *
- * Festival touches on the Home logo. A festival shows only in the countries where it is
- * an official public holiday, and only on its days: what a country's own calendar
- * celebrates, never a guess about the person holding the phone. Everything is decided on
- * the phone; nothing about it is sent anywhere.
+ * Festival touches on the Home logo. A festival shows only in the countries that celebrate
+ * it (where it is a public holiday, or for Halloween where it is widely kept), from a week
+ * before it until two days after: what a country's own calendar celebrates, never a guess
+ * about the person holding the phone. Everything is decided on the phone; nothing about it
+ * is sent anywhere.
  */
 
 package com.blazify.music.festival
@@ -15,6 +16,7 @@ import android.telephony.TelephonyManager
 import androidx.annotation.StringRes
 import com.blazify.music.R
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 enum class Festival(
@@ -27,20 +29,28 @@ enum class Festival(
     /** With [countries] empty, the countries where it is not a public holiday. */
     val notIn: Set<String> = emptySet(),
 ) {
-    // Nepal: Kag Tihar to Bhai Tika (Kartik 21–25, 2083), per the Nepal Calendar Determination Committee.
-    TIHAR(
-        id = "tihar",
-        greetingRes = R.string.festival_greeting_tihar,
-        countries = setOf("NP"),
-        days = listOf(LocalDate.of(2026, 11, 7)..LocalDate.of(2026, 11, 11)),
-    ),
-
-    // Dhanteras to Bhai Dooj; a public holiday as Diwali or Deepavali in these countries.
+    // Tihar in Nepal, Diwali or Deepavali elsewhere: one festival of lights, with its local name.
+    // Nepal: Kag Tihar to Bhai Tika, per the Nepal Calendar Determination Committee; elsewhere
+    // Dhanteras to Bhai Dooj. The two fall within a day of each other, so one span covers both.
     DIWALI(
         id = "diwali",
         greetingRes = R.string.festival_greeting_diwali,
-        countries = setOf("IN", "MY", "SG", "LK", "MU", "FJ", "TT", "GY", "SR"),
-        days = listOf(LocalDate.of(2026, 11, 6)..LocalDate.of(2026, 11, 10)),
+        countries = setOf("NP", "IN", "MY", "SG", "LK", "MU", "FJ", "TT", "GY", "SR"),
+        days = listOf(
+            LocalDate.of(2026, 11, 6)..LocalDate.of(2026, 11, 11),
+            LocalDate.of(2027, 10, 27)..LocalDate.of(2027, 10, 31),
+        ),
+    ),
+
+    // Not a public holiday anywhere, so it shows where it is most widely celebrated.
+    HALLOWEEN(
+        id = "halloween",
+        greetingRes = R.string.festival_greeting_halloween,
+        countries = setOf("US", "CA", "GB", "IE", "AU", "NZ"),
+        days = listOf(
+            LocalDate.of(2027, 10, 31)..LocalDate.of(2027, 10, 31),
+            LocalDate.of(2028, 10, 31)..LocalDate.of(2028, 10, 31),
+        ),
     ),
 
     CHRISTMAS(
@@ -91,15 +101,42 @@ enum class Festival(
     EID_AL_ADHA(id = "eid_al_adha", greetingRes = R.string.festival_greeting_eid, countries = EID_COUNTRIES, days = emptyList()),
     ;
 
+    /** Its greeting where it is celebrated: Diwali is Tihar in Nepal. */
+    @StringRes
+    fun greetingIn(country: String?): Int =
+        if (this == DIWALI && country.equals("NP", ignoreCase = true)) R.string.festival_greeting_tihar else greetingRes
+
     companion object {
-        /** The festival for [country] on [date], if any. */
+        /** The celebration starts this many days before a festival's first day… */
+        const val DAYS_BEFORE = 7L
+
+        /** …and lasts this many days after its last. */
+        const val DAYS_AFTER = 2L
+
+        /**
+         * The festival for [country] on [date], if any: from a week before it until two days after.
+         * When two overlap, as Christmas and New Year do, the one nearer to [date] shows, and on a
+         * tie the one still to come, so Christmas hands over to New Year once it is past.
+         */
         fun on(date: LocalDate, country: String?): Festival? {
             val code = country?.uppercase(Locale.ROOT) ?: return null
-            return entries.firstOrNull { festival ->
-                val here = if (festival.countries.isEmpty()) code !in festival.notIn else code in festival.countries
-                here && festival.days.any { date in it }
-            }
+            return entries
+                .filter { if (it.countries.isEmpty()) code !in it.notIn else code in it.countries }
+                .flatMap { festival -> festival.days.map { festival to it } }
+                .filter { (_, days) -> date in days.start.minusDays(DAYS_BEFORE)..days.endInclusive.plusDays(DAYS_AFTER) }
+                .minWithOrNull(
+                    compareBy<Pair<Festival, ClosedRange<LocalDate>>> { (_, days) -> distance(date, days) }
+                        .thenBy { (_, days) -> if (date < days.start) 0 else 1 },
+                )?.first
         }
+
+        /** Days from [date] to [days]; 0 on the festival itself. */
+        private fun distance(date: LocalDate, days: ClosedRange<LocalDate>): Long =
+            when {
+                date < days.start -> ChronoUnit.DAYS.between(date, days.start)
+                date > days.endInclusive -> ChronoUnit.DAYS.between(days.endInclusive, date)
+                else -> 0L
+            }
     }
 }
 

@@ -130,7 +130,7 @@ android {
         buildConfigField("String", "LASTFM_API_KEY", "\"$lastFmKey\"")
         buildConfigField("String", "LASTFM_SECRET", "\"$lastFmSecret\"")
         buildConfigField("String", "ARCHITECTURE", "\"universal\"")
-        // Test copies only: -PforceFestival=tihar shows that festival on any day. Release builds
+        // Test copies only: -PforceFestival=diwali shows that festival on any day. Release builds
         // (and F-Droid's, which must match them byte for byte) never pass it.
         buildConfigField("String", "FORCE_FESTIVAL", "\"${project.findProperty("forceFestival") ?: ""}\"")
         // Test copies only: show the star prompt on every launch (-PforceStarPrompt=true).

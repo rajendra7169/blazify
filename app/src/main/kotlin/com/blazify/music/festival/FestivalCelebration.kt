@@ -68,7 +68,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.blazify.music.LocalPlayerConnection
 import com.blazify.music.R
+import com.blazify.music.constants.ContentCountryKey
 import com.blazify.music.constants.FestivalTouchesKey
+import com.blazify.music.constants.SYSTEM_DEFAULT
 import com.blazify.music.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -108,6 +110,8 @@ fun FestivalCelebration(
     val context = LocalContext.current
     val playerConnection = LocalPlayerConnection.current
     var festivalTouches by rememberPreference(FestivalTouchesKey, true)
+    val chosenCountry by rememberPreference(ContentCountryKey, SYSTEM_DEFAULT)
+    val country = remember(chosenCountry) { festivalCountry(context, chosenCountry.takeUnless { it == SYSTEM_DEFAULT }) }
     val still = remember {
         Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
     }
@@ -174,7 +178,7 @@ fun FestivalCelebration(
             )
 
             // Below the logo; for Tihar and Diwali, below the rangoli round it.
-            val lights = festival == Festival.TIHAR || festival == Festival.DIWALI
+            val lights = festival == Festival.DIWALI
             val textGap = if (lights) (min(maxWidth.value, maxHeight.value) * 0.42f).dp + 12.dp else logoSize / 2 + 24.dp
             val textIn = ((t - 1.2f) / 0.6f).coerceIn(0f, 1f)
             Column(
@@ -193,7 +197,7 @@ fun FestivalCelebration(
                         },
             ) {
                 Text(
-                    text = stringResource(festival.greetingRes),
+                    text = stringResource(festival.greetingIn(country)),
                     textAlign = TextAlign.Center,
                     style =
                         TextStyle(
@@ -206,7 +210,7 @@ fun FestivalCelebration(
                 Text(
                     text =
                         stringResource(
-                            if (festival == Festival.TIHAR || festival == Festival.DIWALI) {
+                            if (festival == Festival.DIWALI) {
                                 R.string.festival_wish_lights
                             } else {
                                 R.string.festival_wish_joy
@@ -250,7 +254,8 @@ fun FestivalCelebration(
 /** The greeting's own festive colours. */
 private fun greetingColors(festival: Festival): List<Color> =
     when (festival) {
-        Festival.TIHAR, Festival.DIWALI -> listOf(Cream, Amber, Coral)
+        Festival.DIWALI -> listOf(Cream, Amber, Coral)
+        Festival.HALLOWEEN -> listOf(Color(0xFFFFCC80), Color(0xFFFF7043), Color(0xFFCE93D8))
         Festival.CHRISTMAS -> listOf(Color.White, Color(0xFFFFCDD2), Color(0xFFEF5350))
         Festival.NEW_YEAR -> listOf(Gold, Color(0xFFF48FB1), Color(0xFF80DEEA))
         Festival.MUSIC_DAY -> listOf(Color(0xFFFF80AB), Amber, Color(0xFFB388FF))
@@ -269,7 +274,8 @@ private fun DrawScope.drawScene(festival: Festival, t: Float) {
     val centre = Offset(size.width / 2, size.height * LOGO_Y)
     val dusk = (t / 0.5f).coerceIn(0f, 1f)
     when (festival) {
-        Festival.TIHAR, Festival.DIWALI -> lightsScene(t, u, centre, dusk)
+        Festival.DIWALI -> lightsScene(t, u, centre, dusk)
+        Festival.HALLOWEEN -> halloweenScene(t, u, dusk)
         Festival.CHRISTMAS -> christmasScene(t, u, dusk)
         Festival.NEW_YEAR -> newYearScene(t, u, centre, dusk)
         Festival.MUSIC_DAY -> musicScene(t, u, dusk)
@@ -532,6 +538,48 @@ private fun DrawScope.eidScene(t: Float, u: Float, dusk: Float, green: Boolean) 
 }
 
 // ── Pieces ───────────────────────────────────────────────────────────────────
+
+/** Halloween: a full moon rises, bats pour out of it across the sky, and pumpkins light along the bottom. */
+private fun DrawScope.halloweenScene(t: Float, u: Float, dusk: Float) {
+    sky(dusk, Color(0xFF24104A), Color(0xFF4A1A5E), Color(0xFF120612))
+    stars(t, u, dusk, 45, Cream, 0.55f)
+    // Top left, clear of the turn-off pill at the top right.
+    val moonAt = Offset(size.width * 0.22f, size.height * 0.14f)
+    val r = 46f * u
+    val rise = easeOut((t / 1.2f).coerceIn(0f, 1f))
+    drawCircle(
+        Brush.radialGradient(listOf(PaleGold.copy(alpha = 0.4f * rise), Color.Transparent), moonAt, r * 2.6f),
+        r * 2.6f,
+        moonAt,
+    )
+    drawCircle(Brush.linearGradient(listOf(Color(0xFFFFFDE7), PaleGold), moonAt - Offset(r, r), moonAt + Offset(r, r)), r, moonAt, alpha = rise)
+    drawCircle(Gold.copy(alpha = 0.25f * rise), r * 0.2f, moonAt + Offset(-r * 0.3f, r * 0.2f))
+    drawCircle(Gold.copy(alpha = 0.2f * rise), r * 0.12f, moonAt + Offset(r * 0.35f, -r * 0.3f))
+
+    for (i in 0 until 10) {
+        val p = (t - 0.3f - i * 0.22f) / 2.6f
+        if (p <= 0f || p >= 1f) continue
+        val angle = (PI * (-0.3f + 0.55f * hash(i, 61))).toFloat()
+        val reach = p * size.width * (0.7f + 0.4f * hash(i, 62))
+        val at =
+            Offset(
+                moonAt.x + cos(angle) * reach,
+                moonAt.y - sin(angle) * reach * 0.35f + reach * 0.25f + sin(p * 9f + i) * 10f * u,
+            )
+        val span = (12f + 34f * p) * u * (0.7f + 0.6f * hash(i, 63))
+        val fadeOut = 1f - ((p - 0.8f) / 0.2f).coerceIn(0f, 1f)
+        bat(at, span, sin(t * 16f + i * 1.7f), Color(0xFF07030C), alpha = dusk * fadeOut)
+    }
+
+    val n = 5
+    for (i in 0 until n) {
+        val lit = easeOut(((t - 0.6f - i * 0.18f) / 0.5f).coerceIn(0f, 1f))
+        val pr = (20f + 8f * hash(i, 64)) * u
+        val x = size.width * (0.1f + 0.8f * i / (n - 1))
+        val y = size.height - pr * 1.1f - 10f * u * hash(i, 65)
+        jackOLantern(Offset(x, y), pr, lit * (0.8f + 0.2f * sin(t * 9f + i * 2f)), alpha = dusk)
+    }
+}
 
 private fun DrawScope.sky(alpha: Float, top: Color, middle: Color, bottom: Color) =
     drawRect(Brush.verticalGradient(listOf(top, middle, bottom)), alpha = 0.985f * alpha)

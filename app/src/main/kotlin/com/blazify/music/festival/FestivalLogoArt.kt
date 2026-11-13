@@ -83,18 +83,16 @@ fun FestivalLogoArt(
         val k = this.size.minDimension / 256f
         scale(k, k, pivot = Offset.Zero) {
             when (festival) {
-                Festival.TIHAR -> {
-                    image(headphones)
-                    garland(t)
-                    diya(t, rangoli = false)
-                }
                 Festival.DIWALI -> {
                     image(headphones)
+                    garland(t)
                     diya(t, rangoli = true)
-                    sparkle(44f, 48f, 9f, Gold, t, 0f)
-                    sparkle(212f, 44f, 8f, PaleGold, t, 0.9f)
                     sparkle(30f, 92f, 5f, PaleGold, t, 1.7f)
                     sparkle(228f, 96f, 5f, Gold, t, 0.4f)
+                }
+                Festival.HALLOWEEN -> {
+                    image(headphones)
+                    halloween(t)
                 }
                 Festival.CHRISTMAS -> {
                     image(logo)
@@ -600,6 +598,124 @@ private fun triangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: 
         lineTo(x3, y3)
         close()
     }
+
+// ── Halloween ────────────────────────────────────────────────────────────────
+
+private val BatPurple = Color(0xFFAB47BC)
+
+/** A jack-o'-lantern glowing where the flame sits, and bats flitting past a full moon. */
+private fun DrawScope.halloween(t: Float) {
+    val moon = Offset(50f, 50f)
+    drawCircle(Brush.radialGradient(listOf(PaleGold.copy(alpha = 0.45f), Color.Transparent), moon, 40f), 40f, moon)
+    drawCircle(Brush.linearGradient(listOf(Color(0xFFFFFDE7), PaleGold), moon - Offset(22f, 22f), moon + Offset(22f, 22f)), 22f, moon)
+    drawCircle(Color(0xFFFFD54F).copy(alpha = 0.35f), 4f, moon + Offset(-7f, 5f))
+    drawCircle(Color(0xFFFFD54F).copy(alpha = 0.3f), 2.6f, moon + Offset(8f, -6f))
+    bat(Offset(54f + 6f * wave(t, 6f), 54f + 3f * wave(t, 3f)), 30f, wave(t, 0.5f), Color(0xFF1A1020))
+    bat(Offset(102f + 8f * wave(t, 4f, 1f), 24f + 4f * wave(t, 2f)), 32f, wave(t, 0.4f, 0.1f), BatPurple)
+    bat(Offset(212f + 6f * wave(t, 6f, 2f), 38f + 3f * wave(t, 3f, 1f)), 36f, wave(t, 0.5f, 0.2f), BatPurple)
+    val glow = 0.8f + 0.12f * wave(t, 2f) + 0.08f * wave(t, 0.75f)
+    jackOLantern(Offset(128f, 156f), 34f, glow)
+}
+
+/**
+ * A bat seen from the front, [span] wide, its wings at [flap] (-1 down to 1 up). Shared with the
+ * Halloween celebration.
+ */
+internal fun DrawScope.bat(at: Offset, span: Float, flap: Float, color: Color, alpha: Float = 1f) {
+    val f = flap * span * 0.14f
+    val wing =
+        Path().apply {
+            moveTo(span * 0.04f, -span * 0.03f)
+            quadraticTo(span * 0.24f, -span * 0.2f - f, span * 0.5f, -span * 0.1f - f)
+            quadraticTo(span * 0.44f, -span * 0.02f - f * 0.6f, span * 0.38f, span * 0.05f - f * 0.5f)
+            quadraticTo(span * 0.32f, -span * 0.01f - f * 0.4f, span * 0.24f, span * 0.07f - f * 0.3f)
+            quadraticTo(span * 0.17f, span * 0.01f - f * 0.2f, span * 0.04f, span * 0.08f)
+            close()
+        }
+    translate(at.x, at.y) {
+        drawPath(wing, color, alpha = alpha)
+        scale(-1f, 1f, pivot = Offset.Zero) { drawPath(wing, color, alpha = alpha) }
+        drawOval(color, Offset(-span * 0.065f, -span * 0.09f), Size(span * 0.13f, span * 0.2f), alpha = alpha)
+        drawPath(
+            Path().apply {
+                moveTo(-span * 0.06f, -span * 0.06f)
+                lineTo(-span * 0.05f, -span * 0.15f)
+                lineTo(-span * 0.01f, -span * 0.08f)
+                moveTo(span * 0.06f, -span * 0.06f)
+                lineTo(span * 0.05f, -span * 0.15f)
+                lineTo(span * 0.01f, -span * 0.08f)
+            },
+            color,
+            alpha = alpha,
+        )
+    }
+}
+
+/**
+ * A carved pumpkin [r] half-wide, lit from inside at [glow] (0 dark to 1 bright). Shared with the
+ * Halloween celebration.
+ */
+internal fun DrawScope.jackOLantern(centre: Offset, r: Float, glow: Float, alpha: Float = 1f) {
+    val g = glow.coerceIn(0f, 1f)
+    drawCircle(
+        Brush.radialGradient(listOf(Color(0xFFFF9800).copy(alpha = 0.5f * g * alpha), Color.Transparent), centre, r * 1.9f),
+        r * 1.9f,
+        centre,
+    )
+    val h = r * 1.7f
+    val top = centre.y - h / 2
+    fun lobe(width: Float, light: Color, dark: Color) =
+        drawOval(
+            Brush.verticalGradient(listOf(light, Color(0xFFF57C00), dark), top, top + h),
+            Offset(centre.x - width / 2, top),
+            Size(width, h),
+            alpha = alpha,
+        )
+    lobe(r * 2f, Color(0xFFFFA726), Color(0xFFBF360C))
+    lobe(r * 1.3f, Color(0xFFFFB74D), Color(0xFFD84315))
+    lobe(r * 0.62f, Color(0xFFFFCC80), Color(0xFFE65100))
+    drawRoundRect(
+        Color(0xFF5D4037),
+        Offset(centre.x - r * 0.1f, top - r * 0.26f),
+        Size(r * 0.2f, r * 0.34f),
+        androidx.compose.ui.geometry.CornerRadius(r * 0.06f),
+        alpha = alpha,
+    )
+    fun at(x: Float, y: Float) = Offset(centre.x + x * r, centre.y + y * r)
+    val face =
+        Path().apply {
+            // Eyes, nose and a toothy grin.
+            moveTo(at(-0.56f, -0.06f).x, at(-0.56f, -0.06f).y)
+            lineTo(at(-0.18f, -0.06f).x, at(-0.18f, -0.06f).y)
+            lineTo(at(-0.34f, -0.4f).x, at(-0.34f, -0.4f).y)
+            close()
+            moveTo(at(0.56f, -0.06f).x, at(0.56f, -0.06f).y)
+            lineTo(at(0.18f, -0.06f).x, at(0.18f, -0.06f).y)
+            lineTo(at(0.34f, -0.4f).x, at(0.34f, -0.4f).y)
+            close()
+            moveTo(at(-0.09f, 0.1f).x, at(-0.09f, 0.1f).y)
+            lineTo(at(0.09f, 0.1f).x, at(0.09f, 0.1f).y)
+            lineTo(at(0f, -0.04f).x, at(0f, -0.04f).y)
+            close()
+            moveTo(at(-0.6f, 0.2f).x, at(-0.6f, 0.2f).y)
+            lineTo(at(-0.36f, 0.3f).x, at(-0.36f, 0.3f).y)
+            lineTo(at(-0.26f, 0.2f).x, at(-0.26f, 0.2f).y)
+            lineTo(at(-0.12f, 0.32f).x, at(-0.12f, 0.32f).y)
+            lineTo(at(0f, 0.22f).x, at(0f, 0.22f).y)
+            lineTo(at(0.12f, 0.32f).x, at(0.12f, 0.32f).y)
+            lineTo(at(0.26f, 0.2f).x, at(0.26f, 0.2f).y)
+            lineTo(at(0.36f, 0.3f).x, at(0.36f, 0.3f).y)
+            lineTo(at(0.6f, 0.2f).x, at(0.6f, 0.2f).y)
+            quadraticTo(at(0f, 0.78f).x, at(0f, 0.78f).y, at(-0.6f, 0.2f).x, at(-0.6f, 0.2f).y)
+            close()
+        }
+    drawPath(face, Color(0xFF3E1600), alpha = alpha)
+    drawPath(
+        face,
+        Brush.radialGradient(listOf(Color(0xFFFFFDE7), Color(0xFFFFEB3B), Color(0xFFFFB300)), centre, r * 0.9f),
+        alpha = alpha * (0.35f + 0.65f * g),
+    )
+}
 
 // ── Lunar New Year ───────────────────────────────────────────────────────────
 
