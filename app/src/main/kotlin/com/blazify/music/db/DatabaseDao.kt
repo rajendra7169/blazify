@@ -1913,9 +1913,9 @@ interface DatabaseDao {
                 explicit = albumPage.album.explicit || albumPage.songs.any { it.explicit },
             ),
         )
-        if (artists?.size != albumPage.album.artists?.size) {
-            artists?.forEach(::delete)
-        }
+        // The album's artist links are rebuilt below. Deleting the artists themselves here,
+        // whenever their count differed from YouTube's, also took away every song's link to
+        // them and any artist the person follows.
         albumPage.songs
             .map(SongItem::toMediaMetadata)
             .onEach(::insert)
