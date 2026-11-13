@@ -5850,11 +5850,13 @@ class MusicService :
         widgetUpdateJob?.cancel()
         widgetUpdateJob =
             scope.launch {
+                // Once a second for the widgets' progress bar, and not at all while the screen
+                // is off: five full widget rebuilds a second cost battery for nothing.
                 while (isActive) {
-                    if (player.isPlaying) {
+                    if (player.isPlaying && !isScreenOff) {
                         updateWidgetUI(true)
                     }
-                    delay(200)
+                    delay(1000)
                 }
             }
     }
