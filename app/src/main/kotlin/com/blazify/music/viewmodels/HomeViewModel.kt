@@ -1024,6 +1024,36 @@ class HomeViewModel @Inject constructor(
 
     private var isHomeDataLoaded = false
 
+    /** Returns once the phone's network is up and Android has checked it reaches the internet. */
+    private suspend fun awaitWorkingInternet() {
+        val manager = context.getSystemService(android.net.ConnectivityManager::class.java) ?: return
+        fun works() =
+            manager.getNetworkCapabilities(manager.activeNetwork)
+                ?.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+        if (works()) return
+        kotlinx.coroutines.suspendCancellableCoroutine { continuation ->
+            val callback =
+                object : android.net.ConnectivityManager.NetworkCallback() {
+                    override fun onCapabilitiesChanged(
+                        network: android.net.Network,
+                        capabilities: android.net.NetworkCapabilities,
+                    ) {
+                        if (capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED) &&
+                            continuation.isActive
+                        ) {
+                            runCatching { manager.unregisterNetworkCallback(this) }
+                            continuation.resume(Unit) { _, _, _ -> }
+                        }
+                    }
+                }
+            if (runCatching { manager.registerDefaultNetworkCallback(callback) }.isFailure) {
+                continuation.resume(Unit) { _, _, _ -> }
+                return@suspendCancellableCoroutine
+            }
+            continuation.invokeOnCancellation { runCatching { manager.unregisterNetworkCallback(callback) } }
+        }
+    }
+
     fun loadHomeData() {
         if (isHomeDataLoaded) return
         viewModelScope.launch(Dispatchers.IO) {
@@ -1039,6 +1069,16 @@ class HomeViewModel @Inject constructor(
 
                 isHomeDataLoaded = true
                 load()
+                // Opened without a connection (or before the phone had one, right after it
+                // started): nothing loaded, and nothing tried again once the connection came,
+                // so Home stayed blank until a pull to refresh. Try again when it is back.
+                var tries = 0
+                while (homePage.value == null && tries < 3) {
+                    awaitWorkingInternet()
+                    kotlinx.coroutines.delay(1500L * (tries + 1))
+                    tries++
+                    if (homePage.value == null && !isRefreshing.value) load()
+                }
             } catch (e: Exception) {
                 isHomeDataLoaded = false
                 Timber.e(e, "Failed to load home data")
