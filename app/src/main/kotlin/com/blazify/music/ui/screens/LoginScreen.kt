@@ -94,8 +94,11 @@ fun LoginScreen(navController: NavController) {
         webView?.stopLoading()
         completion = coroutineScope.launch {
             val currentCookie = CookieManager.getInstance().getCookie("https://music.youtube.com").orEmpty()
-            if (currentCookie.isBlank()) {
-                Timber.d("Login: No YouTube Music cookie found on close, leaving login screen")
+            // Only a signed-in cookie counts. A visit without signing in still leaves
+            // visitor cookies behind; saving those "completed" the sign-in with no account,
+            // so the app stayed a guest and every return here bounced straight back (#38).
+            if (!isSignedInCookie(currentCookie)) {
+                Timber.d("Login: No signed-in YouTube Music cookie found on close, leaving login screen")
                 isCompletingLogin = false
                 onClose()
                 return@launch
@@ -249,8 +252,9 @@ fun LoginScreen(navController: NavController) {
                             // music.youtube.com with a valid cookie, complete the login.
                             if (url?.contains("music.youtube.com") == true &&
                                 !isCompletingLogin &&
-                                CookieManager.getInstance().getCookie("https://music.youtube.com").orEmpty()
-                                    .isNotBlank()
+                                isSignedInCookie(
+                                    CookieManager.getInstance().getCookie("https://music.youtube.com").orEmpty(),
+                                )
                             ) {
                                 Timber.d("Login: Detected authenticated session on music.youtube.com, completing login...")
                                 completeLogin(navController::navigateUp)
@@ -372,3 +376,7 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
+
+/** A cookie that belongs to a signed-in account: YouTube signs every request with its SAPISID. */
+private fun isSignedInCookie(cookie: String): Boolean =
+    cookie.isNotBlank() && "SAPISID" in com.blazify.innertube.utils.parseCookieString(cookie)
