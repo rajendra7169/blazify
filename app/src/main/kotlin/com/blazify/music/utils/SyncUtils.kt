@@ -696,8 +696,19 @@ class SyncUtils @Inject constructor(
                     val remoteIds = remoteSongs.map { it.id }.toSet()
                     val localSongs = database.likedSongsByNameAsc().first()
 
-                    // Remove likes from songs not in remote
-                    localSongs.filterNot { it.id in remoteIds }.forEach { song ->
+                    // Remove likes from songs not in remote, but only from a whole list: a fetch
+                    // that stopped at a failed page, or came back empty, would otherwise unlike
+                    // every song it did not reach.
+                    val advertised =
+                        page.playlist.songCountText
+                            ?.replace(Regex("[,.\\s]"), "")
+                            ?.let { Regex("""\d+""").find(it)?.value?.toIntOrNull() }
+                    val wholeList =
+                        remoteSongs.isNotEmpty() && (advertised == null || remoteSongs.size >= advertised)
+                    if (!wholeList) {
+                        Timber.w("Liked songs: got ${remoteSongs.size} of ${advertised ?: "?"}, keeping local likes")
+                    }
+                    localSongs.filterNot { !wholeList || it.id in remoteIds }.forEach { song ->
                         try {
                             database.update(song.song.localToggleLike())
                             delay(DB_OPERATION_DELAY_MS)
