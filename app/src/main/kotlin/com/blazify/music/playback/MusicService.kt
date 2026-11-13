@@ -101,6 +101,7 @@ import androidx.media3.session.SessionToken
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.MoreExecutors
 import com.blazify.innertube.YouTube
+import com.blazify.innertube.utils.parseCookieString
 import com.blazify.innertube.models.SongItem
 import com.blazify.innertube.models.WatchEndpoint
 import com.blazify.lastfm.LastFM
@@ -5175,7 +5176,12 @@ class MusicService :
             }
         }
 
-        if (playbackStats.totalPlayTimeMs >= historyDurationMs) {
+        // YouTube's own history: only for a signed-in account, and never while listen history
+        // is paused, which used to stop only the history kept on the phone.
+        if (playbackStats.totalPlayTimeMs >= historyDurationMs &&
+            !dataStore.get(PauseListenHistoryKey, false) &&
+            YouTube.cookie?.let { "SAPISID" in parseCookieString(it) } == true
+        ) {
             scope.launch(Dispatchers.IO) {
                 val playbackUrl =
                     playbackUrlCache[cacheKey(mediaItem.mediaId)]
