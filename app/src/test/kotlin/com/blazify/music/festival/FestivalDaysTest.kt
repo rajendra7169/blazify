@@ -48,9 +48,16 @@ class FestivalDaysTest {
     }
 
     @Test
+    fun diwaliWinsOverHalloweenWhenTheyMeet() {
+        for (day in 24..31) assertEquals(Festival.DIWALI, on(2027, 10, day, "NP"))
+        assertEquals(Festival.DIWALI, on(2027, 11, 2, "IN"))
+    }
+
+    @Test
     fun festivalsStayInTheirCountries() {
-        assertEquals(null, on(2027, 10, 31, "NP").takeIf { it == Festival.HALLOWEEN })
         assertEquals(null, on(2027, 10, 29, "US").takeIf { it == Festival.DIWALI })
+        assertEquals(Festival.HALLOWEEN, on(2028, 10, 31, "NP"))
+        assertEquals(Festival.HALLOWEEN, on(2027, 10, 31, "JP"))
         assertEquals(Festival.CHRISTMAS, on(2026, 12, 20, "NP")) // a public holiday in Nepal
     }
 }

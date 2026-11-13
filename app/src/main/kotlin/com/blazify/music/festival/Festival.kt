@@ -3,7 +3,7 @@
  * Licensed under GPL-3.0 | See NOTICE for contributors
  *
  * Festival touches on the Home logo. A festival shows only in the countries that celebrate
- * it (where it is a public holiday, or for Halloween where it is widely kept), from a week
+ * it (where it is a public holiday; Halloween and the global days everywhere), from a week
  * before it until two days after: what a country's own calendar celebrates, never a guess
  * about the person holding the phone. Everything is decided on the phone; nothing about it
  * is sent anywhere.
@@ -42,11 +42,12 @@ enum class Festival(
         ),
     ),
 
-    // Not a public holiday anywhere, so it shows where it is most widely celebrated.
+    // Not a public holiday anywhere, but kept in cities all over the world, so it shows everywhere.
+    // Where Diwali falls on the same days, as in 2027, Diwali shows instead.
     HALLOWEEN(
         id = "halloween",
         greetingRes = R.string.festival_greeting_halloween,
-        countries = setOf("US", "CA", "GB", "IE", "AU", "NZ"),
+        countries = emptySet(),
         days = listOf(
             LocalDate.of(2027, 10, 31)..LocalDate.of(2027, 10, 31),
             LocalDate.of(2028, 10, 31)..LocalDate.of(2028, 10, 31),
