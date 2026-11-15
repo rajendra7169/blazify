@@ -49,11 +49,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.Image
 
-// Links, mentions, and the two emphases release notes are actually written in.
+// Links (bare, or written [#23](https://…), which showed its brackets and address on
+// screen), mentions, and the two emphases release notes are actually written in.
 // Emphasis used to be missing here, which did not leave it unstyled — it left the
 // asterisks on screen, in a page whose whole job is to be read.
 private val markdownInlineRegex = Regex(
-    "(\\*\\*[^*\\n]+\\*\\*)" +
+    "(\\[[^\\]\\n]+\\]\\(https?://[^)\\s]+\\))" +
+        "|(\\*\\*[^*\\n]+\\*\\*)" +
         "|(\\*[^*\\n]+\\*)" +
         "|(@[a-zA-Z0-9_-]+)" +
         "|(https?://[\\w-]+(\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])",
@@ -359,6 +361,16 @@ fun MarkdownText(text: String) {
             append(raw.substring(lastIndex, result.range.first))
             val match = result.value
             when {
+                match.startsWith("[") && match.endsWith(")") -> {
+                    val label = match.substring(1, match.indexOf("]("))
+                    val link = match.substring(match.indexOf("](") + 2, match.length - 1)
+                    pushStringAnnotation(tag = "URL", annotation = link)
+                    withStyle(SpanStyle(color = linkColour, textDecoration = TextDecoration.Underline)) {
+                        append(label)
+                    }
+                    pop()
+                }
+
                 match.startsWith("**") && match.endsWith("**") ->
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                         append(match.removeSurrounding("**"))
