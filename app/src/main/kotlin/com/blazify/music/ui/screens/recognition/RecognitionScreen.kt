@@ -26,6 +26,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -210,7 +212,7 @@ fun RecognitionScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.arrow_back),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.back),
                         )
                     }
                 },
@@ -321,6 +323,7 @@ fun RecognitionScreen(
 
 @Composable
 private fun ReadyState(onStartRecognition: () -> Unit) {
+    val recognizeLabel = stringResource(R.string.recognize_music)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -339,7 +342,10 @@ private fun ReadyState(onStartRecognition: () -> Unit) {
                                     Color.Transparent,
                                 ),
                         ),
-                    ).clickable { onStartRecognition() },
+                    )
+                    // TalkBack read the big circle as an unnamed button.
+                    .clickable { onStartRecognition() }
+                    .semantics { contentDescription = recognizeLabel },
             contentAlignment = Alignment.Center,
         ) {
             Box(
@@ -368,6 +374,7 @@ private fun ReadyState(onStartRecognition: () -> Unit) {
 
 @Composable
 private fun ListeningState(onCancel: () -> Unit) {
+    val cancelLabel = stringResource(R.string.cancel)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -388,7 +395,8 @@ private fun ListeningState(onCancel: () -> Unit) {
                         .size(160.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
-                        .clickable { onCancel() },
+                        .clickable { onCancel() }
+                        .semantics { contentDescription = cancelLabel },
                 contentAlignment = Alignment.Center,
             ) {
                 SoundWaveBars(
