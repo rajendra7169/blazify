@@ -1,0 +1,3 @@
+New: more than one account with one-tap switching and channel choice, a queue with no lock (drag, swipe to play next or remove), festival logos for Tihar, Diwali, Christmas, New Year and Halloween, faster artist pages with the latest release, and a new song recognition animation.
+
+Fixed: signing in on some phones, Bluetooth headphones skipping songs, the search clear button, followed artists disappearing, and more.
