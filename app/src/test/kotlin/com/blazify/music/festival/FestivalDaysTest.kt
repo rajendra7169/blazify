@@ -40,6 +40,14 @@ class FestivalDaysTest {
     }
 
     @Test
+    fun orthodoxChristmasCountriesGetNewYearInstead() {
+        assertEquals(Festival.NEW_YEAR, on(2026, 12, 25, "RU"))
+        assertEquals(null, on(2026, 12, 20, "RU"))
+        assertEquals(Festival.CHRISTMAS, on(2026, 12, 25, "UA"))
+        assertEquals(Festival.CHRISTMAS, on(2026, 12, 20, "NP"))
+    }
+
+    @Test
     fun tiharAndDiwaliAreOneFestival() {
         assertEquals(Festival.DIWALI, on(2027, 10, 20, "NP"))
         assertEquals(Festival.DIWALI, on(2027, 10, 20, "IN"))

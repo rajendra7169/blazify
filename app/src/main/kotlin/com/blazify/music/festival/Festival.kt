@@ -65,6 +65,8 @@ enum class Festival(
         notIn = setOf(
             "CN", "JP", "TW", "TH", "VN", "KH", "LA", "MN", "BT", "MV", "AF", "IR", "SA", "AE", "QA",
             "KW", "BH", "OM", "YE", "TR", "IL", "LY", "MA", "TN", "MR", "SO", "DZ", "KP",
+            // Orthodox Christmas on 7 January, with no holiday on 25 December: New Year shows there.
+            "RU", "RS", "ME", "MK", "GE", "AM", "KZ", "KG", "UZ", "TJ", "TM", "AZ", "EG", "ET", "ER",
         ),
     ),
 

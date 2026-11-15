@@ -99,11 +99,13 @@ fun rememberActiveFestival(): Festival? {
     val chosenCountry by rememberPreference(ContentCountryKey, SYSTEM_DEFAULT)
     if (testingAll) return Festival.entries[testIndex.intValue % Festival.entries.size]
     if (!enabled) return null
-    return remember(chosenCountry) {
-        // Test copies can be built to pretend it is a festival day (-PforceFestival=tihar);
+    // Keyed on the date too, so an app left open overnight dresses the logo on the first festival day.
+    val today = LocalDate.now()
+    return remember(chosenCountry, today) {
+        // Test copies can be built to pretend it is a festival day (-PforceFestival=diwali);
         // the copies people install are built without it.
         Festival.entries.firstOrNull { it.id == BuildConfig.FORCE_FESTIVAL }
-            ?: Festival.on(LocalDate.now(), festivalCountry(context, chosenCountry.takeUnless { it == SYSTEM_DEFAULT }))
+            ?: Festival.on(today, festivalCountry(context, chosenCountry.takeUnless { it == SYSTEM_DEFAULT }))
     }
 }
 
