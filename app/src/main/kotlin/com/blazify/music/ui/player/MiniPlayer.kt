@@ -676,6 +676,10 @@ private fun NewMiniPlayerSongInfo(
     val liveBroadcasts by LocalPlayerConnection.current?.liveBroadcasts?.collectAsState()
         ?: remember { mutableStateOf(emptySet()) }
 
+    // Each line's box is the 24 units it has at normal text size, kept in dp so it does not
+    // grow with the phone's text size: at 130 % the two lines needed 62 dp of the pill's 48 and
+    // the artist was cut off. At normal size nothing moves; larger letters fit the same boxes.
+    val lineBox = with(LocalDensity.current) { 24.dp.toSp() }
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -686,6 +690,7 @@ private fun NewMiniPlayerSongInfo(
                                 text = metadata.title,
                                 color = onSurfaceColor,
                                 fontSize = 14.sp,
+                                lineHeight = lineBox,
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Clip,
@@ -707,6 +712,7 @@ private fun NewMiniPlayerSongInfo(
                                                   text = metadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
                                                   color = onSurfaceColor.copy(alpha = 0.7f),
                                                  fontSize = 12.sp,
+                                                 lineHeight = lineBox,
                                                  maxLines = 1,
                                                  overflow = TextOverflow.Clip,
                                                  modifier = Modifier.titleMarquee(),
