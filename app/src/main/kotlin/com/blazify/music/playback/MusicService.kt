@@ -4117,6 +4117,33 @@ class MusicService :
             ),
         )
 
+    /**
+     * The stream address for a song whose read reached the network with only its ID: a part of a
+     * cached song that the cache has since let go. The address saved with the song when it was
+     * looked up or saved ahead, while it is still good; otherwise a fresh lookup, with the same
+     * time limit as any other.
+     */
+    private fun lateStreamUrl(mediaId: String): android.net.Uri? {
+        songUrlCache[mediaId]?.takeIf { it.second > System.currentTimeMillis() }?.let {
+            Timber.tag(TAG).d("Cache gap in $mediaId: carrying on online")
+            return it.first.toUri()
+        }
+        Timber.tag(TAG).d("Cache gap in $mediaId: looking its stream up")
+        val playback =
+            runBlocking(Dispatchers.IO) {
+                withTimeoutOrNull(STREAM_RESOLVE_TIMEOUT_MS) {
+                    YTPlayerUtils.playerResponseForPlayback(
+                        mediaId,
+                        audioQuality = audioQuality,
+                        connectivityManager = connectivityManager,
+                    )
+                }
+            }?.getOrNull() ?: return null
+        if (playback.isLive) return null
+        songUrlCache[mediaId] = playback.streamUrl to System.currentTimeMillis() + (playback.streamExpiresInSeconds * 1000L)
+        return playback.streamUrl.toUri()
+    }
+
     private fun createCacheDataSource(): CacheDataSource.Factory =
         CacheDataSource
             .Factory()
@@ -4125,7 +4152,7 @@ class MusicService :
                 CacheDataSource
                     .Factory()
                     .setCache(playerCache)
-                    .setUpstreamDataSourceFactory(createNetworkDataSource()),
+                    .setUpstreamDataSourceFactory(LateStreamDataSource.Factory(createNetworkDataSource(), ::lateStreamUrl)),
             ).setCacheWriteDataSinkFactory(null)
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
