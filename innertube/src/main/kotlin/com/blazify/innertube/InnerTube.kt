@@ -123,6 +123,10 @@ class InnerTube {
                 
                 // Retry on connection failure
                 retryOnConnectionFailure(true)
+
+                // A handshake that never finishes moves on to the next address in seconds, not a
+                // minute: half-working IPv6 used to hold Home on placeholders that long.
+                com.blazify.innertube.utils.HandshakeLimit.apply(this)
                 
                 // Cache configuration for better performance
                 cache(
