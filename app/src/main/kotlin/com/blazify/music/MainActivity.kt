@@ -607,6 +607,8 @@ class MainActivity : ComponentActivity() {
         // The release being offered in the app, if any. Declared here because the
         // check below is what fills it in.
         val offeredRelease = remember { mutableStateOf<ReleaseInfo?>(null) }
+        // Whether this launch's update check has finished, so the star never asks on top of it.
+        val updateCheckDone = remember { mutableStateOf(!BuildConfig.UPDATER_AVAILABLE) }
 
         // Test copies built with -PforceUpdatePrompt=true offer a made-up newer version on every
         // launch, so the update card can be seen without publishing anything.
@@ -629,7 +631,7 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.UPDATER_AVAILABLE) {
             LaunchedEffect(checkForUpdates) {
                 if (checkForUpdates) {
-                    withContext(Dispatchers.IO) {
+                    try { withContext(Dispatchers.IO) {
                         val updatesEnabled = dataStore.get(CheckForUpdatesKey, true)
                         val notifEnabled = dataStore.get(UpdateNotificationsEnabledKey, true)
                         if (!updatesEnabled) return@withContext
@@ -695,9 +697,12 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+                    } } finally {
+                        updateCheckDone.value = true
                     }
                 } else {
                     onLatestVersionNameChange(BuildConfig.VERSION_NAME)
+                    updateCheckDone.value = true
                 }
             }
         }
@@ -874,6 +879,10 @@ class MainActivity : ComponentActivity() {
                 val starUriHandler = LocalUriHandler.current
                 val starScope = rememberCoroutineScope()
                 LaunchedEffect(Unit) {
+                    // One ask per launch: when a new version is being offered, the star waits for
+                    // another day. The check is given a little while to answer first.
+                    withTimeoutOrNull(15_000) { snapshotFlow { updateCheckDone.value }.first { it } }
+                    if (offeredRelease.value != null) return@LaunchedEffect
                     val playing = playerConnectionSnapshot?.player?.isPlaying == true
                     if (!playing && StarPrompt.onOpened(this@MainActivity)) {
                         StarPrompt.onShown(this@MainActivity)
