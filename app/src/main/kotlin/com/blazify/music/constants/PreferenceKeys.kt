@@ -27,6 +27,9 @@ val StarPromptDoneKey = booleanPreferencesKey("starPromptDone")
 val StarPromptFirstSeenKey = longPreferencesKey("starPromptFirstSeen")
 val StarPromptShownKey = intPreferencesKey("starPromptShown")
 val StarPromptLastShownKey = longPreferencesKey("starPromptLastShown")
+// The star is asked per version: the version the asks belong to and when it was first opened.
+val StarPromptVersionKey = intPreferencesKey("starPromptVersion")
+val StarPromptVersionSinceKey = longPreferencesKey("starPromptVersionSince")
 // Empty means every folder, which is what someone means before they have said otherwise.
 val LocalMusicFoldersKey = stringSetPreferencesKey("localMusicFolders")
 
@@ -344,6 +347,11 @@ val LastSeenVersionKey = stringPreferencesKey("lastSeenVersion")
  * next release asks again exactly once.
  */
 val UpdateDeclinedVersionKey = stringPreferencesKey("updateDeclinedVersion")
+// When the offer of UpdateDeclinedVersionKey was put off, the version it reminded about once
+// more after a week, and the version a notification was last posted for.
+val UpdateDeclinedAtKey = longPreferencesKey("updateDeclinedAt")
+val UpdateRemindedVersionKey = stringPreferencesKey("updateRemindedVersion")
+val UpdateNotifiedVersionKey = stringPreferencesKey("updateNotifiedVersion")
 val RandomizeHomeOrderKey = booleanPreferencesKey("randomizeHomeOrder")
 
 val ShowLikedPlaylistKey = booleanPreferencesKey("show_liked_playlist")

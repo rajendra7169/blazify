@@ -159,7 +159,11 @@ import com.blazify.music.constants.EnableHighRefreshRateKey
 import com.blazify.music.constants.EnableLandscapeScalingKey
 import androidx.datastore.preferences.core.edit
 import com.blazify.music.constants.LastSeenVersionKey
+import com.blazify.music.constants.UpdateDeclinedAtKey
 import com.blazify.music.constants.UpdateDeclinedVersionKey
+import com.blazify.music.constants.UpdateNotifiedVersionKey
+import com.blazify.music.constants.UpdateRemindedVersionKey
+import com.blazify.music.utils.UpdatePrompt
 import com.blazify.music.constants.ListenTogetherInTopBarKey
 import com.blazify.music.constants.ListenTogetherUsernameKey
 import com.blazify.music.constants.LyricsProviderOrderKey
@@ -635,17 +639,32 @@ class MainActivity : ComponentActivity() {
                         ).onSuccess { (releaseInfo, hasUpdate) ->
                             if (releaseInfo != null) {
                                 onLatestVersionNameChange(releaseInfo.versionName)
-                                // Offer it in the app, once. A notification can be
-                                // swiped away before it is read, and on a device
-                                // that never granted notifications it is never seen
-                                // at all — but somebody who has just opened the app
-                                // is, by definition, looking at it.
+                                // Offer it in the app: once, and once more a week after
+                                // "Later". A notification can be swiped away before it is
+                                // read, and on a device that never granted notifications it
+                                // is never seen at all, but somebody who has just opened the
+                                // app is, by definition, looking at it.
+                                val tag = releaseInfo.tagName
+                                val declinedTag = dataStore.get(UpdateDeclinedVersionKey, "").ifEmpty { null }
                                 if (hasUpdate &&
-                                    dataStore.get(UpdateDeclinedVersionKey, "") != releaseInfo.tagName
+                                    UpdatePrompt.shouldOffer(
+                                        tag = tag,
+                                        declinedTag = declinedTag,
+                                        declinedAt = dataStore.get(UpdateDeclinedAtKey, 0L).takeIf { it > 0 },
+                                        remindedTag = dataStore.get(UpdateRemindedVersionKey, "").ifEmpty { null },
+                                        now = System.currentTimeMillis(),
+                                    )
                                 ) {
+                                    // The reminder counts once it is on screen, so it never comes a third time.
+                                    if (UpdatePrompt.isReminder(tag, declinedTag)) {
+                                        dataStore.edit { it[UpdateRemindedVersionKey] = tag }
+                                    }
                                     offeredRelease.value = releaseInfo
                                 }
-                                if (hasUpdate && notifEnabled) {
+                                // The notification once per version, not every time the app opens.
+                                if (hasUpdate && notifEnabled &&
+                                    UpdatePrompt.shouldNotify(tag, dataStore.get(UpdateNotifiedVersionKey, "").ifEmpty { null })
+                                ) {
                                     val downloadUrl = Updater.getDownloadUrlForCurrentVariant(releaseInfo)
                                     if (downloadUrl != null) {
                                         val intent = Intent(Intent.ACTION_VIEW, downloadUrl.toUri())
@@ -670,6 +689,7 @@ class MainActivity : ComponentActivity() {
                                             PackageManager.PERMISSION_GRANTED
                                         ) {
                                             NotificationManagerCompat.from(this@MainActivity).notify(1001, notif)
+                                            dataStore.edit { it[UpdateNotifiedVersionKey] = tag }
                                         }
                                     }
                                 }
@@ -847,8 +867,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Asked 3 days, a week, 15 days and a month in, then every two months,
-                // until starred or declined. Not while anything is playing:
+                // Asked 10 days and a month after each version is first opened, until
+                // starred or already starred. Not while anything is playing:
                 // interrupting music to ask a favour is worse than not asking.
                 var showStarPrompt by remember { mutableStateOf(false) }
                 val starUriHandler = LocalUriHandler.current
@@ -1271,7 +1291,14 @@ class MainActivity : ComponentActivity() {
                             onDismiss = {
                                 offeredRelease.value = null
                                 scope.launch {
-                                    dataStore.edit { it[UpdateDeclinedVersionKey] = release.tagName }
+                                    // The first "Later" starts the week before the one reminder;
+                                    // "Later" on the reminder leaves it at that.
+                                    dataStore.edit {
+                                        if (it[UpdateDeclinedVersionKey] != release.tagName) {
+                                            it[UpdateDeclinedVersionKey] = release.tagName
+                                            it[UpdateDeclinedAtKey] = System.currentTimeMillis()
+                                        }
+                                    }
                                 }
                             },
                         )
