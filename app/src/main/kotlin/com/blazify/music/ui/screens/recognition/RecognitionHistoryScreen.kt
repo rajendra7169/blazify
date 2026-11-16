@@ -61,7 +61,6 @@ import com.blazify.music.ui.component.DefaultDialog
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.component.LocalMenuState
 import com.blazify.music.ui.utils.backToMain
-import com.blazify.music.utils.SearchRoutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -72,6 +71,7 @@ fun RecognitionHistoryScreen(navController: NavController) {
     val database = LocalDatabase.current
     val menuState = LocalMenuState.current
     val coroutineScope = rememberCoroutineScope()
+    val recognizedPlayer = rememberRecognizedPlayer(navController)
 
     val historyItems by database.recognitionHistory().collectAsStateWithLifecycle(initialValue = emptyList())
     var showClearDialog by remember { mutableStateOf(false) }
@@ -217,11 +217,7 @@ fun RecognitionHistoryScreen(navController: NavController) {
                 ) { item ->
                     RecognitionHistoryItem(
                         item = item,
-                        onClick = {
-                            // Search for the track on YouTube Music
-                            val searchQuery = "${item.title} ${item.artist}"
-                            navController.navigate(SearchRoutes.resultRoute(searchQuery))
-                        },
+                        onClick = { recognizedPlayer.play(item.title, item.artist, item.youtubeVideoId) },
                         onDelete = {
                             itemToDelete = item
                         },

@@ -104,7 +104,8 @@ object SpotifyImport {
         }
     }
 
-    private suspend fun search(track: SpotifyPlaylist.Track): SongItem? {
+    /** The same song on YouTube Music, by title and artist (and length when it is known), or nothing. */
+    internal suspend fun search(track: SpotifyPlaylist.Track): SongItem? {
         // "Live And Let Die - 2022 Remaster" or "Axel F - From "Beverly Hills Cop" Soundtrack"
         // send the search elsewhere; the plain title and the first artist find the song.
         val firstArtist = splitArtistNames(track.artists).firstOrNull().orEmpty()

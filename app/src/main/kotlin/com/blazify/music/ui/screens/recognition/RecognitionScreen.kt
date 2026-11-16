@@ -88,7 +88,6 @@ import com.blazify.music.R
 import com.blazify.music.db.entities.RecognitionHistory
 import com.blazify.music.ui.component.IconButton
 import com.blazify.music.ui.utils.backToMain
-import com.blazify.music.utils.SearchRoutes
 import com.blazify.shazamkit.models.RecognitionResult
 import com.blazify.shazamkit.models.RecognitionStatus
 import kotlinx.coroutines.Dispatchers
@@ -104,6 +103,7 @@ fun RecognitionScreen(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val coroutineScope = rememberCoroutineScope()
+    val recognizedPlayer = rememberRecognizedPlayer(navController)
 
     // Only reset in Ready state: Listening/Processing belong to a running widget-service
     // recognition that must not be cancelled; Success/NoMatch/Error are results pending
@@ -287,10 +287,9 @@ fun RecognitionScreen(
                         SuccessState(
                             result = status.result,
                             onPlayOnApp = { result ->
-                                // Search for the track on YouTube Music
-                                val searchQuery = "${result.title} ${result.artist}"
-                                navController.navigate(SearchRoutes.resultRoute(searchQuery))
+                                recognizedPlayer.play(result.title, result.artist, result.youtubeVideoId)
                             },
+                            finding = recognizedPlayer.finding,
                             onTryAgain = {
                                 startRecognition()
                             },
@@ -485,6 +484,7 @@ private fun SuccessState(
     onTryAgain: () -> Unit,
     onClose: () -> Unit,
     onSaveToHistory: (RecognitionResult) -> Unit,
+    finding: Boolean = false,
 ) {
     // Save to history when success is shown
     LaunchedEffect(result) {
@@ -554,13 +554,22 @@ private fun SuccessState(
         ) {
             Button(
                 onClick = { onPlayOnApp(result) },
+                enabled = !finding,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.play),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                )
+                if (finding) {
+                    // Finding the same song on YouTube Music, a second or so.
+                    androidx.compose.material3.CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(18.dp),
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.play_on_app))
             }
