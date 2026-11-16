@@ -734,7 +734,10 @@ fun Queue(
                                             snackbarHostState.showSnackbar(
                                                 message = removedSongMsg,
                                                 actionLabel = undoStr,
-                                                duration = SnackbarDuration.Short,
+                                                // Long enough to notice the swipe went too far
+                                                // and reach for Undo: Short (four seconds) was
+                                                // often gone before anyone looked down.
+                                                duration = SnackbarDuration.Long,
                                             )
                                         if (snackbarResult == SnackbarResult.ActionPerformed) {
                                             playerConnection.player.addMediaItem(currentItem.mediaItem)
