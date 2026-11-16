@@ -604,6 +604,24 @@ class MainActivity : ComponentActivity() {
         // check below is what fills it in.
         val offeredRelease = remember { mutableStateOf<ReleaseInfo?>(null) }
 
+        // Test copies built with -PforceUpdatePrompt=true offer a made-up newer version on every
+        // launch, so the update card can be seen without publishing anything.
+        if (BuildConfig.FORCE_UPDATE_PROMPT) {
+            LaunchedEffect(Unit) {
+                offeredRelease.value =
+                    ReleaseInfo(
+                        tagName = "v9.99.0",
+                        versionName = "9.99.0",
+                        description = "",
+                        releaseDate = "",
+                        assets = listOf(
+                            com.blazify.music.utils.ReleaseAsset("Blazify-gms.apk", "https://github.com/rajendra7169/blazify/releases/latest/download/Blazify-gms.apk", 0, "universal", "gms"),
+                            com.blazify.music.utils.ReleaseAsset("Blazify.apk", "https://github.com/rajendra7169/blazify/releases/latest/download/Blazify.apk", 0, "universal", "foss"),
+                        ),
+                    )
+            }
+        }
+
         if (BuildConfig.UPDATER_AVAILABLE) {
             LaunchedEffect(checkForUpdates) {
                 if (checkForUpdates) {
@@ -851,7 +869,7 @@ class MainActivity : ComponentActivity() {
                             starUriHandler.openUri(StarPrompt.REPO)
                         },
                         onLater = { showStarPrompt = false },
-                        onNever = {
+                        onAlreadyStarred = {
                             showStarPrompt = false
                             starScope.launch { StarPrompt.stop(this@MainActivity) }
                         },

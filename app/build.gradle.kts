@@ -135,6 +135,8 @@ android {
         buildConfigField("String", "FORCE_FESTIVAL", "\"${project.findProperty("forceFestival") ?: ""}\"")
         // Test copies only: show the star prompt on every launch (-PforceStarPrompt=true).
         buildConfigField("boolean", "FORCE_STAR_PROMPT", "${project.findProperty("forceStarPrompt") == "true"}")
+        // Test copies only: offer a made-up update on every launch (-PforceUpdatePrompt=true).
+        buildConfigField("boolean", "FORCE_UPDATE_PROMPT", "${project.findProperty("forceUpdatePrompt") == "true"}")
         // Blazify's own Discord application, so friends see "Blazify" in your status
         buildConfigField("Long", "DISCORD_APP_ID", "1564500874733297664L")
     }

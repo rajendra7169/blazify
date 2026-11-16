@@ -14,11 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
@@ -27,7 +25,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.blazify.music.R
-import com.blazify.music.ui.screens.settings.MarkdownText
 import com.blazify.music.utils.ReleaseInfo
 import com.blazify.music.utils.UpdateInstaller
 import com.blazify.music.utils.Updater
@@ -124,121 +124,99 @@ fun UpdateDialog(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    AlertDialog(
-        onDismissRequest = { if (stage !is Stage.Downloading) onDismiss() },
-        title = {
-            Text(
-                when (val s = stage) {
-                    is Stage.Ready ->
-                        if (s.fetched.needsUninstallFirst) {
-                            stringResource(R.string.update_uninstall_first_title)
-                        } else {
-                            stringResource(R.string.update_new_version, release.tagName.removePrefix("v"))
-                        }
-                    else -> stringResource(R.string.update_new_version, release.tagName.removePrefix("v"))
-                },
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 420.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                when (val s = stage) {
-                    is Stage.Offer -> {
-                        if (asset == null) {
-                            Text(stringResource(R.string.update_no_download))
-                        }
-                        MarkdownText(release.description)
-                    }
+    val version = release.tagName.removePrefix("v")
+    val logo = ImageBitmap.imageResource(R.drawable.blaze_logo_white)
+    val later = stringResource(R.string.update_later)
+    val buttons =
+        when (val s = stage) {
+            is Stage.Offer ->
+                PromptButtons(
+                    primary = if (asset != null) stringResource(R.string.update_prompt_update) else null,
+                    onPrimary = ::startDownload,
+                    secondary = later,
+                    onSecondary = onDismiss,
+                )
 
-                    is Stage.Downloading -> {
-                        val total = s.total
-                        if (total != null && total > 0) {
-                            val pct = ((s.done * 100) / total).toInt().coerceIn(0, 100)
-                            Text(stringResource(R.string.update_downloading, pct))
-                            LinearProgressIndicator(
-                                progress = { pct / 100f },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        } else {
-                            Text(stringResource(R.string.update_downloading_indeterminate))
-                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                        }
-                    }
+            is Stage.Downloading -> PromptButtons(null, {}, null, {})
 
-                    is Stage.Ready -> {
-                        if (s.fetched.needsUninstallFirst) {
-                            Text(
-                                stringResource(
-                                    R.string.update_uninstall_first_body,
-                                    s.fetched.displayName,
-                                ),
-                            )
-                        } else {
-                            Text(
-                                stringResource(
-                                    R.string.update_saved_to_downloads,
-                                    s.fetched.displayName,
-                                ),
-                            )
-                        }
-                        if (needsPermission) {
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                stringResource(R.string.update_allow_installs),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
-
-                    is Stage.Failed ->
-                        Text(
-                            stringResource(R.string.update_failed, s.message),
-                            color = MaterialTheme.colorScheme.error,
+            is Stage.Ready ->
+                when {
+                    needsPermission ->
+                        PromptButtons(
+                            stringResource(R.string.update_allow_installs_button),
+                            { UpdateInstaller.requestInstallPermission(context) },
+                            later,
+                            onDismiss,
                         )
+                    s.fetched.needsUninstallFirst ->
+                        PromptButtons(stringResource(R.string.update_open_downloads), { openDownloads(context) }, later, onDismiss)
+                    else ->
+                        PromptButtons(stringResource(R.string.update_install_now), { startInstall(s.fetched) }, later, onDismiss)
                 }
-            }
-        },
-        confirmButton = {
+
+            is Stage.Failed ->
+                PromptButtons(stringResource(R.string.update_download), { stage = Stage.Offer; startDownload() }, later, onDismiss)
+        }
+
+    BlazePromptCard(
+        title =
+            if ((stage as? Stage.Ready)?.fetched?.needsUninstallFirst == true) {
+                stringResource(R.string.update_uninstall_first_title)
+            } else {
+                stringResource(R.string.update_prompt_title, version)
+            },
+        onDismissRequest = { if (stage !is Stage.Downloading) onDismiss() },
+        buttons = buttons,
+        art = { time -> drawRocket(time, logo) },
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 220.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             when (val s = stage) {
                 is Stage.Offer ->
-                    if (asset != null) {
-                        TextButton(onClick = ::startDownload) { Text(stringResource(R.string.update_download)) }
-                    }
+                    PromptBody(
+                        if (asset == null) stringResource(R.string.update_no_download) else stringResource(R.string.update_prompt_body),
+                    )
 
-                is Stage.Downloading -> Unit
-
-                is Stage.Ready ->
-                    if (needsPermission) {
-                        TextButton(onClick = { UpdateInstaller.requestInstallPermission(context) }) {
-                            Text(stringResource(R.string.update_allow_installs_button))
-                        }
-                    } else if (s.fetched.needsUninstallFirst) {
-                        TextButton(onClick = { openDownloads(context) }) {
-                            Text(stringResource(R.string.update_open_downloads))
-                        }
+                is Stage.Downloading -> {
+                    val total = s.total
+                    if (total != null && total > 0) {
+                        val pct = ((s.done * 100) / total).toInt().coerceIn(0, 100)
+                        PromptBody(stringResource(R.string.update_downloading, pct))
+                        LinearProgressIndicator(
+                            progress = { pct / 100f },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     } else {
-                        TextButton(onClick = { startInstall(s.fetched) }) {
-                            Text(stringResource(R.string.update_install_now))
-                        }
+                        PromptBody(stringResource(R.string.update_downloading_indeterminate))
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     }
-
-                is Stage.Failed -> TextButton(onClick = { stage = Stage.Offer }) {
-                    Text(stringResource(R.string.update_download))
                 }
+
+                is Stage.Ready -> {
+                    PromptBody(
+                        if (s.fetched.needsUninstallFirst) {
+                            stringResource(R.string.update_uninstall_first_body, s.fetched.displayName)
+                        } else {
+                            stringResource(R.string.update_saved_to_downloads, s.fetched.displayName)
+                        },
+                    )
+                    if (needsPermission) {
+                        PromptBody(stringResource(R.string.update_allow_installs), color = MaterialTheme.colorScheme.error)
+                    }
+                }
+
+                is Stage.Failed ->
+                    PromptBody(stringResource(R.string.update_failed, s.message), color = MaterialTheme.colorScheme.error)
             }
-        },
-        dismissButton = {
-            if (stage !is Stage.Downloading) {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.update_later)) }
-            }
-        },
-    )
+        }
+    }
 }
 
 /**
