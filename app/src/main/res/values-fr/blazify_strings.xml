@@ -1375,4 +1375,8 @@
     <string name="star_prompt_body_short">Une étoile sur GitHub aide d’autres personnes à le trouver. Gratuit et sans pub.</string>
     <string name="import_spotify_csv_tip">Pour la liste entière, exportez-la en fichier CSV (Exportify le fait avec votre propre connexion Spotify), puis utilisez Paramètres › Sauvegarde et restauration › Importer une playlist CSV.</string>
     <string name="festival_greeting_halloween">Joyeux Halloween !</string>
+    <string name="star_prompt_already">Déjà ajouté aux favoris</string>
+    <string name="update_prompt_title">Blazify %s est arrivé</string>
+    <string name="update_prompt_body">De nouvelles fonctionnalités et corrections sont disponibles. Votre musique et votre bibliothèque restent telles quelles.</string>
+    <string name="update_prompt_update">Mettre à jour</string>
 </resources>
