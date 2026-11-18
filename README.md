@@ -81,7 +81,11 @@ this page download any of them. These are the repos:
 **Windows & Linux:** [rajendra7169/blazify-desktop](https://github.com/rajendra7169/blazify-desktop)<br>
 **iPhone:** [rajendra7169/blazify-ios](https://github.com/rajendra7169/blazify-ios) · ▶ [How to install it (video)](https://youtu.be/H0TF7mbJVbM)
 
-<a href="https://youtu.be/H0TF7mbJVbM"><img src="https://img.youtube.com/vi/H0TF7mbJVbM/maxresdefault.jpg" width="420" alt="Video: how to install Blazify and any .ipa on iPhone" /></a>
+### 📺 Videos
+
+<table><tr>
+<td align="center" width="250"><a href="https://youtu.be/H0TF7mbJVbM"><img src="https://img.youtube.com/vi/H0TF7mbJVbM/maxresdefault.jpg" width="230" alt="How to install on iPhone" /></a><br /><sub><b>How to install on iPhone</b></sub></td>
+</tr></table>
 
 Screenshots, install guides and everything else: **[blazify website](https://rajendra7169.github.io/blazify/)**
 
