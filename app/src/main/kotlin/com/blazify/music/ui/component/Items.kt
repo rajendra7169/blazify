@@ -1106,6 +1106,16 @@ fun MediaMetadataListItem(
     isLive: Boolean = false,
     trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
+    // A song started from a shelf that gave no length (Home, search) carries -1 here for
+    // its whole stay in the queue, while every song after it came with one. The player
+    // writes the real length to the library once it plays, so read it from there.
+    val database = LocalDatabase.current
+    val savedDuration by produceState(-1, mediaMetadata.id, mediaMetadata.duration) {
+        if (mediaMetadata.duration <= 0) {
+            database.song(mediaMetadata.id).collect { value = it?.song?.duration ?: -1 }
+        }
+    }
+    val duration = mediaMetadata.duration.takeIf { it > 0 } ?: savedDuration
     ListItem(
         title = mediaMetadata.title,
         subtitle = {
@@ -1119,7 +1129,7 @@ fun MediaMetadataListItem(
                 text = buildAnnotatedString {
                     val base = joinByBullet(
                         mediaMetadata.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
-                        if (isLive) null else makeTimeString(mediaMetadata.duration * 1000L)
+                        if (isLive || duration <= 0) null else makeTimeString(duration * 1000L)
                     )
                     append(base)
                     if (mediaMetadata.suggestedBy != null && base.isNotEmpty()) {
