@@ -763,6 +763,15 @@ class MusicService :
             return
         }
 
+        finishStarting()
+    }
+
+    /**
+     * Everything after the service is allowed to run: the player, the session and the rest. Split from onCreate so an
+     * instance that had to give up there (Android wouldn't let it start from the background) can finish starting when
+     * the app next starts it, instead of staying alive with no player, which left every song tap waiting forever.
+     */
+    private fun finishStarting() {
         // Read ALL startup preferences in one shot so that subsequent code
         // never calls dataStore.get() (which does runBlocking internally).
         // This consolidates ~15 main-thread-blocking DataStore reads into 1.
@@ -5717,11 +5726,18 @@ class MusicService :
             }
         }
 
-        // This instance gave up in onCreate and has no player; a widget button reaching it would
-        // crash. It is in the foreground now, so it can stop cleanly and the next start is a new one.
+        // This instance gave up in onCreate and has no player. It is in the foreground now, so it can
+        // finish starting here: the media controls often keep it alive, and Android hands the app this same
+        // instance again rather than a new one, so stopping it only left songs that never played.
         if (!::player.isInitialized) {
-            stopSelf()
-            return START_NOT_STICKY
+            if (!gaveUpStarting) {
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            Timber.tag(TAG).w("Service that gave up starting is allowed now; finishing the start")
+            gaveUpStarting = false
+            isRunning = true
+            finishStarting()
         }
 
         // No intent means Android brought the service back by itself after the app was killed,
