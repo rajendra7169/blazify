@@ -2552,6 +2552,11 @@ fun HomeScreen(
                                                             navController.navigate("mood_and_genres")
                                                         }
 
+                                                        // A playlist (the trending chart): the browse page shows none.
+                                                        endpoint.browseId.startsWith("VL") -> {
+                                                            navController.navigate("online_playlist/${endpoint.browseId.removePrefix("VL")}")
+                                                        }
+
                                                         // Handle podcast-related browse endpoints
                                                         endpoint.browseId.startsWith("FEmusic_library_non_music_audio") ||
                                                             endpoint.browseId.startsWith("FEmusic_non_music_audio") -> {
