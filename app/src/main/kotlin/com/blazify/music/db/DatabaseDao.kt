@@ -1740,6 +1740,9 @@ interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(searchHistory: SearchHistory)
 
+    @Query("SELECT DISTINCT songId FROM event WHERE timestamp >= :since")
+    fun songIdsPlayedSince(since: Long): List<String>
+
     @Query("DELETE FROM search_history WHERE LOWER(TRIM(`query`)) = LOWER(TRIM(:query))")
     fun deleteSearchHistorySameAs(query: String)
 

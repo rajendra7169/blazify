@@ -593,6 +593,14 @@ class MusicService :
     private var cachedShufflePlaylistFirst = false
     @Volatile
     private var cachedAutoLoadMore = true
+    @Volatile
+    private var cachedSimilarContent = true
+    /** A new queue is still being fetched: its few songs so far are not the end of it. */
+    @Volatile
+    private var queueLoading = false
+    /** A list running out is being carried on with similar songs; one request at a time. */
+    @Volatile
+    private var continuingWithSimilar = false
 
     /** Which client each song's stream came from, so a refusal can be laid at the right door. */
     private val streamClients = java.util.concurrent.ConcurrentHashMap<String, String>()
@@ -1444,6 +1452,9 @@ class MusicService :
         scope.launch {
             dataStore.data.map { it[AutoLoadMoreKey] ?: true }.distinctUntilChanged().collect { cachedAutoLoadMore = it }
         }
+        scope.launch {
+            dataStore.data.map { it[SimilarContent] ?: true }.distinctUntilChanged().collect { cachedSimilarContent = it }
+        }
         // The Stream sources screen is gone, so every install uses the same clients: all on
         // except iOS/iPadOS (they share clientName "IOS") and ANDROID_CREATOR, which needs
         // DroidGuard. Anything saved on the old screen is ignored on purpose, so a client
@@ -2059,12 +2070,14 @@ class MusicService :
             player.shuffleModeEnabled = false
         }
         originalQueueSize = 0
+        queueLoading = true
         if (queue.preloadItem != null) {
             player.setMediaItem(queue.preloadItem!!.toMediaItem())
             player.prepare()
             player.playWhenReady = playWhenReady
         }
         scope.launch(SilentHandler) {
+          try {
             val initialStatus =
                 withContext(Dispatchers.IO) {
                     runCatching { queue.getInitialStatus() }
@@ -2127,6 +2140,14 @@ class MusicService :
                 val shufflePlaylistFirst = dataStore.get(ShufflePlaylistFirstKey, false)
                 applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, shufflePlaylistFirst)
             }
+          } finally {
+            // Only the newest queue clears the flag: an older one finishing late must not.
+            if (currentQueue === queue) {
+                queueLoading = false
+                // A list of one or two songs gets no further song change before it ends.
+                if (!restoringQueue) maybeContinueWithSimilar()
+            }
+          }
         }
     }
 
@@ -2260,6 +2281,64 @@ class MusicService :
                 .onSuccess {
                     getAutomix(it.album.playlistId)
                 }
+        }
+    }
+
+    /**
+     * Adds a radio of the queue's last online song to the end of the queue and makes that radio
+     * the queue, so it keeps loading more by itself. Leaves out what is already queued and what
+     * was heard in the last few hours, so the carry-on does not open with songs just played.
+     */
+    private fun maybeContinueWithSimilar() {
+        if (cachedSimilarContent &&
+            !queueLoading &&
+            player.repeatMode == REPEAT_MODE_OFF &&
+            player.currentMediaItem?.mediaId !in liveBroadcasts.value &&
+            player.mediaItemCount > 0 &&
+            player.mediaItemCount - player.currentMediaItemIndex <= 3 &&
+            !currentQueue.hasNextPage() &&
+            !continuingWithSimilar &&
+            !inListenTogetherRoom()
+        ) {
+            continueWithSimilar()
+        }
+    }
+
+    private fun continueWithSimilar() {
+        val queued = player.mediaItems
+        val seed = queued.lastOrNull { !LocalMusic.isLocal(it.mediaId) && it.mediaId !in liveBroadcasts.value }?.mediaId ?: return
+        val queuedIds = queued.mapTo(HashSet()) { it.mediaId }
+        continuingWithSimilar = true
+        scope.launch(SilentHandler) {
+            try {
+                val radio = YouTubeQueue(WatchEndpoint(videoId = seed))
+                val items =
+                    withContext(Dispatchers.IO) {
+                        val heardLately = database.songIdsPlayedSince(System.currentTimeMillis() - SIMILAR_SKIP_HEARD_MS).toHashSet()
+                        val fresh =
+                            radio.getInitialStatus().items
+                                .filterExplicit(cachedHideExplicit)
+                                .filterVideoSongs(cachedHideVideoSongs)
+                                .filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
+                                .filter { it.mediaId !in queuedIds }
+                        // Only drop the songs heard lately when enough are left to keep playing.
+                        fresh.filter { it.mediaId !in heardLately }.takeIf { it.size >= 5 } ?: fresh
+                    }
+                // The person may have started something else meanwhile; then this is not wanted.
+                if (items.isEmpty() || player.playbackState == STATE_IDLE || player.mediaItems.lastOrNull()?.mediaId != queued.lastOrNull()?.mediaId) return@launch
+                player.addMediaItems(items)
+                if (player.shuffleModeEnabled) {
+                    applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, cachedShufflePlaylistFirst)
+                }
+                currentQueue = radio
+                queueChangedSinceSave = true
+                Timber.tag(TAG).d("Queue ran low: carrying on with ${items.size} songs like $seed")
+            } catch (e: Exception) {
+                if (e is kotlin.coroutines.cancellation.CancellationException) throw e
+                Timber.tag(TAG).w(e, "Could not carry on with similar songs")
+            } finally {
+                continuingWithSimilar = false
+            }
         }
     }
 
@@ -3148,6 +3227,11 @@ class MusicService :
                 }
             }
         }
+
+        // An album, a playlist or a list from the library has an end, and reaching it used to
+        // mean silence. "Similar content" (on by default) promises more songs like these once
+        // the end is near, so carry on with a radio of the last song, as YouTube Music does.
+        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) maybeContinueWithSimilar()
 
         if (cachedPersistentQueue) {
             saveQueueToDisk()
@@ -6207,6 +6291,8 @@ class MusicService :
         private const val SAVE_AHEAD_BUFFER_BYTES = 64 * 1024
         const val PERSISTENT_QUEUE_FILE = "persistent_queue.data"
         const val PERSISTENT_AUTOMIX_FILE = "persistent_automix.data"
+        /** Songs heard this recently are left out when a list is carried on with similar ones. */
+        const val SIMILAR_SKIP_HEARD_MS = 6 * 60 * 60 * 1000L
         const val PERSISTENT_PLAYER_STATE_FILE = "persistent_player_state.data"
         const val MAX_CONSECUTIVE_ERR = 5
         const val MAX_RETRY_COUNT = 10
