@@ -188,6 +188,9 @@ import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.random.Random
 
+/** [HomeSection.HomePageSection] index of the "Trending 20 <country>" shelf from the charts. */
+private const val TRENDING_HERE_INDEX = -1
+
 sealed class HomeSection(
     val id: String,
     val baseWeight: Int,
@@ -665,6 +668,7 @@ fun HomeScreen(
     val similarRecommendations by viewModel.similarRecommendations.collectAsStateWithLifecycle()
     val accountPlaylists by viewModel.accountPlaylists.collectAsStateWithLifecycle()
     val homePage by viewModel.homePage.collectAsStateWithLifecycle()
+    val trendingHere by viewModel.trendingHere.collectAsStateWithLifecycle()
     val explorePage by viewModel.explorePage.collectAsStateWithLifecycle()
     val dailyDiscover by viewModel.dailyDiscover.collectAsStateWithLifecycle()
     val communityPlaylists by viewModel.communityPlaylists.collectAsStateWithLifecycle()
@@ -1100,6 +1104,7 @@ fun HomeScreen(
             communityPlaylists,
             similarRecommendations,
             homePage?.sections,
+            trendingHere,
             explorePage?.moodAndGenres,
         ) {
             val list = mutableListOf<HomeSection>()
@@ -1122,6 +1127,8 @@ fun HomeScreen(
             homePage?.sections?.indices?.forEach { i ->
                 list.add(HomeSection.HomePageSection(i))
             }
+            // Drawn like a YouTube shelf, under its own index so the others keep theirs.
+            if (!chipActive && trendingHere != null) list.add(HomeSection.HomePageSection(TRENDING_HERE_INDEX))
 
             if (explorePage?.moodAndGenres != null) list.add(HomeSection.MoodAndGenres)
 
@@ -2500,7 +2507,9 @@ fun HomeScreen(
                             if (selectedChip?.title?.contains("Podcast", ignoreCase = true) == true) {
                                 return@forEach
                             }
-                            val sectionData = homePage?.sections?.getOrNull(section.index)
+                            val sectionData =
+                                if (section.index == TRENDING_HERE_INDEX) trendingHere
+                                else homePage?.sections?.getOrNull(section.index)
                             sectionData?.let {
                                 // Check if section contains songs for Play All functionality
                                 val sectionSongs = sectionData.items.filterIsInstance<SongItem>()

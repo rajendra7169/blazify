@@ -16,6 +16,9 @@ import com.blazify.innertube.models.AlbumItem
 import com.blazify.innertube.models.Artist
 import com.blazify.innertube.models.ArtistItem
 import com.blazify.innertube.models.PlaylistItem
+import com.blazify.music.constants.ContentCountryKey
+import com.blazify.music.constants.SYSTEM_DEFAULT
+import com.blazify.music.festival.festivalCountry
 import com.blazify.innertube.models.SongItem
 import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.ui.screens.wrapped.WrappedConstants
@@ -181,6 +184,8 @@ class HomeViewModel @Inject constructor(
     val similarRecommendations = MutableStateFlow<List<SimilarRecommendation>?>(null)
     val accountPlaylists = MutableStateFlow<List<PlaylistItem>?>(null)
     val homePage = MutableStateFlow<HomePage?>(null)
+    /** What is trending in this person's country, from YouTube's charts; null where none. */
+    val trendingHere = MutableStateFlow<HomePage.Section?>(null)
     val explorePage = MutableStateFlow<ExplorePage?>(null)
     val communityPlaylists = MutableStateFlow<List<CommunityPlaylistItem>?>(null)
     val selectedChip = MutableStateFlow<HomePage.Chip?>(null)
@@ -550,6 +555,47 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * YouTube's shelves follow where the connection comes from, not the country chosen in
+     * Settings, and a phone set to "English (United States)" says nothing about where its owner
+     * is. The charts take a country, so this shelf is the one that follows the chosen country,
+     * else the mobile network's. Its "Trending 20 <country>" list is used; countries without
+     * charts of their own (Nepal, for one) get none, and no shelf.
+     */
+    private suspend fun loadTrendingHere(
+        hideExplicit: Boolean,
+        hideVideoSongs: Boolean,
+        hiddenSongIds: Set<String>,
+        blockedArtists: Set<String>,
+    ) {
+        val chosen = context.dataStore.get(ContentCountryKey, SYSTEM_DEFAULT).takeUnless { it == SYSTEM_DEFAULT }
+        val country = festivalCountry(context, chosen) ?: return
+        val chart =
+            YouTube.getChartsPage(country = country).getOrNull()
+                ?.sections?.flatMap { it.items }
+                ?.filterIsInstance<PlaylistItem>()
+                // The trending list is the one YouTube Music builds itself (OLAK5uy_…); the others
+                // are music-video charts.
+                ?.firstOrNull { it.id.startsWith("OLAK5uy_") }
+                ?: return
+        val songs =
+            YouTube.playlist(chart.id).getOrNull()?.songs
+                ?.filterExplicit(hideExplicit)
+                ?.filterVideoSongs(hideVideoSongs)
+                ?.filter { it.id !in hiddenSongIds && it.artists.none { a -> BlockedArtists.isBlocked(blockedArtists, a.id, a.name) } }
+                ?.distinctBy { it.id }
+                ?.takeIf { it.size >= 4 }
+                ?: return
+        trendingHere.value =
+            HomePage.Section(
+                title = chart.title,
+                label = null,
+                thumbnail = null,
+                endpoint = BrowseEndpoint(browseId = "VL${chart.id}"),
+                items = songs,
+            )
+    }
+
     private suspend fun getCommunityPlaylists() {
         val fromTimeStamp = LocalDateTime.now().minusWeeks(4)
         val artistSeeds = database.mostPlayedArtists(fromTimeStamp, limit = 10).first()
@@ -714,6 +760,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) { getDailyDiscover() }
 
         viewModelScope.launch(Dispatchers.IO) { getCommunityPlaylists() }
+
+        viewModelScope.launch(Dispatchers.IO) { loadTrendingHere(hideExplicit, hideVideoSongs, hiddenSongIds, blockedArtists) }
 
         viewModelScope.launch(Dispatchers.IO) {
             YouTube.explore().onSuccess { page ->

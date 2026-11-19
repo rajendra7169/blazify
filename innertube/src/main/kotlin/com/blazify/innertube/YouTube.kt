@@ -52,6 +52,7 @@ import com.blazify.innertube.pages.ArtistItemsContinuationPage
 import com.blazify.innertube.pages.ArtistItemsPage
 import com.blazify.innertube.pages.ArtistPage
 import com.blazify.innertube.pages.BrowseResult
+import com.blazify.innertube.models.body.BrowseBody
 import com.blazify.innertube.pages.ChartsPage
 import com.blazify.innertube.pages.ExplorePage
 import com.blazify.innertube.pages.HistoryPage
@@ -1981,7 +1982,12 @@ object YouTube {
             )
         }
 
-    suspend fun getChartsPage(continuation: String? = null): Result<ChartsPage> =
+    /**
+     * YouTube's charts for [country] (the content country by default). Without a country they
+     * are the Global charts whatever the region; a country without charts of its own (Nepal,
+     * for one) gets the Global ones too.
+     */
+    suspend fun getChartsPage(continuation: String? = null, country: String? = locale.gl): Result<ChartsPage> =
         runCatching {
             val response =
                 innerTube
@@ -1990,6 +1996,8 @@ object YouTube {
                         browseId = "FEmusic_charts",
                         params = "ggMGCgQIgAQ%3D",
                         continuation = continuation,
+                        formData = country?.takeIf { continuation == null && it.length == 2 }
+                            ?.let { BrowseBody.FormData(listOf(it.uppercase())) },
                     ).body<BrowseResponse>()
 
             val sections = mutableListOf<ChartsPage.ChartSection>()

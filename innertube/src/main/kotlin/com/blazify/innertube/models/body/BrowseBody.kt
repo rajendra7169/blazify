@@ -9,5 +9,10 @@ data class BrowseBody(
     val context: Context,
     val browseId: String?,
     val params: String?,
-    val continuation: String?
-)
+    val continuation: String?,
+    /** Choices on a page that has them; the charts take the country here. */
+    val formData: FormData? = null,
+) {
+    @Serializable
+    data class FormData(val selectedValues: List<String>)
+}
