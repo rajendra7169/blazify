@@ -138,6 +138,8 @@ import com.blazify.music.db.entities.PlaylistSongMap
 import com.blazify.music.db.entities.Song
 import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.models.toMediaMetadata
+import com.blazify.music.extensions.isInternetConfirmed
+import com.blazify.music.utils.ConnectionHealth
 import com.blazify.music.extensions.isInternetConnected
 import com.blazify.music.playback.queues.ListQueue
 import com.blazify.music.playback.queues.LocalAlbumRadio
@@ -793,17 +795,35 @@ fun HomeScreen(
     val context = LocalContext.current
     val offlineMixTitle = stringResource(R.string.offline_mix)
     val offlineMixEmpty = stringResource(R.string.offline_mix_empty)
-    val playSavedSongs: (first: Set<String>) -> Unit = { first ->
+    val playSavedSongs: (first: Set<String>, orElse: (() -> Unit)?) -> Unit = { first, orElse ->
         scope.launch {
             val saved = viewModel.songsOnPhone()
             if (saved.isEmpty()) {
-                snackbarHostState.showSnackbar(offlineMixEmpty)
+                if (orElse != null) orElse() else snackbarHostState.showSnackbar(offlineMixEmpty)
                 return@launch
             }
             val (front, rest) = saved.partition { it.id in first }
             playerConnection.playQueue(
                 ListQueue(offlineMixTitle, (front.shuffled() + rest.shuffled()).map { it.toMediaItem() }),
             )
+        }
+    }
+
+    // Offline, the songs on the phone; online, [online]. A network Android has not confirmed
+    // reaches the internet (Wi-Fi with its line down, a data pack run out) gets the songs on the
+    // phone too while there are any: asking YouTube there started a mix that could not load,
+    // and played one song.
+    // The same when Blazify itself found YouTube out of reach a little while ago, which Android
+    // can take a long time to notice: then YouTube is asked again first, for a few seconds.
+    val offlineOr: (first: Set<String>, online: () -> Unit) -> Unit = { first, online ->
+        when {
+            !context.isInternetConnected() -> playSavedSongs(first, null)
+            !context.isInternetConfirmed() -> playSavedSongs(first, online)
+            ConnectionHealth.recentlyDead() ->
+                scope.launch {
+                    if (ConnectionHealth.canReachYouTube()) online() else playSavedSongs(first, online)
+                }
+            else -> online()
         }
     }
 
@@ -1350,9 +1370,7 @@ fun HomeScreen(
                         onForYouClick =
                             if (!isListenTogetherGuest) {
                                 {
-                                    if (!context.isInternetConnected()) {
-                                        playSavedSongs(emptySet())
-                                    } else {
+                                    offlineOr(emptySet()) {
                                         playerConnection.playQueue(
                                             if (forYouFromMix) {
                                                 YouTubeQueue(
@@ -1379,9 +1397,7 @@ fun HomeScreen(
                         onSpeedDialClick =
                             if (!isListenTogetherGuest && speedDialOrder.isNotEmpty()) {
                                 {
-                                    if (!context.isInternetConnected()) {
-                                        playSavedSongs(speedDialOrder.map { it.id }.toSet())
-                                    } else {
+                                    offlineOr(speedDialOrder.map { it.id }.toSet()) {
                                         playerConnection.playQueue(
                                             ListQueue(
                                                 title = speedDialTitle,
@@ -2797,9 +2813,7 @@ fun HomeScreen(
                 lazyListState = lazylistState,
                 icon = R.drawable.shuffle,
                 onClick = {
-                    if (!isListenTogetherGuest && !context.isInternetConnected()) {
-                        playSavedSongs(emptySet())
-                    } else if (!isListenTogetherGuest) {
+                    if (!isListenTogetherGuest) offlineOr(emptySet()) {
                         val local =
                             when {
                                 allLocalItems.isNotEmpty() && allYtItems.isNotEmpty() -> Random.nextFloat() < 0.5

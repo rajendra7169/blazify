@@ -230,6 +230,7 @@ import com.blazify.music.utils.ScrobbleManager
 import com.blazify.music.utils.SyncUtils
 import com.blazify.music.utils.getArtistSeparator
 import com.blazify.music.utils.joinToArtistString
+import com.blazify.music.utils.ConnectionHealth
 import com.blazify.music.utils.LocalMusic
 import com.blazify.music.utils.YTPlayerUtils
 import com.blazify.music.utils.cipher.CipherDeobfuscator
@@ -2144,6 +2145,9 @@ class MusicService :
             // Only the newest queue clears the flag: an older one finishing late must not.
             if (currentQueue === queue) {
                 queueLoading = false
+                // A queue filled from the songs on the phone, because the connection had gone,
+                // finds its first song stuck: go on to the first one that will play.
+                skipAheadIfStillOffline(player.currentMediaItem)
                 // A list of one or two songs gets no further song change before it ends.
                 if (!restoringQueue) maybeContinueWithSimilar()
             }
@@ -2172,8 +2176,40 @@ class MusicService :
             }
         }
         val related = database.getRelatedSongs(id).first().filter { it.id != id }
+        // With YouTube out of reach, what comes next has to be on the phone already, or each song
+        // after the first fails in turn: the saved songs that belong with this one first, then
+        // the rest of what is saved, shuffled.
+        if (!canReachYouTube()) {
+            val saved = songsOnPhone().filter { it.id != id }
+            if (saved.isNotEmpty()) {
+                val relatedIds = related.map { it.id }.toSet()
+                val (near, rest) = saved.partition { it.id in relatedIds }
+                Timber.tag(TAG).i("No connection: the queue goes on with ${saved.size} songs on the phone")
+                return Queue.Status(
+                    title = null,
+                    items = listOf(first) + (near.shuffled() + rest.shuffled()).map { it.toMediaItem() },
+                    mediaItemIndex = 0,
+                )
+            }
+        }
         if (related.isEmpty()) return null
         return Queue.Status(title = null, items = listOf(first) + related.map { it.toMediaItem() }, mediaItemIndex = 0)
+    }
+
+    /** Every song that plays without a connection: saved whole, downloaded, or the listener's own files. */
+    private suspend fun songsOnPhone(): List<Song> {
+        val ids = (playerCache.keys + downloadCache.keys).filterNot { LocalMusic.isLocal(it) }
+        // A few hundred at a time: Android 8's database takes at most 999 values in one query.
+        val saved =
+            ids.chunked(500).flatMap { database.getSongsByIds(it) }.filter { song ->
+                val length =
+                    song.format?.contentLength
+                        ?: ContentMetadata.getContentLength(playerCache.getContentMetadata(song.id)).takeIf { it > 0 }
+                        ?: ContentMetadata.getContentLength(downloadCache.getContentMetadata(song.id)).takeIf { it > 0 }
+                length != null &&
+                    (downloadCache.isCached(song.id, 0, length) || playerCache.isCached(song.id, 0, length))
+            }
+        return (saved + database.localSongsBlocking()).distinctBy { it.id }.filterNot { it.song.isEpisode }
     }
 
     fun startRadioSeamlessly() {
@@ -2298,7 +2334,10 @@ class MusicService :
             player.mediaItemCount - player.currentMediaItemIndex <= 3 &&
             !currentQueue.hasNextPage() &&
             !continuingWithSimilar &&
-            !inListenTogetherRoom()
+            !inListenTogetherRoom() &&
+            // Offline, a list plays to its end and stops: there is nothing similar to fetch.
+            hasUsableNetwork() &&
+            !ConnectionHealth.recentlyDead()
         ) {
             continueWithSimilar()
         }
@@ -3233,6 +3272,8 @@ class MusicService :
         // the end is near, so carry on with a radio of the last song, as YouTube Music does.
         if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) maybeContinueWithSimilar()
 
+        skipAheadIfStillOffline(mediaItem)
+
         if (cachedPersistentQueue) {
             saveQueueToDisk()
         }
@@ -3285,6 +3326,15 @@ class MusicService :
                     }
 
                     initialStallCheckedMediaId = mediaId
+                    // A song that cannot start because the connection is dead is not at fault,
+                    // and neither is the next one: fresh links and skips only walked the queue
+                    // down, a silence at a time, past the songs that are on the phone.
+                    if (!isOnPhone(mediaId) && !canReachYouTube()) {
+                        if (player.currentMediaItem?.mediaId != mediaId) return@launch
+                        if (carryOnWithoutConnection()) return@launch
+                        Timber.tag(TAG).d("No connection for $mediaId and nothing on the phone: waiting")
+                        return@launch
+                    }
                     if (attempt == 0) {
                         Timber.tag(TAG).w("Stream for $mediaId never started playing — fetching a fresh one")
                         performAggressiveCacheClear(mediaId)
@@ -3682,6 +3732,33 @@ class MusicService :
         return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    /** Whether YouTube answers at all: see [ConnectionHealth]. False at once with no network. */
+    private suspend fun canReachYouTube(): Boolean = hasUsableNetwork() && ConnectionHealth.canReachYouTube()
+
+    /**
+     * Moved on to a song that is not on the phone a little while after the connection was found
+     * dead: looks again at once and goes on to the next song on the phone, rather than leaving
+     * this one silent until the stall watch gives up on it some twenty seconds later.
+     */
+    private fun skipAheadIfStillOffline(mediaItem: MediaItem?) {
+        val id = mediaItem?.mediaId ?: return
+        if (!ConnectionHealth.recentlyDead()) return
+        if (isOnPhone(id)) return
+        scope.launch {
+            if (canReachYouTube() || player.currentMediaItem?.mediaId != id) return@launch
+            carryOnWithoutConnection()
+        }
+    }
+
+    /**
+     * After YouTube could not be reached: tells Android, so that it looks again and stops calling
+     * the network connected, then goes on to the next song on the phone. False when there is none.
+     */
+    private fun carryOnWithoutConnection(): Boolean {
+        connectivityManager.activeNetwork?.let { connectivityManager.reportNetworkConnectivity(it, false) }
+        return playNextOnPhone()
+    }
+
     /**
      * Checks if the error is caused by AudioTrack write or initialization failures.
      * These errors indicate the audio renderer is in a corrupted/invalid state.
@@ -3776,9 +3853,21 @@ class MusicService :
         if (!hasUsableNetwork() || isNetworkRelatedError(error)) {
             // With no connection at all, music on the phone can still play: carry on with that
             // instead of standing still until the connection returns.
-            if (!hasUsableNetwork() && playNextOnPhone()) return
-            Timber.tag(TAG).d("Nothing to play from: waiting for the connection to come back")
-            waitOnNetworkError()
+            if (!hasUsableNetwork()) {
+                if (playNextOnPhone()) return
+                Timber.tag(TAG).d("Nothing to play from: waiting for the connection to come back")
+                waitOnNetworkError()
+                return
+            }
+            // Android says connected, which it goes on saying on a dead line: ask YouTube itself
+            // before settling down to wait for a connection that may already be gone.
+            scope.launch {
+                val reachable = canReachYouTube()
+                if (player.currentMediaItem?.mediaId != mediaId) return@launch
+                if (!reachable && carryOnWithoutConnection()) return@launch
+                Timber.tag(TAG).d("Nothing to play from: waiting for the connection to come back")
+                waitOnNetworkError()
+            }
             return
         }
 

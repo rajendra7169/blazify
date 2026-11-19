@@ -34,3 +34,13 @@ fun Context.isInternetConnected(): Boolean {
     val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
 }
+
+/**
+ * Whether Android has checked that the connection really reaches the internet. A network can say
+ * it has internet without this: Wi-Fi whose line is down, mobile data whose pack has run out.
+ */
+fun Context.isInternetConfirmed(): Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false
+}
