@@ -93,7 +93,6 @@ import com.blazify.music.constants.MiniPlayerBottomSpacing
 import com.blazify.music.constants.MiniPlayerHeight
 import com.blazify.music.constants.NavigationBarHeight
 import com.blazify.music.constants.PauseSearchHistoryKey
-import com.blazify.music.db.entities.SearchHistory
 import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.models.toMediaMetadata
 import com.blazify.music.playback.queues.ListQueue
@@ -196,7 +195,7 @@ fun OnlineSearchResult(
                         if (!pauseSearchHistory) {
                             coroutineScope.launch(Dispatchers.IO) {
                                 database.query {
-                                    insert(SearchHistory(query = searchQuery))
+                                    addSearchHistory(searchQuery)
                                 }
                             }
                         }

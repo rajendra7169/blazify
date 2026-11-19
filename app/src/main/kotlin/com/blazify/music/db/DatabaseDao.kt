@@ -1740,6 +1740,21 @@ interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(searchHistory: SearchHistory)
 
+    @Query("DELETE FROM search_history WHERE LOWER(TRIM(`query`)) = LOWER(TRIM(:query))")
+    fun deleteSearchHistorySameAs(query: String)
+
+    /**
+     * Saves a search once: "the weeknd" after "the Weeknd" moves that search to the top,
+     * written the newer way, instead of keeping both (the unique index is case-sensitive).
+     */
+    @Transaction
+    fun addSearchHistory(query: String) {
+        val clean = query.trim()
+        if (clean.isEmpty()) return
+        deleteSearchHistorySameAs(clean)
+        insert(SearchHistory(query = clean))
+    }
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(event: Event)
 

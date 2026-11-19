@@ -185,7 +185,6 @@ import com.blazify.music.constants.StopMusicOnTaskClearKey
 import com.blazify.music.constants.UpdateNotificationsEnabledKey
 import com.blazify.music.constants.UseNewMiniPlayerDesignKey
 import com.blazify.music.db.MusicDatabase
-import com.blazify.music.db.entities.SearchHistory
 import com.blazify.music.extensions.toEnum
 import com.blazify.music.lyrics.LyricsProviderRegistry
 import com.blazify.music.models.toMediaMetadata
@@ -966,7 +965,7 @@ class MainActivity : ComponentActivity() {
                                 if (dataStore[PauseSearchHistoryKey] != true) {
                                     lifecycleScope.launch(Dispatchers.IO) {
                                         runCatching {
-                                            database.insert(SearchHistory(query = searchQuery))
+                                            database.addSearchHistory(searchQuery)
                                         }.onFailure { throwable ->
                                             Timber
                                                 .tag("MainActivity")

@@ -466,7 +466,7 @@ fun OnlineSearchScreen(
                         },
                         onDelete = { history ->
                             database.query {
-                                delete(history)
+                                deleteSearchHistorySameAs(history.query)
                             }
                         },
                         onClear = {
@@ -600,7 +600,7 @@ fun OnlineSearchScreen(
                     },
                     onDelete = {
                         database.query {
-                            delete(history)
+                            deleteSearchHistorySameAs(history.query)
                         }
                     },
                     onFillTextField = {

@@ -72,7 +72,6 @@ import com.blazify.music.R
 import com.blazify.music.constants.PauseSearchHistoryKey
 import com.blazify.music.constants.SearchSource
 import com.blazify.music.constants.SearchSourceKey
-import com.blazify.music.db.entities.SearchHistory
 import com.blazify.music.playback.queues.YouTubeQueue
 import com.blazify.music.ui.component.HideOnScrollFAB
 import com.blazify.music.utils.SearchRoutes
@@ -198,7 +197,7 @@ fun SearchScreen(
         if (!pauseSearchHistory) {
             coroutineScope.launch(Dispatchers.IO) {
                 database.query {
-                    insert(SearchHistory(query = searchQuery))
+                    addSearchHistory(searchQuery)
                 }
             }
         }

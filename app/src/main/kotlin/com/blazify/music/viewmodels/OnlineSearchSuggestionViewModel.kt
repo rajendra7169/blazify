@@ -94,7 +94,8 @@ class OnlineSearchSuggestionViewModel
                         if (query.isEmpty()) {
                             database.searchHistory().map { history ->
                                 SearchSuggestionViewState(
-                                    history = history,
+                                    // Saved before searches were kept once regardless of case.
+                                    history = history.distinctBy { it.query.trim().lowercase() },
                                 )
                             }
                         } else {
@@ -105,7 +106,7 @@ class OnlineSearchSuggestionViewModel
                                 val parsedItem = fetchParsedUrlItem(parsedUrl)
                                 database
                                     .searchHistory(query)
-                                    .map { it.take(3) }
+                                    .map { list -> list.distinctBy { it.query.trim().lowercase() }.take(3) }
                                     .map { history ->
                                         SearchSuggestionViewState(
                                             history = history,
@@ -122,7 +123,7 @@ class OnlineSearchSuggestionViewModel
 
                                 database
                                     .searchHistory(query)
-                                    .map { it.take(3) }
+                                    .map { list -> list.distinctBy { it.query.trim().lowercase() }.take(3) }
                                     .map { history ->
                                         SearchSuggestionViewState(
                                             history = history,
