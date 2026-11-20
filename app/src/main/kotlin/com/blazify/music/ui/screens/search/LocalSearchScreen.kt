@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
@@ -79,6 +80,8 @@ fun LocalSearchScreen(
     onDismiss: () -> Unit,
     isFromCache: Boolean = false,
     pureBlack: Boolean,
+    // No working connection: songs are looked for among those that play without one.
+    offline: Boolean = false,
     viewModel: LocalSearchViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -105,6 +108,10 @@ fun LocalSearchScreen(
 
     LaunchedEffect(query) {
         viewModel.query.value = query
+    }
+
+    LaunchedEffect(offline) {
+        viewModel.offline.value = offline
     }
 
     val configuration = LocalWindowInfo.current
@@ -137,6 +144,26 @@ fun LocalSearchScreen(
             currentValue = searchFilter,
             onValueUpdate = { viewModel.filter.value = it },
         )
+
+        if (offline) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.offline),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    text = stringResource(R.string.search_offline_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
 
         LazyColumn(
             state = lazyListState,

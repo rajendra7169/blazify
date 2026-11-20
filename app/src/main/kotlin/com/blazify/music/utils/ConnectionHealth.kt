@@ -1,8 +1,18 @@
 package com.blazify.music.utils
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.SystemClock
 import com.blazify.innertube.YouTube
+import com.blazify.music.extensions.isInternetConfirmed
+import com.blazify.music.extensions.isInternetConnected
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -44,4 +54,46 @@ object ConnectionHealth {
 
     /** True when YouTube could not be reached a little while ago and has not answered since. */
     fun recentlyDead(): Boolean = deadAt != 0L && SystemClock.elapsedRealtime() - deadAt < MEMORY_MS
+
+    /**
+     * Whether there is no working connection: none at all, or one Android has not confirmed
+     * reaches the internet, or one Blazify found dead a little while ago, where YouTube is then
+     * asked directly and does not answer. A confirmed connection is taken at its word, as Home's
+     * buttons take it, so nothing is asked when the connection is fine.
+     */
+    suspend fun isOffline(context: Context): Boolean =
+        when {
+            !context.isInternetConnected() -> true
+            !context.isInternetConfirmed() || recentlyDead() -> !canReachYouTube()
+            else -> false
+        }
+
+    /** Fires whenever the phone's connection comes, goes or changes. */
+    fun changes(context: Context): Flow<Unit> =
+        callbackFlow {
+            val manager = context.getSystemService(ConnectivityManager::class.java)
+            if (manager == null) {
+                awaitClose {}
+                return@callbackFlow
+            }
+            val callback =
+                object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        trySend(Unit)
+                    }
+
+                    override fun onLost(network: Network) {
+                        trySend(Unit)
+                    }
+
+                    override fun onCapabilitiesChanged(
+                        network: Network,
+                        networkCapabilities: NetworkCapabilities,
+                    ) {
+                        trySend(Unit)
+                    }
+                }
+            val registered = runCatching { manager.registerDefaultNetworkCallback(callback) }.isSuccess
+            awaitClose { if (registered) runCatching { manager.unregisterNetworkCallback(callback) } }
+        }.conflate()
 }

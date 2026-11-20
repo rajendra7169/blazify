@@ -1529,4 +1529,6 @@
     <string name="spatial_sound_desc_off">Off. Surround places the song round you; 8D sends it circling your head. Best with headphones</string>
     <string name="spatial_sound_desc_surround">Surround: the song comes from speakers round you, with its width and room behind</string>
     <string name="spatial_sound_desc_orbit">8D: the song slowly circles your head</string>
+    <string name="search_offline">Search songs on this phone…</string>
+    <string name="search_offline_notice">No connection. Showing songs that play offline: downloaded, cached and on this device.</string>
 </resources>

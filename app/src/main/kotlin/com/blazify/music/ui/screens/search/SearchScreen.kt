@@ -56,7 +56,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.platform.LocalContext
+import com.blazify.music.extensions.isInternetConnected
+import com.blazify.music.utils.ConnectionHealth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -161,6 +168,19 @@ fun SearchScreen(
     }
     val pauseSearchHistory by rememberPreference(PauseSearchHistoryKey, defaultValue = false)
 
+    // With no working connection, typing searches the songs that play without one instead of
+    // YouTube, which cannot answer. Read the way Home's buttons read it, and again whenever the
+    // connection changes. A connection Android has confirmed costs no extra look.
+    val context = LocalContext.current
+    var offline by remember { mutableStateOf(!context.isInternetConnected()) }
+    LaunchedEffect(Unit) {
+        ConnectionHealth.changes(context).onStart { emit(Unit) }.collectLatest {
+            // Networks come and go in bursts; read once they settle.
+            delay(300)
+            offline = ConnectionHealth.isOffline(context)
+        }
+    }
+
     fun handleSearch(searchQuery: String) {
         if (searchQuery.isEmpty()) {
             return
@@ -168,7 +188,14 @@ fun SearchScreen(
 
         focusManager.clearFocus()
 
-        when (val parsedUrl = YouTubeUrlParser.parse(searchQuery)) {
+        val parsedUrl = YouTubeUrlParser.parse(searchQuery)
+        if (offline && parsedUrl == null) {
+            // Offline the results are already showing under the box; a recent search tapped
+            // goes into the box to show its own.
+            if (query.text != searchQuery) {
+                query = TextFieldValue(searchQuery, TextRange(searchQuery.length))
+            }
+        } else when (parsedUrl) {
             is YouTubeUrlParser.ParsedUrl.Video -> {
                 playerConnection?.playQueue(
                     YouTubeQueue(
@@ -249,9 +276,10 @@ fun SearchScreen(
                                     Text(
                                         text =
                                             stringResource(
-                                                when (searchSource) {
-                                                    SearchSource.LOCAL -> R.string.search_library
-                                                    SearchSource.ONLINE -> R.string.search_yt_music
+                                                when {
+                                                    offline -> R.string.search_offline
+                                                    searchSource == SearchSource.LOCAL -> R.string.search_library
+                                                    else -> R.string.search_yt_music
                                                 },
                                             ),
                                         style =
@@ -342,16 +370,19 @@ fun SearchScreen(
                     .padding(top = paddingValues.calculateTopPadding())
                     .fillMaxSize(),
         ) {
-            when (searchSource) {
-                SearchSource.LOCAL -> {
+            // Offline, what was typed is looked for among the songs that play without a
+            // connection; the empty box still shows the recent searches as before.
+            when {
+                searchSource == SearchSource.LOCAL || (offline && query.text.isNotEmpty()) -> {
                     LocalSearchScreen(
                         query = query.text,
                         onDismiss = { navController.navigateUp() },
                         pureBlack = pureBlack,
+                        offline = offline,
                     )
                 }
 
-                SearchSource.ONLINE -> {
+                else -> {
                     OnlineSearchScreen(
                         query = query.text,
                         onQueryChange = { query = it },
