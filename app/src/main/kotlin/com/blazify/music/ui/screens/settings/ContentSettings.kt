@@ -67,6 +67,9 @@ import com.blazify.music.constants.EnableLrcLibKey
 import com.blazify.music.constants.EnablePaxsenixKey
 import com.blazify.music.constants.EnableLyricsPlus
 import com.blazify.music.constants.HideExplicitKey
+import com.blazify.music.constants.OfflineHomeCachedKey
+import com.blazify.music.constants.OfflineHomeDeviceKey
+import com.blazify.music.constants.OfflineHomeDownloadedKey
 import com.blazify.music.constants.HideVideoSongsKey
 import com.blazify.music.constants.HideYoutubeShortsKey
 import com.blazify.music.constants.LanguageCodeToName
@@ -127,6 +130,10 @@ fun ContentSettings(
     val (addToPlaylistAtTop, onAddToPlaylistAtTopChange) = rememberPreference(key = AddToPlaylistAtTopKey, defaultValue = true)
     val (showMostStatsPlaylists, onShowMostStatsPlaylistsChange) =
         rememberPreference(key = ShowMostStatsPlaylistsKey, defaultValue = true)
+    val (offlineHomeCached, onOfflineHomeCachedChange) = rememberPreference(key = OfflineHomeCachedKey, defaultValue = true)
+    val (offlineHomeDownloaded, onOfflineHomeDownloadedChange) =
+        rememberPreference(key = OfflineHomeDownloadedKey, defaultValue = true)
+    val (offlineHomeDevice, onOfflineHomeDeviceChange) = rememberPreference(key = OfflineHomeDeviceKey, defaultValue = true)
     val (randomizeHomeOrder, onRandomizeHomeOrderChange) = rememberPreference(
         RandomizeHomeOrderKey,
         defaultValue = true
@@ -768,6 +775,78 @@ fun ContentSettings(
                         )
                     },
                     onClick = { showQuickPicksDialog = true }
+                )
+            )
+        )
+        Spacer(modifier = Modifier.height(27.dp))
+
+        // When there is no connection, Home's shuffle, For you and Speed dial play the songs
+        // saved on the phone; each kind of saved song can be left out of them.
+        Material3SettingsGroup(
+            title = stringResource(R.string.offline_home_group),
+            items = listOf(
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.cached),
+                    title = { Text(stringResource(R.string.offline_home_cached)) },
+                    description = { Text(stringResource(R.string.offline_home_cached_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = offlineHomeCached,
+                            onCheckedChange = onOfflineHomeCachedChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (offlineHomeCached) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onOfflineHomeCachedChange(!offlineHomeCached) }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.download),
+                    title = { Text(stringResource(R.string.offline_home_downloaded)) },
+                    description = { Text(stringResource(R.string.offline_home_downloaded_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = offlineHomeDownloaded,
+                            onCheckedChange = onOfflineHomeDownloadedChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (offlineHomeDownloaded) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onOfflineHomeDownloadedChange(!offlineHomeDownloaded) }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.library_music),
+                    title = { Text(stringResource(R.string.offline_home_device)) },
+                    description = { Text(stringResource(R.string.offline_home_device_desc)) },
+                    trailingContent = {
+                        Switch(
+                            checked = offlineHomeDevice,
+                            onCheckedChange = onOfflineHomeDeviceChange,
+                            thumbContent = {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (offlineHomeDevice) R.drawable.check else R.drawable.close
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            }
+                        )
+                    },
+                    onClick = { onOfflineHomeDeviceChange(!offlineHomeDevice) }
                 )
             )
         )

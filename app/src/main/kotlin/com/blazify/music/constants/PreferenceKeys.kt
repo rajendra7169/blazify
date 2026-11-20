@@ -855,3 +855,8 @@ enum class NavBarStyle {
 
 // First-run onboarding (shown once until completed/skipped).
 val OnboardingCompletedKey = booleanPreferencesKey("onboardingCompleted")
+
+// What Home plays when there is no connection: each kind of saved song can be left out.
+val OfflineHomeCachedKey = booleanPreferencesKey("offlineHomeCached")
+val OfflineHomeDownloadedKey = booleanPreferencesKey("offlineHomeDownloaded")
+val OfflineHomeDeviceKey = booleanPreferencesKey("offlineHomeDevice")

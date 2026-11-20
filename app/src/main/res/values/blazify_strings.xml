@@ -1531,4 +1531,11 @@
     <string name="spatial_sound_desc_orbit">8D: the song slowly circles your head</string>
     <string name="search_offline">Search songs on this phone…</string>
     <string name="search_offline_notice">No connection. Showing songs that play offline: downloaded, cached and on this device.</string>
+    <string name="offline_home_group">Home with no connection</string>
+    <string name="offline_home_cached">Cached songs</string>
+    <string name="offline_home_cached_desc">Songs kept whole in the song cache after you played them</string>
+    <string name="offline_home_downloaded">Downloaded songs</string>
+    <string name="offline_home_downloaded_desc">Songs you downloaded</string>
+    <string name="offline_home_device">Songs on this device</string>
+    <string name="offline_home_device_desc">Your own music files on this phone</string>
 </resources>
