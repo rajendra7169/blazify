@@ -287,6 +287,34 @@ fun PlayerMenu(
         }
     }
 
+    // 3D sound, last in this menu: the same choice as Settings › Player, a tap away while listening.
+    val (spatialSound, onSpatialSoundChange) = com.blazify.music.utils.rememberEnumPreference(
+        com.blazify.music.constants.SpatialSoundKey,
+        defaultValue = com.blazify.music.eq.audio.SpatialSound.OFF,
+    )
+    var showSpatialSoundDialog by rememberSaveable { mutableStateOf(false) }
+    if (showSpatialSoundDialog) {
+        com.blazify.music.ui.component.EnumDialog(
+            onDismiss = { showSpatialSoundDialog = false },
+            onSelect = {
+                onSpatialSoundChange(it)
+                showSpatialSoundDialog = false
+            },
+            title = stringResource(R.string.spatial_sound),
+            current = spatialSound,
+            values = com.blazify.music.eq.audio.SpatialSound.entries.toList(),
+            valueText = {
+                stringResource(
+                    when (it) {
+                        com.blazify.music.eq.audio.SpatialSound.OFF -> R.string.spatial_sound_off
+                        com.blazify.music.eq.audio.SpatialSound.SURROUND -> R.string.spatial_sound_surround
+                        com.blazify.music.eq.audio.SpatialSound.ORBIT -> R.string.spatial_sound_orbit
+                    },
+                )
+            },
+        )
+    }
+
     var showPitchTempoDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -940,6 +968,30 @@ fun PlayerMenu(
                                         if (!varispeedMode) showPitchTempoDialog = true
                                         else showSpeedDialog = true
                                     },
+                                ),
+                            )
+                            add(
+                                Material3MenuItemData(
+                                    title = { Text(text = stringResource(R.string.spatial_sound)) },
+                                    description = {
+                                        Text(
+                                            text = stringResource(
+                                                when (spatialSound) {
+                                                    com.blazify.music.eq.audio.SpatialSound.OFF -> R.string.spatial_sound_off
+                                                    com.blazify.music.eq.audio.SpatialSound.SURROUND -> R.string.spatial_sound_surround
+                                                    com.blazify.music.eq.audio.SpatialSound.ORBIT -> R.string.spatial_sound_orbit
+                                                },
+                                            ),
+                                        )
+                                    },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.sound_wave),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                    },
+                                    onClick = { showSpatialSoundDialog = true },
                                 ),
                             )
                         }
