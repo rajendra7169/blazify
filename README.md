@@ -276,15 +276,21 @@ and UI/UX suggestions, each with a short form. Or use **Settings → Report a pr
 inside the app: it fills in your app version and phone for you, which is usually the
 difference between a bug that gets fixed and one that cannot be reproduced.
 
-**[Translate Blazify on Weblate](https://hosted.weblate.org/engage/blazify/)**: the app
-follows your phone's language, and translations are done on Weblate. If a word reads
-wrong in your language, or a text still shows in English, you can fix it there in the
-browser, with no coding and no GitHub account needed. Your fix comes to the app in the
-next release.
+<div align="center">
 
-<a href="https://hosted.weblate.org/engage/blazify/">
-<img src="https://hosted.weblate.org/widget/blazify/multi-auto.svg" alt="Translation status per language" />
-</a>
+<h2>Translations</h2>
+
+<a href="https://hosted.weblate.org/engage/blazify/"><img src="https://hosted.weblate.org/widget/blazify/svg-badge.svg" alt="Translation status" /></a>
+
+<p>We use Weblate to translate Blazify. <a href="https://hosted.weblate.org/engage/blazify/">Contribute a translation</a>.</p>
+
+<a href="https://hosted.weblate.org/engage/blazify/"><img src="https://hosted.weblate.org/widget/blazify/horizontal-auto.svg" alt="Translation status per language" /></a>
+
+</div>
+
+The app follows your phone's language. If a word reads wrong in your language, or a text
+still shows in English, you can fix it on Weblate in the browser, with no coding and no
+GitHub account needed. Your fix comes to the app in the next release.
 
 ---
 
