@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.blazify.music.MainActivity
 import com.blazify.music.R
+import com.blazify.music.utils.SecureHttp
 import com.blazify.shazamkit.models.RecognitionResult
 import com.blazify.shazamkit.models.RecognitionStatus
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +26,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 class RecognitionForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -297,17 +298,13 @@ class RecognitionForegroundService : Service() {
         withContext(Dispatchers.IO) {
             Timber.tag(TAG).d("Loading cover art bitmap from %s", url)
             runCatching {
-                val connection = (URL(url).openConnection() as? HttpURLConnection)
-                    ?: return@runCatching null
-                try {
-                    connection.connectTimeout = BITMAP_CONNECT_TIMEOUT_MS
-                    connection.readTimeout = BITMAP_READ_TIMEOUT_MS
-                    connection.instanceFollowRedirects = true
-                    connection.doInput = true
-                    connection.connect()
-                    connection.inputStream.use(BitmapFactory::decodeStream)
-                } finally {
-                    connection.disconnect()
+                val client = SecureHttp.client.newBuilder()
+                    .connectTimeout(BITMAP_CONNECT_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                    .readTimeout(BITMAP_READ_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                    .build()
+                client.newCall(Request.Builder().url(url).build()).execute().use { response ->
+                    if (!response.isSuccessful) return@runCatching null
+                    response.body?.byteStream()?.use(BitmapFactory::decodeStream)
                 }
             }.getOrNull()
         }
