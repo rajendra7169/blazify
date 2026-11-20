@@ -177,6 +177,12 @@ fun PlayerSettings(
         defaultValue = LoudnessLevel.BALANCED,
     )
 
+    val (spatialSound, onSpatialSoundChange) = rememberEnumPreference(
+        com.blazify.music.constants.SpatialSoundKey,
+        defaultValue = com.blazify.music.eq.audio.SpatialSound.OFF,
+    )
+    var showSpatialSoundDialog by remember { mutableStateOf(false) }
+
     val (audioOffload, onAudioOffloadChange) = rememberPreference(
         key = AudioOffload,
         defaultValue = false
@@ -312,6 +318,20 @@ fun PlayerSettings(
                     AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
                 }
             }
+        )
+    }
+
+    if (showSpatialSoundDialog) {
+        EnumDialog(
+            onDismiss = { showSpatialSoundDialog = false },
+            onSelect = {
+                onSpatialSoundChange(it)
+                showSpatialSoundDialog = false
+            },
+            title = stringResource(R.string.spatial_sound),
+            current = spatialSound,
+            values = com.blazify.music.eq.audio.SpatialSound.entries.toList(),
+            valueText = { stringResource(spatialSoundName(it)) },
         )
     }
 
@@ -586,6 +606,22 @@ fun PlayerSettings(
                         onClick = { showLoudnessLevelDialog = true }
                     ))
                 }
+                add(Material3SettingsItem(
+                    icon = painterResource(R.drawable.sound_wave),
+                    title = { Text(stringResource(R.string.spatial_sound)) },
+                    description = {
+                        Text(
+                            stringResource(
+                                when (spatialSound) {
+                                    com.blazify.music.eq.audio.SpatialSound.OFF -> R.string.spatial_sound_desc_off
+                                    com.blazify.music.eq.audio.SpatialSound.SURROUND -> R.string.spatial_sound_desc_surround
+                                    com.blazify.music.eq.audio.SpatialSound.ORBIT -> R.string.spatial_sound_desc_orbit
+                                },
+                            ),
+                        )
+                    },
+                    onClick = { showSpatialSoundDialog = true }
+                ))
                 add(Material3SettingsItem(
                     icon = painterResource(R.drawable.graphic_eq),
                     title = { Text(stringResource(R.string.audio_offload)) },
@@ -1312,3 +1348,11 @@ private fun sponsorLabel(category: SponsorBlock.Category): Int =
         SponsorBlock.Category.INTRO -> R.string.sponsorblock_intro
         SponsorBlock.Category.OUTRO -> R.string.sponsorblock_outro
     }
+
+/** The name each 3D sound choice goes by. */
+private fun spatialSoundName(sound: com.blazify.music.eq.audio.SpatialSound) = when (sound) {
+    com.blazify.music.eq.audio.SpatialSound.OFF -> R.string.spatial_sound_off
+    com.blazify.music.eq.audio.SpatialSound.SURROUND -> R.string.spatial_sound_surround
+    com.blazify.music.eq.audio.SpatialSound.ORBIT -> R.string.spatial_sound_orbit
+}
+

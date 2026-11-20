@@ -109,6 +109,7 @@ import com.blazify.music.MainActivity
 import com.blazify.music.R
 import com.blazify.music.constants.AndroidAutoTargetPlaylistKey
 import com.blazify.music.constants.AudioNormalizationKey
+import com.blazify.music.constants.SpatialSoundKey
 import com.blazify.music.constants.AudioOffload
 import com.blazify.music.constants.AudioQualityKey
 import com.blazify.music.constants.AudioTrackPlaybackParamsKey
@@ -477,6 +478,11 @@ class MusicService :
 
     private var cachedNormalizationGainMb: Int? = null
     private var cachedNormalizationEnabled: Boolean = false
+
+    /** 3D sound: one processor for the service's life, so a new player keeps the person's choice. */
+    private val spatialProcessor = com.blazify.music.eq.audio.SpatialAudioProcessor()
+    @Volatile
+    private var cachedSpatialSound = com.blazify.music.eq.audio.SpatialSound.OFF
 
     @Volatile private var discordRpcEnabled = false
     @Volatile private var lastDiscordReconnectAttemptAtMs: Long = 0L
@@ -1186,12 +1192,23 @@ class MusicService :
             setupAudioNormalization()
         }
 
+        // 3D sound follows the setting at once, mid-song.
+        dataStore.data
+            .map { it[SpatialSoundKey].toEnum(com.blazify.music.eq.audio.SpatialSound.OFF) }
+            .distinctUntilChanged()
+            .collectLatest(scope) { sound ->
+                cachedSpatialSound = sound
+                spatialProcessor.sound = sound
+            }
+
         combine(
             dataStore.data.map { it[AudioOffload] ?: false },
             dataStore.data.map { it[CrossfadeEnabledKey] ?: false },
-        ) { offloadPref, crossfadeEnabled ->
-            // Force disable offload if crossfade is enabled to prevent volume ramp issues
-            if (crossfadeEnabled) false else offloadPref
+            dataStore.data.map { it[SpatialSoundKey].toEnum(com.blazify.music.eq.audio.SpatialSound.OFF) },
+        ) { offloadPref, crossfadeEnabled, spatial ->
+            // Force disable offload if crossfade is enabled to prevent volume ramp issues; 3D sound needs the
+            // app's own sound path too, which offload skips.
+            if (crossfadeEnabled || spatial != com.blazify.music.eq.audio.SpatialSound.OFF) false else offloadPref
         }.distinctUntilChanged()
             .collectLatest(scope) { useOffload ->
                 player.setOffloadEnabled(useOffload)
@@ -1595,6 +1612,8 @@ class MusicService :
         }
         val eqProcessor = CustomEqualizerAudioProcessor()
         equalizerService.addAudioProcessor(eqProcessor)
+        // 3D sound comes after the equalizer, so the sound placed round the head is the sound the person tuned.
+        spatialProcessor.sound = cachedSpatialSound
 
         val silenceProcessor = SilenceDetectorAudioProcessor { handleLongSilenceDetected() }
 
@@ -1617,7 +1636,7 @@ class MusicService :
             ExoPlayer
                 .Builder(this)
                 .setMediaSourceFactory(createMediaSourceFactory())
-                .setRenderersFactory(createRenderersFactory(normalizationProcessor, eqProcessor, silenceProcessor, useAudioTrackPlaybackParams))
+                .setRenderersFactory(createRenderersFactory(normalizationProcessor, eqProcessor, silenceProcessor, useAudioTrackPlaybackParams, spatialProcessor))
                 .setLoadControl(
                     // Minutes of the song are fetched ahead on a connection that costs nothing, so
                     // a lift, a tunnel or a bad room passes without the music stopping; on mobile
@@ -5294,6 +5313,7 @@ class MusicService :
         eqProcessor: CustomEqualizerAudioProcessor,
         silenceProcessor: SilenceDetectorAudioProcessor,
         useAudioTrackPlaybackParams: Boolean,
+        spatialProcessor: com.blazify.music.eq.audio.SpatialAudioProcessor,
     ) = object : DefaultRenderersFactory(this) {
         override fun buildAudioRenderers(
             context: Context,
@@ -5352,6 +5372,7 @@ class MusicService :
                     arrayOf(
                         normalizationProcessor,
                         eqProcessor,
+                        spatialProcessor,
                         silenceProcessor,
                     ),
                     SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),

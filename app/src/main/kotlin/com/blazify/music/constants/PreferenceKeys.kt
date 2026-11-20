@@ -183,6 +183,9 @@ val AudioNormalizationKey = booleanPreferencesKey("audioNormalization")
 
 val LoudnessLevelKey = stringPreferencesKey("loudnessLevel")
 
+/** 3D sound in the player: off, Surround or 8D (see eq.audio.SpatialSound). */
+val SpatialSoundKey = stringPreferencesKey("spatialSound")
+
 enum class LoudnessLevel(
     val targetLufs: Float
 ) {

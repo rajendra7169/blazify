@@ -1521,4 +1521,12 @@
     <string name="update_prompt_body">New features and fixes are ready. Your music and library stay just as they are.</string>
     <string name="update_prompt_update">Update</string>
     <string name="import_spotify_csv_tip">For the whole list, export it as a CSV file (Exportify does it with your own Spotify sign-in), then use Settings › Backup and restore › Import a CSV playlist.</string>
+    <!-- 3D sound in the player -->
+    <string name="spatial_sound">3D sound</string>
+    <string name="spatial_sound_off">Off</string>
+    <string name="spatial_sound_surround">Surround</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Off. Surround places the song round you; 8D sends it circling your head. Best with headphones</string>
+    <string name="spatial_sound_desc_surround">Surround: the song comes from speakers round you, with its width and room behind</string>
+    <string name="spatial_sound_desc_orbit">8D: the song slowly circles your head</string>
 </resources>
