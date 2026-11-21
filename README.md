@@ -292,6 +292,7 @@ The app follows your phone's language. If a word reads wrong in your language, o
 still shows in English, you can fix it on Weblate in the browser, with no coding and no
 GitHub account needed. Your fix comes to the app in the next release.
 
+<!-- Contributors section: hidden until there are more people to thank. Remove this comment line and the closing one to show it.
 ## Contributors
 
 Everyone who helped make Blazify better. Thank you!
@@ -303,7 +304,10 @@ Everyone who helped make Blazify better. Thank you!
 **Translators**
 
 | Language | Translated by |
-|---|---|
+|
+-->
+
+---|---|
 | French | Mickaël Binos |
 
 **Want to help?** Fix a bug or add something with a
