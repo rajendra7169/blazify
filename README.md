@@ -292,6 +292,26 @@ The app follows your phone's language. If a word reads wrong in your language, o
 still shows in English, you can fix it on Weblate in the browser, with no coding and no
 GitHub account needed. Your fix comes to the app in the next release.
 
+## Contributors
+
+Everyone who helped make Blazify better. Thank you!
+
+<a href="https://github.com/rajendra7169/blazify/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=rajendra7169/blazify" alt="People who have contributed code to Blazify" />
+</a>
+
+**Translators**
+
+| Language | Translated by |
+|---|---|
+| French | Mickaël Binos |
+
+**Want to help?** Fix a bug or add something with a
+[pull request](https://github.com/rajendra7169/blazify/pulls), or
+[translate Blazify on Weblate](https://hosted.weblate.org/engage/blazify/) without any
+coding. Every merged pull request puts you in the picture above, and every translator
+gets a line in this table.
+
 ---
 
 ## Disclaimer
