@@ -5,7 +5,6 @@
 
 package com.blazify.music.utils
 
-import android.graphics.RectF
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
@@ -21,9 +20,6 @@ object LaunchSignal {
      * [homeSettled], which needs frames drawn, so it always ran into its time limit instead.
      */
     val homeComposed = MutableStateFlow(false)
-
-    /** Where the header's logo is drawn, in window pixels. */
-    val headerLogo = MutableStateFlow<RectF?>(null)
 
     /** False while the launch logo is on its way, so there are never two logos at once. */
     val headerLogoShown = MutableStateFlow(true)

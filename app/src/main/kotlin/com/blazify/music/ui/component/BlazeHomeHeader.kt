@@ -5,9 +5,7 @@
 
 package com.blazify.music.ui.component
 
-import androidx.compose.ui.layout.boundsInWindow
 import com.blazify.music.utils.loadedBitmap
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.animation.animateColorAsState
@@ -163,11 +161,6 @@ fun BlazeHomeHeader(
                 val logoModifier = Modifier
                     .size(logoSize)
                     .graphicsLayer { alpha = logoAlpha }
-                    .onGloballyPositioned { at ->
-                        val r = at.boundsInWindow()
-                        com.blazify.music.utils.LaunchSignal.headerLogo.value =
-                            android.graphics.RectF(r.left, r.top, r.right, r.bottom)
-                    }
                 // On a festival day here, the logo dresses up and plays a celebration when tapped.
                 val festival = com.blazify.music.festival.rememberActiveFestival()
                 if (festival != null) {
