@@ -240,6 +240,57 @@ class InnerTube {
         }
     }
 
+    /**
+     * YouTube Music's search for Video Art. Always asked in English, whatever the app's language:
+     * the finder reads view counts out of "2.1B views".
+     */
+    suspend fun videoArtMusicSearch(
+        client: YouTubeClient,
+        query: String,
+        params: String,
+    ) = withRetry {
+        httpClient.post("search") {
+            ytClient(client, setLogin = false)
+            setBody(
+                SearchBody(
+                    context = client.toContext(locale.copy(hl = "en"), visitorData, null),
+                    query = query,
+                    params = params,
+                )
+            )
+        }
+    }
+
+    /**
+     * Everyday YouTube's search (youtube.com, not YouTube Music), for Video Art: where the songs
+     * YouTube Music has no official video for still have theirs. Signed out and in English.
+     */
+    suspend fun webSearch(
+        client: YouTubeClient,
+        query: String,
+    ) = withRetry {
+        httpClient.post("${YouTubeClient.ORIGIN_YOUTUBE}/youtubei/v1/search") {
+            contentType(ContentType.Application.Json)
+            headers {
+                append("X-Goog-Api-Format-Version", "1")
+                append("X-YouTube-Client-Name", client.clientId)
+                append("X-YouTube-Client-Version", client.clientVersion)
+                append("X-Origin", YouTubeClient.ORIGIN_YOUTUBE)
+                append("Referer", "${YouTubeClient.ORIGIN_YOUTUBE}/")
+                visitorData?.let { append("X-Goog-Visitor-Id", it) }
+            }
+            userAgent(client.userAgent)
+            parameter("prettyPrint", false)
+            setBody(
+                SearchBody(
+                    context = client.toContext(locale.copy(hl = "en"), visitorData, null),
+                    query = query,
+                    params = null,
+                )
+            )
+        }
+    }
+
     suspend fun player(
         client: YouTubeClient,
         videoId: String,

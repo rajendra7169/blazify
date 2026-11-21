@@ -48,6 +48,9 @@ data class YouTubeClient(
         const val REFERER_YOUTUBE_MUSIC = "$ORIGIN_YOUTUBE_MUSIC/"
         const val API_URL_YOUTUBE_MUSIC = "$ORIGIN_YOUTUBE_MUSIC/youtubei/v1/"
 
+        /** Everyday YouTube, for the searches YouTube Music cannot answer. */
+        const val ORIGIN_YOUTUBE = "https://www.youtube.com"
+
         val WEB = YouTubeClient(
             clientName = "WEB",
             clientVersion = "2.20260213.00.00",

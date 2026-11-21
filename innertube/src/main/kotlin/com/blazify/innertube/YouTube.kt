@@ -73,6 +73,9 @@ import com.blazify.innertube.pages.SearchResult
 import com.blazify.innertube.pages.SearchSuggestionPage
 import com.blazify.innertube.pages.SearchSummary
 import com.blazify.innertube.pages.SearchSummaryPage
+import com.blazify.innertube.videoart.MusicVideoRow
+import com.blazify.innertube.videoart.VideoArtRows
+import com.blazify.innertube.videoart.WebVideoRow
 import io.ktor.client.call.body
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.async
@@ -338,6 +341,20 @@ object YouTube {
                 items = searchItems.distinctBy { it.id },
                 continuation = searchContinuation,
             )
+        }
+
+    /** YouTube Music's video rows for [query], for Video Art, read as plain rows. */
+    suspend fun videoArtMusicRows(query: String): Result<List<MusicVideoRow>> =
+        runCatching {
+            val answer = innerTube.videoArtMusicSearch(WEB_REMIX, query, VideoArtRows.MUSIC_VIDEO_PARAMS).bodyAsText()
+            VideoArtRows.music(Json.parseToJsonElement(answer))
+        }
+
+    /** Everyday YouTube's videos for [query] (youtube.com, not YouTube Music), for Video Art. */
+    suspend fun videoArtWebRows(query: String): Result<List<WebVideoRow>> =
+        runCatching {
+            val answer = innerTube.webSearch(WEB, query).bodyAsText()
+            VideoArtRows.web(Json.parseToJsonElement(answer))
         }
 
     suspend fun searchContinuation(continuation: String): Result<SearchResult> =
