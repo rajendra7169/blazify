@@ -156,6 +156,11 @@ object VideoArtFinder {
                 notes += "x ${row.title.take(40)} (no artist)"
                 return@forEachIndexed
             }
+            if (row.artistBadge && !byArtist) {
+                // Another artist's own channel: a cover, however it is titled.
+                notes += "x ${row.title.take(40)} (another artist ${row.channel})"
+                return@forEachIndexed
+            }
             val trusted = row.artistBadge || row.verified || "vevo" in fold(row.channel)
             if (!trusted) {
                 notes += "x ${row.title.take(40)} (unverified ${row.channel})"
@@ -167,7 +172,7 @@ object VideoArtFinder {
             score += if (hasGoodWord(row.title)) 2 else 0
             score += 0.6 * log10(max(row.views, 1L).toDouble())
             if (length != 0 && row.length != 0) score -= min(abs(row.length - length) / 60.0, 3.0)
-            score -= 0.15 * rank
+            score -= 0.05 * rank
             kept += score to row
         }
         if (kept.isEmpty()) return VideoArtResult(null, notes)

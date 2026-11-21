@@ -93,7 +93,7 @@ class VideoArtFinderTest {
         val pick = find(sample, asked).pick!!
         assertEquals("ElZfdU54Cp8", pick.videoId)
         assertEquals("Zee Music Company", pick.channel)
-        assertEquals(7.1, pick.score!!, 0.05)
+        assertEquals(7.6, pick.score!!, 0.05)
         // The same title re-uploaded by an unverified channel comes first in search, and is turned down.
         assertEquals("UEvOsQBu1jY", sample.web.first().videoId)
         // Searched by the song's name without (From "Bhediya").
@@ -153,6 +153,21 @@ class VideoArtFinderTest {
         // A Vevo channel counts as trusted without a tick.
         val vevo = VideoArtFinder.pickScored(song, listOf(row("vevo0000001", "Artist - Song", "ArtistVEVO", verified = false)))
         assertFalse(vevo.pick == null)
+    }
+
+    @Test
+    fun anotherArtistsChannelIsACoverHoweverItIsTitled() {
+        // A cover singer's own channel, titled with the original singer and without the word "cover".
+        val song = VideoArtSong("Apna Bana Le", listOf("Arijit Singh"), 262)
+        val cover = WebVideoRow("cover000001", "Apna Bana Le - Arijit Singh | Emma Heesters", "Emma Heesters",
+            artistBadge = true, verified = true, views = 20_000_000L, length = 250)
+        val result = VideoArtFinder.pickScored(song, listOf(cover))
+        assertNull(result.pick)
+        assertTrue(result.notes.single().endsWith("(another artist Emma Heesters)"))
+
+        // The singer's own channel with the same badge is the song's.
+        val own = cover.copy(videoId = "own00000001", channel = "Arijit Singh")
+        assertEquals("own00000001", VideoArtFinder.pickScored(song, listOf(own)).pick?.videoId)
     }
 
     @Test
