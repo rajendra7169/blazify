@@ -3,15 +3,16 @@ package com.blazify.music.utils.cipher
 import android.content.Context
 import android.util.Base64
 import com.blazify.innertube.YouTube
+import com.blazify.music.utils.SecureHttp
+import okhttp3.Request
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import timber.log.Timber
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 
 /**
  * Cosmetic "when did we add cipher support for this player" dates, shown in the song-details
@@ -101,17 +102,15 @@ object PlayerDatesStore {
     fun get(hash: String?): String? = hash?.let { dates[it] }
 
     private fun fetchRemote(remoteUrl: String): String {
-        val url = URL(remoteUrl)
-        val conn = (YouTube.proxy?.let { url.openConnection(it) } ?: url.openConnection()) as HttpURLConnection
-        return try {
-            conn.run {
-                connectTimeout = 10_000
-                readTimeout = 10_000
-                setRequestProperty("User-Agent", "Mozilla/5.0")
-                inputStream.bufferedReader().use { it.readText() }
-            }
-        } finally {
-            conn.disconnect() // release the socket immediately, including on the error path
+        val client = SecureHttp.client.newBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .proxy(YouTube.proxy)
+            .build()
+        val request = Request.Builder().url(remoteUrl).header("User-Agent", "Mozilla/5.0").build()
+        return client.newCall(request).execute().use { response ->
+            check(response.isSuccessful) { "HTTP ${response.code}" }
+            response.body?.string().orEmpty()
         }
     }
 }

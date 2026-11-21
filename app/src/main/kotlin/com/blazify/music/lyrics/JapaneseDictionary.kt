@@ -14,6 +14,7 @@ import com.atilika.kuromoji.dict.UnknownDictionary
 import com.atilika.kuromoji.ipadic.Tokenizer
 import com.atilika.kuromoji.trie.DoubleArrayTrie
 import com.atilika.kuromoji.util.ResourceResolver
+import com.blazify.music.utils.SecureHttp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,10 +23,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Request
 import timber.log.Timber
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 import java.security.MessageDigest
 import java.util.zip.ZipFile
 
@@ -154,13 +154,11 @@ object JapaneseDictionary {
     }
 
     private fun fetch(url: String, target: File): Boolean = runCatching {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15_000
-        connection.readTimeout = 30_000
-        try {
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) return@runCatching false
-            val total = connection.contentLengthLong.takeIf { it > 0 }
-            connection.inputStream.use { input ->
+        SecureHttp.client.newCall(Request.Builder().url(url).build()).execute().use { response ->
+            if (response.code != 200) return@runCatching false
+            val body = response.body ?: return@runCatching false
+            val total = body.contentLength().takeIf { it > 0 }
+            body.byteStream().use { input ->
                 target.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024)
                     var done = 0L
@@ -174,8 +172,6 @@ object JapaneseDictionary {
                 }
             }
             true
-        } finally {
-            connection.disconnect()
         }
     }.getOrElse {
         Timber.w(it, "Japanese dictionary source failed: %s", url)

@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.blazify.music.utils.SecureHttp
+import okhttp3.Request
 import org.json.JSONObject
 import timber.log.Timber
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.concurrent.atomic.AtomicLong
 
 data class DiscordUser(
@@ -258,21 +258,15 @@ object DiscordRpcManager {
 
     fun fetchCurrentUser(token: String): DiscordUser? {
         return try {
-            val url = URL("https://discord.com/api/v10/users/@me")
-            val conn = url.openConnection() as HttpURLConnection
-            conn.connectTimeout = 10_000
-            conn.readTimeout = 10_000
-            conn.requestMethod = "GET"
-            conn.setRequestProperty("Authorization", "Bearer $token")
-            conn.setRequestProperty("Accept", "application/json")
+            val request = Request.Builder()
+                .url("https://discord.com/api/v10/users/@me")
+                .header("Authorization", "Bearer $token")
+                .header("Accept", "application/json")
+                .build()
 
-            val responseCode = conn.responseCode
-            val responseBody = if (responseCode in 200..299) {
-                conn.inputStream.bufferedReader().readText()
-            } else {
-                conn.errorStream?.bufferedReader()?.readText() ?: ""
+            val (responseCode, responseBody) = SecureHttp.client.newCall(request).execute().use {
+                it.code to (it.body?.string() ?: "")
             }
-            conn.disconnect()
 
             if (responseCode !in 200..299) {
                 Timber.tag(TAG).w("fetchCurrentUser: HTTP $responseCode body=$responseBody")
