@@ -67,8 +67,9 @@ import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
 import coil3.compose.AsyncImage
 import com.blazify.innertube.YouTube
-import com.blazify.innertube.models.SongItem
-import com.blazify.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_OMV
+import com.blazify.innertube.videoart.VideoArtFinder
+import com.blazify.innertube.videoart.VideoArtSong
+import com.blazify.innertube.videoart.VideoArtText
 import com.blazify.music.R
 import com.blazify.music.constants.VideoOnMobileKey
 import com.blazify.music.models.MediaMetadata
@@ -119,8 +120,11 @@ private object SongVideos {
     /** How far apart a song and its video may be in length and still be the same cut. */
     private const val SAME_CUT_SECONDS = 3
 
-    /** How many search results are looked through for the song's own music video. */
-    private const val CANDIDATES = 5
+    /** How many YouTube Music results are looked through for the song's own music video. */
+    private const val CANDIDATES = VideoArtFinder.MUSIC_CANDIDATES
+
+    /** How many everyday YouTube results are looked through when YouTube Music has none. */
+    private const val WEB_CANDIDATES = VideoArtFinder.WEB_CANDIDATES
 
     /**
      * Lookups run on their own, not on the screen asking: the player lays itself out again as it
@@ -157,33 +161,45 @@ private object SongVideos {
             return SongVideo(song.id, url, synced = true)
         }
 
-        // Otherwise the artist's official video — a fan upload or lyric video is not the song's
-        // picture. The same cut as the song follows it in step; a different cut runs on its own.
+        // Otherwise the song's own music video — a fan upload, a live show or a lyric video is not
+        // the song's picture. YouTube Music's official videos first, then everyday YouTube, then
+        // the artist's own lyric video as a last resort (VideoArtFinder has the rules).
         if (song.title.isBlank()) return null
-        val artist = song.artists.joinToString { it.name }
-        val official =
-            YouTube
-                .search("${song.title} $artist", YouTube.SearchFilter.FILTER_VIDEO)
-                .getOrNull()
-                ?.items
-                ?.filterIsInstance<SongItem>()
-                ?.take(CANDIDATES)
-                ?.filter { it.musicVideoType == MUSIC_VIDEO_TYPE_OMV }
-                .orEmpty()
-        // The official video closest in length to the song, rather than the first one found. An
-        // album track is often longer than its video — a 6:50 song with videos of 5:03 and 6:24 —
-        // and the first result was the short one, which ended with most of the song still to go.
-        val closest =
-            if (song.duration > 0) {
-                official.filter { it.duration != null }.minByOrNull { abs(it.duration!! - song.duration) }
-            } else {
-                null
+        val length = song.duration.coerceAtLeast(0)
+        val found =
+            VideoArtFinder.find(
+                VideoArtSong(
+                    title = song.title,
+                    artists = VideoArtText.splitArtists(song.artists.map { it.name }),
+                    length = length,
+                ),
+                // No answer from YouTube Music may only mean the connection dropped: that is "no
+                // video" for now, and asked again soon.
+                musicSearch = { query -> YouTube.videoArtMusicRows(query).getOrThrow() },
+                // Everyday YouTube failing still leaves the lyric video YouTube Music found.
+                webSearch = { query ->
+                    YouTube.videoArtWebRows(query).getOrElse { e ->
+                        Timber.tag("VideoArt").w(e, "everyday YouTube search failed for ${song.id}")
+                        emptyList()
+                    }
+                },
+                musicCandidates = CANDIDATES,
+                webCandidates = WEB_CANDIDATES,
+            )
+        val pick =
+            found.pick ?: run {
+                Timber.tag("VideoArt").d("no video for ${song.id}: ${found.notes.joinToString("; ")}")
+                return null
             }
-        val candidate = closest ?: official.firstOrNull() ?: return null
-        val synced = closest?.duration?.let { d -> abs(d - song.duration) <= SAME_CUT_SECONDS } == true
-        val url = YTPlayerUtils.videoStreamUrl(candidate.id, maxHeight) ?: return null
-        Timber.tag("VideoArt").d("video for ${song.id}: ${candidate.id} (${candidate.duration}s for a ${song.duration}s song), ${if (synced) "in step" else "on its own"}")
-        return SongVideo(candidate.id, url, synced = synced)
+        // The same cut as the song follows it in step; a different cut — a longer opening, a
+        // shorter edit — runs on its own.
+        val synced = length > 0 && pick.length > 0 && abs(pick.length - length) <= SAME_CUT_SECONDS
+        val url = YTPlayerUtils.videoStreamUrl(pick.videoId, maxHeight) ?: return null
+        Timber.tag("VideoArt").d(
+            "video for ${song.id}: ${pick.videoId} via ${pick.source.name.lowercase()} " +
+                "(${pick.length}s for a ${song.duration}s song), ${if (synced) "in step" else "on its own"}",
+        )
+        return SongVideo(pick.videoId, url, synced = synced)
     }
 }
 
