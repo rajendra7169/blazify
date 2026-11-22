@@ -240,6 +240,7 @@ constructor(
                         scope.launch {
                             when (download.state) {
                                 Download.STATE_COMPLETED -> {
+                                    retries.edit().remove(download.request.id).apply()
                                     database.updateDownloadedInfo(download.request.id, true, LocalDateTime.now())
                                     // Its cover too, or it plays offline as a blank square.
                                     OfflineCovers.save(context, database.song(download.request.id).first()?.song?.thumbnailUrl)
@@ -282,6 +283,11 @@ constructor(
             )
         }
 
+    /** How many times each unfinished download has been asked for again at a start. */
+    private val retries by lazy {
+        context.getSharedPreferences("download_retries", Context.MODE_PRIVATE)
+    }
+
     init {
         // With Download only on Wi-Fi on, downloads wait for an unmetered network and
         // pick up again by themselves when the phone connects to one.
@@ -314,11 +320,41 @@ constructor(
         // Downloads the phone gave up on — the app was closed, the service was stopped, the
         // connection went — are asked for again. Someone who sent a playlist to download should
         // find it downloaded, not half of it with nothing said.
+        //
+        // But only for songs still wanted, and only a few times. A song deleted from the library
+        // and its playlists kept its failed download, which was asked for again at every start
+        // and said "Download failed" each time for a song the person had already removed; and a
+        // song YouTube never lets download failed for ever. Those are let go instead.
         if (unfinished.isNotEmpty()) {
-            Timber.tag(TAG).i("Asking again for ${unfinished.size} download(s) that did not finish")
-            unfinished.forEach { downloadManager.addDownload(it.request) }
+            scope.launch(Dispatchers.IO) {
+                val again = mutableListOf<Download>()
+                val letGo = mutableListOf<String>()
+                unfinished.forEach { download ->
+                    val id = download.request.id
+                    val song = runCatching { database.song(id).first() }.getOrNull()
+                    val wanted =
+                        song != null &&
+                            (song.song.inLibrary != null || song.song.liked ||
+                                runCatching { database.playlistSongMaps(id).isNotEmpty() }.getOrDefault(false))
+                    val tries = retries.getInt(id, 0)
+                    if (wanted && tries < MAX_RETRIES) {
+                        retries.edit().putInt(id, tries + 1).apply()
+                        again += download
+                    } else {
+                        retries.edit().remove(id).apply()
+                        letGo += id
+                    }
+                }
+                Timber.tag(TAG).i("Downloads that did not finish: asking again for ${again.size}, letting go of ${letGo.size}")
+                withContext(Dispatchers.Main) {
+                    letGo.forEach { downloadManager.removeDownload(it) }
+                    again.forEach { downloadManager.addDownload(it.request) }
+                    downloadManager.resumeDownloads()
+                }
+            }
+        } else {
+            downloadManager.resumeDownloads()
         }
-        downloadManager.resumeDownloads()
     }
 
     fun getDownload(songId: String): Flow<Download?> = downloads.map { it[songId] }
@@ -349,5 +385,10 @@ constructor(
 
     fun release() {
         scope.cancel()
+    }
+
+    companion object {
+        /** Starts at which an unfinished download is asked for again before it is let go. */
+        private const val MAX_RETRIES = 3
     }
 }
