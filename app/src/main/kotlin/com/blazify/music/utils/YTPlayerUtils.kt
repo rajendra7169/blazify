@@ -37,7 +37,10 @@ import com.blazify.music.utils.potoken.PoTokenResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.OkHttpClient
@@ -46,6 +49,31 @@ import timber.log.Timber
 object YTPlayerUtils {
     private const val logTag = "YTPlayerUtils"
     private const val TAG = "YTPlayerUtils"
+
+    /**
+     * One connection pool for the stream test and the player.
+     *
+     * The test opens a connection to the server that holds the song, and a moment later the
+     * player asked the same server for the same file over a connection of its own — a second
+     * set of handshakes between the tap and the first sound. Sharing the pool lets the player
+     * take the connection the test left open. A connection is only shared when everything about
+     * it matches, which is why both start from this one client, proxy sign-in included.
+     */
+    private val streamPool = okhttp3.ConnectionPool()
+
+    private val proxySignIn = okhttp3.Authenticator { _, response ->
+        YouTube.proxyAuth?.let { auth ->
+            response.request.newBuilder().header("Proxy-Authorization", auth).build()
+        } ?: response.request
+    }
+
+    /** The base for every client that fetches songs: the shared pool, the proxy and its sign-in. */
+    fun streamClientBase(): OkHttpClient =
+        OkHttpClient.Builder()
+            .connectionPool(streamPool)
+            .proxy(YouTube.proxy)
+            .proxyAuthenticator(proxySignIn)
+            .build()
 
     /**
      * Deliberately impatient.
@@ -57,8 +85,7 @@ object YTPlayerUtils {
      * a cipher the app cannot currently extract and is refused every time.
      * Four seconds is longer than a working address has ever needed.
      */
-    private val httpClient = OkHttpClient.Builder()
-        .proxy(YouTube.proxy)
+    private val httpClient = streamClientBase().newBuilder()
         .connectTimeout(4, java.util.concurrent.TimeUnit.SECONDS)
         .readTimeout(4, java.util.concurrent.TimeUnit.SECONDS)
         .callTimeout(6, java.util.concurrent.TimeUnit.SECONDS)
@@ -114,10 +141,49 @@ object YTPlayerUtils {
 
     private const val TRUSTED_UNTIL_KEY = "main_client_trusted_until"
 
+    /**
+     * The other client that last played a song, kept for a few hours and across restarts.
+     *
+     * When the main client is refused, every song used to walk the same list again — clients
+     * that ask to prove we are not a bot, one that is no longer supported — before reaching the
+     * one that works, a second or more each, every time. The one that worked is asked first now.
+     * Kept as name and version, since two clients can share a name.
+     */
+    @Volatile
+    private var preferredFallback: String? = null
+
+    @Volatile
+    private var preferredFallbackAt: Long = 0
+
+    private const val PREFERRED_FALLBACK_KEY = "preferred_fallback"
+    private const val PREFERRED_FALLBACK_AT_KEY = "preferred_fallback_at"
+    private const val PREFERRED_FALLBACK_MS = 6 * 60 * 60 * 1000L
+
+    private fun clientKey(client: YouTubeClient) = "${client.clientName}/${client.clientVersion}"
+
+    private fun notePreferredFallback(client: YouTubeClient) {
+        val key = clientKey(client)
+        val now = System.currentTimeMillis()
+        if (key == preferredFallback && now - preferredFallbackAt < PREFERRED_FALLBACK_MS / 2) return
+        preferredFallback = key
+        preferredFallbackAt = now
+        streamHealth?.edit()?.putString(PREFERRED_FALLBACK_KEY, key)?.putLong(PREFERRED_FALLBACK_AT_KEY, now)?.apply()
+        Timber.tag(TAG).i("${client.clientName} ${client.clientVersion} played a song: it is asked first among the other clients for now")
+    }
+
+    /** The place in [STREAM_FALLBACK_CLIENTS] of the client that last worked, if still recent. */
+    private fun preferredFallbackIndex(): Int? {
+        val key = preferredFallback ?: return null
+        if (System.currentTimeMillis() - preferredFallbackAt > PREFERRED_FALLBACK_MS) return null
+        return STREAM_FALLBACK_CLIENTS.indexOfFirst { clientKey(it) == key }.takeIf { it >= 0 }
+    }
+
     fun initialize(context: android.content.Context) {
         val prefs = context.getSharedPreferences("stream_health", android.content.Context.MODE_PRIVATE)
         streamHealth = prefs
         mainClientTrustedUntil = prefs.getLong(TRUSTED_UNTIL_KEY, 0L)
+        preferredFallback = prefs.getString(PREFERRED_FALLBACK_KEY, null)
+        preferredFallbackAt = prefs.getLong(PREFERRED_FALLBACK_AT_KEY, 0L)
     }
 
     private fun mainClientTrusted() = System.currentTimeMillis() < mainClientTrustedUntil
@@ -458,7 +524,7 @@ object YTPlayerUtils {
             unavailableSongs.remove(videoId)
         }
 
-        val first = resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
+        val first = resolveWithHeadStart(videoId, playlistId, audioQuality, connectivityManager)
         if (first.isSuccess) return first
         // A fresh identity does not change what YouTube will play in this country.
         if (isSongUnavailable(first.exceptionOrNull())) return first
@@ -467,12 +533,97 @@ object YTPlayerUtils {
         return resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager)
     }
 
+    /** How long the usual way gets before a client that needs no token is asked as well. */
+    private const val HEAD_START_MS = 1_200L
+
+    /**
+     * The usual way, with a second one started beside it when the first is slow.
+     *
+     * A song with the app already running resolves in well under a second. Started from cold —
+     * a shared link, the notification, a car — the main client first waits for its token, which
+     * is seconds of browser work, and measured on a phone the first sound came seven to fourteen
+     * seconds after the tap. So when the usual way has not answered within [HEAD_START_MS], one
+     * client that needs no token is asked too, and whichever brings a stream that passes its test
+     * first is played. The usual way is never skipped and, on a warm start, never joined.
+     */
+    private suspend fun resolveWithHeadStart(
+        videoId: String,
+        playlistId: String?,
+        audioQuality: AudioQuality,
+        connectivityManager: ConnectivityManager,
+    ): Result<PlaybackData> = coroutineScope {
+        val usual = async(Dispatchers.IO) { resolveForPlayback(videoId, playlistId, audioQuality, connectivityManager) }
+        val quickClient = quickClient() ?: return@coroutineScope usual.await()
+        withTimeoutOrNull(HEAD_START_MS) { usual.await() }?.let { return@coroutineScope it }
+
+        Timber.tag(TAG).i("$videoId is slow to resolve: asking ${quickClient.clientName} ${quickClient.clientVersion} as well")
+        val quick = async(Dispatchers.IO) { resolveQuick(videoId, playlistId, quickClient, audioQuality, connectivityManager) }
+        val firstDone = select<Pair<String, Result<PlaybackData>>> {
+            usual.onAwait { "usual" to it }
+            quick.onAwait { "quick" to it }
+        }
+        val result =
+            if (firstDone.second.isSuccess) {
+                firstDone
+            } else if (firstDone.first == "usual") {
+                "quick" to quick.await().let { if (it.isSuccess) it else firstDone.second }
+            } else {
+                "usual" to usual.await()
+            }
+        // The other is no longer wanted. The usual way may be inside the token's browser work,
+        // which finishes on its own and leaves the token warm for the next song.
+        if (result.first == "quick") usual.cancel() else quick.cancel()
+        if (result.first == "quick" && result.second.isSuccess) {
+            Timber.tag(TAG).i("Playback: client=${quickClient.clientName} (asked beside the usual way), videoId=$videoId")
+            notePreferredFallback(quickClient)
+        }
+        result.second
+    }
+
+    /**
+     * The client asked beside the usual way: the one that last worked, or else the first in the
+     * list, as long as it needs no token, no sign-in and no deciphering, and is switched on.
+     */
+    private fun quickClient(): YouTubeClient? {
+        fun usable(c: YouTubeClient) =
+            !c.useWebPoTokens && !c.loginRequired && !c.useSignatureTimestamp &&
+                c.clientName !in disabledStreamClients &&
+                c.clientName !in listOf("WEB", "WEB_REMIX", "WEB_CREATOR", "TVHTML5")
+        preferredFallbackIndex()?.let { STREAM_FALLBACK_CLIENTS[it] }?.takeIf(::usable)?.let { return it }
+        return STREAM_FALLBACK_CLIENTS.firstOrNull(::usable)
+    }
+
+    /** One client, its stream tested before it is handed over; anything unusual is left to the usual way. */
+    private suspend fun resolveQuick(
+        videoId: String,
+        playlistId: String?,
+        client: YouTubeClient,
+        audioQuality: AudioQuality,
+        connectivityManager: ConnectivityManager,
+    ): Result<PlaybackData> = runCatching {
+        val response = YouTube.player(videoId, playlistId, client, null, null).getOrThrow()
+        check(response.playabilityStatus.status == "OK") { "${client.clientName}: ${response.playabilityStatus.reason}" }
+        check(response.videoDetails?.isLive != true) { "a live broadcast" }
+        val format = checkNotNull(findFormat(response, audioQuality, connectivityManager)) { "no format" }
+        val url = checkNotNull(format.url) { "no direct address" }
+        check(validateStatus(url, format.contentLength)) { "stream refused" }
+        PlaybackData(
+            audioConfig = response.playerConfig?.audioConfig,
+            videoDetails = response.videoDetails,
+            playbackTracking = response.playbackTracking,
+            format = format,
+            streamUrl = url,
+            streamExpiresInSeconds = checkNotNull(response.streamingData?.expiresInSeconds) { "no expiry" },
+            streamClient = client.clientName,
+        )
+    }.onFailure { Timber.tag(logTag).d("Quick ${client.clientName}: ${it.message}") }
+
     private suspend fun resolveForPlayback(
         videoId: String,
         playlistId: String? = null,
         audioQuality: AudioQuality,
         connectivityManager: ConnectivityManager,
-    ): Result<PlaybackData> = runCatching {
+    ): Result<PlaybackData> = runCatching { coroutineScope {
         Timber.tag(TAG).d("=== PLAYER RESPONSE FOR PLAYBACK ===")
         Timber.tag(TAG).d("videoId: $videoId")
         Timber.tag(TAG).d("playlistId: $playlistId")
@@ -486,25 +637,29 @@ object YTPlayerUtils {
         val isLoggedIn = YouTube.cookie != null
         Timber.tag(TAG).d("Authentication status: ${if (isLoggedIn) "LOGGED_IN" else "ANONYMOUS"}")
 
-        // Get signature timestamp (same as before for normal content)
+        // The signature timestamp and the token need nothing from each other, and on a cold start
+        // the token alone is seconds of browser work: they are fetched side by side, not in turn.
+        val sessionId = YouTube.visitorData
+        val tokenJob =
+            if (MAIN_CLIENT.useWebPoTokens && sessionId != null) {
+                Timber.tag(logTag).d("Generating PoToken for WEB_REMIX with sessionId")
+                poTokenAskedForSong = true
+                async(Dispatchers.IO) {
+                    try {
+                        poTokenGenerator.getWebClientPoToken(videoId, sessionId)?.also {
+                            Timber.tag(logTag).d("PoToken generated successfully")
+                        }
+                    } catch (e: Exception) {
+                        Timber.tag(logTag).e(e, "PoToken generation failed: ${e.message}")
+                        null
+                    }
+                }
+            } else {
+                null
+            }
         val signatureTimestamp = getSignatureTimestampOrNull(videoId)
         Timber.tag(logTag).d("Signature timestamp: ${signatureTimestamp.timestamp}")
-
-        // Generate PoToken
-        var poToken: PoTokenResult? = null
-        val sessionId = YouTube.visitorData
-        if (MAIN_CLIENT.useWebPoTokens && sessionId != null) {
-            Timber.tag(logTag).d("Generating PoToken for WEB_REMIX with sessionId")
-            poTokenAskedForSong = true
-            try {
-                poToken = poTokenGenerator.getWebClientPoToken(videoId, sessionId)
-                if (poToken != null) {
-                    Timber.tag(logTag).d("PoToken generated successfully")
-                }
-            } catch (e: Exception) {
-                Timber.tag(logTag).e(e, "PoToken generation failed: ${e.message}")
-            }
-        }
+        var poToken: PoTokenResult? = tokenJob?.await()
 
         // Try WEB_REMIX with signature timestamp and poToken (same as before)
         Timber.tag(logTag).d("Attempting to get player response using MAIN_CLIENT: ${MAIN_CLIENT.clientName}")
@@ -544,6 +699,16 @@ object YTPlayerUtils {
             }
         }
 
+        // "The page needs to be reloaded" is the main client being turned away, not the song: the
+        // same answer comes for every song for a while. Rest it as when its stream is refused, so
+        // the clients that do work are asked first.
+        if (mainPlayerResponse.playabilityStatus.status == "UNPLAYABLE" &&
+            mainPlayerResponse.playabilityStatus.reason?.contains("reload", ignoreCase = true) == true
+        ) {
+            Timber.tag(TAG).w("${MAIN_CLIENT.clientName} says the page needs to be reloaded")
+            noteMainClientRefused()
+        }
+
         // If we still don't have a valid response, throw
 
         var audioConfig = mainPlayerResponse.playerConfig?.audioConfig
@@ -558,7 +723,7 @@ object YTPlayerUtils {
         if (videoDetails?.isLive == true && hlsManifestUrl != null) {
             val playlistUrl = liveManifestUrl(hlsManifestUrl, poToken?.streamingDataPoToken)
             Timber.tag(TAG).i("Live broadcast: playing the segment playlist for videoId=$videoId")
-            return@runCatching PlaybackData(
+            return@coroutineScope PlaybackData(
                 audioConfig = audioConfig,
                 videoDetails = videoDetails,
                 playbackTracking = mainPlayerResponse.playbackTracking,
@@ -628,12 +793,24 @@ object YTPlayerUtils {
         val mainAsLastResort =
             noStreamingToken && !isAgeRestricted && !mainClientRefusing() &&
                 MAIN_CLIENT.clientName !in disabledStreamClients
-        val clientOrder =
+        val baseOrder =
             if (mainAsLastResort) {
                 STREAM_FALLBACK_CLIENTS.indices + listOf(-1)
             } else {
                 (startIndex until STREAM_FALLBACK_CLIENTS.size).toList()
             }
+        // The other client that worked last goes first among the others (after the main client,
+        // when that is still being asked first).
+        val preferred = preferredFallbackIndex()
+        val clientOrder =
+            if (preferred != null && preferred in baseOrder) {
+                val rest = baseOrder.filter { it != preferred }
+                if (rest.firstOrNull() == -1) listOf(-1, preferred) + rest.drop(1) else listOf(preferred) + rest
+            } else {
+                baseOrder
+            }
+        var successIndex: Int? = null
+        var bestFallbackIndex: Int? = null
 
         // Whether any client was turned away with a bot check. That is the identity being doubted,
         // not the song being blocked, and a fresh identity clears it; but the last client's answer
@@ -850,6 +1027,7 @@ object YTPlayerUtils {
                         bestFallbackExpiry = streamExpiresInSeconds
                         bestFallbackResponse = streamPlayerResponse
                         bestFallbackClient = currentClient.clientName
+                        bestFallbackIndex = clientIndex
                     }
                     continue
                 }
@@ -860,6 +1038,7 @@ object YTPlayerUtils {
                     Timber.tag(TAG)
                         .i("Playback: client=${currentClient.clientName}, videoId=$videoId")
                     successClient = currentClient.clientName
+                    successIndex = clientIndex
                     break
                 }
 
@@ -882,6 +1061,7 @@ object YTPlayerUtils {
                     // Log for release builds
                     Timber.tag(TAG).i("Playback: client=${currentClient.clientName}, videoId=$videoId")
                     successClient = currentClient.clientName
+                    successIndex = clientIndex
                     break
                 } else {
                     Timber.tag(logTag).d("Stream validation failed for client: ${currentClient.clientName}")
@@ -911,6 +1091,7 @@ object YTPlayerUtils {
             streamExpiresInSeconds = bestFallbackExpiry
             streamPlayerResponse = bestFallbackResponse
             successClient = bestFallbackClient
+            successIndex = bestFallbackIndex
         }
 
         if (streamPlayerResponse == null) {
@@ -956,6 +1137,7 @@ object YTPlayerUtils {
         }
 
         Timber.tag(logTag).d("Successfully obtained playback data with format: ${format.mimeType}, bitrate: ${format.bitrate}")
+        successIndex?.takeIf { it >= 0 }?.let { notePreferredFallback(STREAM_FALLBACK_CLIENTS[it]) }
         if (isUploadedTrack) {
             println("[PLAYBACK_DEBUG] SUCCESS: Got playback data for uploaded track - format=${format.mimeType}, streamUrl=${streamUrl.take(100)}...")
         }
@@ -968,7 +1150,7 @@ object YTPlayerUtils {
             streamExpiresInSeconds,
             streamClient = successClient ?: "unknown",
         )
-    }.onFailure { e ->
+    } }.onFailure { e ->
         println("[PLAYBACK_DEBUG] EXCEPTION during playback for videoId=$videoId: ${e::class.simpleName}: ${e.message}")
         e.printStackTrace()
     }

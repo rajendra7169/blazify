@@ -4303,19 +4303,8 @@ class MusicService :
     private fun createNetworkDataSource(): DataSource.Factory =
         DefaultDataSource.Factory(
             this,
-            OkHttpDataSource.Factory(
-                OkHttpClient
-                    .Builder()
-                    .proxy(YouTube.proxy)
-                    .proxyAuthenticator { _, response ->
-                        YouTube.proxyAuth?.let { auth ->
-                            response.request
-                                .newBuilder()
-                                .header("Proxy-Authorization", auth)
-                                .build()
-                        } ?: response.request
-                    }.build(),
-            ),
+            // The same pool as the stream test, so the player takes the connection it left open.
+            OkHttpDataSource.Factory(YTPlayerUtils.streamClientBase()),
         )
 
     /**
