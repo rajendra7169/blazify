@@ -2,7 +2,7 @@
 <resources>
     <string name="home">Domov</string>
     <string name="songs">Piesne</string>
-    <string name="artists">Umelci</string>
+    <string name="artists">Interpreti</string>
     <string name="albums">Albumy</string>
     <string name="playlists">Playlisty</string>
     <plurals name="n_selected">
