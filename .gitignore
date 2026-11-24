@@ -59,8 +59,6 @@ app/persistent-debug.keystore
 # The release signing key must never be committed — this repo is public.
 app/keystore/
 *.jks
-# ^^^ think twice before removing this gitignore, it became so FUCKING
-# annoying to unstage this file every time i want to commit stuff
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -115,3 +113,6 @@ app/src/main/cpp/coverart/
 
 # Local technical docs (do not publish)
 docs/*.pdf
+
+# Python caches from the scripts/ tools
+__pycache__/
