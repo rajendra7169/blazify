@@ -23,7 +23,7 @@ internal fun TrendingDemo(
     val note = painterResource(R.drawable.music_note)
     val measurer = rememberTextMeasurer()
     val title = stringResource(R.string.trending)
-    DemoCanvas(loopMs = 4400, stillAt = 0.60f, playing = playing, modifier = modifier) { t, c ->
+    DemoCanvas(loopMs = 4400, stillAt = 0.66f, playing = playing, modifier = modifier) { t, c ->
         inDesignBox { u ->
             val opened = t > 0.62f && t < 0.95f
             text(measurer, title, 20f, 4f, 13f, c.ink, u, bold = true, maxWidth = 200f)
@@ -50,6 +50,9 @@ internal fun TrendingDemo(
                 visible = seg(t, 0.44f, 0.48f) * (1f - seg(t, 0.74f, 0.80f)),
                 tap = seg(t, 0.58f, 0.64f),
                 u = u,
+                // The arrow sits at the top edge of the box: a smaller finger, and a still frame
+                // just after the tap, keep its ring inside the box.
+                size = 10f,
             )
         }
     }

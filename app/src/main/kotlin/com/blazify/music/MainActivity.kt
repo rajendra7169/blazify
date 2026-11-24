@@ -217,7 +217,6 @@ import com.blazify.music.ui.screens.navigationBuilder
 import com.blazify.music.ui.component.UpdateDialog
 import com.blazify.music.ui.screens.settings.ChangelogScreen
 import com.blazify.music.ui.screens.whatsnew.WhatsNewPopup
-import com.blazify.music.whatsnew.FeatureEntry
 import com.blazify.music.whatsnew.WhatsNewCatalog
 import com.blazify.music.whatsnew.WhatsNewGate
 import com.blazify.music.ui.screens.settings.DarkMode
@@ -870,14 +869,20 @@ class MainActivity : ComponentActivity() {
                 // The What's new popup, once after an update that has news, shown on Home. When it
                 // has something to show it takes the place of the changelog opening by itself, so
                 // only one thing appears after an update.
-                var whatsNewCards by remember { mutableStateOf<List<FeatureEntry>>(emptyList()) }
+                // Kept as the cards' ids, which survive a rotation or a theme change: both recreate
+                // the activity, and the version is already marked seen, so lost cards never return.
+                var whatsNewIds by rememberSaveable { mutableStateOf("") }
+                val whatsNewCards =
+                    remember(whatsNewIds) {
+                        if (whatsNewIds.isEmpty()) emptyList() else WhatsNewCatalog.entriesFor(whatsNewIds.split(','))
+                    }
 
                 LaunchedEffect(Unit) {
                     val news = WhatsNewGate.check(this@MainActivity)
                     if (news.isNotEmpty()) {
                         // Debug builds show every card, the next release's included, to check them.
-                        whatsNewCards =
-                            if (BuildConfig.DEBUG) WhatsNewCatalog.previewEntries() else WhatsNewCatalog.newEntries(news)
+                        val cards = if (BuildConfig.DEBUG) WhatsNewCatalog.previewEntries() else WhatsNewCatalog.newEntries(news)
+                        whatsNewIds = cards.joinToString(",") { it.id }
                         return@LaunchedEffect
                     }
                     val lastSeenVersion = dataStore.data.first()[LastSeenVersionKey] ?: ""
@@ -1267,9 +1272,9 @@ class MainActivity : ComponentActivity() {
                                     BuildConfig.VERSION_NAME
                                 },
                             entries = whatsNewCards,
-                            onSkip = { whatsNewCards = emptyList() },
+                            onSkip = { whatsNewIds = "" },
                             onSeeMore = {
-                                whatsNewCards = emptyList()
+                                whatsNewIds = ""
                                 navController.navigate("settings/whats_new")
                             },
                         )

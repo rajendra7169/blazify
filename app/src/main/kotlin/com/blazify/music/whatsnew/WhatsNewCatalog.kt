@@ -251,6 +251,15 @@ object WhatsNewCatalog {
             .filter { it.available() }
             .distinctBy { it.id }
 
+    /**
+     * The cards with these [ids], in that order. The popup keeps only the ids across a rotation
+     * or a theme change, which recreate the activity, and finds its cards again here.
+     */
+    fun entriesFor(ids: List<String>): List<FeatureEntry> {
+        val all = (releases.flatMap { it.entries } + coreFeatures).associateBy { it.id }
+        return ids.mapNotNull { all[it] }
+    }
+
     /** The cards for [releases], newest first, each feature once, at most [MAX_NEW]. */
     fun newEntries(releases: List<WhatsNewRelease>): List<FeatureEntry> =
         releases

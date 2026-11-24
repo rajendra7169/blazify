@@ -7,6 +7,7 @@ package com.blazify.music.ui.screens.whatsnew
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -14,12 +15,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,10 +51,15 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -59,7 +68,11 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.blazify.music.R
@@ -90,6 +103,10 @@ private const val DRIFT_MS = 16_000
  * Behind the cards, soft colour fields drift and blend from one card's colours into the next as
  * the cards are swiped. Everything that moves is read while drawing, so swiping and drifting
  * redraw without recomposing, and with animations off the popup holds still.
+ *
+ * It fits any window: the title and the buttons always show, and a card too tall for the space
+ * left (a small phone, large text) scrolls on its own. On a phone held sideways each card puts
+ * its demo beside its words instead of above them.
  */
 @Composable
 fun WhatsNewPopup(
@@ -100,99 +117,204 @@ fun WhatsNewPopup(
 ) {
     if (entries.isEmpty()) return
     Dialog(onDismissRequest = onSkip, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        val still = rememberReduceMotion()
-        val scheme = MaterialTheme.colorScheme
-        val palettes =
-            remember(scheme, entries.size) {
-                val pairs =
-                    listOf(
-                        scheme.primary to scheme.tertiary,
-                        scheme.tertiary to scheme.secondary,
-                        scheme.secondary to scheme.primary,
-                        scheme.primary to scheme.secondary,
-                        scheme.tertiary to scheme.primary,
-                        scheme.secondary to scheme.tertiary,
-                    )
-                List(entries.size) { pairs[it % pairs.size] }
-            }
-        val pager = rememberPagerState { entries.size }
-        val drift = rememberDrift(still)
+        BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            // Sideways: wider than tall, and too short to stack the demo over the words.
+            val sideways = maxWidth > maxHeight && maxHeight < 600.dp
+            val outerV = if (sideways) 12.dp else 24.dp
+            val innerV = if (sideways) 14.dp else 20.dp
+            // What the title row, the buttons and the paddings take; the demo gets the rest, within limits.
+            val demoHeight =
+                if (sideways) {
+                    (maxHeight - outerV * 2 - innerV * 2 - 120.dp).coerceIn(150.dp, 286.dp)
+                } else {
+                    // About 390 dp go to the title, the card's words and the buttons at normal text
+                    // size; the phone gets what is left, full size on most phones, smaller on short
+                    // ones so the words still show. Larger text scrolls within the card.
+                    (maxHeight - 390.dp).coerceIn(170.dp, 286.dp)
+                }
+            PopupBody(
+                version = version,
+                entries = entries,
+                sideways = sideways,
+                demoHeight = demoHeight,
+                innerV = innerV,
+                onSkip = onSkip,
+                onSeeMore = onSeeMore,
+                modifier =
+                    Modifier
+                        .padding(horizontal = 18.dp, vertical = outerV)
+                        .widthIn(max = if (sideways) 760.dp else 460.dp)
+                        .heightIn(max = maxHeight - outerV * 2)
+                        .fillMaxWidth(),
+            )
+        }
+    }
+}
 
-        val enter = remember { Animatable(if (still) 1f else 0f) }
-        LaunchedEffect(Unit) { enter.animateTo(1f, spring(dampingRatio = 0.78f, stiffness = 260f)) }
-
-        Box(
-            modifier =
-                Modifier
-                    .padding(horizontal = 18.dp, vertical = 24.dp)
-                    .widthIn(max = 460.dp)
-                    .fillMaxWidth()
-                    .graphicsLayer {
-                        val e = enter.value
-                        alpha = e.coerceIn(0f, 1f)
-                        scaleX = 0.92f + 0.08f * e
-                        scaleY = 0.92f + 0.08f * e
-                        translationY = (1f - e) * 28.dp.toPx()
-                    }.clip(RoundedCornerShape(32.dp))
-                    .drawBehind { aurora(pagerPosition(pager), palettes, drift.value, scheme.surfaceContainerLow) },
-        ) {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(vertical = 20.dp)) {
-                Text(
-                    text = stringResource(R.string.whats_new_title, version),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = scheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 24.dp).semantics { heading() },
+@Composable
+private fun PopupBody(
+    version: String,
+    entries: List<FeatureEntry>,
+    sideways: Boolean,
+    demoHeight: Dp,
+    innerV: Dp,
+    onSkip: () -> Unit,
+    onSeeMore: () -> Unit,
+    modifier: Modifier,
+) {
+    val still = rememberReduceMotion()
+    val scheme = MaterialTheme.colorScheme
+    val palettes =
+        remember(scheme, entries.size) {
+            val pairs =
+                listOf(
+                    scheme.primary to scheme.tertiary,
+                    scheme.tertiary to scheme.secondary,
+                    scheme.secondary to scheme.primary,
+                    scheme.primary to scheme.secondary,
+                    scheme.tertiary to scheme.primary,
+                    scheme.secondary to scheme.tertiary,
                 )
-                Spacer(Modifier.height(16.dp))
+            List(entries.size) { pairs[it % pairs.size] }
+        }
+    val pager = rememberPagerState { entries.size }
+    val drift = rememberDrift(still, pager.settledPage)
+    val phones = remember(entries) { entries.map { hasPhoneJourney(it.demo) } }
+    // How strong the colour fields are: softer on a light theme, so the words keep their contrast.
+    val tint = if (scheme.surface.luminance() > 0.5f) 0.5f else 0.7f
 
-                HorizontalPager(
-                    state = pager,
-                    contentPadding = PaddingValues(horizontal = 20.dp),
-                    pageSpacing = 16.dp,
-                    verticalAlignment = Alignment.Top,
-                ) { page ->
-                    val position = stringResource(R.string.whats_new_card_position, page + 1, entries.size)
-                    PopupCard(
-                        entry = entries[page],
-                        palette = palettes[page],
-                        playing = page == pager.settledPage,
-                        drift = drift,
-                        modifier =
-                            Modifier
-                                .semantics { stateDescription = position }
-                                .graphicsLayer {
-                                    // The cards beside the current one sit back a little and fade.
-                                    val away = min(1f, abs(pager.currentPage - page + pager.currentPageOffsetFraction))
-                                    val near = 1f - away
-                                    scaleX = 0.9f + 0.1f * near
-                                    scaleY = 0.9f + 0.1f * near
-                                    alpha = 0.55f + 0.45f * near
-                                    translationY = away * 10.dp.toPx()
-                                },
-                    )
-                }
+    val enter = remember { Animatable(if (still) 1f else 0f) }
+    LaunchedEffect(Unit) { enter.animateTo(1f, spring(dampingRatio = 0.78f, stiffness = 260f)) }
 
-                Spacer(Modifier.height(18.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextButton(onClick = onSkip) {
-                        Text(stringResource(R.string.whats_new_skip), color = scheme.onSurfaceVariant)
-                    }
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Dots(pager, palettes, scheme.onSurfaceVariant.copy(alpha = 0.3f))
-                    }
-                    GradientButton(
-                        text = stringResource(R.string.whats_new_see_more),
-                        pager = pager,
-                        palettes = palettes,
-                        onClick = onSeeMore,
-                    )
+    Box(
+        modifier =
+            modifier.graphicsLayer {
+                val e = enter.value
+                alpha = e.coerceIn(0f, 1f)
+                scaleX = 0.92f + 0.08f * e
+                scaleY = 0.92f + 0.08f * e
+                translationY = (1f - e) * 28.dp.toPx()
+            },
+    ) {
+        AuroraBackdrop(
+            position = { pagerPosition(pager) },
+            palettes = palettes,
+            drift = drift,
+            base = scheme.surfaceContainerLow,
+            tint = tint,
+            modifier = Modifier.matchParentSize(),
+        )
+        Column(Modifier.padding(vertical = innerV)) {
+            Text(
+                text = stringResource(R.string.whats_new_title, version),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = scheme.onSurface,
+                // Two lines at most, so large text wraps rather than cutting off the version.
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 24.dp).semantics { heading() },
+            )
+            Spacer(Modifier.height(if (sideways) 10.dp else 16.dp))
+
+            HorizontalPager(
+                state = pager,
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                pageSpacing = 16.dp,
+                verticalAlignment = Alignment.Top,
+                // Takes what the title and the buttons leave, and no more than its cards need.
+                modifier =
+                    Modifier
+                        .weight(1f, fill = false)
+                        .drawBehind { phoneGlow(pagerPosition(pager), palettes, phones, drift.value, sideways, demoHeight.toPx(), 20.dp.toPx(), tint) },
+            ) { page ->
+                val position = stringResource(R.string.whats_new_card_position, page + 1, entries.size)
+                PopupCard(
+                    entry = entries[page],
+                    palette = palettes[page],
+                    playing = page == pager.settledPage,
+                    tint = tint,
+                    sideways = sideways,
+                    demoHeight = demoHeight,
+                    modifier =
+                        Modifier
+                            .verticalScroll(rememberScrollState())
+                            .semantics { stateDescription = position }
+                            .graphicsLayer {
+                                // The cards beside the current one sit back a little and fade.
+                                val away = min(1f, abs(pager.currentPage - page + pager.currentPageOffsetFraction))
+                                val near = 1f - away
+                                scaleX = 0.9f + 0.1f * near
+                                scaleY = 0.9f + 0.1f * near
+                                alpha = 0.55f + 0.45f * near
+                                translationY = away * 10.dp.toPx()
+                                // Fade each drawing as it is made, not the card drawn off screen and
+                                // then blended: that extra picture every frame was the swipe's main cost.
+                                compositingStrategy = CompositingStrategy.ModulateAlpha
+                            },
+                )
+            }
+
+            Spacer(Modifier.height(if (sideways) 10.dp else 18.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onSkip) {
+                    Text(stringResource(R.string.whats_new_skip), color = scheme.onSurface.copy(alpha = 0.85f), maxLines = 1)
                 }
+                Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Dots(pager, palettes, scheme.onSurfaceVariant.copy(alpha = 0.3f))
+                }
+                GradientButton(
+                    text = stringResource(R.string.whats_new_see_more),
+                    pager = pager,
+                    palettes = palettes,
+                    onClick = onSeeMore,
+                )
             }
         }
+    }
+}
+
+private val POPUP_RADIUS = 32.dp
+
+/** How much smaller than the popup its colour fields are painted before being stretched to fit. */
+private const val BACKDROP_SCALE = 4
+
+/**
+ * The popup's background. The colour fields are so soft that a picture a quarter the size looks
+ * the same stretched up, so they are painted into a small layer the graphics chip enlarges: about
+ * a sixteenth of the painting, every frame they move. One rounded clip round the whole keeps the
+ * corners sharp.
+ */
+@Composable
+private fun AuroraBackdrop(
+    position: () -> Float,
+    palettes: List<Palette>,
+    drift: State<Float>,
+    base: Color,
+    tint: Float,
+    modifier: Modifier,
+) {
+    Box(modifier.clip(RoundedCornerShape(POPUP_RADIUS)).background(base)) {
+        Spacer(
+            Modifier
+                .layout { measurable, constraints ->
+                    val w = constraints.maxWidth
+                    val h = constraints.maxHeight
+                    val small = measurable.measure(Constraints.fixed((w + BACKDROP_SCALE - 1) / BACKDROP_SCALE, (h + BACKDROP_SCALE - 1) / BACKDROP_SCALE))
+                    layout(w, h) {
+                        small.placeWithLayer(0, 0) {
+                            scaleX = BACKDROP_SCALE.toFloat()
+                            scaleY = BACKDROP_SCALE.toFloat()
+                            transformOrigin = TransformOrigin(0f, 0f)
+                            // Painted at its own small size, then enlarged as a picture.
+                            compositingStrategy = CompositingStrategy.Offscreen
+                        }
+                    }
+                }.drawBehind { aurora(position(), palettes, drift.value, tint) },
+        )
     }
 }
 
@@ -206,7 +328,9 @@ private fun PopupCard(
     entry: FeatureEntry,
     palette: Palette,
     playing: Boolean,
-    drift: State<Float>,
+    tint: Float,
+    sideways: Boolean,
+    demoHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -222,24 +346,14 @@ private fun PopupCard(
         }
     }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    val demo: @Composable (Modifier) -> Unit = { place ->
         if (hasPhoneJourney(entry.demo)) {
             // The real app on a phone, walking from Home to the feature, on a glow of the card's colours.
             PhoneDemo(
                 demo = entry.demo,
                 playing = playing,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(286.dp)
-                        .drawBehind {
-                            val glow = size.minDimension * 0.66f
-                            val drift2 = drift.value * 2f * PI.toFloat()
-                            val first = center + Offset(-size.width * 0.12f * cos(drift2), -size.height * 0.08f)
-                            val second = center + Offset(size.width * 0.16f * sin(drift2), size.height * 0.2f)
-                            drawCircle(Brush.radialGradient(listOf(palette.first.copy(alpha = 0.38f), Color.Transparent), first, glow), glow, first)
-                            drawCircle(Brush.radialGradient(listOf(palette.second.copy(alpha = 0.26f), Color.Transparent), second, glow * 0.8f), glow * 0.8f, second)
-                        },
+                // Its glow is drawn behind the pager (phoneGlow), where a card's scrolling cannot cut it off.
+                modifier = place.height(demoHeight),
             )
         } else {
             FeatureDemo(
@@ -247,9 +361,8 @@ private fun PopupCard(
                 icon = entry.icon,
                 playing = playing,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
+                    place
+                        .height(min(150.dp, demoHeight))
                         .clip(RoundedCornerShape(20.dp))
                         .background(scheme.surfaceContainerHigh)
                         .background(
@@ -257,30 +370,20 @@ private fun PopupCard(
                         ),
             )
         }
-        Spacer(Modifier.height(10.dp))
+    }
 
-        // The words, on a wash of the card's colours that fades out at its edges, no border.
+    // The words, on a wash of the card's colours that fades out at its edges, no border.
+    val words: @Composable (Modifier) -> Unit = { place ->
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
+                place
                     .drawBehind {
                         val radius = CornerRadius(24.dp.toPx())
                         drawRoundRect(
                             Brush.linearGradient(
-                                listOf(palette.first.copy(alpha = 0.20f), palette.second.copy(alpha = 0.12f), Color.Transparent),
+                                listOf(palette.first.copy(alpha = 0.20f * tint), palette.second.copy(alpha = 0.12f * tint), Color.Transparent),
                                 start = Offset.Zero,
                                 end = Offset(size.width, size.height * 1.4f),
-                            ),
-                            cornerRadius = radius,
-                        )
-                        // A light sweep that drifts across the wash.
-                        val sweep = drift.value * size.width * 2f - size.width * 0.5f
-                        drawRoundRect(
-                            Brush.linearGradient(
-                                listOf(Color.Transparent, Color.White.copy(alpha = 0.06f), Color.Transparent),
-                                start = Offset(sweep - size.width * 0.3f, 0f),
-                                end = Offset(sweep + size.width * 0.3f, size.height),
                             ),
                             cornerRadius = radius,
                         )
@@ -293,17 +396,33 @@ private fun PopupCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = scheme.onSurface,
-                minLines = 2,
+                // Portrait cards keep one height as they are swiped; beside the demo there is room to spare.
+                minLines = if (sideways) 1 else 2,
                 modifier = Modifier.rise(reveal, 0.18f).semantics { heading() },
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(entry.description),
                 style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSurfaceVariant,
-                minLines = 3,
+                // The main text colour, softened: the secondary one is too faint over the colour fields.
+                color = scheme.onSurface.copy(alpha = 0.85f),
+                minLines = if (sideways) 1 else 3,
                 modifier = Modifier.rise(reveal, 0.34f),
             )
+        }
+    }
+
+    if (sideways) {
+        Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            demo(Modifier.weight(0.42f))
+            Spacer(Modifier.width(14.dp))
+            words(Modifier.weight(0.58f))
+        }
+    } else {
+        Column(modifier = modifier.fillMaxWidth()) {
+            demo(Modifier.fillMaxWidth())
+            Spacer(Modifier.height(10.dp))
+            words(Modifier.fillMaxWidth())
         }
     }
 }
@@ -318,6 +437,7 @@ private fun Modifier.rise(
         val eased = 1f - (1f - shown) * (1f - shown) * (1f - shown)
         alpha = eased
         translationY = (1f - eased) * 12.dp.toPx()
+        compositingStrategy = CompositingStrategy.ModulateAlpha
     }
 
 /** New, Improved or Fixed, on a pill shaded with the card's colours. */
@@ -357,18 +477,21 @@ private fun Dots(
 ) {
     if (palettes.size < 2) return
     val count = palettes.size
-    Canvas(Modifier.width((count * 12 + 14).dp).height(6.dp).clearAndSetSemantics {}) {
+    // As wide as the dots need, or the room between the buttons if that is less (large text, a
+    // narrow phone), with the dots scaled down to fit rather than running under the buttons.
+    Canvas(Modifier.widthIn(max = (count * 12 + 14).dp).fillMaxWidth().height(6.dp).clearAndSetSemantics {}) {
         val position = pagerPosition(pager)
-        val dot = 6.dp.toPx()
-        val gap = 6.dp.toPx()
-        val stretch = 14.dp.toPx()
+        val fit = min(1f, size.width / (count * 12 + 14).dp.toPx())
+        val dot = 6.dp.toPx() * fit
+        val gap = 6.dp.toPx() * fit
+        val stretch = 14.dp.toPx() * fit
         var x = 0f
         for (i in 0 until count) {
             val near = 1f - min(1f, abs(position - i))
             val width = dot + stretch * near
             drawRoundRect(
                 color = lerp(idle, palettes[i].first, near),
-                topLeft = Offset(x, 0f),
+                topLeft = Offset(x, (size.height - dot) / 2f),
                 size = androidx.compose.ui.geometry.Size(width, dot),
                 cornerRadius = CornerRadius(dot / 2f),
             )
@@ -399,16 +522,20 @@ private fun GradientButton(
     }
 }
 
-/** A slow 0-to-1 clock for the drifting colours. Holds still, and costs no frames, with animations off. */
+/**
+ * The slow clock for the drifting colours, in turns. Each time a card settles it glides on by
+ * one turn and slows to a stop, so a popup left open draws no frames at all (idle means zero
+ * frames). With animations off it never moves.
+ */
 @Composable
-private fun rememberDrift(still: Boolean): State<Float> {
+private fun rememberDrift(
+    still: Boolean,
+    settledPage: Int,
+): State<Float> {
     val clock = remember { Animatable(0.15f) }
-    LaunchedEffect(still) {
+    LaunchedEffect(still, settledPage) {
         if (still) return@LaunchedEffect
-        while (true) {
-            clock.animateTo(1f, tween(durationMillis = ((1f - clock.value) * DRIFT_MS).toInt().coerceAtLeast(1), easing = LinearEasing))
-            clock.snapTo(0f)
-        }
+        clock.animateTo(clock.value + 1f, tween(durationMillis = DRIFT_MS, easing = LinearOutSlowInEasing))
     }
     return clock.asState()
 }
@@ -428,16 +555,47 @@ private fun blendedPalette(
 }
 
 /**
- * The popup's background: three soft colour fields over [base], drifting with [time] and sliding
+ * The glow of the card's colours behind the phone mock-up, blending from card to card as they
+ * are swiped and fading out for a card whose demo is not a phone. [inset] is the pager's side padding.
+ */
+private fun DrawScope.phoneGlow(
+    position: Float,
+    palettes: List<Palette>,
+    phones: List<Boolean>,
+    time: Float,
+    sideways: Boolean,
+    demoHeight: Float,
+    inset: Float,
+    tint: Float,
+) {
+    val last = phones.lastIndex
+    val left = floor(position).toInt().coerceIn(0, last)
+    val right = (left + 1).coerceAtMost(last)
+    val share = (position - left).coerceIn(0f, 1f)
+    val strength = (if (phones[left]) 1f - share else 0f) + (if (phones[right] && right != left) share else 0f)
+    if (strength <= 0.01f) return
+    val (a, b) = blendedPalette(position, palettes)
+    val width = (size.width - inset * 2f) * (if (sideways) 0.42f else 1f)
+    val height = min(demoHeight, size.height)
+    val middle = Offset(inset + width / 2f, height / 2f)
+    val glow = min(width, height) * 0.66f
+    val turn = time * 2f * PI.toFloat()
+    val first = middle + Offset(-width * 0.12f * cos(turn), -height * 0.08f)
+    val second = middle + Offset(width * 0.16f * sin(turn), height * 0.2f)
+    drawCircle(Brush.radialGradient(listOf(a.copy(alpha = 0.38f * strength * tint), Color.Transparent), first, glow), glow, first)
+    drawCircle(Brush.radialGradient(listOf(b.copy(alpha = 0.26f * strength * tint), Color.Transparent), second, glow * 0.8f), glow * 0.8f, second)
+}
+
+/**
+ * The popup's colour fields: three soft fields, drifting with [time] and sliding
  * a little as the cards are swiped, their colours blending from one card's into the next.
  */
 private fun DrawScope.aurora(
     position: Float,
     palettes: List<Palette>,
     time: Float,
-    base: Color,
+    tint: Float,
 ) {
-    drawRect(base)
     val (a, b) = blendedPalette(position, palettes)
     val w = size.width
     val h = size.height
@@ -448,16 +606,20 @@ private fun DrawScope.aurora(
         colour: Color,
         x: Float,
         y: Float,
-        radius: Float,
+        reach: Float,
         strength: Float,
     ) {
         val centre = Offset(x, y)
-        drawCircle(Brush.radialGradient(listOf(colour.copy(alpha = strength), Color.Transparent), centre, radius), radius, centre)
+        drawCircle(Brush.radialGradient(listOf(colour.copy(alpha = strength * tint), Color.Transparent), centre, reach), reach, centre)
     }
 
-    field(a, w * (0.18f + 0.08f * sin(turn)) - slide, h * (0.10f + 0.05f * cos(turn)), w * 0.95f, 0.50f)
-    field(b, w * (0.88f - 0.08f * cos(turn)) - slide, h * (0.45f + 0.06f * sin(turn * 2f)), w * 0.85f, 0.38f)
-    field(lerp(a, b, 0.5f), w * (0.40f + 0.10f * sin(turn + 1f)) + slide, h * 1.02f, w * 0.80f, 0.34f)
+    // Sized by the shorter side: a wide popup on a phone held sideways would otherwise be flooded
+    // with colour and its words lose their contrast. Portrait popups are narrower than tall, so
+    // they look as before.
+    val s = min(w, h)
+    field(a, w * (0.18f + 0.08f * sin(turn)) - slide, h * (0.10f + 0.05f * cos(turn)), s * 0.95f, 0.50f)
+    field(b, w * (0.88f - 0.08f * cos(turn)) - slide, h * (0.45f + 0.06f * sin(turn * 2f)), s * 0.85f, 0.38f)
+    field(lerp(a, b, 0.5f), w * (0.40f + 0.10f * sin(turn + 1f)) + slide, h * 1.02f, s * 0.80f, 0.34f)
     // A faint sheen from the top, like light on glass.
     drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.06f), Color.Transparent), 0f, h * 0.35f))
 }

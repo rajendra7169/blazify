@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -209,7 +213,12 @@ fun WhatsNewScreen(navController: NavController) {
         newEntries = entries,
         onClose = { navController.navigateUp() },
         onOpenReleaseNotes = { showChangelog.value = true },
-        windowInsets = LocalPlayerAwareWindowInsets.current,
+        // The shared insets keep room at the top for the app's title bar, which other screens
+        // draw there. This page has its own title row, so it keeps clear of the status bar only.
+        windowInsets =
+            LocalPlayerAwareWindowInsets.current
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                .add(WindowInsets.statusBars.only(WindowInsetsSides.Top)),
         onPreviewPopup = if (BuildConfig.DEBUG) ({ previewPopup = true }) else null,
     )
     if (previewPopup) {

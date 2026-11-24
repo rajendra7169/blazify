@@ -9,16 +9,20 @@ import android.text.Annotation
 import android.text.Spanned
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -42,37 +46,56 @@ fun FeatureCard(
 ) {
     val scheme = MaterialTheme.colorScheme
     val title = rememberAccentedString(entry.heading, scheme.primary)
-    Column(
+    val demo: @Composable (Modifier) -> Unit = { place ->
+        FeatureDemo(
+            demo = entry.demo,
+            icon = entry.icon,
+            playing = playing,
+            modifier =
+                place
+                    .height(132.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(scheme.surfaceContainerHigh),
+        )
+    }
+    val words: @Composable (Modifier) -> Unit = { place ->
+        Column(place) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = scheme.onSurface,
+                modifier = Modifier.semantics { heading() },
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(entry.description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = scheme.onSurfaceVariant,
+            )
+        }
+    }
+    BoxWithConstraints(
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(scheme.surfaceContainer)
             .padding(16.dp),
     ) {
-        FeatureDemo(
-            demo = entry.demo,
-            icon = entry.icon,
-            playing = playing,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(132.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(scheme.surfaceContainerHigh),
-        )
-        Spacer(Modifier.height(14.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = scheme.onSurface,
-            modifier = Modifier.semantics { heading() },
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(entry.description),
-            style = MaterialTheme.typography.bodyMedium,
-            color = scheme.onSurfaceVariant,
-        )
+        // Wide (a phone held sideways, a tablet): the demo beside the words, so a screen holds
+        // several cards instead of one.
+        if (maxWidth >= 520.dp) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                demo(Modifier.weight(0.45f))
+                Spacer(Modifier.width(16.dp))
+                words(Modifier.weight(0.55f))
+            }
+        } else {
+            Column {
+                demo(Modifier.fillMaxWidth())
+                Spacer(Modifier.height(14.dp))
+                words(Modifier.fillMaxWidth())
+            }
+        }
     }
 }
 

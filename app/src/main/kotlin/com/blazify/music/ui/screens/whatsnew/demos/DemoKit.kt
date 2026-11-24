@@ -123,6 +123,9 @@ internal fun rememberDemoColors(): DemoColors {
     }
 }
 
+/** How many times a demo plays its whole story before it settles on its key moment. */
+private const val DEMO_PLAYS = 2
+
 /** True when animations are off (Remove animations, or an animator scale of 0). */
 @Composable
 internal fun rememberReduceMotion(): Boolean {
@@ -152,11 +155,15 @@ internal fun DemoCanvas(
             clock.snapTo(stillAt)
             return@LaunchedEffect
         }
-        // Each time a demo comes into view it starts from the beginning of its story.
-        while (true) {
+        // Each time a demo comes into view it starts from the beginning of its story. It tells it
+        // DEMO_PLAYS times, then once more up to its key moment and holds there, so a card left on
+        // screen stops drawing frames (idle means zero frames). Swiping or scrolling back restarts it.
+        repeat(DEMO_PLAYS) {
             clock.snapTo(0f)
             clock.animateTo(1f, tween(durationMillis = loopMs, easing = LinearEasing))
         }
+        clock.snapTo(0f)
+        clock.animateTo(stillAt, tween(durationMillis = (loopMs * stillAt).toInt(), easing = LinearEasing))
     }
     Spacer(modifier.drawBehind { draw(clock.value, colors) })
 }
