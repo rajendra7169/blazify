@@ -958,6 +958,38 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
         },
         {
           "@type": "Question",
+          "name": "Which Blazify APK should I download, and are both safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Take Blazify-gms.apk, the everyday build, which can also cast to a television. On a phone without Google services, take Blazify.apk, the same app without casting. Both are built from the same public source code and both are safe. Download them only from the official website, the GitHub releases page or F-Droid; APK mirror sites often carry an old version."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was Blazify removed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Blazify is active and gets a new version about every two weeks. Every release stays on the releases page and on F-Droid, and the app tells you itself when a new one is out."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Blazify on iPhone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The iPhone version is installed as an IPA file, because apps like this are not allowed in the App Store. The Blazify on iPhone page explains how, step by step, with a video."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I import a playlist from a CSV file into Blazify?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Go to Library, Playlists, tap the add button and choose Import a CSV playlist (it is also in Settings, Backup and restore). Pick the file, choose which columns hold the song title and the artist, and tap Continue. From Spotify, choose Import from Spotify and paste a public playlist link, or export the whole list as a CSV file first."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Does Blazify need root?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -1309,6 +1341,20 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       <details class="rise"><summary>لماذا يحذّرني Android؟</summary>
         <p>يعرض Android هذا التحذير لأي تطبيق لم يُثبَّت من متجر، أيًّا كان مطوّره. إنه يخبرك بأن أحدًا لم يفحص الملف. وهذا صحيح، ولهذا تحديدًا يهمّ أن تكون الشيفرة المصدرية متاحة للعموم.</p></details>
 
+      <details class="rise"><summary>أي ملف APK أحمّل، وهل كلاهما آمن؟</summary>
+        <p>حمّل <b>Blazify-gms.apk</b>، النسخة المعتادة التي تستطيع أيضًا البث إلى التلفاز. وعلى هاتف بلا خدمات Google (بلا Google، أو LineageOS، أو هاتف Huawei) حمّل <b>Blazify.apk</b>: التطبيق نفسه بلا بث إلى التلفاز.</p>
+        <p>كلاهما مبني من الشيفرة المصدرية العامة نفسها، وكلاهما آمن. حمّلهما فقط من هذه الصفحة أو من <a href="https://github.com/rajendra7169/blazify/releases/latest">صفحة الإصدارات</a> أو من <a href="https://f-droid.org/packages/com.blazify.music/" rel="noopener">F-Droid</a>. مواقع نسخ ملفات APK كثيرًا ما تعرض نسخة قديمة.</p></details>
+
+      <details class="rise"><summary>هل حُذف Blazify؟</summary>
+        <p>لا. Blazify نشط ويحصل على نسخة جديدة كل أسبوعين تقريبًا. كل إصدار يبقى في صفحة الإصدارات وعلى F-Droid، والتطبيق نفسه يخبرك حين تصدر نسخة جديدة.</p></details>
+
+      <details class="rise"><summary>هل يتوفر Blazify على iPhone؟</summary>
+        <p>نعم. تُثبَّت نسخة iPhone كملف IPA، لأن App Store لا يقبل تطبيقات كهذا. صفحة <a href="iphone/">Blazify على iPhone</a> تشرح الطريقة خطوة بخطوة مع فيديو.</p></details>
+
+      <details class="rise"><summary>كيف أستورد قائمة تشغيل من ملف CSV؟</summary>
+        <p>افتح <b>مكتبة › قوائم الأغاني</b>، واضغط زر الإضافة واختر <b>استيراد قوائم تشغيل CSV</b> (وهو أيضًا في إعدادات › النسخ الاحتياطي والاستعادة). اختر الملف، وحدّد الأعمدة التي فيها اسم الأغنية والفنان، ثم اضغط متابعة.</p>
+        <p>ومن Spotify، اختر <b>استيراد من Spotify</b> والصق رابط قائمة تشغيل عامة، أو صدّر القائمة كاملة أولًا كملف CSV ثم استورده.</p></details>
+
       <details class="rise"><summary>هل يحتاج إلى صلاحيات الروت؟</summary>
         <p>لا. إنه تطبيق عادي ويعمل على أي هاتف بنظام Android 8.0 أو أحدث.</p></details>
 
@@ -1556,7 +1602,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 104px;position:relative;z
       </div>
       <div class="f-col">
         <h5>تنزيل</h5>
-        <a href="https://github.com/rajendra7169/blazify/releases/latest">Android</a> <a href="https://rajendrapandey.info.np/projects/blazify">Windows</a> <a href="https://rajendrapandey.info.np/projects/blazify">Linux</a> <a href="https://github.com/rajendra7169/blazify-ios">iPhone</a> <a href="https://apkpure.com/blazify/com.blazify.music" rel="noopener">APKPure</a> <a href="https://appteka.store/app/b16r317210" rel="noopener">Appteka</a> <a href="https://f-droid.org/packages/com.blazify.music/" rel="noopener">F-Droid</a>
+        <a href="https://github.com/rajendra7169/blazify/releases/latest">Android</a> <a href="https://rajendrapandey.info.np/projects/blazify">Windows</a> <a href="https://rajendrapandey.info.np/projects/blazify">Linux</a> <a href="https://github.com/rajendra7169/blazify-ios">iPhone</a> <a href="https://apkpure.com/blazify/com.blazify.music" rel="nofollow noopener">APKPure</a> <a href="https://appteka.store/app/b16r317210" rel="noopener">Appteka</a> <a href="https://f-droid.org/packages/com.blazify.music/" rel="noopener">F-Droid</a>
       </div>
       <div class="f-col">
         <h5>اعرف المزيد</h5>
