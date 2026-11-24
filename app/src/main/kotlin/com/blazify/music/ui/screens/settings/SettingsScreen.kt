@@ -191,6 +191,9 @@ fun SettingsScreen(
             add(SettingRow(R.drawable.info, stringResource(R.string.about), stringResource(R.string.hint_about), badge = hasUpdate) {
                 navController.navigate("settings/about")
             })
+            add(SettingRow(R.drawable.celebration, stringResource(R.string.whats_new), stringResource(R.string.hint_whats_new)) {
+                navController.navigate("settings/whats_new")
+            })
             add(SettingRow(R.drawable.newspaper, stringResource(R.string.changelog), stringResource(R.string.hint_changelog)) {
                 showChangelog.value = true
             })

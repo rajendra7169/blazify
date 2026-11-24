@@ -342,6 +342,11 @@ val ShowWrappedCardKey = booleanPreferencesKey("show_wrapped_card")
 val WrappedSeenYearKey = intPreferencesKey("wrapped_seen_year")
 val LastSeenVersionKey = stringPreferencesKey("lastSeenVersion")
 
+// The version the What's new page was last shown for, or skipped for on purpose. Its own key:
+// LastSeenVersionKey is rewritten early at every start, so it cannot tell whether a new
+// version has been seen.
+val WhatsNewSeenVersionKey = stringPreferencesKey("whatsNewSeenVersion")
+
 /**
  * The release somebody has already been offered and waved away.
  *

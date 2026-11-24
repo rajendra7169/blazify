@@ -1538,4 +1538,67 @@
     <string name="offline_home_downloaded_desc">Songs you downloaded</string>
     <string name="offline_home_device">Songs on this device</string>
     <string name="offline_home_device_desc">Your own music files on this phone</string>
+
+    <!-- What's new -->
+    <!-- The page shown once after an update, and from Settings › About. In each _title string the words inside <annotation type="accent"> are shown in the accent colour: keep the tag around the matching words in your language. -->
+    <string name="whats_new">What\'s new</string>
+    <string name="hint_whats_new">New features, each with a short demo</string>
+    <!-- %1$s is the version, for example 9.20.0 -->
+    <string name="whats_new_title">What\'s new in %1$s</string>
+    <string name="whats_new_section_new">New in this version</string>
+    <!-- "Blazify" is the app's name: keep it as it is -->
+    <string name="whats_new_section_core">What Blazify can do</string>
+    <string name="whats_new_see_all">See all features</string>
+    <string name="whats_new_see_fewer">Show fewer</string>
+    <string name="whats_new_release_notes">Full release notes</string>
+    <string name="whats_new_skip">Skip</string>
+    <string name="whats_new_see_more">See more</string>
+    <!-- Badges on the cards: a new feature, a better one, and one that works properly again -->
+    <string name="whats_new_kind_new">New</string>
+    <string name="whats_new_kind_improved">Improved</string>
+    <string name="whats_new_kind_fixed">Fixed</string>
+    <!-- Read out by TalkBack on each card, for example "2 of 5" -->
+    <string name="whats_new_card_position">%1$d of %2$d</string>
+    <string name="whats_new_preview_popup" translatable="false">Show the popup (debug builds only)</string>
+
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D sound</annotation> moves the song around you</string>
+    <string name="whats_new_spatial_sound_desc">Surround places it on speakers round you, 8D circles your head. Find it in Player settings.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">Search</annotation> works with no connection</string>
+    <string name="whats_new_offline_search_desc">It finds your downloaded, cached and local songs by title, artist or album.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Trending</annotation> follows your country</string>
+    <string name="whats_new_trending_desc">Charts and a new shelf on Home show what is popular where you live.</string>
+    <string name="whats_new_keeps_playing_title">Music <annotation type="accent">keeps playing</annotation> when a list ends</string>
+    <string name="whats_new_keeps_playing_desc">Similar songs join the queue when an album or playlist runs out.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Video Art</annotation> finds the real music video</string>
+    <string name="whats_new_video_art_finder_desc">No more covers, live or lyric uploads when the song\'s own video exists.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Switch accounts</annotation> with one tap</string>
+    <string name="whats_new_accounts_desc">The Google accounts you sign in to are kept, so you can move between them.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Swipe right</annotation> to play a song next</string>
+    <string name="whats_new_queue_swipe_desc">The queue has no lock: drag to reorder, swipe left to remove.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">Song recognition</annotation> listens with a sound wave</string>
+    <string name="whats_new_recognition_wave_desc">It shows when it is listening and searching, with tips when a song is not found.</string>
+
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Download</annotation> songs to play offline</string>
+    <string name="whats_new_core_downloads_desc">Tap the arrow on a song, album or playlist, and it plays with no connection.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">Synced lyrics</annotation> light up word by word</string>
+    <string name="whats_new_core_lyrics_desc">With translation and romanization, from the sources you choose.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Six player designs</annotation> to choose from</string>
+    <string name="whats_new_core_player_designs_desc">Classic, Ring, Full Art, Record, Cassette and Video Art, coloured by the song.</string>
+    <string name="whats_new_core_equalizer_title">A <annotation type="accent">10-band equalizer</annotation> with presets</string>
+    <string name="whats_new_core_equalizer_desc">Drag each band, pick a preset, or import an AutoEQ profile for your headphones.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Sleep timer</annotation> stops the music for you</string>
+    <string name="whats_new_core_sleep_timer_desc">Tap the moon in the player and pick the minutes, or stop at the end of the song.</string>
+    <!-- "Blaze" stays as it is; only "Together" may be translated -->
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> plays in sync with friends</string>
+    <string name="whats_new_core_together_desc">Share a room code and everyone hears the same song at the same moment.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Recognise</annotation> the song playing around you</string>
+    <string name="whats_new_core_recognition_desc">Tap the sound wave in the search bar and Blazify names the song.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Your own music</annotation> plays beside streaming</string>
+    <string name="whats_new_core_local_music_desc">Music files on your phone share the same library, queue and player.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Look &amp; Feel</annotation> restyles the app</string>
+    <string name="whats_new_core_look_and_feel_desc">Theme, player, mini-player, lyrics and Home, with a live preview as you go.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Video Art</annotation> plays the music video</string>
+    <string name="whats_new_core_video_art_desc">The song\'s own video plays behind the player, muted and in step.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Cast</annotation> to your TV</string>
+    <string name="whats_new_core_cast_desc">Send the music to a Chromecast or Google TV from the player.</string>
 </resources>

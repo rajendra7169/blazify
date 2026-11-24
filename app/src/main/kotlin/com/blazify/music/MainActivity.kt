@@ -216,6 +216,10 @@ import com.blazify.music.ui.screens.Screens
 import com.blazify.music.ui.screens.navigationBuilder
 import com.blazify.music.ui.component.UpdateDialog
 import com.blazify.music.ui.screens.settings.ChangelogScreen
+import com.blazify.music.ui.screens.whatsnew.WhatsNewPopup
+import com.blazify.music.whatsnew.FeatureEntry
+import com.blazify.music.whatsnew.WhatsNewCatalog
+import com.blazify.music.whatsnew.WhatsNewGate
 import com.blazify.music.ui.screens.settings.DarkMode
 import com.blazify.music.ui.screens.settings.NavigationTab
 import androidx.compose.ui.graphics.Brush
@@ -863,7 +867,19 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
+                // The What's new popup, once after an update that has news, shown on Home. When it
+                // has something to show it takes the place of the changelog opening by itself, so
+                // only one thing appears after an update.
+                var whatsNewCards by remember { mutableStateOf<List<FeatureEntry>>(emptyList()) }
+
                 LaunchedEffect(Unit) {
+                    val news = WhatsNewGate.check(this@MainActivity)
+                    if (news.isNotEmpty()) {
+                        // Debug builds show every card, the next release's included, to check them.
+                        whatsNewCards =
+                            if (BuildConfig.DEBUG) WhatsNewCatalog.previewEntries() else WhatsNewCatalog.newEntries(news)
+                        return@LaunchedEffect
+                    }
                     val lastSeenVersion = dataStore.data.first()[LastSeenVersionKey] ?: ""
                     val currentVersion = BuildConfig.VERSION_NAME
                     if (lastSeenVersion != currentVersion) {
@@ -1236,6 +1252,27 @@ class MainActivity : ComponentActivity() {
                 ) {
                     if (showChangelog.value) {
                         ChangelogScreen(onDismiss = { showChangelog.value = false })
+                    }
+
+                    // On Home only, and never on top of an update being offered.
+                    if (whatsNewCards.isNotEmpty() &&
+                        offeredRelease.value == null &&
+                        navBackStackEntry?.destination?.route == Screens.Home.route
+                    ) {
+                        WhatsNewPopup(
+                            version =
+                                if (BuildConfig.DEBUG) {
+                                    WhatsNewCatalog.releases.firstOrNull()?.version ?: BuildConfig.VERSION_NAME
+                                } else {
+                                    BuildConfig.VERSION_NAME
+                                },
+                            entries = whatsNewCards,
+                            onSkip = { whatsNewCards = emptyList() },
+                            onSeeMore = {
+                                whatsNewCards = emptyList()
+                                navController.navigate("settings/whats_new")
+                            },
+                        )
                     }
 
                     sharedPlaylist?.let { shared ->

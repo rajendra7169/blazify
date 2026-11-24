@@ -95,6 +95,7 @@ import com.blazify.music.ui.screens.settings.integrations.IntegrationScreen
 import com.blazify.music.ui.screens.settings.integrations.LastFMSettings
 import com.blazify.music.ui.screens.settings.integrations.ListenTogetherSettings
 
+import com.blazify.music.ui.screens.whatsnew.WhatsNewScreen
 import com.blazify.music.ui.screens.wrapped.WrappedScreen
 import com.blazify.music.utils.rememberEnumPreference
 import com.blazify.music.utils.rememberPreference
@@ -536,6 +537,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     composable("settings/about") {
         AboutScreen(navController)
+    }
+
+    composable("settings/whats_new") {
+        WhatsNewScreen(navController)
     }
 
     composable("login") {
