@@ -1373,4 +1373,77 @@
     <string name="star_prompt_title_short">¿Te gusta Blazify?</string>
     <string name="star_prompt_body_short">Una estrella en GitHub ayuda a que otros lo encuentren. Es gratis y sin anuncios.</string>
     <string name="import_spotify_csv_tip">Para la lista completa, expórtala como archivo CSV (Exportify lo hace con tu propio inicio de sesión de Spotify) y luego usa Ajustes › Copia de seguridad y restauración › Importar una playlist CSV.</string>
+    <string name="festival_greeting_halloween">Feliz Halloween</string>
+    <string name="star_prompt_already">Ya le di una estrella</string>
+    <string name="update_prompt_title">Ya está aquí Blazify %s</string>
+    <string name="update_prompt_body">Las novedades y correcciones están listas. Tu música y tu biblioteca se quedan tal como están.</string>
+    <string name="update_prompt_update">Actualizar</string>
+    <string name="spatial_sound">Sonido 3D</string>
+    <string name="spatial_sound_off">Desactivado</string>
+    <string name="spatial_sound_surround">Envolvente</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Desactivado. Envolvente coloca la canción a tu alrededor; 8D la hace girar alrededor de tu cabeza. Mejor con auriculares</string>
+    <string name="spatial_sound_desc_surround">Envolvente: la canción sale de altavoces a tu alrededor, con su amplitud y la sala detrás</string>
+    <string name="spatial_sound_desc_orbit">8D: la canción gira despacio alrededor de tu cabeza</string>
+    <string name="search_offline">Buscar canciones en este teléfono…</string>
+    <string name="search_offline_notice">Sin conexión. Se muestran las canciones que suenan sin conexión: descargadas, en caché y en este dispositivo.</string>
+    <string name="offline_home_group">Inicio sin conexión</string>
+    <string name="offline_home_cached">Canciones en caché</string>
+    <string name="offline_home_cached_desc">Canciones guardadas completas en la caché de canciones después de reproducirlas</string>
+    <string name="offline_home_downloaded">Canciones descargadas</string>
+    <string name="offline_home_downloaded_desc">Las canciones que descargaste</string>
+    <string name="offline_home_device">Canciones de este dispositivo</string>
+    <string name="offline_home_device_desc">Tus propios archivos de música en este teléfono</string>
+    <string name="whats_new">Novedades</string>
+    <string name="hint_whats_new">Las nuevas funciones, cada una con una breve demostración</string>
+    <string name="whats_new_title">Novedades de %1$s</string>
+    <string name="whats_new_section_new">Nuevo en esta versión</string>
+    <string name="whats_new_section_core">Lo que Blazify puede hacer</string>
+    <string name="whats_new_see_all">Ver todas las funciones</string>
+    <string name="whats_new_see_fewer">Ver menos</string>
+    <string name="whats_new_release_notes">Notas de la versión completas</string>
+    <string name="whats_new_skip">Omitir</string>
+    <string name="whats_new_see_more">Ver más</string>
+    <string name="whats_new_kind_new">Nuevo</string>
+    <string name="whats_new_kind_improved">Mejorado</string>
+    <string name="whats_new_kind_fixed">Corregido</string>
+    <string name="whats_new_card_position">%1$d de %2$d</string>
+    <string name="whats_new_spatial_sound_title">El <annotation type="accent">sonido 3D</annotation> mueve la canción a tu alrededor</string>
+    <string name="whats_new_spatial_sound_desc">Envolvente la coloca en altavoces a tu alrededor; 8D gira alrededor de tu cabeza. Está en los ajustes del reproductor.</string>
+    <string name="whats_new_offline_search_title">La <annotation type="accent">búsqueda</annotation> funciona sin conexión</string>
+    <string name="whats_new_offline_search_desc">Encuentra tus canciones descargadas, en caché y locales por título, artista o álbum.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Tendencias</annotation> se adapta a tu país</string>
+    <string name="whats_new_trending_desc">Las listas de éxitos y una nueva sección en Inicio muestran lo que se escucha donde vives.</string>
+    <string name="whats_new_keeps_playing_title">La música <annotation type="accent">sigue sonando</annotation> cuando termina una lista</string>
+    <string name="whats_new_keeps_playing_desc">Se añaden canciones similares a la cola cuando se acaba un álbum o una lista.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Video Art</annotation> encuentra el videoclip real</string>
+    <string name="whats_new_video_art_finder_desc">Se acabaron las versiones, los directos y los vídeos con letra cuando existe el vídeo oficial de la canción.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Cambia de cuenta</annotation> con un toque</string>
+    <string name="whats_new_accounts_desc">Las cuentas de Google con las que inicias sesión se guardan para que puedas pasar de una a otra.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Desliza a la derecha</annotation> para reproducir una canción a continuación</string>
+    <string name="whats_new_queue_swipe_desc">La cola ya no tiene bloqueo: arrastra para reordenar y desliza a la izquierda para quitar.</string>
+    <string name="whats_new_recognition_wave_title">La <annotation type="accent">identificación de canciones</annotation> escucha con una onda de sonido</string>
+    <string name="whats_new_recognition_wave_desc">Muestra cuándo está escuchando y buscando, con consejos cuando no encuentra una canción.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Descarga</annotation> canciones para escucharlas sin conexión</string>
+    <string name="whats_new_core_downloads_desc">Toca la flecha de una canción, un álbum o una lista, y sonará sin conexión.</string>
+    <string name="whats_new_core_lyrics_title">La <annotation type="accent">letra sincronizada</annotation> se ilumina palabra por palabra</string>
+    <string name="whats_new_core_lyrics_desc">Con traducción y romanización, de las fuentes que elijas.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seis diseños de reproductor</annotation> para elegir</string>
+    <string name="whats_new_core_player_designs_desc">Clásico, Anillo, Portada completa, Vinilo, Casete y Video Art, con los colores de la canción.</string>
+    <string name="whats_new_core_equalizer_title">Un <annotation type="accent">ecualizador de 10 bandas</annotation> con preajustes</string>
+    <string name="whats_new_core_equalizer_desc">Arrastra cada banda, elige un preajuste o importa un perfil de AutoEQ para tus auriculares.</string>
+    <string name="whats_new_core_sleep_timer_title">El <annotation type="accent">temporizador de apagado</annotation> detiene la música por ti</string>
+    <string name="whats_new_core_sleep_timer_desc">Toca la luna en el reproductor y elige los minutos, o que pare al final de la canción.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> suena sincronizado con tus amigos</string>
+    <string name="whats_new_core_together_desc">Comparte un código de sala y todos escuchan la misma canción en el mismo momento.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Identifica</annotation> la canción que suena a tu alrededor</string>
+    <string name="whats_new_core_recognition_desc">Toca la onda de sonido en la barra de búsqueda y Blazify te dice qué canción es.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Tu propia música</annotation> junto al streaming</string>
+    <string name="whats_new_core_local_music_desc">Los archivos de música de tu teléfono comparten la misma biblioteca, cola y reproductor.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Aspecto</annotation> cambia el estilo de la app</string>
+    <string name="whats_new_core_look_and_feel_desc">Tema, reproductor, minirreproductor, letra e Inicio, con vista previa en directo mientras ajustas.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Video Art</annotation> reproduce el videoclip</string>
+    <string name="whats_new_core_video_art_desc">El vídeo oficial de la canción se ve detrás del reproductor, silenciado y sincronizado.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Envía</annotation> a tu televisor</string>
+    <string name="whats_new_core_cast_desc">Envía la música a un Chromecast o Google TV desde el reproductor.</string>
 </resources>
