@@ -276,4 +276,10 @@
     <string name="dismiss">Elrejtés</string>
     <string name="options">Opciók</string>
     <string name="preview">Előnézet</string>
+    <string name="pause">Szünet</string>
+    <string name="theme_desc">Az alkalmazás témájának testreszabása</string>
+    <string name="theme_colors">Téma és színek</string>
+    <string name="theme_mode">Téma mód</string>
+    <string name="color_palette">Színpaletta</string>
+    <string name="use_system_colors">Rendszerszínek használata</string>
 </resources>
