@@ -57,6 +57,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.CacheDrawScope
 import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.draw.drawWithCache
@@ -277,7 +279,14 @@ fun RadioDial(
                     model = request,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.offset(x = w * WIN_L, y = w * WIN_T).size(w * WIN_S),
+                    // The rounding above is only for the cover itself: the picture shown while it
+                    // loads (or if it fails) came out square, its corners poking past the window.
+                    // The window never moves, so this clip is drawn once, not every frame.
+                    modifier =
+                        Modifier
+                            .offset(x = w * WIN_L, y = w * WIN_T)
+                            .size(w * WIN_S)
+                            .clip(RoundedCornerShape(w * WIN_CORNER)),
                 )
             }
 
