@@ -2394,7 +2394,7 @@ fun BottomSheetPlayer(
                             RadioDial(
                                 isPlaying = effectiveIsPlaying,
                                 progress = radioProgress,
-                                modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
+                                modifier = Modifier.padding(horizontal = PlayerHorizontalPadding, vertical = 8.dp),
                                 seed = MaterialTheme.colorScheme.primary,
                                 thumbnailUrl = mediaMetadata?.thumbnailUrl,
                                 onScrub = if (radioCanSeek) radioScrub else null,
