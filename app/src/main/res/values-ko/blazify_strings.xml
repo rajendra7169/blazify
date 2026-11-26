@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">Blazify 마음에 드세요?</string>
     <string name="star_prompt_body_short">GitHub에 별을 남기면 다른 사람들이 찾기 쉬워져요. 무료이고 광고가 없어요.</string>
     <string name="import_spotify_csv_tip">전체 목록을 가져오려면 CSV 파일로 내보낸 뒤(Exportify에서 내 Spotify 로그인으로 할 수 있어요) 설정 › 백업 및 복원 › CSV 재생목록 가져오기를 사용하세요.</string>
+    <string name="festival_greeting_halloween">해피 할로윈</string>
+    <string name="star_prompt_already">이미 별을 남겼어요</string>
+    <string name="update_prompt_title">Blazify %s 출시</string>
+    <string name="update_prompt_body">새 기능과 수정 사항이 준비됐어요. 음악과 보관함은 그대로 유지돼요.</string>
+    <string name="update_prompt_update">업데이트</string>
+    <string name="spatial_sound">3D 사운드</string>
+    <string name="spatial_sound_off">끔</string>
+    <string name="spatial_sound_surround">서라운드</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">끔. 서라운드는 노래를 내 주변에 배치하고, 8D는 머리 주위를 돌게 해요. 헤드폰으로 들으면 가장 좋아요</string>
+    <string name="spatial_sound_desc_surround">서라운드: 주변 스피커에서 노래가 들리고, 소리의 폭과 뒤쪽 공간감까지 느껴져요</string>
+    <string name="spatial_sound_desc_orbit">8D: 노래가 머리 주위를 천천히 돌아요</string>
+    <string name="search_offline">이 휴대폰의 노래 검색…</string>
+    <string name="search_offline_notice">연결되지 않았어요. 오프라인으로 재생할 수 있는 노래(다운로드됨, 캐시됨, 이 기기에 있음)를 보여 드려요.</string>
+    <string name="offline_home_group">연결이 없을 때의 홈</string>
+    <string name="offline_home_cached">캐시된 노래</string>
+    <string name="offline_home_cached_desc">재생한 뒤 노래 캐시에 통째로 저장된 노래</string>
+    <string name="offline_home_downloaded">다운로드한 노래</string>
+    <string name="offline_home_downloaded_desc">내가 다운로드한 노래</string>
+    <string name="offline_home_device">이 기기의 노래</string>
+    <string name="offline_home_device_desc">이 휴대폰에 있는 내 음악 파일</string>
+    <string name="whats_new">새로운 기능</string>
+    <string name="hint_whats_new">새 기능을 짧은 데모와 함께 소개해요</string>
+    <string name="whats_new_title">%1$s의 새로운 기능</string>
+    <string name="whats_new_section_new">이번 버전의 새 기능</string>
+    <string name="whats_new_section_core">Blazify로 할 수 있는 일</string>
+    <string name="whats_new_see_all">모든 기능 보기</string>
+    <string name="whats_new_see_fewer">접기</string>
+    <string name="whats_new_release_notes">전체 릴리스 노트</string>
+    <string name="whats_new_skip">건너뛰기</string>
+    <string name="whats_new_see_more">더 보기</string>
+    <string name="whats_new_kind_new">새 기능</string>
+    <string name="whats_new_kind_improved">개선됨</string>
+    <string name="whats_new_kind_fixed">수정됨</string>
+    <string name="whats_new_card_position">%2$d개 중 %1$d번째</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D 사운드</annotation>로 노래가 내 주위를 움직여요</string>
+    <string name="whats_new_spatial_sound_desc">서라운드는 주변 스피커에 배치하고, 8D는 머리 주위를 돌아요. 플레이어 설정에서 찾을 수 있어요.</string>
+    <string name="whats_new_offline_search_title">연결 없이도 <annotation type="accent">검색</annotation>할 수 있어요</string>
+    <string name="whats_new_offline_search_desc">다운로드한 노래, 캐시된 노래, 기기 속 노래를 제목, 아티스트, 앨범으로 찾아요.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">트렌드</annotation>가 내 나라에 맞춰져요</string>
+    <string name="whats_new_trending_desc">차트와 홈의 새 섹션에서 내가 사는 곳의 인기 음악을 보여 줘요.</string>
+    <string name="whats_new_keeps_playing_title">목록이 끝나도 음악이 <annotation type="accent">계속 재생돼요</annotation></string>
+    <string name="whats_new_keeps_playing_desc">앨범이나 재생목록이 끝나면 비슷한 노래가 대기열에 추가돼요.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">비디오 아트</annotation>가 진짜 뮤직비디오를 찾아요</string>
+    <string name="whats_new_video_art_finder_desc">노래의 공식 영상이 있으면 커버, 라이브, 가사 영상은 더 이상 나오지 않아요.</string>
+    <string name="whats_new_accounts_title">한 번의 탭으로 <annotation type="accent">계정 전환</annotation></string>
+    <string name="whats_new_accounts_desc">로그인한 Google 계정이 저장되어 계정 사이를 오갈 수 있어요.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">오른쪽으로 스와이프</annotation>해서 다음 곡으로 재생</string>
+    <string name="whats_new_queue_swipe_desc">이제 대기열에 잠금이 없어요. 드래그해서 순서를 바꾸고, 왼쪽으로 스와이프해서 삭제하세요.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">노래 인식</annotation>이 음파로 듣고 있음을 보여 줘요</string>
+    <string name="whats_new_recognition_wave_desc">듣는 중인지 찾는 중인지 보여 주고, 노래를 찾지 못하면 도움말을 알려 줘요.</string>
+    <string name="whats_new_core_downloads_title">노래를 <annotation type="accent">다운로드</annotation>해서 오프라인으로 재생</string>
+    <string name="whats_new_core_downloads_desc">노래, 앨범, 재생목록의 화살표를 탭하면 연결 없이도 재생돼요.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">싱크 가사</annotation>가 단어마다 빛나요</string>
+    <string name="whats_new_core_lyrics_desc">번역과 로마자 표기를 지원하고, 가사 출처도 직접 고를 수 있어요.</string>
+    <string name="whats_new_core_player_designs_title">고를 수 있는 <annotation type="accent">6가지 플레이어 디자인</annotation></string>
+    <string name="whats_new_core_player_designs_desc">클래식, 링, 풀 아트, 레코드, 카세트, 비디오 아트. 노래에 맞춰 색이 바뀌어요.</string>
+    <string name="whats_new_core_equalizer_title">프리셋이 있는 <annotation type="accent">10밴드 이퀄라이저</annotation></string>
+    <string name="whats_new_core_equalizer_desc">밴드를 하나씩 드래그하거나 프리셋을 고르거나, 헤드폰용 AutoEQ 프로필을 가져오세요.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">수면 타이머</annotation>가 음악을 대신 꺼 줘요</string>
+    <string name="whats_new_core_sleep_timer_desc">플레이어의 달 아이콘을 탭하고 시간을 고르거나, 노래가 끝날 때 멈추세요.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation>로 친구와 함께 동시에 재생</string>
+    <string name="whats_new_core_together_desc">방 코드를 공유하면 모두가 같은 노래를 같은 순간에 들어요.</string>
+    <string name="whats_new_core_recognition_title">주변에서 흐르는 노래를 <annotation type="accent">인식</annotation>해요</string>
+    <string name="whats_new_core_recognition_desc">검색창의 음파를 탭하면 Blazify가 노래 제목을 알려 줘요.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">내 음악 파일</annotation>도 스트리밍과 함께 재생</string>
+    <string name="whats_new_core_local_music_desc">휴대폰 속 음악 파일도 같은 보관함, 대기열, 플레이어를 함께 써요.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">디자인</annotation>에서 앱 스타일을 바꿔요</string>
+    <string name="whats_new_core_look_and_feel_desc">테마, 플레이어, 미니 플레이어, 가사, 홈을 실시간 미리보기로 바꿔 보세요.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">비디오 아트</annotation>가 뮤직비디오를 재생해요</string>
+    <string name="whats_new_core_video_art_desc">노래의 공식 영상이 플레이어 뒤에서 음소거된 채 박자에 맞춰 재생돼요.</string>
+    <string name="whats_new_core_cast_title">TV로 <annotation type="accent">전송</annotation></string>
+    <string name="whats_new_core_cast_desc">플레이어에서 Chromecast나 Google TV로 음악을 보내세요.</string>
 </resources>
