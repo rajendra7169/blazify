@@ -3230,6 +3230,7 @@ class MusicService :
         mediaItem: MediaItem?,
         reason: Int,
     ) {
+        noteDirection(reason)
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
             countRepeat()
         } else if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
@@ -4848,6 +4849,24 @@ class MusicService :
      */
     private var offlineJumps = 0
 
+    /** The queue position of the song before this one, to tell a Previous from a Next. */
+    private var lastItemIndex = C.INDEX_UNSET
+
+    /** The listener went back a song: offline, looking for a saved song goes on backwards too. */
+    private var movedBack = false
+
+    private fun noteDirection(reason: Int) {
+        val from = lastItemIndex
+        val to = player.currentMediaItemIndex
+        lastItemIndex = to
+        movedBack =
+            reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK &&
+            from != C.INDEX_UNSET &&
+            !player.currentTimeline.isEmpty &&
+            from < player.currentTimeline.windowCount &&
+            player.currentTimeline.getPreviousWindowIndex(from, Player.REPEAT_MODE_OFF, player.shuffleModeEnabled) == to
+    }
+
     /**
      * With no connection, goes on to the next song in the queue that is on the phone — saved
      * ahead, downloaded, or one of the listener's own files — rather than stopping to wait.
@@ -4861,18 +4880,29 @@ class MusicService :
         if (timeline.isEmpty) return false
         val current = player.currentMediaItemIndex
         val repeatMode = if (player.repeatMode == Player.REPEAT_MODE_ONE) Player.REPEAT_MODE_OFF else player.repeatMode
-        var index = current
-        repeat(count) {
-            index = timeline.getNextWindowIndex(index, repeatMode, player.shuffleModeEnabled)
-            if (index == C.INDEX_UNSET || index == current) return false
-            val item = player.getMediaItemAt(index)
-            val id = item.metadata?.id ?: item.mediaId
-            if (isOnPhone(id)) {
-                offlineJumps++
-                Timber.tag(TAG).i("No connection: going on to $id, which is on the phone")
-                player.seekTo(index, 0)
-                player.prepare()
-                return true
+        // After a Previous, the nearest saved song further back: going forward instead would
+        // land on the song just left, so Previous would seem to do nothing. If nothing further
+        // back is saved, the next saved song still beats silence.
+        val directions = if (movedBack) listOf(true, false) else listOf(false)
+        for (backwards in directions) {
+            var index = current
+            for (step in 0 until count) {
+                index =
+                    if (backwards) {
+                        timeline.getPreviousWindowIndex(index, repeatMode, player.shuffleModeEnabled)
+                    } else {
+                        timeline.getNextWindowIndex(index, repeatMode, player.shuffleModeEnabled)
+                    }
+                if (index == C.INDEX_UNSET || index == current) break
+                val item = player.getMediaItemAt(index)
+                val id = item.metadata?.id ?: item.mediaId
+                if (isOnPhone(id)) {
+                    offlineJumps++
+                    Timber.tag(TAG).i("No connection: going ${if (backwards) "back" else "on"} to $id, which is on the phone")
+                    player.seekTo(index, 0)
+                    player.prepare()
+                    return true
+                }
             }
         }
         return false
