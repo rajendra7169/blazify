@@ -15,6 +15,26 @@
 
 package com.blazify.music.ui.player
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioManager
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.blazify.music.R
+import kotlin.math.roundToInt
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -83,8 +103,14 @@ import kotlin.math.sin
 private const val CAB_BOTTOM = 0.885f
 private const val FOOT_BOTTOM = 0.925f
 
-/** Width over height: the cabinet plus its feet. */
+/** Width over height of the cabinet with its feet. */
 private const val RADIO_ASPECT = 1f / FOOT_BOTTOM
+
+/** Height of the band above the cabinet that holds the antennas, as a share of the width. */
+private const val ANT_H = 0.15f
+
+/** Width over height of the whole radio: antennas, cabinet and feet. */
+private const val WHOLE_ASPECT = 1f / (ANT_H + FOOT_BOTTOM)
 
 private const val CAB_CORNER = 0.075f
 
@@ -180,6 +206,9 @@ fun RadioDial(
     thumbnailUrl: String? = null,
     onScrub: ((Float) -> Unit)? = null,
     onSeek: ((Float) -> Unit)? = null,
+    onPlayPause: (() -> Unit)? = null,
+    /** False in a small preview: its pointer still shows the volume, but it can't be turned. */
+    volumeKnob: Boolean = true,
 ) {
     val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val colors = remember(seed, dark) { radioColors(seed, dark) }
@@ -193,15 +222,38 @@ fun RadioDial(
 
     // Where the finger holds the needle; read only in the dial's draw.
     var drag by remember { mutableStateOf<Float?>(null) }
+
+    // The right knob is the phone's media volume, the one the side buttons change. Its pointer
+    // follows that volume, so it turns when the buttons are pressed too; while a finger turns
+    // it, it follows the finger smoothly between the volume's steps.
+    val volume = rememberMediaVolume()
+    var volumeDrag by remember { mutableStateOf<Float?>(null) }
+    val haptics = LocalHapticFeedback.current
+    val latestPlayPause by rememberUpdatedState(onPlayPause)
     val latestProgress by rememberUpdatedState(progress)
     val latestSeek by rememberUpdatedState(onSeek)
     val latestScrub by rememberUpdatedState(onScrub)
 
     // A radio's dial reads left to right in every language.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        BoxWithConstraints(modifier = modifier.aspectRatio(RADIO_ASPECT)) {
+        BoxWithConstraints(modifier = modifier.aspectRatio(WHOLE_ASPECT)) {
             val w = maxWidth
 
+            // 0) Two short antennas standing on the cabinet: drawn once.
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(w * ANT_H)
+                    .graphicsLayer()
+                    .drawWithCache { buildAntennas() },
+            )
+
+            Box(
+                Modifier
+                    .offset(y = w * ANT_H)
+                    .fillMaxWidth()
+                    .aspectRatio(RADIO_ASPECT),
+            ) {
             // 1) Cabinet, grille, recesses, knob bodies, name plate: drawn once into its own layer.
             Spacer(
                 Modifier
@@ -246,8 +298,57 @@ fun RadioDial(
                         val dial = buildDial(measurer)
                         onDrawBehind {
                             val f = (drag ?: latestProgress()).coerceIn(0f, 1f)
-                            dial.draw(this, f, glow.value)
+                            dial.draw(this, f, glow.value, (volumeDrag ?: volume.level).coerceIn(0f, 1f))
                         }
+                    },
+            )
+
+            // The knobs. Each touch area is larger than the knob drawn, so it is easy to hit.
+            val knobTouch = maxOf(48.dp, w * KNOB_R * 2.6f)
+            val powerLabel = stringResource(R.string.play_pause)
+            val volumeLabel = stringResource(R.string.volume)
+            if (onPlayPause != null) {
+                // Left: the power switch. A tap plays or pauses; the knob turns to on or off.
+                Box(
+                    Modifier
+                        .offset(x = w * KNOB_LX - knobTouch / 2, y = w * KNOB_Y - knobTouch / 2)
+                        .size(knobTouch)
+                        .semantics {
+                            role = Role.Button
+                            contentDescription = powerLabel
+                        }.pointerInput(Unit) {
+                            detectTapGestures {
+                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                latestPlayPause?.invoke()
+                            }
+                        },
+                )
+            }
+            // Right: the volume. Turned by dragging up or to the right for louder.
+            if (volumeKnob) Box(
+                Modifier
+                    .offset(x = w * KNOB_RX - knobTouch / 2, y = w * KNOB_Y - knobTouch / 2)
+                    .size(knobTouch)
+                    .semantics {
+                        contentDescription = volumeLabel
+                        progressBarRangeInfo = ProgressBarRangeInfo(volume.level, 0f..1f, volume.steps)
+                        setProgress { target ->
+                            volume.set(target)
+                            true
+                        }
+                    }.pointerInput(Unit) {
+                        val fullTurn = 140.dp.toPx()
+                        detectDragGestures(
+                            onDragStart = { volumeDrag = volume.level },
+                            onDrag = { change, amount ->
+                                change.consume()
+                                val next = ((volumeDrag ?: volume.level) + (amount.x - amount.y) / fullTurn).coerceIn(0f, 1f)
+                                volumeDrag = next
+                                if (volume.set(next)) haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            },
+                            onDragEnd = { volumeDrag = null },
+                            onDragCancel = { volumeDrag = null },
+                        )
                     },
             )
 
@@ -291,6 +392,7 @@ fun RadioDial(
                             )
                         },
                 )
+            }
             }
         }
     }
@@ -609,6 +711,7 @@ private class DialPieces(
         scope: DrawScope,
         f: Float,
         g: Float,
+        volume: Float,
     ) = with(scope) {
         val corner = CornerRadius(s * 0.02f)
 
@@ -674,9 +777,11 @@ private class DialPieces(
             style = Stroke(width = s * 0.004f),
         )
 
-        // Knob pointers turn a little with the song: volume a quarter turn, tuning most of one.
-        knobPointer(Offset(s * KNOB_LX, s * KNOB_Y), s * KNOB_R, -135f + 90f * f, s)
-        knobPointer(Offset(s * KNOB_RX, s * KNOB_Y), s * KNOB_R, -150f + 300f * f, s)
+        // Left knob, the power switch: turned to the left when off, to the right when on, moving
+        // with the backlight as the music stops and starts. Right knob, the volume: from far left
+        // at silence round to far right at full.
+        knobPointer(Offset(s * KNOB_LX, s * KNOB_Y), s * KNOB_R, -60f + 120f * g, s)
+        knobPointer(Offset(s * KNOB_RX, s * KNOB_Y), s * KNOB_R, -135f + 270f * volume, s)
 
         // Pilot lamp in the name plate.
         val lamp = Offset(s * (PLATE_L + 0.045f), s * (PLATE_T + PLATE_B) / 2f)
@@ -764,4 +869,106 @@ private fun CacheDrawScope.buildDial(measurer: TextMeasurer): DialPieces {
             endY = rect.bottom,
         )
     return DialPieces(s, rect, scaleLeft, scaleRight, ticks, labels, bandLeft, bandRight, gloss)
+}
+
+/* ---------------------------------------------------------------------------------------- */
+/* Layer 0: the antennas                                                                     */
+/* ---------------------------------------------------------------------------------------- */
+
+private val Chrome = Color(0xFFD9DDE2)
+private val ChromeShade = Color(0xFF8C939B)
+
+/**
+ * Two short telescopic antennas in a V from a brass mount on top of the cabinet. The band is
+ * [ANT_H] of the width tall and ends where the cabinet starts.
+ */
+private fun CacheDrawScope.buildAntennas(): DrawResult {
+    val s = size.width
+    val baseY = size.height
+    val mount = Offset(s * 0.5f, baseY)
+    val length = size.height * 0.9f
+    val rods =
+        listOf(-24f, 24f).map { lean ->
+            val a = Math.toRadians(lean.toDouble() - 90.0)
+            Offset(cos(a).toFloat(), sin(a).toFloat())
+        }
+    return onDrawBehind {
+        for (dir in rods) {
+            val joint = mount + dir * (length * 0.52f)
+            val tip = mount + dir * length
+            // Shadow, then the thick lower section and the thin upper one.
+            drawLine(Color.Black.copy(alpha = 0.18f), mount + Offset(s * 0.006f, 0f), tip + Offset(s * 0.006f, 0f), strokeWidth = s * 0.012f, cap = StrokeCap.Round)
+            drawLine(ChromeShade, mount, joint, strokeWidth = s * 0.014f, cap = StrokeCap.Round)
+            drawLine(Chrome, mount, joint, strokeWidth = s * 0.007f, cap = StrokeCap.Round)
+            drawLine(ChromeShade, joint, tip, strokeWidth = s * 0.009f, cap = StrokeCap.Round)
+            drawLine(Chrome, joint, tip, strokeWidth = s * 0.0045f, cap = StrokeCap.Round)
+            // A small ball at the tip.
+            drawCircle(ChromeShade, radius = s * 0.013f, center = tip)
+            drawCircle(Chrome, radius = s * 0.008f, center = tip - Offset(s * 0.003f, s * 0.003f))
+        }
+        // The brass mount the two rods turn in, half sunk into the cabinet's top.
+        drawArc(
+            brush = Brush.verticalGradient(listOf(BrassLight, BrassDark), startY = baseY - s * 0.04f, endY = baseY),
+            startAngle = 180f,
+            sweepAngle = 180f,
+            useCenter = true,
+            topLeft = Offset(mount.x - s * 0.045f, baseY - s * 0.04f),
+            size = Size(s * 0.09f, s * 0.08f),
+        )
+    }
+}
+
+/* ---------------------------------------------------------------------------------------- */
+/* The phone's media volume, for the volume knob                                              */
+/* ---------------------------------------------------------------------------------------- */
+
+private class MediaVolume(
+    private val audio: AudioManager?,
+) {
+    val steps: Int = (audio?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 15).coerceAtLeast(1)
+
+    var level by mutableFloatStateOf(read())
+        private set
+
+    private fun read(): Float = (audio?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0).toFloat() / steps
+
+    fun refresh() {
+        level = read()
+    }
+
+    /** Sets the volume to the step nearest [fraction]; true when that changed the step. */
+    fun set(fraction: Float): Boolean {
+        val audio = audio ?: return false
+        val index = (fraction.coerceIn(0f, 1f) * steps).roundToInt()
+        val changed = index != audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+        // A fixed-volume phone, or Do Not Disturb, can refuse.
+        if (changed) runCatching { audio.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0) }
+        refresh()
+        return changed
+    }
+}
+
+/** The media volume, kept up to date while on screen, including changes from the side buttons. */
+@Composable
+private fun rememberMediaVolume(): MediaVolume {
+    val context = LocalContext.current
+    val volume = remember(context) { MediaVolume(context.getSystemService(AudioManager::class.java)) }
+    DisposableEffect(context) {
+        val receiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    c: Context?,
+                    intent: Intent?,
+                ) = volume.refresh()
+            }
+        ContextCompat.registerReceiver(
+            context,
+            receiver,
+            IntentFilter("android.media.VOLUME_CHANGED_ACTION"),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        volume.refresh()
+        onDispose { runCatching { context.unregisterReceiver(receiver) } }
+    }
+    return volume
 }

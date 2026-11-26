@@ -918,6 +918,7 @@ private fun RadioPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor:
             modifier = Modifier.fillMaxWidth(0.94f),
             thumbnailUrl = meta?.thumbnailUrl,
             onSeek = if (pc != null && dur > 0) { f -> pc.player.seekTo((f * dur).toLong()) } else null,
+            volumeKnob = false,
         )
         Spacer(Modifier.weight(0.3f))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

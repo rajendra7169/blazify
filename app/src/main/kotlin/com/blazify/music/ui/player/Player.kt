@@ -1149,6 +1149,23 @@ fun BottomSheetPlayer(
             }
             sliderPosition = null
         }
+        // The Radio's left knob is its power switch: the same as the play button, for everyone
+        // but a Listen Together guest, whose play button mutes instead.
+        val radioPlayPause: (() -> Unit)? =
+            if (isListenTogetherGuest) {
+                null
+            } else {
+                {
+                    if (isCasting) {
+                        if (castIsPlaying) castHandler?.pause() else castHandler?.play()
+                    } else if (playbackState == STATE_ENDED) {
+                        playerConnection.player.seekTo(0, 0)
+                        playerConnection.player.playWhenReady = true
+                    } else {
+                        playerConnection.togglePlayPause()
+                    }
+                }
+            }
 
         val controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit = { mediaMetadata ->
             val playPauseRoundness by animateDpAsState(
@@ -2006,6 +2023,7 @@ fun BottomSheetPlayer(
                     radioProgress = radioProgress,
                     onRadioScrub = if (radioCanSeek) radioScrub else null,
                     onRadioSeek = if (radioCanSeek) radioSeek else null,
+                    onRadioPlayPause = radioPlayPause,
                     onShowLyrics = { showInlineLyrics = true },
                     onToggleLyrics = { showInlineLyrics = !showInlineLyrics },
                     onSleepTimer = { showSleepTimerDialog = true },
@@ -2404,6 +2422,7 @@ fun BottomSheetPlayer(
                                 thumbnailUrl = mediaMetadata?.thumbnailUrl,
                                 onScrub = if (radioCanSeek) radioScrub else null,
                                 onSeek = if (radioCanSeek) radioSeek else null,
+                                onPlayPause = radioPlayPause,
                             )
                             SeekMessage(playerSeeker)
                         }
@@ -2895,6 +2914,7 @@ private fun BoxScope.LandscapePlayer(
     radioProgress: () -> Float,
     onRadioScrub: ((Float) -> Unit)?,
     onRadioSeek: ((Float) -> Unit)?,
+    onRadioPlayPause: (() -> Unit)?,
     onShowLyrics: () -> Unit,
     onToggleLyrics: () -> Unit,
     onSleepTimer: () -> Unit,
@@ -3091,6 +3111,7 @@ private fun BoxScope.LandscapePlayer(
                                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                                             onScrub = onRadioScrub,
                                             onSeek = onRadioSeek,
+                                            onPlayPause = onRadioPlayPause,
                                         )
                                         SeekMessage(playerSeeker)
                                     }
