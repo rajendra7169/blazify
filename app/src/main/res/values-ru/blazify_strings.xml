@@ -1386,4 +1386,77 @@
     <string name="star_prompt_title_short">Нравится Blazify?</string>
     <string name="star_prompt_body_short">Звезда на GitHub помогает другим найти его. Бесплатно и без рекламы.</string>
     <string name="import_spotify_csv_tip">Чтобы получить весь список, экспортируйте его в CSV (Exportify делает это через ваш вход в Spotify), затем откройте Настройки › Резервное копирование › Импорт плейлиста CSV.</string>
+    <string name="festival_greeting_halloween">Счастливого Хеллоуина</string>
+    <string name="star_prompt_already">Звезда уже есть</string>
+    <string name="update_prompt_title">Вышел Blazify %s</string>
+    <string name="update_prompt_body">Новые функции и исправления готовы. Ваша музыка и библиотека останутся как есть.</string>
+    <string name="update_prompt_update">Обновить</string>
+    <string name="spatial_sound">3D-звук</string>
+    <string name="spatial_sound_off">Выкл.</string>
+    <string name="spatial_sound_surround">Объёмный</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Выкл. Объёмный режим располагает песню вокруг вас, 8D заставляет её кружить вокруг головы. Лучше всего в наушниках</string>
+    <string name="spatial_sound_desc_surround">Объёмный: песня звучит из колонок вокруг вас, с шириной сцены и комнатой позади</string>
+    <string name="spatial_sound_desc_orbit">8D: песня медленно кружит вокруг вашей головы</string>
+    <string name="search_offline">Поиск песен на этом телефоне…</string>
+    <string name="search_offline_notice">Нет подключения. Показаны песни, доступные офлайн: скачанные, кэшированные и сохранённые на устройстве.</string>
+    <string name="offline_home_group">Главная без подключения</string>
+    <string name="offline_home_cached">Кэшированные песни</string>
+    <string name="offline_home_cached_desc">Песни, целиком сохранённые в кэше после прослушивания</string>
+    <string name="offline_home_downloaded">Скачанные песни</string>
+    <string name="offline_home_downloaded_desc">Песни, которые вы скачали</string>
+    <string name="offline_home_device">Песни на устройстве</string>
+    <string name="offline_home_device_desc">Ваши собственные музыкальные файлы на этом телефоне</string>
+    <string name="whats_new">Что нового</string>
+    <string name="hint_whats_new">Новые функции, у каждой короткая демонстрация</string>
+    <string name="whats_new_title">Что нового в %1$s</string>
+    <string name="whats_new_section_new">Новое в этой версии</string>
+    <string name="whats_new_section_core">Что умеет Blazify</string>
+    <string name="whats_new_see_all">Все функции</string>
+    <string name="whats_new_see_fewer">Свернуть</string>
+    <string name="whats_new_release_notes">Полный список изменений</string>
+    <string name="whats_new_skip">Пропустить</string>
+    <string name="whats_new_see_more">Подробнее</string>
+    <string name="whats_new_kind_new">Новое</string>
+    <string name="whats_new_kind_improved">Улучшено</string>
+    <string name="whats_new_kind_fixed">Исправлено</string>
+    <string name="whats_new_card_position">%1$d из %2$d</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D-звук</annotation> перемещает песню вокруг вас</string>
+    <string name="whats_new_spatial_sound_desc">Объёмный режим раскладывает её по колонкам вокруг вас, 8D кружит вокруг головы. Включается в настройках плеера.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">Поиск</annotation> работает без подключения</string>
+    <string name="whats_new_offline_search_desc">Находит скачанные, кэшированные и локальные песни по названию, исполнителю или альбому.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Тренды</annotation> учитывают вашу страну</string>
+    <string name="whats_new_trending_desc">Чарты и новая подборка на Главной показывают, что популярно там, где вы живёте.</string>
+    <string name="whats_new_keeps_playing_title">Музыка <annotation type="accent">играет дальше</annotation>, когда список заканчивается</string>
+    <string name="whats_new_keeps_playing_desc">Когда альбом или плейлист заканчивается, в очередь добавляются похожие песни.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Video Art</annotation> находит настоящий клип</string>
+    <string name="whats_new_video_art_finder_desc">Больше никаких каверов, живых записей и лирик-видео, если у песни есть собственный клип.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Смена аккаунта</annotation> одним касанием</string>
+    <string name="whats_new_accounts_desc">Аккаунты Google, в которые вы входите, сохраняются, и между ними можно переключаться.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Смахните вправо</annotation>, чтобы песня играла следующей</string>
+    <string name="whats_new_queue_swipe_desc">В очереди больше нет блокировки: перетаскивайте, чтобы изменить порядок, смахните влево, чтобы удалить.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">Распознавание музыки</annotation> слушает со звуковой волной</string>
+    <string name="whats_new_recognition_wave_desc">Видно, когда оно слушает и ищет, а если песня не найдена, появляются подсказки.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Скачивайте</annotation> песни для прослушивания офлайн</string>
+    <string name="whats_new_core_downloads_desc">Нажмите на стрелку у песни, альбома или плейлиста, и они будут играть без подключения.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">Синхронный текст</annotation> подсвечивается слово за словом</string>
+    <string name="whats_new_core_lyrics_desc">С переводом и романизацией, из выбранных вами источников.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Шесть дизайнов плеера</annotation> на выбор</string>
+    <string name="whats_new_core_player_designs_desc">Классический, Кольцо, Во всю обложку, Пластинка, Кассета и Video Art, в цветах песни.</string>
+    <string name="whats_new_core_equalizer_title"><annotation type="accent">10-полосный эквалайзер</annotation> с пресетами</string>
+    <string name="whats_new_core_equalizer_desc">Двигайте каждую полосу, выберите пресет или импортируйте профиль AutoEQ для своих наушников.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Таймер сна</annotation> сам остановит музыку</string>
+    <string name="whats_new_core_sleep_timer_desc">Нажмите на луну в плеере и выберите минуты или остановку в конце песни.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> играет синхронно с друзьями</string>
+    <string name="whats_new_core_together_desc">Поделитесь кодом комнаты, и все услышат одну песню в один и тот же момент.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Распознайте</annotation> песню, которая звучит рядом</string>
+    <string name="whats_new_core_recognition_desc">Нажмите на звуковую волну в строке поиска, и Blazify назовёт песню.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Ваша музыка</annotation> играет рядом со стримингом</string>
+    <string name="whats_new_core_local_music_desc">Музыкальные файлы на телефоне используют ту же библиотеку, очередь и плеер.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Оформление</annotation> меняет стиль приложения</string>
+    <string name="whats_new_core_look_and_feel_desc">Тема, плеер, мини-плеер, текст и Главная, с живым предпросмотром по ходу настройки.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Video Art</annotation> показывает клип</string>
+    <string name="whats_new_core_video_art_desc">Собственный клип песни идёт за плеером, без звука и в такт.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Трансляция</annotation> на телевизор</string>
+    <string name="whats_new_core_cast_desc">Отправьте музыку на Chromecast или Google TV прямо из плеера.</string>
 </resources>
