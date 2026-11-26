@@ -276,4 +276,10 @@
     <string name="new_version_available">Uusi versio saatavilla</string>
     <string name="translation_models">Käännösmallit</string>
     <string name="clear_translation_models">Tyhjennä käännösmallit</string>
+    <string name="pause">Tauko</string>
+    <string name="theme_desc">Muokkaa sovelluksen teemaa</string>
+    <string name="theme_colors">Teema ja värit</string>
+    <string name="theme_mode">Teematila</string>
+    <string name="color_palette">Väripaletti</string>
+    <string name="use_system_colors">Käytä järjestelmän värejä</string>
 </resources>
