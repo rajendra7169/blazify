@@ -276,4 +276,10 @@
     <string name="dismiss">বাতিল করুন</string>
     <string name="options">বিকল্পসমূহ</string>
     <string name="preview">প্রিভিউ</string>
+    <string name="pause">পজ</string>
+    <string name="theme_desc">অ্যাপের থিম কাস্টমাইজ করুন</string>
+    <string name="theme_colors">থিম ও রং</string>
+    <string name="theme_mode">থিম মোড</string>
+    <string name="color_palette">রঙের প্যালেট</string>
+    <string name="use_system_colors">সিস্টেমের রং ব্যবহার করুন</string>
 </resources>
