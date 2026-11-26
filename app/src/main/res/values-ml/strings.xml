@@ -276,4 +276,10 @@
     <string name="new_version_available">പുതിയ വേർഷൻ ലഭ്യമാണ്</string>
     <string name="translation_models">വിവർത്തന പദ്ധതികൾ</string>
     <string name="clear_translation_models">വിവർത്തന പദ്ധതികൾ കളയുക</string>
+    <string name="pause">താൽക്കാലികമായി നിർത്തുക</string>
+    <string name="theme_desc">ആപ്പിന്റെ തീം നിങ്ങളുടെ ഇഷ്ടത്തിന് മാറ്റുക</string>
+    <string name="theme_colors">തീമും നിറങ്ങളും</string>
+    <string name="theme_mode">തീം മോഡ്</string>
+    <string name="color_palette">വർണ്ണ പാലറ്റ്</string>
+    <string name="use_system_colors">സിസ്റ്റം നിറങ്ങൾ ഉപയോഗിക്കുക</string>
 </resources>
