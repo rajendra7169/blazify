@@ -241,7 +241,7 @@ fun RadioDial(
         BoxWithConstraints(modifier = modifier.aspectRatio(WHOLE_ASPECT)) {
             val w = maxWidth
 
-            // 0) Two short antennas standing on the cabinet: drawn once.
+            // 0) The antenna standing on the cabinet's top right: drawn once.
             Spacer(
                 Modifier
                     .fillMaxWidth()
@@ -888,41 +888,36 @@ private val Chrome = Color(0xFFD9DDE2)
 private val ChromeShade = Color(0xFF8C939B)
 
 /**
- * Two short telescopic antennas in a V from a brass mount on top of the cabinet. The band is
- * [ANT_H] of the width tall and ends where the cabinet starts.
+ * One telescopic antenna standing at the top right of the cabinet, leaning a little outwards
+ * from a brass mount. The band is [ANT_H] of the width tall and ends where the cabinet starts.
  */
 private fun CacheDrawScope.buildAntennas(): DrawResult {
     val s = size.width
     val baseY = size.height
-    val mount = Offset(s * 0.5f, baseY)
-    val length = size.height * 0.9f
-    val rods =
-        listOf(-24f, 24f).map { lean ->
-            val a = Math.toRadians(lean.toDouble() - 90.0)
-            Offset(cos(a).toFloat(), sin(a).toFloat())
-        }
+    val mount = Offset(s * 0.8f, baseY)
+    val length = size.height * 0.94f
+    val a = Math.toRadians(18.0 - 90.0)
+    val dir = Offset(cos(a).toFloat(), sin(a).toFloat())
+    val joint = mount + dir * (length * 0.5f)
+    val tip = mount + dir * length
     return onDrawBehind {
-        for (dir in rods) {
-            val joint = mount + dir * (length * 0.52f)
-            val tip = mount + dir * length
-            // Shadow, then the thick lower section and the thin upper one.
-            drawLine(Color.Black.copy(alpha = 0.18f), mount + Offset(s * 0.006f, 0f), tip + Offset(s * 0.006f, 0f), strokeWidth = s * 0.012f, cap = StrokeCap.Round)
-            drawLine(ChromeShade, mount, joint, strokeWidth = s * 0.014f, cap = StrokeCap.Round)
-            drawLine(Chrome, mount, joint, strokeWidth = s * 0.007f, cap = StrokeCap.Round)
-            drawLine(ChromeShade, joint, tip, strokeWidth = s * 0.009f, cap = StrokeCap.Round)
-            drawLine(Chrome, joint, tip, strokeWidth = s * 0.0045f, cap = StrokeCap.Round)
-            // A small ball at the tip.
-            drawCircle(ChromeShade, radius = s * 0.013f, center = tip)
-            drawCircle(Chrome, radius = s * 0.008f, center = tip - Offset(s * 0.003f, s * 0.003f))
-        }
-        // The brass mount the two rods turn in, half sunk into the cabinet's top.
+        // Shadow, then the thick lower section and the thin upper one.
+        drawLine(Color.Black.copy(alpha = 0.18f), mount + Offset(s * 0.006f, 0f), tip + Offset(s * 0.006f, 0f), strokeWidth = s * 0.012f, cap = StrokeCap.Round)
+        drawLine(ChromeShade, mount, joint, strokeWidth = s * 0.014f, cap = StrokeCap.Round)
+        drawLine(Chrome, mount, joint, strokeWidth = s * 0.007f, cap = StrokeCap.Round)
+        drawLine(ChromeShade, joint, tip, strokeWidth = s * 0.009f, cap = StrokeCap.Round)
+        drawLine(Chrome, joint, tip, strokeWidth = s * 0.0045f, cap = StrokeCap.Round)
+        // A small ball at the tip.
+        drawCircle(ChromeShade, radius = s * 0.013f, center = tip)
+        drawCircle(Chrome, radius = s * 0.008f, center = tip - Offset(s * 0.003f, s * 0.003f))
+        // The brass mount it turns in, half sunk into the cabinet's top.
         drawArc(
-            brush = Brush.verticalGradient(listOf(BrassLight, BrassDark), startY = baseY - s * 0.04f, endY = baseY),
+            brush = Brush.verticalGradient(listOf(BrassLight, BrassDark), startY = baseY - s * 0.032f, endY = baseY),
             startAngle = 180f,
             sweepAngle = 180f,
             useCenter = true,
-            topLeft = Offset(mount.x - s * 0.045f, baseY - s * 0.04f),
-            size = Size(s * 0.09f, s * 0.08f),
+            topLeft = Offset(mount.x - s * 0.034f, baseY - s * 0.032f),
+            size = Size(s * 0.068f, s * 0.064f),
         )
     }
 }
