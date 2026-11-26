@@ -285,4 +285,10 @@
     <string name="refetch">Reîncarcă</string>
     <string name="sided">Într-o parte</string>
     <string name="remove_download_playlist_confirm">Sigur vrei să ștergi toate cele %s (de) melodii din playlist din Melodii descărcate?</string>
+    <string name="pause">Pauză</string>
+    <string name="theme_desc">Personalizează tema aplicației</string>
+    <string name="theme_colors">Temă și culori</string>
+    <string name="theme_mode">Modul temei</string>
+    <string name="color_palette">Paletă de culori</string>
+    <string name="use_system_colors">Folosește culorile sistemului</string>
 </resources>
