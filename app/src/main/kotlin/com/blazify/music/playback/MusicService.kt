@@ -609,6 +609,9 @@ class MusicService :
     @Volatile
     private var continuingWithSimilar = false
 
+    /** The queue's next page is being fetched; one request at a time. */
+    private var loadingMore = false
+
     /** Which client each song's stream came from, so a refusal can be laid at the right door. */
     private val streamClients = java.util.concurrent.ConcurrentHashMap<String, String>()
 
@@ -2176,8 +2179,12 @@ class MusicService :
                 // A queue filled from the songs on the phone, because the connection had gone,
                 // finds its first song stuck: go on to the first one that will play.
                 skipAheadIfStillOffline(player.currentMediaItem)
-                // A list of one or two songs gets no further song change before it ends.
-                if (!restoringQueue) maybeContinueWithSimilar()
+                // A list of one or two songs gets no further song change before it ends, so
+                // whatever comes after it has to be fetched now, or the song ends in silence.
+                if (!restoringQueue) {
+                    maybeLoadMore()
+                    maybeContinueWithSimilar()
+                }
             }
           }
         }
@@ -2349,18 +2356,87 @@ class MusicService :
     }
 
     /**
+     * Fetches the queue's next page once few songs are left. Runs after every song change and
+     * also straight after a queue loads, because a radio that opens with one song gets no song
+     * change before it ends. Songs already queued are left out: a radio's later pages repeat
+     * earlier songs. A page that brings nothing new hands over to [maybeContinueWithSimilar].
+     */
+    private fun maybeLoadMore() {
+        if (!cachedAutoLoadMore ||
+            queueLoading ||
+            loadingMore ||
+            // A station plays on its own: it has no end for a next song to follow.
+            player.currentMediaItem?.mediaId in liveBroadcasts.value ||
+            player.mediaItemCount - player.currentMediaItemIndex > 5 ||
+            !currentQueue.hasNextPage() ||
+            (cachedDisableLoadMoreWhenRepeatAll && player.repeatMode == REPEAT_MODE_ALL)
+        ) {
+            return
+        }
+        val queue = currentQueue
+        // Only a radio repeats itself; a playlist may hold the same song twice on purpose.
+        val queuedIds = if (queue is YouTubeQueue) player.mediaItems.mapTo(HashSet()) { it.mediaId } else emptySet()
+        loadingMore = true
+        scope.launch(SilentHandler) {
+            var added = false
+            try {
+                val mediaItems =
+                    withContext(Dispatchers.IO) {
+                        queue
+                            .nextPage()
+                            .filterExplicit(cachedHideExplicit)
+                            .filterVideoSongs(cachedHideVideoSongs)
+                            .filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
+                            .filter { it.mediaId !in queuedIds }
+                            .distinctBy { it.mediaId }
+                    }
+                // Something else may have started meanwhile; then this page is not wanted.
+                if (currentQueue !== queue || player.playbackState == STATE_IDLE) return@launch
+                if (mediaItems.isNotEmpty()) {
+                    player.addMediaItems(mediaItems)
+                    if (player.shuffleModeEnabled) {
+                        applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, cachedShufflePlaylistFirst)
+                    }
+                    queueChangedSinceSave = true
+                    playOnIfEnded()
+                    added = true
+                }
+            } catch (e: Exception) {
+                if (e is kotlin.coroutines.cancellation.CancellationException) throw e
+                Timber.tag(TAG).w(e, "Could not load more of the queue")
+            } finally {
+                loadingMore = false
+            }
+            if (!added && currentQueue === queue) maybeContinueWithSimilar(queueRanDry = true)
+        }
+    }
+
+    /**
+     * Songs added after the last one finished: play on into them instead of staying stopped.
+     * Not when playback was paused, as the sleep timer's "end of song" does.
+     */
+    private fun playOnIfEnded() {
+        if (player.playbackState == Player.STATE_ENDED && player.playWhenReady && player.hasNextMediaItem()) {
+            player.seekToNextMediaItem()
+            player.prepare()
+            player.play()
+        }
+    }
+
+    /**
      * Adds a radio of the queue's last online song to the end of the queue and makes that radio
      * the queue, so it keeps loading more by itself. Leaves out what is already queued and what
      * was heard in the last few hours, so the carry-on does not open with songs just played.
      */
-    private fun maybeContinueWithSimilar() {
+    private fun maybeContinueWithSimilar(queueRanDry: Boolean = false) {
         if (cachedSimilarContent &&
             !queueLoading &&
             player.repeatMode == REPEAT_MODE_OFF &&
             player.currentMediaItem?.mediaId !in liveBroadcasts.value &&
             player.mediaItemCount > 0 &&
             player.mediaItemCount - player.currentMediaItemIndex <= 3 &&
-            !currentQueue.hasNextPage() &&
+            // A queue that says it has more but just brought nothing new counts as finished.
+            (queueRanDry || !currentQueue.hasNextPage()) &&
             !continuingWithSimilar &&
             !inListenTogetherRoom() &&
             // Offline, a list plays to its end and stops: there is nothing similar to fetch.
@@ -2399,6 +2475,7 @@ class MusicService :
                 }
                 currentQueue = radio
                 queueChangedSinceSave = true
+                playOnIfEnded()
                 Timber.tag(TAG).d("Queue ran low: carrying on with ${items.size} songs like $seed")
             } catch (e: Exception) {
                 if (e is kotlin.coroutines.cancellation.CancellationException) throw e
@@ -3269,36 +3346,13 @@ class MusicService :
             }
         }
 
-        if (cachedAutoLoadMore &&
-            reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT &&
-            // A station plays on its own: it has no end for a next song to follow.
-            player.currentMediaItem?.mediaId !in liveBroadcasts.value &&
-            player.mediaItemCount - player.currentMediaItemIndex <= 5 &&
-            currentQueue.hasNextPage() &&
-            !(cachedDisableLoadMoreWhenRepeatAll && player.repeatMode == REPEAT_MODE_ALL)
-        ) {
-            scope.launch(SilentHandler) {
-                val mediaItems =
-                    withContext(Dispatchers.IO) {
-                        currentQueue
-                            .nextPage()
-                            .filterExplicit(cachedHideExplicit)
-                            .filterVideoSongs(cachedHideVideoSongs)
-                            .filterHidden(cachedHiddenSongIds).filterBlockedArtists(cachedBlockedArtists)
-                    }
-                if (player.playbackState != STATE_IDLE && mediaItems.isNotEmpty()) {
-                    player.addMediaItems(mediaItems)
-                    if (player.shuffleModeEnabled) {
-                        applyShuffleOrder(player.currentMediaItemIndex, player.mediaItemCount, cachedShufflePlaylistFirst)
-                    }
-                }
-            }
+        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+            maybeLoadMore()
+            // An album, a playlist or a list from the library has an end, and reaching it used to
+            // mean silence. "Similar content" (on by default) promises more songs like these once
+            // the end is near, so carry on with a radio of the last song, as YouTube Music does.
+            maybeContinueWithSimilar()
         }
-
-        // An album, a playlist or a list from the library has an end, and reaching it used to
-        // mean silence. "Similar content" (on by default) promises more songs like these once
-        // the end is near, so carry on with a radio of the last song, as YouTube Music does.
-        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) maybeContinueWithSimilar()
 
         skipAheadIfStillOffline(mediaItem)
 

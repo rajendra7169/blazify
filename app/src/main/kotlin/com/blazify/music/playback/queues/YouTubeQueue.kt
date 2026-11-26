@@ -8,9 +8,11 @@ package com.blazify.music.playback.queues
 
 import androidx.media3.common.MediaItem
 import com.blazify.innertube.YouTube
+import com.blazify.innertube.models.SongItem
 import com.blazify.innertube.models.WatchEndpoint
 import com.blazify.music.extensions.toMediaItem
 import com.blazify.music.models.MediaMetadata
+import com.blazify.music.models.toMediaMetadata
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 
@@ -145,6 +147,22 @@ class YouTubeQueue(
     }
 
     companion object {
+        /**
+         * What a tap on one song from a shelf plays: that song's own radio, the same queue a tap
+         * in Search gives, so what follows matches its language and mood.
+         *
+         * A shelf hands each song a link of its own, and on Home that link can point into a
+         * personal mix of everything the listener plays (a Hindi song followed by English
+         * ones), or come back with the song alone and nothing after it. Episodes keep their
+         * link, which goes on through their show.
+         */
+        fun forSong(song: SongItem): YouTubeQueue =
+            if (song.isEpisode) {
+                YouTubeQueue(song.endpoint ?: WatchEndpoint(videoId = song.id), song.toMediaMetadata())
+            } else {
+                radio(song.toMediaMetadata())
+            }
+
         /**
          * Creates a radio queue based on a song.
          * Explicitly requests the RDAMVM playlist to trigger automotive/radio mixing.

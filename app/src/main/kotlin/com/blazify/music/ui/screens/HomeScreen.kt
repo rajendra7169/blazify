@@ -1011,12 +1011,7 @@ fun HomeScreen(
                                         } else {
                                             playerConnection.playQueue(
                                                 if (autoRadioQueue) {
-                                                    YouTubeQueue(
-                                                        item.endpoint ?: WatchEndpoint(
-                                                            videoId = item.id,
-                                                        ),
-                                                        item.toMediaMetadata(),
-                                                    )
+                                                    YouTubeQueue.forSong(item)
                                                 } else {
                                                     ListQueue(
                                                         title = item.title,
@@ -1763,13 +1758,7 @@ fun HomeScreen(
                                                                                                 is SongItem -> {
                                                                                                     playerConnection.playQueue(
                                                                                                         if (autoRadioQueue) {
-                                                                                                            YouTubeQueue(
-                                                                                                                randomItem.endpoint
-                                                                                                                    ?: WatchEndpoint(
-                                                                                                                        videoId = randomItem.id,
-                                                                                                                    ),
-                                                                                                                randomItem.toMediaMetadata(),
-                                                                                                            )
+                                                                                                            YouTubeQueue.forSong(randomItem)
                                                                                                         } else {
                                                                                                             ListQueue(
                                                                                                                 title = randomItem.title,
@@ -1856,13 +1845,7 @@ fun HomeScreen(
                                                                                                     } else {
                                                                                                         playerConnection.playQueue(
                                                                                                             if (autoRadioQueue) {
-                                                                                                                YouTubeQueue(
-                                                                                                                    item.endpoint
-                                                                                                                        ?: WatchEndpoint(
-                                                                                                                            videoId = item.id,
-                                                                                                                        ),
-                                                                                                                    item.toMediaMetadata(),
-                                                                                                                )
+                                                                                                                YouTubeQueue.forSong(item)
                                                                                                             } else {
                                                                                                                 ListQueue(
                                                                                                                     title = item.title,
@@ -2149,10 +2132,7 @@ fun HomeScreen(
                                                 onSongClick = { song ->
                                                     if (!isListenTogetherGuest) {
                                                         playerConnection.playQueue(
-                                                            YouTubeQueue(
-                                                                song.endpoint ?: WatchEndpoint(videoId = song.id),
-                                                                song.toMediaMetadata(),
-                                                            ),
+                                                            YouTubeQueue.forSong(song),
                                                         )
                                                     }
                                                 },
@@ -2216,10 +2196,7 @@ fun HomeScreen(
                                                         if (mediaMetadata != null) {
                                                             playerConnection.playQueue(
                                                                 if (autoRadioQueue) {
-                                                                    YouTubeQueue(
-                                                                        song.endpoint ?: WatchEndpoint(videoId = song.id),
-                                                                        mediaMetadata,
-                                                                    )
+                                                                    YouTubeQueue.forSong(song)
                                                                 } else {
                                                                     ListQueue(
                                                                         title = song.title,
@@ -2656,10 +2633,7 @@ fun HomeScreen(
                                                                     if (!isListenTogetherGuest) {
                                                                         playerConnection.playQueue(
                                                                             if (autoRadioQueue) {
-                                                                                YouTubeQueue(
-                                                                                    song.endpoint ?: WatchEndpoint(videoId = song.id),
-                                                                                    song.toMediaMetadata(),
-                                                                                )
+                                                                                YouTubeQueue.forSong(song)
                                                                             } else {
                                                                                 ListQueue(
                                                                                     title = song.title,
