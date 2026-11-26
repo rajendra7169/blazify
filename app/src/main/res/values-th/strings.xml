@@ -267,4 +267,10 @@
     <string name="new_version_available">มีเวอร์ชันใหม่พร้อมใช้งาน</string>
     <string name="translation_models">โมเดลการแปล</string>
     <string name="clear_translation_models">ล้างโมเดลการแปล</string>
+    <string name="pause">หยุดชั่วคราว</string>
+    <string name="theme_desc">ปรับแต่งธีมของแอป</string>
+    <string name="theme_colors">ธีมและสี</string>
+    <string name="theme_mode">โหมดธีม</string>
+    <string name="color_palette">ชุดสี</string>
+    <string name="use_system_colors">ใช้สีของระบบ</string>
 </resources>
