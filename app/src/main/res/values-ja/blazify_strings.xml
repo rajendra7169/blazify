@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">Blazify を楽しんでいますか？</string>
     <string name="star_prompt_body_short">GitHub でスターを付けると、ほかの人が見つけやすくなります。無料で広告もありません。</string>
     <string name="import_spotify_csv_tip">全曲を入れるには CSV ファイルに書き出し（Exportify なら自分の Spotify ログインで書き出せます）、設定 › バックアップと復元 › CSV プレイリストを読み込む を使ってください。</string>
+    <string name="festival_greeting_halloween">ハッピーハロウィン</string>
+    <string name="star_prompt_already">スター済み</string>
+    <string name="update_prompt_title">Blazify %s が登場</string>
+    <string name="update_prompt_body">新機能と修正の準備ができました。音楽やライブラリはそのまま残ります。</string>
+    <string name="update_prompt_update">アップデート</string>
+    <string name="spatial_sound">3D サウンド</string>
+    <string name="spatial_sound_off">オフ</string>
+    <string name="spatial_sound_surround">サラウンド</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">オフ。サラウンドは曲をあなたの周りに配置し、8D は頭の周りを回らせます。ヘッドホン推奨</string>
+    <string name="spatial_sound_desc_surround">サラウンド：周りのスピーカーから曲が流れ、音の広がりと奥の空間も感じられます</string>
+    <string name="spatial_sound_desc_orbit">8D：曲がゆっくりと頭の周りを回ります</string>
+    <string name="search_offline">このスマホの曲を検索…</string>
+    <string name="search_offline_notice">接続がありません。オフラインで再生できる曲（ダウンロード済み、キャッシュ済み、このデバイス内）を表示しています。</string>
+    <string name="offline_home_group">オフライン時のホーム</string>
+    <string name="offline_home_cached">キャッシュした曲</string>
+    <string name="offline_home_cached_desc">再生後に曲のキャッシュにまるごと保存された曲</string>
+    <string name="offline_home_downloaded">ダウンロードした曲</string>
+    <string name="offline_home_downloaded_desc">あなたがダウンロードした曲</string>
+    <string name="offline_home_device">このデバイスの曲</string>
+    <string name="offline_home_device_desc">このスマホにあるあなた自身の音楽ファイル</string>
+    <string name="whats_new">新機能</string>
+    <string name="hint_whats_new">新しい機能を短いデモで紹介</string>
+    <string name="whats_new_title">%1$s の新機能</string>
+    <string name="whats_new_section_new">このバージョンの新機能</string>
+    <string name="whats_new_section_core">Blazify でできること</string>
+    <string name="whats_new_see_all">すべての機能を見る</string>
+    <string name="whats_new_see_fewer">表示を減らす</string>
+    <string name="whats_new_release_notes">リリースノート全文</string>
+    <string name="whats_new_skip">スキップ</string>
+    <string name="whats_new_see_more">もっと見る</string>
+    <string name="whats_new_kind_new">新機能</string>
+    <string name="whats_new_kind_improved">改善</string>
+    <string name="whats_new_kind_fixed">修正</string>
+    <string name="whats_new_card_position">%2$d 件中 %1$d 件目</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D サウンド</annotation>で曲があなたの周りを動く</string>
+    <string name="whats_new_spatial_sound_desc">サラウンドは周りのスピーカーに配置し、8D は頭の周りを回ります。プレーヤー設定にあります。</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">検索</annotation>が接続なしでも使える</string>
+    <string name="whats_new_offline_search_desc">ダウンロード済み・キャッシュ済み・端末内の曲を、曲名、アーティスト、アルバムで見つけます。</string>
+    <string name="whats_new_trending_title"><annotation type="accent">急上昇</annotation>があなたの国に合わせて表示</string>
+    <string name="whats_new_trending_desc">チャートとホームの新しい棚で、あなたの住む地域の人気曲がわかります。</string>
+    <string name="whats_new_keeps_playing_title">リストが終わっても音楽が<annotation type="accent">再生され続ける</annotation></string>
+    <string name="whats_new_keeps_playing_desc">アルバムやプレイリストが終わると、似た曲が再生キューに追加されます。</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">ビデオアート</annotation>が本物のミュージックビデオを見つける</string>
+    <string name="whats_new_video_art_finder_desc">その曲の公式ビデオがあれば、カバーやライブ、歌詞動画が使われることはもうありません。</string>
+    <string name="whats_new_accounts_title">ワンタップで<annotation type="accent">アカウントを切り替え</annotation></string>
+    <string name="whats_new_accounts_desc">ログインした Google アカウントは保存されるので、すぐに切り替えられます。</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">右にスワイプ</annotation>で次に再生</string>
+    <string name="whats_new_queue_swipe_desc">再生キューのロックはなくなりました。ドラッグで並べ替え、左にスワイプで削除できます。</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">楽曲認識</annotation>が音の波で聞き取り中を表示</string>
+    <string name="whats_new_recognition_wave_desc">聞き取り中や検索中がひと目でわかり、曲が見つからないときはヒントが出ます。</string>
+    <string name="whats_new_core_downloads_title">曲を<annotation type="accent">ダウンロード</annotation>してオフラインで再生</string>
+    <string name="whats_new_core_downloads_desc">曲、アルバム、プレイリストの矢印をタップすれば、接続なしで再生できます。</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">同期歌詞</annotation>が一語ずつ光る</string>
+    <string name="whats_new_core_lyrics_desc">翻訳とローマ字表記つき。歌詞のソースは自由に選べます。</string>
+    <string name="whats_new_core_player_designs_title">選べる<annotation type="accent">6 つのプレーヤーデザイン</annotation></string>
+    <string name="whats_new_core_player_designs_desc">クラシック、リング、フルアート、レコード、カセット、ビデオアート。曲に合わせて色が変わります。</string>
+    <string name="whats_new_core_equalizer_title">プリセット付き<annotation type="accent">10 バンドイコライザー</annotation></string>
+    <string name="whats_new_core_equalizer_desc">各バンドをドラッグしたり、プリセットを選んだり、ヘッドホン用の AutoEQ プロファイルを読み込んだりできます。</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">スリープタイマー</annotation>で音楽を自動で停止</string>
+    <string name="whats_new_core_sleep_timer_desc">プレーヤーの月アイコンをタップして分数を選ぶか、曲の終わりで停止します。</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> で友だちと同時に再生</string>
+    <string name="whats_new_core_together_desc">ルームコードを共有すれば、全員が同じ曲を同じ瞬間に聴けます。</string>
+    <string name="whats_new_core_recognition_title">周りで流れている曲を<annotation type="accent">認識</annotation></string>
+    <string name="whats_new_core_recognition_desc">検索バーの音の波をタップすると、Blazify が曲名を教えてくれます。</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">手持ちの音楽</annotation>もストリーミングと一緒に再生</string>
+    <string name="whats_new_core_local_music_desc">スマホ内の音楽ファイルも、同じライブラリ、再生キュー、プレーヤーで使えます。</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">デザイン</annotation>でアプリの見た目を変更</string>
+    <string name="whats_new_core_look_and_feel_desc">テーマ、プレーヤー、ミニプレーヤー、歌詞、ホームを、ライブプレビューを見ながら調整できます。</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">ビデオアート</annotation>でミュージックビデオを再生</string>
+    <string name="whats_new_core_video_art_desc">その曲の公式ビデオがプレーヤーの背景で、ミュートのまま曲に合わせて流れます。</string>
+    <string name="whats_new_core_cast_title">テレビに<annotation type="accent">キャスト</annotation></string>
+    <string name="whats_new_core_cast_desc">プレーヤーから Chromecast や Google TV に音楽を送れます。</string>
 </resources>
