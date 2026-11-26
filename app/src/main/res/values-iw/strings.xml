@@ -285,4 +285,10 @@
     <string name="new_version_available">גירסה חדשה זמינה</string>
     <string name="translation_models">מודלים של תרגום</string>
     <string name="clear_translation_models">ניקוי מודלי תרגום</string>
+    <string name="pause">השהה</string>
+    <string name="theme_desc">התאם אישית את עיצוב האפליקציה</string>
+    <string name="theme_colors">עיצוב וצבעים</string>
+    <string name="theme_mode">מצב עיצוב</string>
+    <string name="color_palette">פלטת צבעים</string>
+    <string name="use_system_colors">השתמש בצבעי המערכת</string>
 </resources>
