@@ -285,4 +285,10 @@
     <string name="use_login_for_browse_desc">Ciò può influenzare il contenuto che vedi e ad esempio mostra album solo premium se hai effettuato l\'accesso con un account Premium</string>
     <string name="dismiss">Ignorare</string>
     <string name="action_login">Accedi</string>
+    <string name="pause">Pausa</string>
+    <string name="theme_desc">Personalizza il tema dell\'app</string>
+    <string name="theme_colors">Tema e colori</string>
+    <string name="theme_mode">Modalità tema</string>
+    <string name="color_palette">Tavolozza colori</string>
+    <string name="use_system_colors">Usa i colori di sistema</string>
 </resources>
