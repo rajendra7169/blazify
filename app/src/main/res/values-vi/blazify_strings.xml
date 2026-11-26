@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">Bạn thích Blazify chứ?</string>
     <string name="star_prompt_body_short">Một ngôi sao trên GitHub giúp người khác tìm thấy nó. Miễn phí, không quảng cáo.</string>
     <string name="import_spotify_csv_tip">Để có cả danh sách, hãy xuất nó thành tệp CSV (Exportify làm việc này bằng đăng nhập Spotify của bạn), rồi dùng Cài đặt › Sao lưu và khôi phục › Nhập danh sách phát CSV.</string>
+    <string name="festival_greeting_halloween">Chúc mừng Halloween</string>
+    <string name="star_prompt_already">Đã gắn sao rồi</string>
+    <string name="update_prompt_title">Blazify %s đã có mặt</string>
+    <string name="update_prompt_body">Tính năng mới và bản sửa lỗi đã sẵn sàng. Nhạc và thư viện của bạn vẫn giữ nguyên.</string>
+    <string name="update_prompt_update">Cập nhật</string>
+    <string name="spatial_sound">Âm thanh 3D</string>
+    <string name="spatial_sound_off">Tắt</string>
+    <string name="spatial_sound_surround">Âm thanh vòm</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Tắt. Âm thanh vòm đặt bài hát quanh bạn; 8D đưa bài hát xoay vòng quanh đầu bạn. Nghe bằng tai nghe là tốt nhất</string>
+    <string name="spatial_sound_desc_surround">Âm thanh vòm: bài hát phát ra từ các loa quanh bạn, với độ rộng và không gian phòng phía sau</string>
+    <string name="spatial_sound_desc_orbit">8D: bài hát chậm rãi xoay quanh đầu bạn</string>
+    <string name="search_offline">Tìm bài hát trên điện thoại này…</string>
+    <string name="search_offline_notice">Không có kết nối. Đang hiện các bài hát phát được khi ngoại tuyến: đã tải xuống, trong bộ nhớ đệm và trên thiết bị này.</string>
+    <string name="offline_home_group">Trang chủ khi không có kết nối</string>
+    <string name="offline_home_cached">Bài hát trong bộ nhớ đệm</string>
+    <string name="offline_home_cached_desc">Bài hát được lưu trọn vẹn trong bộ nhớ đệm bài hát sau khi bạn phát</string>
+    <string name="offline_home_downloaded">Bài hát đã tải xuống</string>
+    <string name="offline_home_downloaded_desc">Các bài hát bạn đã tải xuống</string>
+    <string name="offline_home_device">Bài hát trên thiết bị này</string>
+    <string name="offline_home_device_desc">Tệp nhạc của riêng bạn trên điện thoại này</string>
+    <string name="whats_new">Có gì mới</string>
+    <string name="hint_whats_new">Tính năng mới, mỗi tính năng có một bản demo ngắn</string>
+    <string name="whats_new_title">Có gì mới trong %1$s</string>
+    <string name="whats_new_section_new">Mới trong phiên bản này</string>
+    <string name="whats_new_section_core">Blazify làm được gì</string>
+    <string name="whats_new_see_all">Xem tất cả tính năng</string>
+    <string name="whats_new_see_fewer">Thu gọn</string>
+    <string name="whats_new_release_notes">Ghi chú phát hành đầy đủ</string>
+    <string name="whats_new_skip">Bỏ qua</string>
+    <string name="whats_new_see_more">Xem thêm</string>
+    <string name="whats_new_kind_new">Mới</string>
+    <string name="whats_new_kind_improved">Cải tiến</string>
+    <string name="whats_new_kind_fixed">Đã sửa</string>
+    <string name="whats_new_card_position">%1$d trên %2$d</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">Âm thanh 3D</annotation> đưa bài hát chuyển động quanh bạn</string>
+    <string name="whats_new_spatial_sound_desc">Âm thanh vòm đặt bài hát lên các loa quanh bạn, 8D xoay quanh đầu bạn. Có trong cài đặt Trình phát.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">Tìm kiếm</annotation> hoạt động khi không có kết nối</string>
+    <string name="whats_new_offline_search_desc">Tìm các bài hát đã tải xuống, trong bộ nhớ đệm và trên máy theo tên bài, nghệ sĩ hoặc album.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Thịnh hành</annotation> theo quốc gia của bạn</string>
+    <string name="whats_new_trending_desc">Biểu đồ và một mục mới trên Trang chủ cho thấy những gì đang phổ biến nơi bạn sống.</string>
+    <string name="whats_new_keeps_playing_title">Nhạc <annotation type="accent">vẫn tiếp tục phát</annotation> khi danh sách kết thúc</string>
+    <string name="whats_new_keeps_playing_desc">Các bài hát tương tự được thêm vào hàng đợi khi album hoặc danh sách phát hết bài.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Video Art</annotation> tìm đúng video âm nhạc gốc</string>
+    <string name="whats_new_video_art_finder_desc">Không còn bản cover, bản live hay video lời bài hát khi bài hát đã có video chính thức.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Chuyển tài khoản</annotation> chỉ với một chạm</string>
+    <string name="whats_new_accounts_desc">Các tài khoản Google bạn đã đăng nhập được giữ lại để bạn chuyển qua lại giữa chúng.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Vuốt sang phải</annotation> để phát bài hát tiếp theo</string>
+    <string name="whats_new_queue_swipe_desc">Hàng đợi không còn khóa: kéo để sắp xếp lại, vuốt sang trái để xóa.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">Nhận dạng bài hát</annotation> lắng nghe với sóng âm</string>
+    <string name="whats_new_recognition_wave_desc">Hiển thị khi đang nghe và đang tìm, kèm mẹo khi không tìm thấy bài hát.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Tải xuống</annotation> bài hát để nghe ngoại tuyến</string>
+    <string name="whats_new_core_downloads_desc">Chạm vào mũi tên trên bài hát, album hoặc danh sách phát, và nó sẽ phát không cần kết nối.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">Lời bài hát đồng bộ</annotation> sáng lên theo từng từ</string>
+    <string name="whats_new_core_lyrics_desc">Có bản dịch và La-tinh hóa, từ các nguồn bạn chọn.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sáu kiểu trình phát</annotation> để bạn chọn</string>
+    <string name="whats_new_core_player_designs_desc">Cổ điển, Vòng tròn, Ảnh bìa toàn màn hình, Đĩa than, Băng cassette và Video Art, mang màu của bài hát.</string>
+    <string name="whats_new_core_equalizer_title"><annotation type="accent">Bộ cân bằng 10 dải</annotation> có cấu hình sẵn</string>
+    <string name="whats_new_core_equalizer_desc">Kéo từng dải, chọn cấu hình sẵn hoặc nhập hồ sơ AutoEQ cho tai nghe của bạn.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Hẹn giờ ngủ</annotation> tự dừng nhạc giúp bạn</string>
+    <string name="whats_new_core_sleep_timer_desc">Chạm vào mặt trăng trong trình phát và chọn số phút, hoặc dừng khi hết bài.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> phát đồng bộ cùng bạn bè</string>
+    <string name="whats_new_core_together_desc">Chia sẻ mã phòng và mọi người cùng nghe một bài hát vào cùng một lúc.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Nhận dạng</annotation> bài hát đang phát quanh bạn</string>
+    <string name="whats_new_core_recognition_desc">Chạm vào sóng âm trên thanh tìm kiếm và Blazify sẽ cho biết tên bài hát.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Nhạc của riêng bạn</annotation> phát cùng nhạc trực tuyến</string>
+    <string name="whats_new_core_local_music_desc">Tệp nhạc trên điện thoại dùng chung thư viện, hàng đợi và trình phát.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Giao diện</annotation> thay đổi phong cách ứng dụng</string>
+    <string name="whats_new_core_look_and_feel_desc">Chủ đề, trình phát, trình phát mini, lời bài hát và Trang chủ, có xem trước trực tiếp khi bạn chỉnh.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Video Art</annotation> phát video âm nhạc</string>
+    <string name="whats_new_core_video_art_desc">Video chính thức của bài hát phát phía sau trình phát, tắt tiếng và khớp nhịp.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Truyền</annotation> lên TV của bạn</string>
+    <string name="whats_new_core_cast_desc">Gửi nhạc tới Chromecast hoặc Google TV ngay từ trình phát.</string>
 </resources>
