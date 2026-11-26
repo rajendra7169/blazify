@@ -99,6 +99,13 @@ object WhatsNewCatalog {
                             icon = R.drawable.search,
                         ),
                         FeatureEntry(
+                            id = "radio_player",
+                            heading = R.string.whats_new_radio_player_title,
+                            description = R.string.whats_new_radio_player_desc,
+                            demo = DemoId.PLAYER_DESIGNS,
+                            icon = R.drawable.radio,
+                        ),
+                        FeatureEntry(
                             id = "trending_country",
                             heading = R.string.whats_new_trending_title,
                             description = R.string.whats_new_trending_desc,

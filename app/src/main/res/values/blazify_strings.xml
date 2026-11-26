@@ -1566,6 +1566,8 @@
     <string name="whats_new_spatial_sound_desc">Surround places it on speakers round you, 8D circles your head. Find it in Player settings.</string>
     <string name="whats_new_offline_search_title"><annotation type="accent">Search</annotation> works with no connection</string>
     <string name="whats_new_offline_search_desc">It finds your downloaded, cached and local songs by title, artist or album.</string>
+    <string name="whats_new_radio_player_title">A <annotation type="accent">vintage radio</annotation> plays your songs</string>
+    <string name="whats_new_radio_player_desc">A new player design: the cover in its window, a dial needle that follows the song. Drag it to seek.</string>
     <string name="whats_new_trending_title"><annotation type="accent">Trending</annotation> follows your country</string>
     <string name="whats_new_trending_desc">Charts and a new shelf on Home show what is popular where you live.</string>
     <string name="whats_new_keeps_playing_title">Music <annotation type="accent">keeps playing</annotation> when a list ends</string>
@@ -1583,8 +1585,8 @@
     <string name="whats_new_core_downloads_desc">Tap the arrow on a song, album or playlist, and it plays with no connection.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Synced lyrics</annotation> light up word by word</string>
     <string name="whats_new_core_lyrics_desc">With translation and romanization, from the sources you choose.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Six player designs</annotation> to choose from</string>
-    <string name="whats_new_core_player_designs_desc">Classic, Ring, Full Art, Record, Cassette and Video Art, coloured by the song.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seven player designs</annotation> to choose from</string>
+    <string name="whats_new_core_player_designs_desc">Classic, Ring, Full Art, Record, Cassette, Radio and Video Art, coloured by the song.</string>
     <string name="whats_new_core_equalizer_title">A <annotation type="accent">10-band equalizer</annotation> with presets</string>
     <string name="whats_new_core_equalizer_desc">Drag each band, pick a preset, or import an AutoEQ profile for your headphones.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Sleep timer</annotation> stops the music for you</string>

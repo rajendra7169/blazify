@@ -27,7 +27,7 @@ private const val CX = 140f
 private const val CY = 48f
 private val VinylBlack = Color(0xFF151311)
 
-/** The player turns from Classic into Ring, Record and Cassette, each named under it. */
+/** The player turns from Classic into Ring, Record, Cassette and Radio, each named under it. */
 @Composable
 internal fun PlayerDesignsDemo(
     playing: Boolean,
@@ -41,13 +41,14 @@ internal fun PlayerDesignsDemo(
             stringResource(R.string.player_design_ring),
             stringResource(R.string.player_design_record),
             stringResource(R.string.player_design_cassette),
+            stringResource(R.string.player_design_radio),
         )
-    DemoCanvas(loopMs = 6400, stillAt = 0.30f, playing = playing, modifier = modifier) { t, c ->
+    DemoCanvas(loopMs = 8000, stillAt = 0.30f, playing = playing, modifier = modifier) { t, c ->
         inDesignBox { u ->
-            val step = (t * 4f).toInt().coerceAtMost(3)
-            val within = t * 4f - step
+            val step = (t * 5f).toInt().coerceAtMost(4)
+            val within = t * 5f - step
             val change = ease(seg(within, 0f, 0.18f))
-            val previous = (step + 3) % 4
+            val previous = (step + 4) % 5
             val spin = t * 720f
 
             fun design(
@@ -61,7 +62,8 @@ internal fun PlayerDesignsDemo(
                         0 -> cover(c, 0, note, CX - 35f, CY - 35f, 70f, 12f, u, alpha = alpha)
                         1 -> ringDesign(c, note, spin, alpha, u)
                         2 -> recordDesign(c, note, spin, alpha, u)
-                        else -> cassetteDesign(c, spin, alpha, u)
+                        3 -> cassetteDesign(c, spin, alpha, u)
+                        else -> radioDesign(c, note, within, alpha, u)
                     }
                 }
             }
@@ -157,4 +159,44 @@ private fun DrawScope.cassetteDesign(
             }
         }
     }
+}
+
+private val RadioWalnut = Color(0xFF5B3A24)
+private val RadioGlass = Color(0xFFFFE3A6)
+private val RadioNeedle = Color(0xFFD7261E)
+
+/** A small tabletop radio: the cover in its window, a grille, and the dial's needle sweeping along. */
+private fun DrawScope.radioDesign(
+    c: DemoColors,
+    note: Painter,
+    sweep: Float,
+    alpha: Float,
+    u: Float,
+) {
+    val body = androidx.compose.ui.graphics.lerp(c.accent, RadioWalnut, 0.55f)
+    pill(Color.Black.fade(0.25f * alpha), CX - 50f, CY + 30f, 12f, 5f, u, radius = 2f)
+    pill(Color.Black.fade(0.25f * alpha), CX + 38f, CY + 30f, 12f, 5f, u, radius = 2f)
+    pill(body.fade(alpha), CX - 56f, CY - 36f, 112f, 68f, u, radius = 10f)
+    cover(c, 0, note, CX - 48f, CY - 29f, 38f, 5f, u, alpha = alpha)
+    // Speaker grille.
+    var y = CY - 25f
+    var row = 0
+    while (y < CY + 6f) {
+        var x = CX + 2f + if (row % 2 == 0) 2.5f else 5f
+        while (x < CX + 48f) {
+            drawCircle(Color.Black.fade(0.45f * alpha), 1.4f * u, Offset(x * u, y * u))
+            x += 5f
+        }
+        y += 4.4f
+        row++
+    }
+    // Dial with its needle following the song.
+    pill(RadioGlass.fade(alpha), CX - 48f, CY + 14f, 96f, 12f, u, radius = 3f)
+    for (i in 0..10) {
+        val tx = CX - 42f + 84f * i / 10f
+        val len = if (i % 2 == 0) 4f else 2.5f
+        drawLine(c.ink.fade(0.6f * alpha), Offset(tx * u, (CY + 23f - len) * u), Offset(tx * u, (CY + 23f) * u), strokeWidth = 0.8f * u)
+    }
+    val nx = CX - 42f + 84f * (0.15f + 0.7f * sweep.coerceIn(0f, 1f))
+    drawLine(RadioNeedle.fade(alpha), Offset(nx * u, (CY + 15.5f) * u), Offset(nx * u, (CY + 24.5f) * u), strokeWidth = 1.4f * u, cap = StrokeCap.Round)
 }
