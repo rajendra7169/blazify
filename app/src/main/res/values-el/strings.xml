@@ -274,4 +274,12 @@
     <string name="search_history">Ιστορικό αναζήτησης</string>
     <string name="disable_screenshot">Απενεργοποίηση στιγμιότυπων οθόνης</string>
     <string name="action_login">Συνδεθείτε</string>
+    <string name="pause">Παύση</string>
+    <string name="theme_desc">Προσαρμόστε το θέμα της εφαρμογής</string>
+    <string name="theme_colors">Θέμα &amp; Χρώματα</string>
+    <string name="theme_mode">Λειτουργία θέματος</string>
+    <string name="color_palette">Παλέτα χρωμάτων</string>
+    <string name="use_system_colors">Χρήση χρωμάτων συστήματος</string>
+    <string name="use_login_for_browse">Χρήση σύνδεσης για την περιήγηση περιεχομένου</string>
+    <string name="use_login_for_browse_desc">Αυτό μπορεί να επηρεάσει το περιεχόμενο που βλέπετε και, για παράδειγμα, εμφανίζει άλμπουμ μόνο για Premium αν έχετε συνδεθεί με λογαριασμό Premium</string>
 </resources>
