@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">Suka Blazify?</string>
     <string name="star_prompt_body_short">Bintang di GitHub membantu orang lain menemukannya. Gratis, tanpa iklan.</string>
     <string name="import_spotify_csv_tip">Untuk seluruh daftar, ekspor sebagai file CSV (Exportify melakukannya dengan login Spotify milikmu), lalu buka Setelan › Cadangkan dan pulihkan › Impor playlist CSV.</string>
+    <string name="festival_greeting_halloween">Selamat Halloween</string>
+    <string name="star_prompt_already">Sudah diberi bintang</string>
+    <string name="update_prompt_title">Blazify %s sudah hadir</string>
+    <string name="update_prompt_body">Fitur baru dan perbaikan sudah siap. Musik dan pustaka Anda tetap seperti semula.</string>
+    <string name="update_prompt_update">Perbarui</string>
+    <string name="spatial_sound">Suara 3D</string>
+    <string name="spatial_sound_off">Nonaktif</string>
+    <string name="spatial_sound_surround">Surround</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Nonaktif. Surround menempatkan lagu di sekitar Anda; 8D membuatnya berputar mengelilingi kepala. Paling bagus dengan headphone</string>
+    <string name="spatial_sound_desc_surround">Surround: lagu terdengar dari speaker di sekitar Anda, lengkap dengan lebar suara dan ruangan di belakangnya</string>
+    <string name="spatial_sound_desc_orbit">8D: lagu perlahan berputar mengelilingi kepala Anda</string>
+    <string name="search_offline">Cari lagu di ponsel ini…</string>
+    <string name="search_offline_notice">Tidak ada koneksi. Menampilkan lagu yang bisa diputar offline: diunduh, tersimpan di cache, dan di perangkat ini.</string>
+    <string name="offline_home_group">Beranda tanpa koneksi</string>
+    <string name="offline_home_cached">Lagu di cache</string>
+    <string name="offline_home_cached_desc">Lagu yang tersimpan utuh di cache lagu setelah Anda memutarnya</string>
+    <string name="offline_home_downloaded">Lagu yang diunduh</string>
+    <string name="offline_home_downloaded_desc">Lagu yang Anda unduh</string>
+    <string name="offline_home_device">Lagu di perangkat ini</string>
+    <string name="offline_home_device_desc">File musik Anda sendiri di ponsel ini</string>
+    <string name="whats_new">Yang baru</string>
+    <string name="hint_whats_new">Fitur baru, masing-masing dengan demo singkat</string>
+    <string name="whats_new_title">Yang baru di %1$s</string>
+    <string name="whats_new_section_new">Baru di versi ini</string>
+    <string name="whats_new_section_core">Yang bisa dilakukan Blazify</string>
+    <string name="whats_new_see_all">Lihat semua fitur</string>
+    <string name="whats_new_see_fewer">Tampilkan lebih sedikit</string>
+    <string name="whats_new_release_notes">Catatan rilis lengkap</string>
+    <string name="whats_new_skip">Lewati</string>
+    <string name="whats_new_see_more">Lihat selengkapnya</string>
+    <string name="whats_new_kind_new">Baru</string>
+    <string name="whats_new_kind_improved">Ditingkatkan</string>
+    <string name="whats_new_kind_fixed">Diperbaiki</string>
+    <string name="whats_new_card_position">%1$d dari %2$d</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">Suara 3D</annotation> menggerakkan lagu di sekitar Anda</string>
+    <string name="whats_new_spatial_sound_desc">Surround menempatkannya di speaker sekitar Anda, 8D berputar mengelilingi kepala. Ada di pengaturan Pemutar.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">Pencarian</annotation> bekerja tanpa koneksi</string>
+    <string name="whats_new_offline_search_desc">Menemukan lagu yang diunduh, tersimpan di cache, dan lokal berdasarkan judul, artis, atau album.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Sedang Tren</annotation> mengikuti negara Anda</string>
+    <string name="whats_new_trending_desc">Tangga lagu dan bagian baru di Beranda menampilkan apa yang populer di tempat Anda.</string>
+    <string name="whats_new_keeps_playing_title">Musik <annotation type="accent">terus berputar</annotation> saat daftar selesai</string>
+    <string name="whats_new_keeps_playing_desc">Lagu serupa masuk ke antrean saat album atau playlist habis.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Sampul Video</annotation> menemukan video musik yang asli</string>
+    <string name="whats_new_video_art_finder_desc">Tidak ada lagi cover, versi live, atau video lirik jika video resmi lagu itu tersedia.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Ganti akun</annotation> dengan sekali ketuk</string>
+    <string name="whats_new_accounts_desc">Akun Google yang Anda gunakan untuk masuk tetap tersimpan, jadi Anda bisa berpindah di antaranya.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Geser ke kanan</annotation> untuk memutar lagu berikutnya</string>
+    <string name="whats_new_queue_swipe_desc">Antrean tidak lagi dikunci: seret untuk mengurutkan, geser ke kiri untuk menghapus.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">Pengenal lagu</annotation> mendengarkan dengan gelombang suara</string>
+    <string name="whats_new_recognition_wave_desc">Menunjukkan kapan sedang mendengarkan dan mencari, dengan tips jika lagu tidak ditemukan.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Unduh</annotation> lagu untuk diputar offline</string>
+    <string name="whats_new_core_downloads_desc">Ketuk panah pada lagu, album, atau playlist, dan lagu bisa diputar tanpa koneksi.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">Lirik tersinkron</annotation> menyala kata demi kata</string>
+    <string name="whats_new_core_lyrics_desc">Dengan terjemahan dan romanisasi, dari sumber pilihan Anda.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Enam desain pemutar</annotation> untuk dipilih</string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Cincin, Sampul Penuh, Piringan Hitam, Kaset, dan Sampul Video, diwarnai sesuai lagu.</string>
+    <string name="whats_new_core_equalizer_title"><annotation type="accent">Equalizer 10 band</annotation> dengan preset</string>
+    <string name="whats_new_core_equalizer_desc">Seret tiap band, pilih preset, atau impor profil AutoEQ untuk headphone Anda.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Waktu tidur</annotation> menghentikan musik untuk Anda</string>
+    <string name="whats_new_core_sleep_timer_desc">Ketuk ikon bulan di pemutar lalu pilih menitnya, atau berhenti di akhir lagu.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> memutar musik serempak dengan teman</string>
+    <string name="whats_new_core_together_desc">Bagikan kode ruang, dan semua orang mendengar lagu yang sama pada saat yang sama.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Kenali</annotation> lagu yang diputar di sekitar Anda</string>
+    <string name="whats_new_core_recognition_desc">Ketuk gelombang suara di bilah pencarian, dan Blazify menyebutkan judul lagunya.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Musik Anda sendiri</annotation> diputar bersama streaming</string>
+    <string name="whats_new_core_local_music_desc">File musik di ponsel Anda berbagi pustaka, antrean, dan pemutar yang sama.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Tampilan &amp; Nuansa</annotation> mengubah gaya aplikasi</string>
+    <string name="whats_new_core_look_and_feel_desc">Tema, pemutar, pemutar mini, lirik, dan Beranda, dengan pratinjau langsung saat Anda mengatur.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Sampul Video</annotation> memutar video musiknya</string>
+    <string name="whats_new_core_video_art_desc">Video resmi lagu diputar di belakang pemutar, tanpa suara dan selaras dengan lagu.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Transmisikan</annotation> ke TV Anda</string>
+    <string name="whats_new_core_cast_desc">Kirim musik ke Chromecast atau Google TV dari pemutar.</string>
 </resources>
