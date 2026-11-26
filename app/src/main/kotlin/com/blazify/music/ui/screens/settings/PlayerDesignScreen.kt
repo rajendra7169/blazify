@@ -34,6 +34,7 @@ import coil3.toBitmap
 import com.blazify.music.constants.PlayerBackgroundStyle
 import com.blazify.music.constants.PlayerBackgroundStyleKey
 import com.blazify.music.ui.player.CassetteTape
+import com.blazify.music.ui.player.RadioDial
 import com.blazify.music.ui.player.SeekableAlbumRing
 import com.blazify.music.ui.player.VideoStage
 import com.blazify.music.ui.player.VideoStageShare
@@ -424,6 +425,7 @@ internal fun LivePreview(design: PlayerDesign, pc: PlayerConnection?) {
             PlayerDesign.FULL_ART -> FullArtPreview(meta, pc)
             PlayerDesign.RECORD -> RecordPreview(meta, pc, textColor)
             PlayerDesign.CASSETTE -> CassettePreview(meta, pc, textColor)
+            PlayerDesign.RADIO -> RadioPreview(meta, pc, textColor)
             PlayerDesign.VIDEO -> VideoPreview(meta, pc)
         }
     }
@@ -890,6 +892,44 @@ private fun RecordPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor
         }
         Spacer(Modifier.height(12.dp))
         PreviewSlider(pc, cs.primary, textColor.copy(alpha = 0.22f), textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewTransport(pc, textColor)
+        Spacer(Modifier.height(10.dp))
+        PreviewQueuePeek(textColor)
+    }
+}
+
+/* ---------- RADIO ---------- */
+
+@Composable
+private fun RadioPreview(meta: MediaMetadata?, pc: PlayerConnection?, textColor: Color) {
+    val isPlaying by remember(pc) { pc?.isPlaying ?: MutableStateFlow(false) }.collectAsState()
+    val (pos, dur) = rememberLivePosition(pc)
+    val fraction = if (dur > 0) (pos.toFloat() / dur).coerceIn(0f, 1f) else PREVIEW_FALLBACK_PROGRESS
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        PreviewHeader(meta, textColor)
+        Spacer(Modifier.weight(0.3f))
+        RadioDial(
+            isPlaying = isPlaying,
+            progress = { fraction },
+            modifier = Modifier.fillMaxWidth(0.94f),
+            thumbnailUrl = meta?.thumbnailUrl,
+            onSeek = if (pc != null && dur > 0) { f -> pc.player.seekTo((f * dur).toLong()) } else null,
+        )
+        Spacer(Modifier.weight(0.3f))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) { PreviewTitle(meta, textColor) }
+            PreviewTitleActions(pc, textColor)
+        }
+        // The dial is the seek bar here, so only the times sit under the title.
+        Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            val shownDur = if (dur > 0) dur else PREVIEW_FALLBACK_DURATION
+            Text(makeTimeString((fraction * shownDur).toLong()), fontSize = 9.sp, lineHeight = 11.2.sp, color = textColor.copy(alpha = 0.8f))
+            Text(makeTimeString(shownDur), fontSize = 9.sp, lineHeight = 11.2.sp, color = textColor.copy(alpha = 0.8f))
+        }
         Spacer(Modifier.height(10.dp))
         PreviewTransport(pc, textColor)
         Spacer(Modifier.height(10.dp))
