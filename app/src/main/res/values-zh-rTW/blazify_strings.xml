@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">輕觸歌曲、專輯或播放清單上的箭頭，沒有網路也能播放。</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">同步歌詞</annotation>逐字亮起</string>
     <string name="whats_new_core_lyrics_desc">支援翻譯和羅馬化，歌詞來源由你選擇。</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">六種播放器樣式</annotation>任你挑選</string>
-    <string name="whats_new_core_player_designs_desc">經典、圓環、滿版封面、黑膠唱片、卡帶和影片封面，顏色隨歌曲變化。</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">七種播放器樣式</annotation>任你挑選</string>
+    <string name="whats_new_core_player_designs_desc">經典、圓環、滿版封面、黑膠唱片、卡帶、收音機和影片封面，顏色隨歌曲變化。</string>
     <string name="whats_new_core_equalizer_title">附預設組合的<annotation type="accent">十段等化器</annotation></string>
     <string name="whats_new_core_equalizer_desc">拖曳每個頻段、選擇預設組合，或為你的耳機匯入 AutoEQ 設定檔。</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">睡眠定時器</annotation>幫你停止音樂</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">歌曲的官方影片在播放器後方靜音同步播放。</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">投放</annotation>到電視</string>
     <string name="whats_new_core_cast_desc">從播放器將音樂傳送到 Chromecast 或 Google TV。</string>
+    <string name="player_design_radio">收音機</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">復古收音機</annotation>為你播放歌曲</string>
+    <string name="whats_new_radio_player_desc">全新播放器樣式：封面嵌在視窗中，調頻指針隨歌曲移動。拖曳指針即可調整進度。</string>
 </resources>

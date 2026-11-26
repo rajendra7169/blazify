@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">Ketuk panah pada lagu, album, atau playlist, dan lagu bisa diputar tanpa koneksi.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Lirik tersinkron</annotation> menyala kata demi kata</string>
     <string name="whats_new_core_lyrics_desc">Dengan terjemahan dan romanisasi, dari sumber pilihan Anda.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Enam desain pemutar</annotation> untuk dipilih</string>
-    <string name="whats_new_core_player_designs_desc">Klasik, Cincin, Sampul Penuh, Piringan Hitam, Kaset, dan Sampul Video, diwarnai sesuai lagu.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Tujuh desain pemutar</annotation> untuk dipilih</string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Cincin, Sampul Penuh, Piringan Hitam, Kaset, Radio, dan Sampul Video, diwarnai sesuai lagu.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">Equalizer 10 band</annotation> dengan preset</string>
     <string name="whats_new_core_equalizer_desc">Seret tiap band, pilih preset, atau impor profil AutoEQ untuk headphone Anda.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Waktu tidur</annotation> menghentikan musik untuk Anda</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">Video resmi lagu diputar di belakang pemutar, tanpa suara dan selaras dengan lagu.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Transmisikan</annotation> ke TV Anda</string>
     <string name="whats_new_core_cast_desc">Kirim musik ke Chromecast atau Google TV dari pemutar.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Radio antik</annotation> memutar lagu Anda</string>
+    <string name="whats_new_radio_player_desc">Desain pemutar baru: sampul di jendelanya, jarum penunjuk yang mengikuti lagu. Seret untuk melompat ke bagian lain.</string>
 </resources>

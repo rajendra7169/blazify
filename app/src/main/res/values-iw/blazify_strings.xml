@@ -1429,8 +1429,8 @@
     <string name="whats_new_core_downloads_desc">הקש על החץ בשיר, באלבום או בפלייליסט, והוא יתנגן גם בלי חיבור.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">מילות שיר מסונכרנות</annotation> נדלקות מילה אחר מילה</string>
     <string name="whats_new_core_lyrics_desc">עם תרגום ותעתיק לטיני, מהמקורות שתבחר.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">שישה עיצובי נגן</annotation> לבחירה</string>
-    <string name="whats_new_core_player_designs_desc">קלאסי, טבעת, עטיפה מלאה, תקליט, קלטת ווידאו ארט, בצבעי השיר.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">שבעה עיצובי נגן</annotation> לבחירה</string>
+    <string name="whats_new_core_player_designs_desc">קלאסי, טבעת, עטיפה מלאה, תקליט, קלטת, רדיו ווידאו ארט, בצבעי השיר.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">אקולייזר 10 פסים</annotation> עם הגדרות מוכנות</string>
     <string name="whats_new_core_equalizer_desc">גרור כל פס, בחר הגדרה מוכנה או ייבא פרופיל AutoEQ לאוזניות שלך.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">טיימר שינה</annotation> עוצר את המוזיקה בשבילך</string>
@@ -1447,4 +1447,7 @@
     <string name="whats_new_core_video_art_desc">הקליפ של השיר עצמו מתנגן מאחורי הנגן, מושתק ומסונכרן.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">העבר</annotation> לטלוויזיה שלך</string>
     <string name="whats_new_core_cast_desc">שלח את המוזיקה ל-Chromecast או ל-Google TV מהנגן.</string>
+    <string name="player_design_radio">רדיו</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">רדיו ישן</annotation> מנגן את השירים שלך</string>
+    <string name="whats_new_radio_player_desc">עיצוב נגן חדש: העטיפה בחלון שלה, ומחוג סקאלה שעוקב אחרי השיר. גרור אותו כדי לדלג בשיר.</string>
 </resources>

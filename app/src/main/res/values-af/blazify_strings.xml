@@ -11,4 +11,9 @@
     <string name="weeks">Weke</string>
     <string name="months">Maande</string>
     <string name="years">Yare</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">\'n <annotation type="accent">Ouderwetse radio</annotation> speel jou liedjies</string>
+    <string name="whats_new_radio_player_desc">\'n Nuwe spelerontwerp: die omslag in sy venster, \'n skaalnaald wat die liedjie volg. Sleep dit om te spoel.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sewe spelerontwerpe</annotation> om van te kies</string>
+    <string name="whats_new_core_player_designs_desc">Klassiek, Ring, Volle omslag, Plaat, Kasset, Radio en Video Art, gekleur deur die liedjie.</string>
 </resources>

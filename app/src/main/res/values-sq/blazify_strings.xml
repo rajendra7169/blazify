@@ -232,4 +232,9 @@
     <string name="enter_room_code">Fut një kod dhome</string>
     <string name="blazify">BLAZIFY</string>
     <string name="android_auto">Android Auto</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Një <annotation type="accent">radio e vjetër</annotation> luan këngët tuaja</string>
+    <string name="whats_new_radio_player_desc">Një dizajn i ri i luajtësit: kopertina në dritaren e saj, një gjilpërë shkalle që ndjek këngën. Tërhiqeni për të kaluar përpara ose prapa.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Shtatë dizajne luajtësi</annotation> për të zgjedhur</string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Unazë, Kopertinë e plotë, Disk, Kasetë, Radio dhe Video Art, me ngjyrat e këngës.</string>
 </resources>

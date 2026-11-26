@@ -30,4 +30,9 @@
     <string name="max_selection_limit">அதிகபட்ச தேர்வு வரம்பு</string>
     <string name="share_selected">தேர்ந்தெடுத்தவற்றைப் பகிர்</string>
     <string name="customize_colors">வண்ணங்களைத் தனிப்பயனாக்குங்கள்</string>
+    <string name="player_design_radio">வானொலி</string>
+    <string name="whats_new_radio_player_title">ஒரு <annotation type="accent">பழைய வானொலி</annotation> உங்கள் பாடல்களை இசைக்கிறது</string>
+    <string name="whats_new_radio_player_desc">புதிய பிளேயர் வடிவமைப்பு: அதன் சாளரத்தில் கவர், பாடலுடன் நகரும் டயல் முள். பாடலில் முன்னும் பின்னும் செல்ல அதை இழுக்கவும்.</string>
+    <string name="whats_new_core_player_designs_title">தேர்வு செய்ய <annotation type="accent">ஏழு பிளேயர் வடிவமைப்புகள்</annotation></string>
+    <string name="whats_new_core_player_designs_desc">கிளாசிக், ரிங், ஃபுல் ஆர்ட், ரெக்கார்டு, கேசட், வானொலி மற்றும் வீடியோ ஆர்ட், பாடலின் நிறங்களில்.</string>
 </resources>

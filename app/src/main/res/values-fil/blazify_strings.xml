@@ -58,4 +58,9 @@
     <string name="lyrics">liriko</string>
     <string name="close">isara</string>
     <string name="crop_album_art">icrop ang album art</string>
+    <string name="player_design_radio">Radyo</string>
+    <string name="whats_new_radio_player_title">Isang <annotation type="accent">lumang radyo</annotation> ang tumutugtog ng mga kanta mo</string>
+    <string name="whats_new_radio_player_desc">Bagong disenyo ng player: ang cover sa sariling bintana nito, at isang karayom sa dial na sumusunod sa kanta. I-drag ito para lumipat sa ibang bahagi ng kanta.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Pitong disenyo ng player</annotation> na mapagpipilian</string>
+    <string name="whats_new_core_player_designs_desc">Classic, Ring, Full Art, Record, Cassette, Radyo at Video Art, kulay ayon sa kanta.</string>
 </resources>

@@ -20,4 +20,9 @@
     <string name="please_wait">ଅପେକ୍ଷା କରନ୍ତୁ</string>
     <string name="cancel">ବନ୍ଦ କରନ୍ତୁ</string>
     <string name="enable">ଚାଲୁ</string>
+    <string name="player_design_radio">ରେଡିଓ</string>
+    <string name="whats_new_radio_player_title">ଏକ <annotation type="accent">ପୁରୁଣା ରେଡିଓ</annotation> ଆପଣଙ୍କ ଗୀତ ବଜାଏ</string>
+    <string name="whats_new_radio_player_desc">ନୂଆ ପ୍ଲେୟାର ଡିଜାଇନ୍: ଝରକାରେ ମଲାଟ, ଗୀତ ସହ ଚାଲୁଥିବା ଡାଏଲର କଣ୍ଟା। ଗୀତର ଅନ୍ୟ ଅଂଶକୁ ଯିବା ପାଇଁ ଏହାକୁ ଟାଣନ୍ତୁ।</string>
+    <string name="whats_new_core_player_designs_title">ବାଛିବା ପାଇଁ <annotation type="accent">ସାତଟି ପ୍ଲେୟାର ଡିଜାଇନ୍</annotation></string>
+    <string name="whats_new_core_player_designs_desc">କ୍ଲାସିକ୍, ରିଙ୍ଗ, ଫୁଲ୍ ଆର୍ଟ, ରେକର୍ଡ, କ୍ୟାସେଟ୍, ରେଡିଓ ଓ ଭିଡିଓ ଆର୍ଟ, ଗୀତର ରଙ୍ଗରେ।</string>
 </resources>

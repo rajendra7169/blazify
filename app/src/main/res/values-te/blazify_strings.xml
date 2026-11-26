@@ -63,4 +63,9 @@
     <string name="seek_seconds_addup_description">సక్రియమైనట్లయితే, ప్రతి సీక్ స్కిప్‌కి 5 అదనపు సెకండ్లను క్రమంగా జోడిస్తుంది</string>
     <string name="listen_together_room_code">రూమ్ కోడ్</string>
     <string name="lyrics_animation_apple">ఆపిల్ మ్యూజిక్ స్టైల్</string>
+    <string name="player_design_radio">రేడియో</string>
+    <string name="whats_new_radio_player_title">ఒక <annotation type="accent">పాత రేడియో</annotation> మీ పాటలను వినిపిస్తుంది</string>
+    <string name="whats_new_radio_player_desc">కొత్త ప్లేయర్ డిజైన్: కిటికీలో ముఖచిత్రం, పాటతో పాటు కదిలే డయల్ ముల్లు. పాటలో ముందుకు వెనుకకు వెళ్లడానికి దాన్ని లాగండి.</string>
+    <string name="whats_new_core_player_designs_title">ఎంచుకోవడానికి <annotation type="accent">ఏడు ప్లేయర్ డిజైన్‌లు</annotation></string>
+    <string name="whats_new_core_player_designs_desc">క్లాసిక్, రింగ్, ఫుల్ ఆర్ట్, రికార్డ్, క్యాసెట్, రేడియో మరియు వీడియో ఆర్ట్, పాట రంగుల్లో.</string>
 </resources>

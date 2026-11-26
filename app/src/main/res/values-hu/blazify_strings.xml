@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">Koppints a nyílra egy dalon, albumon vagy lejátszási listán, és kapcsolat nélkül is szól.</string>
     <string name="whats_new_core_lyrics_title">A <annotation type="accent">szinkronizált dalszöveg</annotation> szóról szóra kigyullad</string>
     <string name="whats_new_core_lyrics_desc">Fordítással és latin betűs átírással, a választott forrásokból.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Hat lejátszódizájn</annotation> közül választhatsz</string>
-    <string name="whats_new_core_player_designs_desc">Klasszikus, Gyűrű, Teljes borító, Hanglemez, Kazetta és Videós borító, a dalhoz igazodó színekkel.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Hét lejátszódizájn</annotation> közül választhatsz</string>
+    <string name="whats_new_core_player_designs_desc">Klasszikus, Gyűrű, Teljes borító, Hanglemez, Kazetta, Rádió és Videós borító, a dalhoz igazodó színekkel.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">10 sávos hangszínszabályzó</annotation> előbeállításokkal</string>
     <string name="whats_new_core_equalizer_desc">Húzd az egyes sávokat, válassz előbeállítást, vagy importálj AutoEQ profilt a fejhallgatódhoz.</string>
     <string name="whats_new_core_sleep_timer_title">Az <annotation type="accent">alvásidőzítő</annotation> leállítja helyetted a zenét</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">A dal saját videója a lejátszó mögött fut, némítva és szinkronban.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Küldd át</annotation> a TV-dre</string>
     <string name="whats_new_core_cast_desc">Küldd a zenét Chromecastra vagy Google TV-re a lejátszóból.</string>
+    <string name="player_design_radio">Rádió</string>
+    <string name="whats_new_radio_player_title">Egy <annotation type="accent">régi rádió</annotation> játssza a dalaidat</string>
+    <string name="whats_new_radio_player_desc">Új lejátszódizájn: a borító az ablakában, a skálamutató követi a dalt. Húzással ugorhatsz a dalban.</string>
 </resources>

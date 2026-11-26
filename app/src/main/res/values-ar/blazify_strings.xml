@@ -1463,8 +1463,8 @@
     <string name="whats_new_core_downloads_desc">اضغط على السهم في أغنية أو ألبوم أو قائمة تشغيل، وستعمل دون اتصال.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">الكلمات المتزامنة</annotation> تضيء كلمةً بكلمة</string>
     <string name="whats_new_core_lyrics_desc">مع الترجمة والكتابة بالحروف اللاتينية، من المصادر التي تختارها.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">ستة تصاميم للمشغل</annotation> لتختار منها</string>
-    <string name="whats_new_core_player_designs_desc">كلاسيكي، حلقة، غلاف كامل، أسطوانة، كاسيت وغلاف فيديو، بألوان الأغنية.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">سبعة تصاميم للمشغل</annotation> لتختار منها</string>
+    <string name="whats_new_core_player_designs_desc">كلاسيكي، حلقة، غلاف كامل، أسطوانة، كاسيت، راديو وغلاف فيديو، بألوان الأغنية.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">موازن صوت بعشرة نطاقات</annotation> مع إعدادات مسبقة</string>
     <string name="whats_new_core_equalizer_desc">اسحب كل نطاق، أو اختر إعدادًا مسبقًا، أو استورد ملف AutoEQ لسماعاتك.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">مؤقت النوم</annotation> يوقف الموسيقى عنك</string>
@@ -1481,4 +1481,7 @@
     <string name="whats_new_core_video_art_desc">يُعرض فيديو الأغنية الأصلي خلف المشغل، صامتًا ومتزامنًا معها.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">أرسل</annotation> إلى التلفاز</string>
     <string name="whats_new_core_cast_desc">أرسل الموسيقى إلى Chromecast أو Google TV من المشغل.</string>
+    <string name="player_design_radio">راديو</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">راديو عتيق</annotation> يشغّل أغانيك</string>
+    <string name="whats_new_radio_player_desc">تصميم جديد للمشغل: الغلاف في نافذته، وإبرة مؤشر تتبع الأغنية. اسحبها للانتقال داخل الأغنية.</string>
 </resources>

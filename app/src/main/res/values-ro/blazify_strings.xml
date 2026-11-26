@@ -1429,8 +1429,8 @@
     <string name="whats_new_core_downloads_desc">Atinge săgeata de pe o melodie, un album sau un playlist și va fi redat fără conexiune.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Versurile sincronizate</annotation> se aprind cuvânt cu cuvânt</string>
     <string name="whats_new_core_lyrics_desc">Cu traducere și romanizare, din sursele pe care le alegi.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Șase designuri de player</annotation> din care să alegi</string>
-    <string name="whats_new_core_player_designs_desc">Clasic, Inel, Copertă completă, Vinil, Casetă și Artă video, colorate după melodie.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Șapte designuri de player</annotation> din care să alegi</string>
+    <string name="whats_new_core_player_designs_desc">Clasic, Inel, Copertă completă, Vinil, Casetă, Radio și Artă video, colorate după melodie.</string>
     <string name="whats_new_core_equalizer_title">Un <annotation type="accent">egalizator cu 10 benzi</annotation> cu presetări</string>
     <string name="whats_new_core_equalizer_desc">Trage fiecare bandă, alege o presetare sau importă un profil AutoEQ pentru căștile tale.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Temporizatorul de somn</annotation> oprește muzica pentru tine</string>
@@ -1447,4 +1447,7 @@
     <string name="whats_new_core_video_art_desc">Videoclipul melodiei rulează în spatele playerului, fără sunet și sincronizat.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Proiectează</annotation> pe televizor</string>
     <string name="whats_new_core_cast_desc">Trimite muzica pe un Chromecast sau Google TV din player.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Un <annotation type="accent">radio de epocă</annotation> îți cântă melodiile</string>
+    <string name="whats_new_radio_player_desc">Un nou design de player: coperta în fereastra ei, un ac de scală care urmează melodia. Trage-l pentru a derula.</string>
 </resources>

@@ -1429,8 +1429,8 @@
     <string name="whats_new_core_downloads_desc">Touchez la flèche d\'un titre, d\'un album ou d\'une playlist, et il se lit sans connexion.</string>
     <string name="whats_new_core_lyrics_title">Les <annotation type="accent">paroles synchronisées</annotation> s\'illuminent mot par mot</string>
     <string name="whats_new_core_lyrics_desc">Avec traduction et romanisation, depuis les sources de votre choix.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Six designs de lecteur</annotation> au choix</string>
-    <string name="whats_new_core_player_designs_desc">Classique, Anneau, Pochette pleine, Vinyle, Cassette et Pochette vidéo, aux couleurs du titre.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sept designs de lecteur</annotation> au choix</string>
+    <string name="whats_new_core_player_designs_desc">Classique, Anneau, Pochette pleine, Vinyle, Cassette, Radio et Pochette vidéo, aux couleurs du titre.</string>
     <string name="whats_new_core_equalizer_title">Un <annotation type="accent">égaliseur 10 bandes</annotation> avec préréglages</string>
     <string name="whats_new_core_equalizer_desc">Faites glisser chaque bande, choisissez un préréglage ou importez un profil AutoEQ pour votre casque.</string>
     <string name="whats_new_core_sleep_timer_title">La <annotation type="accent">minuterie de sommeil</annotation> arrête la musique pour vous</string>
@@ -1447,4 +1447,7 @@
     <string name="whats_new_core_video_art_desc">Le clip du titre défile derrière le lecteur, en sourdine et en rythme.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Castez</annotation> sur votre TV</string>
     <string name="whats_new_core_cast_desc">Envoyez la musique vers un Chromecast ou une Google TV depuis le lecteur.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Une <annotation type="accent">radio vintage</annotation> joue vos titres</string>
+    <string name="whats_new_radio_player_desc">Un nouveau design de lecteur : la pochette dans sa fenêtre, une aiguille de cadran qui suit le titre. Faites-la glisser pour vous déplacer dans le titre.</string>
 </resources>

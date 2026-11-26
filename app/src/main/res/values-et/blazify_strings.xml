@@ -136,4 +136,9 @@
     <string name="share_playlist_desc">Jaga esitlusloendit teistega</string>
     <string name="delete_playlist_desc">Kustuta see esitlusloend jäädavalt</string>
     <string name="sync_playlist_desc">Sünkroniseeri esitlusloend Youtube Music\'ga</string>
+    <string name="player_design_radio">Raadio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Vana raadio</annotation> mängib sinu lugusid</string>
+    <string name="whats_new_radio_player_desc">Uus pleieri kujundus: kaanepilt oma aknas, skaalanõel, mis järgib lugu. Lohista seda, et loos edasi-tagasi liikuda.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seitse pleierikujundust</annotation> valikus</string>
+    <string name="whats_new_core_player_designs_desc">Klassikaline, Rõngas, Täiskaanepilt, Vinüülplaat, Kassett, Raadio ja Video Art, loo värvides.</string>
 </resources>

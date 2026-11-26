@@ -103,4 +103,9 @@
         <item quantity="other">%dsekundi</item>
     </plurals>
     <string name="token_adv_login_description">Ovo je NAPREDNA metoda prijave. Kao alternativa web portalu, ovdje možete direktno unijeti ili ažurirati svoj token za prijavu. Na primjer, ovo može ubrzati prijavu na više uređaja. Imajte na umu da neće biti prihvaćeni nevažeći formati tokena koje aplikacija ne uspije analizirati</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Stari radio</annotation> pušta tvoje pjesme</string>
+    <string name="whats_new_radio_player_desc">Novi izgled plejera: naslovnica u prozorčiću, kazaljka skale koja prati pjesmu. Povuci je za premotavanje.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sedam izgleda plejera</annotation> za odabir</string>
+    <string name="whats_new_core_player_designs_desc">Klasični, Prsten, Cijela naslovnica, Ploča, Kaseta, Radio i Video Art, u bojama pjesme.</string>
 </resources>

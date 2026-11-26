@@ -1428,8 +1428,8 @@
     <string name="whats_new_core_downloads_desc">Toque na seta de uma música, álbum ou playlist, e ela toca sem conexão.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Letras sincronizadas</annotation> acendem palavra por palavra</string>
     <string name="whats_new_core_lyrics_desc">Com tradução e romanização, das fontes que você escolher.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seis visuais de tocador</annotation> para escolher</string>
-    <string name="whats_new_core_player_designs_desc">Clássico, Anel, Capa inteira, Vinil, Fita cassete e Video Art, com as cores da música.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sete visuais de tocador</annotation> para escolher</string>
+    <string name="whats_new_core_player_designs_desc">Clássico, Anel, Capa inteira, Vinil, Fita cassete, Rádio e Video Art, com as cores da música.</string>
     <string name="whats_new_core_equalizer_title">Um <annotation type="accent">equalizador de 10 bandas</annotation> com predefinições</string>
     <string name="whats_new_core_equalizer_desc">Arraste cada banda, escolha uma predefinição ou importe um perfil AutoEQ para seus fones.</string>
     <string name="whats_new_core_sleep_timer_title">O <annotation type="accent">timer para soneca</annotation> para a música por você</string>
@@ -1446,4 +1446,7 @@
     <string name="whats_new_core_video_art_desc">O clipe da própria música passa atrás do tocador, sem som e em sincronia.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Transmita</annotation> para sua TV</string>
     <string name="whats_new_core_cast_desc">Envie a música para um Chromecast ou Google TV direto do tocador.</string>
+    <string name="player_design_radio">Rádio</string>
+    <string name="whats_new_radio_player_title">Um <annotation type="accent">rádio antigo</annotation> toca suas músicas</string>
+    <string name="whats_new_radio_player_desc">Um novo visual de tocador: a capa na janelinha, um ponteiro de sintonia que acompanha a música. Arraste para avançar ou voltar.</string>
 </resources>

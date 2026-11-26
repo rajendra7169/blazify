@@ -1424,8 +1424,8 @@
     <string name="whats_new_core_downloads_desc">Tocca la freccia su un brano, album o playlist e si riproduce senza connessione.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Testi sincronizzati</annotation> che si illuminano parola per parola</string>
     <string name="whats_new_core_lyrics_desc">Con traduzione e romanizzazione, dalle fonti che scegli.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sei stili di lettore</annotation> tra cui scegliere</string>
-    <string name="whats_new_core_player_designs_desc">Classico, Anello, Copertina intera, Disco, Cassetta e Video Art, colorati dal brano.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sette stili di lettore</annotation> tra cui scegliere</string>
+    <string name="whats_new_core_player_designs_desc">Classico, Anello, Copertina intera, Disco, Cassetta, Radio e Video Art, colorati dal brano.</string>
     <string name="whats_new_core_equalizer_title">Un <annotation type="accent">equalizzatore a 10 bande</annotation> con preimpostazioni</string>
     <string name="whats_new_core_equalizer_desc">Trascina ogni banda, scegli una preimpostazione o importa un profilo AutoEQ per le tue cuffie.</string>
     <string name="whats_new_core_sleep_timer_title">Il <annotation type="accent">timer</annotation> ferma la musica per te</string>
@@ -1442,4 +1442,7 @@
     <string name="whats_new_core_video_art_desc">Il video ufficiale del brano scorre dietro il lettore, senza audio e a tempo.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Trasmetti</annotation> sulla tua TV</string>
     <string name="whats_new_core_cast_desc">Invia la musica a un Chromecast o a Google TV dal lettore.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Una <annotation type="accent">radio d\'epoca</annotation> suona i tuoi brani</string>
+    <string name="whats_new_radio_player_desc">Un nuovo stile di lettore: la copertina nella sua finestra, una lancetta che segue il brano. Trascinala per spostarti nel brano.</string>
 </resources>

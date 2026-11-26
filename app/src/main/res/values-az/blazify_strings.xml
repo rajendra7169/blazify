@@ -116,4 +116,9 @@
     <string name="uploaded_playlist">Yükləndi</string>
     <string name="filter_uploaded">Yükləndi</string>
     <string name="artist_page_settings">Sənətçinin səhifəsi</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Mahnılarını <annotation type="accent">köhnə radio</annotation> çalır</string>
+    <string name="whats_new_radio_player_desc">Yeni pleyer dizaynı: üzlük öz pəncərəsində, mahnını izləyən şkala əqrəbi. Mahnıda irəli-geri keçmək üçün onu sürüşdür.</string>
+    <string name="whats_new_core_player_designs_title">Seçmək üçün <annotation type="accent">yeddi pleyer dizaynı</annotation></string>
+    <string name="whats_new_core_player_designs_desc">Klassik, Halqa, Tam üzlük, Plastinka, Kaset, Radio və Video Art, mahnının rənglərində.</string>
 </resources>

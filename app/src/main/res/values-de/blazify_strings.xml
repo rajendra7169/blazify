@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">Tippe auf den Pfeil bei einem Song, Album oder einer Playlist, dann läuft er auch ohne Verbindung.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Synchronisierte Songtexte</annotation> leuchten Wort für Wort auf</string>
     <string name="whats_new_core_lyrics_desc">Mit Übersetzung und Romanisierung, aus den Quellen deiner Wahl.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sechs Player-Designs</annotation> zur Auswahl</string>
-    <string name="whats_new_core_player_designs_desc">Klassisch, Ring, Vollbild-Cover, Schallplatte, Kassette und Videocover, in den Farben des Songs.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sieben Player-Designs</annotation> zur Auswahl</string>
+    <string name="whats_new_core_player_designs_desc">Klassisch, Ring, Vollbild-Cover, Schallplatte, Kassette, Radio und Videocover, in den Farben des Songs.</string>
     <string name="whats_new_core_equalizer_title">Ein <annotation type="accent">10-Band-Equalizer</annotation> mit Presets</string>
     <string name="whats_new_core_equalizer_desc">Zieh jedes Band, wähle ein Preset oder importiere ein AutoEQ-Profil für deine Kopfhörer.</string>
     <string name="whats_new_core_sleep_timer_title">Der <annotation type="accent">Schlaf-Timer</annotation> stoppt die Musik für dich</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">Das eigene Video des Songs läuft stumm und synchron hinter dem Player.</string>
     <string name="whats_new_core_cast_title">Auf deinen Fernseher <annotation type="accent">streamen</annotation></string>
     <string name="whats_new_core_cast_desc">Schick die Musik vom Player aus an einen Chromecast oder Google TV.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Ein <annotation type="accent">Vintage-Radio</annotation> spielt deine Songs</string>
+    <string name="whats_new_radio_player_desc">Ein neues Player-Design: das Cover im Sichtfenster, ein Skalenzeiger, der dem Song folgt. Zum Spulen ziehen.</string>
 </resources>

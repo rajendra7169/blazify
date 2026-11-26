@@ -320,4 +320,9 @@
         <item quantity="other">%d pásiem</item>
     </plurals>
     <string name="delete_profile_desc">Odstrániť profil</string>
+    <string name="player_design_radio">Rádio</string>
+    <string name="whats_new_radio_player_title">Vaše skladby hrá <annotation type="accent">staré rádio</annotation></string>
+    <string name="whats_new_radio_player_desc">Nový vzhľad prehrávača: obal v okienku a ručička stupnice, ktorá sleduje skladbu. Potiahnutím ručičky sa posuniete v skladbe.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sedem vzhľadov prehrávača</annotation> na výber</string>
+    <string name="whats_new_core_player_designs_desc">Klasický, Prstenec, Celý obal, Platňa, Kazeta, Rádio a Video Art, zafarbené podľa skladby.</string>
 </resources>

@@ -54,4 +54,9 @@
     <string name="select">Выбраць усё</string>
     <string name="link_copied">Спасылка скапіравана ў буфер абмену</string>
     <string name="now_playing">Зараз грае</string>
+    <string name="player_design_radio">Радыё</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Старое радыё</annotation> грае вашыя песні</string>
+    <string name="whats_new_radio_player_desc">Новы дызайн плэера: вокладка ў акенцы, стрэлка шкалы рухаецца разам з песняй. Пацягніце яе, каб перамотваць.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Сем дызайнаў плэера</annotation> на выбар</string>
+    <string name="whats_new_core_player_designs_desc">Класічны, Кольца, Уся вокладка, Пласцінка, Касета, Радыё і Video Art, у колерах песні.</string>
 </resources>

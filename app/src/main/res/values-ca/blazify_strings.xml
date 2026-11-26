@@ -704,4 +704,9 @@
     <string name="monthly_most_playlist_name">Els més escoltats del mes</string>
     <string name="and">i</string>
     <string name="lyrics_from_provider">Lletra de %s</string>
+    <string name="player_design_radio">Ràdio</string>
+    <string name="whats_new_radio_player_title">Una <annotation type="accent">ràdio antiga</annotation> reprodueix les teves cançons</string>
+    <string name="whats_new_radio_player_desc">Un nou disseny del reproductor: la portada a la seva finestra i una agulla del dial que segueix la cançó. Arrossega-la per avançar o retrocedir.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Set dissenys de reproductor</annotation> per triar</string>
+    <string name="whats_new_core_player_designs_desc">Clàssic, Anell, Portada completa, Vinil, Casset, Ràdio i Video Art, amb els colors de la cançó.</string>
 </resources>

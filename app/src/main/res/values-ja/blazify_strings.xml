@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">曲、アルバム、プレイリストの矢印をタップすれば、接続なしで再生できます。</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">同期歌詞</annotation>が一語ずつ光る</string>
     <string name="whats_new_core_lyrics_desc">翻訳とローマ字表記つき。歌詞のソースは自由に選べます。</string>
-    <string name="whats_new_core_player_designs_title">選べる<annotation type="accent">6 つのプレーヤーデザイン</annotation></string>
-    <string name="whats_new_core_player_designs_desc">クラシック、リング、フルアート、レコード、カセット、ビデオアート。曲に合わせて色が変わります。</string>
+    <string name="whats_new_core_player_designs_title">選べる<annotation type="accent">7 つのプレーヤーデザイン</annotation></string>
+    <string name="whats_new_core_player_designs_desc">クラシック、リング、フルアート、レコード、カセット、ラジオ、ビデオアート。曲に合わせて色が変わります。</string>
     <string name="whats_new_core_equalizer_title">プリセット付き<annotation type="accent">10 バンドイコライザー</annotation></string>
     <string name="whats_new_core_equalizer_desc">各バンドをドラッグしたり、プリセットを選んだり、ヘッドホン用の AutoEQ プロファイルを読み込んだりできます。</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">スリープタイマー</annotation>で音楽を自動で停止</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">その曲の公式ビデオがプレーヤーの背景で、ミュートのまま曲に合わせて流れます。</string>
     <string name="whats_new_core_cast_title">テレビに<annotation type="accent">キャスト</annotation></string>
     <string name="whats_new_core_cast_desc">プレーヤーから Chromecast や Google TV に音楽を送れます。</string>
+    <string name="player_design_radio">ラジオ</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">レトロなラジオ</annotation>で曲を再生</string>
+    <string name="whats_new_radio_player_desc">新しいプレーヤーデザイン。窓の中にカバーが映り、ダイヤルの針が曲に合わせて動きます。針をドラッグすると再生位置を変えられます。</string>
 </resources>

@@ -60,4 +60,9 @@
     <string name="now_playing">දැන් ප්ලේ වෙන්නේ</string>
     <string name="lyrics">පද රචනා</string>
     <string name="close">වසාදමන්න</string>
+    <string name="player_design_radio">රේඩියෝ</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">පැරණි රේඩියෝවක්</annotation> ඔබේ ගීත වාදනය කරයි</string>
+    <string name="whats_new_radio_player_desc">නව ධාවක සැලසුමක්: කවරය එහි කවුළුවේ, ගීතය අනුගමනය කරන ඩයල් කටුවක්. ගීතයේ වෙනත් තැනකට යාමට එය අදින්න.</string>
+    <string name="whats_new_core_player_designs_title">තෝරා ගැනීමට <annotation type="accent">ධාවක සැලසුම් හතක්</annotation></string>
+    <string name="whats_new_core_player_designs_desc">සම්භාව්‍ය, මුදුව, සම්පූර්ණ කලාව, තැටිය, කැසට්, රේඩියෝ සහ Video Art, ගීතයේ වර්ණවලින්.</string>
 </resources>

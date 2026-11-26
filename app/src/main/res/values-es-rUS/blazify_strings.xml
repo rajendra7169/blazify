@@ -1428,8 +1428,8 @@
     <string name="whats_new_core_downloads_desc">Toca la flecha de una canción, un álbum o una playlist, y se escuchará sin conexión.</string>
     <string name="whats_new_core_lyrics_title">Las <annotation type="accent">letras sincronizadas</annotation> se iluminan palabra por palabra</string>
     <string name="whats_new_core_lyrics_desc">Con traducción y romanización, de las fuentes que elijas.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seis diseños de reproductor</annotation> para elegir</string>
-    <string name="whats_new_core_player_designs_desc">Clásico, Anillo, Portada completa, Vinilo, Casete y Video Art, con los colores de la canción.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Siete diseños de reproductor</annotation> para elegir</string>
+    <string name="whats_new_core_player_designs_desc">Clásico, Anillo, Portada completa, Vinilo, Casete, Radio y Video Art, con los colores de la canción.</string>
     <string name="whats_new_core_equalizer_title">Un <annotation type="accent">ecualizador de 10 bandas</annotation> con preajustes</string>
     <string name="whats_new_core_equalizer_desc">Arrastra cada banda, elige un preajuste o importa un perfil de AutoEQ para tus audífonos.</string>
     <string name="whats_new_core_sleep_timer_title">El <annotation type="accent">temporizador de apagado</annotation> detiene la música por ti</string>
@@ -1446,4 +1446,7 @@
     <string name="whats_new_core_video_art_desc">El video oficial de la canción se ve detrás del reproductor, silenciado y sincronizado.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Transmite</annotation> a tu TV</string>
     <string name="whats_new_core_cast_desc">Envía la música a un Chromecast o Google TV desde el reproductor.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Un <annotation type="accent">radio antiguo</annotation> reproduce tus canciones</string>
+    <string name="whats_new_radio_player_desc">Un nuevo diseño de reproductor: la portada en su ventana y una aguja del dial que sigue la canción. Arrástrala para avanzar o retroceder.</string>
 </resources>

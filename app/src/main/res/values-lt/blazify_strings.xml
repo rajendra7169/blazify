@@ -399,4 +399,9 @@
     <string name="scrobble_delay_percent">Skroblavimo vėlinimas procentais</string>
     <string name="scrobble_delay_minutes">Skroblavimo vėlinimas minutėmis</string>
     <string name="hide_youtube_shorts">Slėpti YouTube Shorts</string>
+    <string name="player_design_radio">Radijas</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Senovinis radijas</annotation> groja jūsų dainas</string>
+    <string name="whats_new_radio_player_desc">Naujas grotuvo dizainas: viršelis savo langelyje, skalės rodyklė, sekanti dainą. Vilkite ją, kad persuktumėte.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Septyni grotuvo dizainai</annotation> pasirinkti</string>
+    <string name="whats_new_core_player_designs_desc">Klasikinis, Žiedas, Visas viršelis, Plokštelė, Kasetė, Radijas ir Video Art, dainos spalvomis.</string>
 </resources>

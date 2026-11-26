@@ -1441,8 +1441,8 @@
     <string name="whats_new_core_downloads_desc">Нажмите на стрелку у песни, альбома или плейлиста, и они будут играть без подключения.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Синхронный текст</annotation> подсвечивается слово за словом</string>
     <string name="whats_new_core_lyrics_desc">С переводом и романизацией, из выбранных вами источников.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Шесть дизайнов плеера</annotation> на выбор</string>
-    <string name="whats_new_core_player_designs_desc">Классический, Кольцо, Во всю обложку, Пластинка, Кассета и Video Art, в цветах песни.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Семь дизайнов плеера</annotation> на выбор</string>
+    <string name="whats_new_core_player_designs_desc">Классический, Кольцо, Во всю обложку, Пластинка, Кассета, Радио и Video Art, в цветах песни.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">10-полосный эквалайзер</annotation> с пресетами</string>
     <string name="whats_new_core_equalizer_desc">Двигайте каждую полосу, выберите пресет или импортируйте профиль AutoEQ для своих наушников.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Таймер сна</annotation> сам остановит музыку</string>
@@ -1459,4 +1459,7 @@
     <string name="whats_new_core_video_art_desc">Собственный клип песни идёт за плеером, без звука и в такт.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Трансляция</annotation> на телевизор</string>
     <string name="whats_new_core_cast_desc">Отправьте музыку на Chromecast или Google TV прямо из плеера.</string>
+    <string name="player_design_radio">Радио</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Винтажное радио</annotation> играет ваши песни</string>
+    <string name="whats_new_radio_player_desc">Новый дизайн плеера: обложка в окошке, стрелка шкалы движется вместе с песней. Перетащите её для перемотки.</string>
 </resources>

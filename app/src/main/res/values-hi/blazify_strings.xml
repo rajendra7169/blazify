@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">किसी गाने, एल्बम या प्लेलिस्ट पर तीर टैप करें, और वह बिना कनेक्शन के चलेगा।</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">सिंक किए गए बोल</annotation> शब्द-दर-शब्द चमकते हैं</string>
     <string name="whats_new_core_lyrics_desc">अनुवाद और रोमन लिपि के साथ, आपके चुने हुए स्रोतों से।</string>
-    <string name="whats_new_core_player_designs_title">चुनने के लिए <annotation type="accent">छह प्लेयर डिज़ाइन</annotation></string>
-    <string name="whats_new_core_player_designs_desc">क्लासिक, रिंग, पूरा कवर, रिकॉर्ड, कैसेट और वीडियो कवर, गाने के रंगों में।</string>
+    <string name="whats_new_core_player_designs_title">चुनने के लिए <annotation type="accent">सात प्लेयर डिज़ाइन</annotation></string>
+    <string name="whats_new_core_player_designs_desc">क्लासिक, रिंग, पूरा कवर, रिकॉर्ड, कैसेट, रेडियो और वीडियो कवर, गाने के रंगों में।</string>
     <string name="whats_new_core_equalizer_title">प्रीसेट के साथ <annotation type="accent">10-बैंड इक्वलाइज़र</annotation></string>
     <string name="whats_new_core_equalizer_desc">हर बैंड को खींचें, कोई प्रीसेट चुनें, या अपने हेडफ़ोन के लिए AutoEQ प्रोफ़ाइल इंपोर्ट करें।</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">स्लीप टाइमर</annotation> आपके लिए संगीत रोक देता है</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">गाने का अपना वीडियो प्लेयर के पीछे, बिना आवाज़ और ताल के साथ चलता है।</string>
     <string name="whats_new_core_cast_title">अपने टीवी पर <annotation type="accent">कास्ट करें</annotation></string>
     <string name="whats_new_core_cast_desc">प्लेयर से संगीत को Chromecast या Google TV पर भेजें।</string>
+    <string name="player_design_radio">रेडियो</string>
+    <string name="whats_new_radio_player_title">एक <annotation type="accent">पुराना रेडियो</annotation> बजाता है आपके गाने</string>
+    <string name="whats_new_radio_player_desc">नया प्लेयर डिज़ाइन: खिड़की में कवर, और गाने के साथ चलती डायल की सुई। गाने में आगे-पीछे जाने के लिए उसे खींचें।</string>
 </resources>

@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">แตะลูกศรบนเพลง อัลบั้ม หรือเพลย์ลิสต์ แล้วก็เล่นได้โดยไม่ต้องเชื่อมต่อ</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">เนื้อเพลงแบบซิงค์</annotation> ไฮไลต์ทีละคำ</string>
     <string name="whats_new_core_lyrics_desc">พร้อมคำแปลและการถอดเสียง จากแหล่งที่คุณเลือก</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">ดีไซน์เครื่องเล่นหกแบบ</annotation>ให้เลือก</string>
-    <string name="whats_new_core_player_designs_desc">คลาสสิก วงแหวน ภาพเต็มจอ แผ่นเสียง เทปคาสเซ็ต และวิดีโออาร์ต ใช้สีตามเพลง</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">ดีไซน์เครื่องเล่นเจ็ดแบบ</annotation>ให้เลือก</string>
+    <string name="whats_new_core_player_designs_desc">คลาสสิก วงแหวน ภาพเต็มจอ แผ่นเสียง เทปคาสเซ็ต วิทยุ และวิดีโออาร์ต ใช้สีตามเพลง</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">อีควอไลเซอร์ 10 ย่าน</annotation> พร้อมพรีเซ็ต</string>
     <string name="whats_new_core_equalizer_desc">ลากแต่ละย่าน เลือกพรีเซ็ต หรือนำเข้าโปรไฟล์ AutoEQ สำหรับหูฟังของคุณ</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">ตั้งเวลาปิดเพลง</annotation> หยุดเพลงให้คุณ</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">วิดีโอของเพลงนั้นจะเล่นอยู่ด้านหลังเครื่องเล่น โดยปิดเสียงและเล่นตรงจังหวะ</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">แคสต์</annotation>ไปยังทีวีของคุณ</string>
     <string name="whats_new_core_cast_desc">ส่งเพลงไปยัง Chromecast หรือ Google TV จากเครื่องเล่น</string>
+    <string name="player_design_radio">วิทยุ</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">วิทยุวินเทจ</annotation>เล่นเพลงของคุณ</string>
+    <string name="whats_new_radio_player_desc">ดีไซน์เครื่องเล่นใหม่: ปกอยู่ในหน้าต่างของวิทยุ เข็มหน้าปัดเคลื่อนตามเพลง ลากเข็มเพื่อเลื่อนไปยังช่วงที่ต้องการ</string>
 </resources>

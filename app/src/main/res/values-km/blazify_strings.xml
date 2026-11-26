@@ -16,4 +16,9 @@
     <string name="time_transfer_listen_time_label">Tempo d\'ascolto:</string>
     <string name="time_transfer_convert">Convertire</string>
     <string name="song_dropdown_more_results">Scrivi ancora per restringere i risultati (%d in più)</string>
+    <string name="player_design_radio">វិទ្យុ</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">វិទ្យុបុរាណ</annotation>ចាក់បទចម្រៀងរបស់អ្នក</string>
+    <string name="whats_new_radio_player_desc">ការរចនាកម្មវិធីចាក់ថ្មី៖ គម្របនៅក្នុងបង្អួចរបស់វា និងម្ជុលផ្ទាំងរលកដែលដើរតាមបទចម្រៀង។ អូសវាដើម្បីរំលងទៅមុខ ឬថយក្រោយ។</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">ការរចនាកម្មវិធីចាក់ប្រាំពីរ</annotation>សម្រាប់ជ្រើសរើស</string>
+    <string name="whats_new_core_player_designs_desc">បុរាណ ចិញ្ចៀន រូបភាពពេញ ថាស កាសែត វិទ្យុ និង Video Art ដែលមានពណ៌តាមបទចម្រៀង។</string>
 </resources>

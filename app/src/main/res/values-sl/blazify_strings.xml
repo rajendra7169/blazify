@@ -266,4 +266,9 @@
     <string name="casting_to">Predvajanje na %s</string>
     <string name="progress_percent">Napredek: %s%%</string>
     <string name="listening_to_blazify">Poslušaš Blazify</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Star radio</annotation> predvaja vaše skladbe</string>
+    <string name="whats_new_radio_player_desc">Nov videz predvajalnika: naslovnica v okencu, kazalec skale, ki sledi skladbi. Povlecite ga za premikanje po skladbi.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sedem videzov predvajalnika</annotation> na izbiro</string>
+    <string name="whats_new_core_player_designs_desc">Klasični, Obroč, Cela naslovnica, Plošča, Kaseta, Radio in Video Art, v barvah skladbe.</string>
 </resources>

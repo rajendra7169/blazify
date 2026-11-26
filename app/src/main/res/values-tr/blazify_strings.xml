@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">Bir şarkı, albüm veya çalma listesindeki oka dokun, bağlantı olmadan da çalsın.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Senkronize sözler</annotation> kelime kelime parlar</string>
     <string name="whats_new_core_lyrics_desc">Çeviri ve Latinleştirme ile, seçtiğin kaynaklardan.</string>
-    <string name="whats_new_core_player_designs_title">Seçebileceğin <annotation type="accent">altı oynatıcı tasarımı</annotation></string>
-    <string name="whats_new_core_player_designs_desc">Klasik, Halka, Tam Kapak, Plak, Kaset ve Video Art, şarkının renkleriyle.</string>
+    <string name="whats_new_core_player_designs_title">Seçebileceğin <annotation type="accent">yedi oynatıcı tasarımı</annotation></string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Halka, Tam Kapak, Plak, Kaset, Radyo ve Video Art, şarkının renkleriyle.</string>
     <string name="whats_new_core_equalizer_title">Hazır ayarlı <annotation type="accent">10 bantlı ekolayzer</annotation></string>
     <string name="whats_new_core_equalizer_desc">Her bandı sürükle, bir hazır ayar seç ya da kulaklığın için bir AutoEQ profili içe aktar.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Uyku zamanlayıcısı</annotation> müziği senin için durdurur</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">Şarkının kendi videosu oynatıcının arkasında sessiz ve senkronize oynar.</string>
     <string name="whats_new_core_cast_title">Televizyonuna <annotation type="accent">yayınla</annotation></string>
     <string name="whats_new_core_cast_desc">Müziği oynatıcıdan bir Chromecast\'e veya Google TV\'ye gönder.</string>
+    <string name="player_design_radio">Radyo</string>
+    <string name="whats_new_radio_player_title">Şarkılarını <annotation type="accent">eski bir radyo</annotation> çalıyor</string>
+    <string name="whats_new_radio_player_desc">Yeni bir oynatıcı tasarımı: kapak kendi penceresinde, şarkıyı takip eden bir kadran ibresi. Sarmak için ibreyi sürükle.</string>
 </resources>

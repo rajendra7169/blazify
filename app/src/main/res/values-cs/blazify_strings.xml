@@ -1441,8 +1441,8 @@
     <string name="whats_new_core_downloads_desc">Klepněte na šipku u skladby, alba nebo playlistu a bude hrát i bez připojení.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Synchronizované texty</annotation> se rozsvěcují slovo po slově</string>
     <string name="whats_new_core_lyrics_desc">S překladem a přepisem do latinky, ze zdrojů, které si vyberete.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Šest vzhledů přehrávače</annotation> na výběr</string>
-    <string name="whats_new_core_player_designs_desc">Klasický, Prstenec, Celý obal, Deska, Kazeta a Video Art, vybarvené podle skladby.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sedm vzhledů přehrávače</annotation> na výběr</string>
+    <string name="whats_new_core_player_designs_desc">Klasický, Prstenec, Celý obal, Deska, Kazeta, Rádio a Video Art, vybarvené podle skladby.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">10pásmový ekvalizér</annotation> s předvolbami</string>
     <string name="whats_new_core_equalizer_desc">Posouvejte jednotlivá pásma, vyberte předvolbu nebo importujte profil AutoEQ pro svá sluchátka.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Časovač spánku</annotation> za vás zastaví hudbu</string>
@@ -1459,4 +1459,7 @@
     <string name="whats_new_core_video_art_desc">Vlastní video skladby hraje za přehrávačem, ztlumené a synchronně.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Odesílejte</annotation> do televize</string>
     <string name="whats_new_core_cast_desc">Pošlete hudbu z přehrávače do Chromecastu nebo Google TV.</string>
+    <string name="player_design_radio">Rádio</string>
+    <string name="whats_new_radio_player_title">Skladby vám hraje <annotation type="accent">staré rádio</annotation></string>
+    <string name="whats_new_radio_player_desc">Nový vzhled přehrávače: obal v okénku a ručička stupnice, která sleduje skladbu. Přetažením ručičky se posunete ve skladbě.</string>
 </resources>

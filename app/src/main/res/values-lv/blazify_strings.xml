@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="back_button_desc">Atpakaļ</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Vecs radio</annotation> atskaņo jūsu dziesmas</string>
+    <string name="whats_new_radio_player_desc">Jauns atskaņotāja dizains: vāciņš savā lodziņā, skalas adata, kas seko dziesmai. Velciet to, lai pārtītu.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Septiņi atskaņotāja dizaini</annotation>, no kuriem izvēlēties</string>
+    <string name="whats_new_core_player_designs_desc">Klasisks, Gredzens, Pilns vāciņš, Plate, Kasete, Radio un Video Art, dziesmas krāsās.</string>
 </resources>

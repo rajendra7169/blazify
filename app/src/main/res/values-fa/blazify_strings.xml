@@ -128,4 +128,9 @@
     <string name="seek_seconds_addup">افزایش تدریجی زمان پرش</string>
     <string name="about_artist">درباره</string>
     <string name="hide_player_thumbnail">پنهان کردن تصویر پخش کننده</string>
+    <string name="player_design_radio">رادیو</string>
+    <string name="whats_new_radio_player_title">یک <annotation type="accent">رادیوی قدیمی</annotation> آهنگ‌های شما را پخش می‌کند</string>
+    <string name="whats_new_radio_player_desc">طرح تازه پخش‌کننده: کاور در پنجره‌اش، و عقربه‌ای روی صفحه که همراه آهنگ حرکت می‌کند. برای جابه‌جایی در آهنگ آن را بکشید.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">هفت طرح پخش‌کننده</annotation> برای انتخاب</string>
+    <string name="whats_new_core_player_designs_desc">کلاسیک، حلقه، کاور کامل، صفحه گرامافون، کاست، رادیو و Video Art، با رنگ‌های آهنگ.</string>
 </resources>

@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">Tik op de pijl bij een nummer, album of afspeellijst en het speelt zonder verbinding.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Gesynchroniseerde songteksten</annotation> lichten woord voor woord op</string>
     <string name="whats_new_core_lyrics_desc">Met vertaling en romanisering, uit de bronnen die jij kiest.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Zes spelerontwerpen</annotation> om uit te kiezen</string>
-    <string name="whats_new_core_player_designs_desc">Klassiek, Ring, Volledige hoes, Plaat, Cassette en Video Art, gekleurd door het nummer.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Zeven spelerontwerpen</annotation> om uit te kiezen</string>
+    <string name="whats_new_core_player_designs_desc">Klassiek, Ring, Volledige hoes, Plaat, Cassette, Radio en Video Art, gekleurd door het nummer.</string>
     <string name="whats_new_core_equalizer_title">Een <annotation type="accent">equalizer met 10 banden</annotation> en voorinstellingen</string>
     <string name="whats_new_core_equalizer_desc">Sleep elke band, kies een voorinstelling of importeer een AutoEQ-profiel voor je koptelefoon.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Slaaptimer</annotation> stopt de muziek voor je</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">De eigen video van het nummer speelt achter de speler, zonder geluid en synchroon.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Cast</annotation> naar je tv</string>
     <string name="whats_new_core_cast_desc">Stuur de muziek vanuit de speler naar een Chromecast of Google TV.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Een <annotation type="accent">ouderwetse radio</annotation> speelt je nummers</string>
+    <string name="whats_new_radio_player_desc">Een nieuw spelerontwerp: de hoes in het venster, een afstemnaald die het nummer volgt. Sleep om door te spoelen.</string>
 </resources>

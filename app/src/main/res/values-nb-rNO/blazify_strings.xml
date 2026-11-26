@@ -116,4 +116,9 @@
     <string name="skip_silence_instant">Hopp over stillhet øyeblikkelig</string>
     <string name="monthly_most_playlist_name">Månedlig mest</string>
     <string name="restart">Restart</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">En <annotation type="accent">gammeldags radio</annotation> spiller sangene dine</string>
+    <string name="whats_new_radio_player_desc">Et nytt spillerdesign: omslaget i et vindu, en skalanål som følger sangen. Dra den for å spole.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sju spillerdesign</annotation> å velge mellom</string>
+    <string name="whats_new_core_player_designs_desc">Klassisk, Ring, Fullt omslag, Plate, Kassett, Radio og Video Art, farget etter sangen.</string>
 </resources>

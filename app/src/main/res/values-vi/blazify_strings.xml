@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">Chạm vào mũi tên trên bài hát, album hoặc danh sách phát, và nó sẽ phát không cần kết nối.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Lời bài hát đồng bộ</annotation> sáng lên theo từng từ</string>
     <string name="whats_new_core_lyrics_desc">Có bản dịch và La-tinh hóa, từ các nguồn bạn chọn.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sáu kiểu trình phát</annotation> để bạn chọn</string>
-    <string name="whats_new_core_player_designs_desc">Cổ điển, Vòng tròn, Ảnh bìa toàn màn hình, Đĩa than, Băng cassette và Video Art, mang màu của bài hát.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Bảy kiểu trình phát</annotation> để bạn chọn</string>
+    <string name="whats_new_core_player_designs_desc">Cổ điển, Vòng tròn, Ảnh bìa toàn màn hình, Đĩa than, Băng cassette, Radio và Video Art, mang màu của bài hát.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">Bộ cân bằng 10 dải</annotation> có cấu hình sẵn</string>
     <string name="whats_new_core_equalizer_desc">Kéo từng dải, chọn cấu hình sẵn hoặc nhập hồ sơ AutoEQ cho tai nghe của bạn.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Hẹn giờ ngủ</annotation> tự dừng nhạc giúp bạn</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">Video chính thức của bài hát phát phía sau trình phát, tắt tiếng và khớp nhịp.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Truyền</annotation> lên TV của bạn</string>
     <string name="whats_new_core_cast_desc">Gửi nhạc tới Chromecast hoặc Google TV ngay từ trình phát.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Chiếc radio cổ</annotation> phát nhạc của bạn</string>
+    <string name="whats_new_radio_player_desc">Một kiểu trình phát mới: ảnh bìa trong ô kính, kim dò đài chạy theo bài hát. Kéo kim để tua.</string>
 </resources>

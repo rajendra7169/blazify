@@ -501,4 +501,9 @@
     <string name="pause_music_when_media_is_muted">Паузира музиката когато медията се заглуши</string>
     <string name="resume_on_bluetooth_connect">Продължи на Bluetooth връзка</string>
     <string name="hide_youtube_shorts">Скрий YouTube Shorts</string>
+    <string name="player_design_radio">Радио</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Старо радио</annotation> пуска вашите песни</string>
+    <string name="whats_new_radio_player_desc">Нов дизайн на плейъра: корицата в прозорче, стрелка на скалата, която следва песента. Плъзнете я, за да превъртите.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Седем дизайна на плейъра</annotation> за избор</string>
+    <string name="whats_new_core_player_designs_desc">Класически, Пръстен, Цяла корица, Плоча, Касета, Радио и Video Art, в цветовете на песента.</string>
 </resources>

@@ -312,4 +312,9 @@
     <string name="like">Lika</string>
     <string name="widget_description">Musikkavspelarwidget med avspelingskontrollar</string>
     <string name="turntable_widget_description">Snartilgang til songen du spela av nylegast</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Ein <annotation type="accent">gammaldags radio</annotation> spelar songane dine</string>
+    <string name="whats_new_radio_player_desc">Eit nytt spelardesign: omslaget i eit vindauge, ei skalanål som følgjer songen. Dra ho for å spola.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sju spelardesign</annotation> å velja mellom</string>
+    <string name="whats_new_core_player_designs_desc">Klassisk, Ring, Heilt omslag, Plate, Kassett, Radio og Video Art, farga etter songen.</string>
 </resources>

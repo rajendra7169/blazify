@@ -834,4 +834,9 @@
     <string name="lyrics_click_change">Cambiar a letra ao premer</string>
     <string name="lyrics_from_provider">Letras de %s</string>
     <string name="youtube_music_lyrics_note">NOTA: as letras de YouTube Music amosaranse automaticamente cando non haxa outra fonte dispoñible. Polo xeral, non están sincronizadas</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Unha <annotation type="accent">radio antiga</annotation> reproduce as túas cancións</string>
+    <string name="whats_new_radio_player_desc">Un novo deseño de reprodutor: a portada na súa xanela e unha agulla do dial que segue a canción. Arrástraa para avanzar ou retroceder.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sete deseños de reprodutor</annotation> para escoller</string>
+    <string name="whats_new_core_player_designs_desc">Clásico, Anel, Portada completa, Vinilo, Casete, Radio e Video Art, coas cores da canción.</string>
 </resources>

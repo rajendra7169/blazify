@@ -523,4 +523,9 @@
     <string name="widget_recognizer_unknown_artist">Egile ezezaguna</string>
     <string name="widget_recognizer_mic_desc">Abesti bat ezagutu</string>
     <string name="widget_recognizer_channel_name">Musika-ezagutzea</string>
+    <string name="player_design_radio">Irratia</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Irrati zahar</annotation> batek zure abestiak jotzen ditu</string>
+    <string name="whats_new_radio_player_desc">Erreproduzitzailearen diseinu berria: estalkia bere leihoan, abestiari jarraitzen dion orratz bat. Arrastatu aurrera edo atzera joateko.</string>
+    <string name="whats_new_core_player_designs_title">Aukeratzeko <annotation type="accent">zazpi erreproduzitzaile-diseinu</annotation></string>
+    <string name="whats_new_core_player_designs_desc">Klasikoa, Eraztuna, Estalki osoa, Diskoa, Kasetea, Irratia eta Video Art, abestiaren koloreekin.</string>
 </resources>

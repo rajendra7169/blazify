@@ -149,4 +149,9 @@
     <string name="enable_lrclib_desc">Communitydriven synkroniserad databas för låttexter</string>
     <string name="enable_kugou_desc">Hämtar låttexter från KoGou, en populär Kinesisk musikplattform</string>
     <string name="youtube_music_lyrics_note">OBS: Låttexter från YouTube Music kommer användas när andra låttexttjänster inte är tillgängliga. Låttexter från YTM är oftast inte synkroniserade.</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">En <annotation type="accent">gammaldags radio</annotation> spelar dina låtar</string>
+    <string name="whats_new_radio_player_desc">En ny spelardesign: omslaget i sitt fönster, en skalnål som följer låten. Dra den för att spola.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sju spelardesigner</annotation> att välja mellan</string>
+    <string name="whats_new_core_player_designs_desc">Klassisk, Ring, Helt omslag, Skiva, Kassett, Radio och Video Art, färgade efter låten.</string>
 </resources>

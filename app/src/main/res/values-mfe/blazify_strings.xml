@@ -105,4 +105,9 @@
     <string name="shuffle_playlist_first">Zwe playlist/album en aleatoire en premie</string>
     <string name="shuffle_playlist_first_desc">Kan en aleatoire, zwe tou sante depi playlist/album orizinal en premie, apre zwe bann cki similaire</string>
     <string name="show_wrapped_card">Montre Résumé</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Enn <annotation type="accent">vie radio</annotation> zwe ou bann sante</string>
+    <string name="whats_new_radio_player_desc">Enn nouvo design player: cover-la dan so lafenet, enn lezegwi ki swiv sante-la. Rans li pou al pli devan ouswa pli deryer.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Set design player</annotation> pou swazir</string>
+    <string name="whats_new_core_player_designs_desc">Classic, Ring, Full Art, Record, Cassette, Radio ek Video Art, dan kouler sante-la.</string>
 </resources>

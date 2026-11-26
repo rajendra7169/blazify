@@ -1405,8 +1405,8 @@
     <string name="whats_new_core_downloads_desc">노래, 앨범, 재생목록의 화살표를 탭하면 연결 없이도 재생돼요.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">싱크 가사</annotation>가 단어마다 빛나요</string>
     <string name="whats_new_core_lyrics_desc">번역과 로마자 표기를 지원하고, 가사 출처도 직접 고를 수 있어요.</string>
-    <string name="whats_new_core_player_designs_title">고를 수 있는 <annotation type="accent">6가지 플레이어 디자인</annotation></string>
-    <string name="whats_new_core_player_designs_desc">클래식, 링, 풀 아트, 레코드, 카세트, 비디오 아트. 노래에 맞춰 색이 바뀌어요.</string>
+    <string name="whats_new_core_player_designs_title">고를 수 있는 <annotation type="accent">7가지 플레이어 디자인</annotation></string>
+    <string name="whats_new_core_player_designs_desc">클래식, 링, 풀 아트, 레코드, 카세트, 라디오, 비디오 아트. 노래에 맞춰 색이 바뀌어요.</string>
     <string name="whats_new_core_equalizer_title">프리셋이 있는 <annotation type="accent">10밴드 이퀄라이저</annotation></string>
     <string name="whats_new_core_equalizer_desc">밴드를 하나씩 드래그하거나 프리셋을 고르거나, 헤드폰용 AutoEQ 프로필을 가져오세요.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">수면 타이머</annotation>가 음악을 대신 꺼 줘요</string>
@@ -1423,4 +1423,7 @@
     <string name="whats_new_core_video_art_desc">노래의 공식 영상이 플레이어 뒤에서 음소거된 채 박자에 맞춰 재생돼요.</string>
     <string name="whats_new_core_cast_title">TV로 <annotation type="accent">전송</annotation></string>
     <string name="whats_new_core_cast_desc">플레이어에서 Chromecast나 Google TV로 음악을 보내세요.</string>
+    <string name="player_design_radio">라디오</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">빈티지 라디오</annotation>로 노래를 들어요</string>
+    <string name="whats_new_radio_player_desc">새 플레이어 디자인: 창 안에 커버가 보이고, 다이얼 바늘이 노래를 따라 움직여요. 바늘을 드래그해서 원하는 위치로 이동하세요.</string>
 </resources>

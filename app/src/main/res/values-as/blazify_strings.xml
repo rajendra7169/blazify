@@ -45,4 +45,9 @@
     <string name="show_artist_monthly_listeners">মাহেকীয়া শ্ৰোতাক দেখুৱাওক</string>
     <string name="download_playlist_desc">অফলাইন প্লেবেকৰ বাবে সকলো গীত ডাউনলোড কৰক</string>
     <string name="remove_download_playlist_desc">Remove all downloaded songs from this playlist</string>
+    <string name="player_design_radio">ৰেডিঅ\'</string>
+    <string name="whats_new_radio_player_title">এটা <annotation type="accent">পুৰণি ৰেডিঅ\'</annotation>ত বাজে আপোনাৰ গান</string>
+    <string name="whats_new_radio_player_desc">নতুন প্লেয়াৰ ডিজাইন: খিৰিকীত কভাৰ, গানৰ লগে লগে আগবাঢ়ে ডায়েলৰ কাঁটা। গানৰ আন অংশলৈ যাবলৈ কাঁটাডাল টানক।</string>
+    <string name="whats_new_core_player_designs_title">বাছি ল\'বলৈ <annotation type="accent">সাতটা প্লেয়াৰ ডিজাইন</annotation></string>
+    <string name="whats_new_core_player_designs_desc">ক্লাছিক, ৰিং, সম্পূৰ্ণ আৰ্ট, ৰেকৰ্ড, কেছেট, ৰেডিঅ\' আৰু ভিডিঅ\' আৰ্ট, গানৰ ৰঙেৰে ৰঙীন।</string>
 </resources>

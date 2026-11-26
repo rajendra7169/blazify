@@ -1422,8 +1422,8 @@
     <string name="whats_new_core_downloads_desc">Toque na seta de uma música, álbum ou lista de reprodução e ela toca sem ligação.</string>
     <string name="whats_new_core_lyrics_title">As <annotation type="accent">letras sincronizadas</annotation> acendem palavra a palavra</string>
     <string name="whats_new_core_lyrics_desc">Com tradução e romanização, das fontes que escolher.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Seis designs de leitor</annotation> à escolha</string>
-    <string name="whats_new_core_player_designs_desc">Clássico, Anel, Capa inteira, Disco, Cassete e Video Art, com as cores da música.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sete designs de leitor</annotation> à escolha</string>
+    <string name="whats_new_core_player_designs_desc">Clássico, Anel, Capa inteira, Disco, Cassete, Rádio e Video Art, com as cores da música.</string>
     <string name="whats_new_core_equalizer_title">Um <annotation type="accent">equalizador de 10 bandas</annotation> com predefinições</string>
     <string name="whats_new_core_equalizer_desc">Arraste cada banda, escolha uma predefinição ou importe um perfil AutoEQ para os seus auscultadores.</string>
     <string name="whats_new_core_sleep_timer_title">O <annotation type="accent">temporizador</annotation> para a música por si</string>
@@ -1440,4 +1440,7 @@
     <string name="whats_new_core_video_art_desc">O vídeo da própria música toca por trás do leitor, sem som e em sincronia.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Transmita</annotation> para a sua TV</string>
     <string name="whats_new_core_cast_desc">Envie a música para um Chromecast ou Google TV a partir do leitor.</string>
+    <string name="player_design_radio">Rádio</string>
+    <string name="whats_new_radio_player_title">Um <annotation type="accent">rádio antigo</annotation> toca as suas músicas</string>
+    <string name="whats_new_radio_player_desc">Um novo design de leitor: a capa na sua janela, um ponteiro de sintonia que acompanha a música. Arraste-o para avançar ou recuar.</string>
 </resources>

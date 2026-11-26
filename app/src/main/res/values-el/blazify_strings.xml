@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">Πατήστε το βέλος σε ένα τραγούδι, άλμπουμ ή λίστα και θα παίζει χωρίς σύνδεση.</string>
     <string name="whats_new_core_lyrics_title">Οι <annotation type="accent">συγχρονισμένοι στίχοι</annotation> φωτίζονται λέξη προς λέξη</string>
     <string name="whats_new_core_lyrics_desc">Με μετάφραση και λατινοποίηση, από τις πηγές που επιλέγετε.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Έξι σχέδια αναπαραγωγέα</annotation> για να διαλέξετε</string>
-    <string name="whats_new_core_player_designs_desc">Κλασικό, Δακτύλιος, Πλήρες εξώφυλλο, Δίσκος, Κασέτα και Video Art, χρωματισμένα από το τραγούδι.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Επτά σχέδια αναπαραγωγέα</annotation> για να διαλέξετε</string>
+    <string name="whats_new_core_player_designs_desc">Κλασικό, Δακτύλιος, Πλήρες εξώφυλλο, Δίσκος, Κασέτα, Ραδιόφωνο και Video Art, χρωματισμένα από το τραγούδι.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">Ισοσταθμιστής 10 ζωνών</annotation> με προεπιλογές</string>
     <string name="whats_new_core_equalizer_desc">Σύρετε κάθε ζώνη, διαλέξτε μια προεπιλογή ή εισαγάγετε ένα προφίλ AutoEQ για τα ακουστικά σας.</string>
     <string name="whats_new_core_sleep_timer_title">Ο <annotation type="accent">χρονοδιακόπτης ύπνου</annotation> σταματά τη μουσική για εσάς</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">Το επίσημο βίντεο του τραγουδιού παίζει πίσω από τον αναπαραγωγέα, σε σίγαση και συγχρονισμένα.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Μετάδοση</annotation> στην τηλεόρασή σας</string>
     <string name="whats_new_core_cast_desc">Στείλτε τη μουσική σε Chromecast ή Google TV από τον αναπαραγωγέα.</string>
+    <string name="player_design_radio">Ραδιόφωνο</string>
+    <string name="whats_new_radio_player_title">Ένα <annotation type="accent">παλιό ραδιόφωνο</annotation> παίζει τα τραγούδια σας</string>
+    <string name="whats_new_radio_player_desc">Νέο σχέδιο αναπαραγωγέα: το εξώφυλλο στο παράθυρό του, μια βελόνα κλίμακας που ακολουθεί το τραγούδι. Σύρετέ τη για να μετακινηθείτε στο τραγούδι.</string>
 </resources>

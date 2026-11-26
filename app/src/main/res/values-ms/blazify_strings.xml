@@ -70,4 +70,9 @@
     <string name="default_style">Asal</string>
     <string name="primary_color_style">Warna utama</string>
     <string name="tertiary_color_style">Warna tertiari</string>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Radio antik</annotation> memainkan lagu anda</string>
+    <string name="whats_new_radio_player_desc">Reka bentuk pemain baharu: muka album dalam tingkapnya, jarum dail yang mengikut lagu. Seret untuk melompat ke bahagian lain.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Tujuh reka bentuk pemain</annotation> untuk dipilih</string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Cincin, Seni Penuh, Piring Hitam, Kaset, Radio dan Video Art, diwarnakan mengikut lagu.</string>
 </resources>

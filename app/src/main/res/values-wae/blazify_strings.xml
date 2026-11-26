@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="player_design_radio">Radio</string>
+    <string name="whats_new_radio_player_title">Äs <annotation type="accent">altmodischs Radio</annotation> spilt dini Lieder</string>
+    <string name="whats_new_radio_player_desc">Äs nüüs Player-Design: ds Cover i sim Fänschter, ä Zeiger, wa em Lied naageit. Zie ne, um z spuele.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Sibe Player-Designs</annotation> zum Uswääle</string>
+    <string name="whats_new_core_player_designs_desc">Klassisch, Ring, Ganzes Cover, Platte, Kassette, Radio und Video Art, i de Farbe vom Lied.</string>
     </resources>

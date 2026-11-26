@@ -1417,8 +1417,8 @@
     <string name="whats_new_core_downloads_desc">কোনো গান, অ্যালবাম বা প্লেলিস্টের তীর চিহ্নে ট্যাপ করুন, তাহলে কানেকশন ছাড়াই চলবে।</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">সিঙ্ক করা লিরিক্স</annotation> শব্দে শব্দে জ্বলে ওঠে</string>
     <string name="whats_new_core_lyrics_desc">অনুবাদ ও রোমান অক্ষরসহ, আপনার বেছে নেওয়া সোর্স থেকে।</string>
-    <string name="whats_new_core_player_designs_title">বেছে নেওয়ার জন্য <annotation type="accent">ছয়টি প্লেয়ার ডিজাইন</annotation></string>
-    <string name="whats_new_core_player_designs_desc">ক্লাসিক, রিং, ফুল আর্ট, রেকর্ড, ক্যাসেট ও ভিডিও আর্ট, গানের রঙে রাঙানো।</string>
+    <string name="whats_new_core_player_designs_title">বেছে নেওয়ার জন্য <annotation type="accent">সাতটি প্লেয়ার ডিজাইন</annotation></string>
+    <string name="whats_new_core_player_designs_desc">ক্লাসিক, রিং, ফুল আর্ট, রেকর্ড, ক্যাসেট, রেডিও ও ভিডিও আর্ট, গানের রঙে রাঙানো।</string>
     <string name="whats_new_core_equalizer_title">প্রিসেটসহ <annotation type="accent">১০-ব্যান্ড ইকুয়ালাইজার</annotation></string>
     <string name="whats_new_core_equalizer_desc">প্রতিটি ব্যান্ড টেনে সাজান, একটি প্রিসেট বেছে নিন, বা আপনার হেডফোনের জন্য একটি AutoEQ প্রোফাইল ইমপোর্ট করুন।</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">স্লিপ টাইমার</annotation> আপনার হয়ে গান বন্ধ করে</string>
@@ -1435,4 +1435,7 @@
     <string name="whats_new_core_video_art_desc">প্লেয়ারের পেছনে গানের নিজের ভিডিও চলে, মিউট করা এবং তালে তাল মিলিয়ে।</string>
     <string name="whats_new_core_cast_title">আপনার টিভিতে <annotation type="accent">কাস্ট করুন</annotation></string>
     <string name="whats_new_core_cast_desc">প্লেয়ার থেকে গান Chromecast বা Google TV-তে পাঠান।</string>
+    <string name="player_design_radio">রেডিও</string>
+    <string name="whats_new_radio_player_title">আপনার গান বাজায় একটি <annotation type="accent">পুরোনো দিনের রেডিও</annotation></string>
+    <string name="whats_new_radio_player_desc">নতুন প্লেয়ার ডিজাইন: জানালায় কভার, আর গানের সঙ্গে এগোয় ডায়ালের কাঁটা। গানের অন্য অংশে যেতে কাঁটাটি টেনে আনুন।</string>
 </resources>

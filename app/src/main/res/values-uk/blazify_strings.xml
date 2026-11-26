@@ -1441,8 +1441,8 @@
     <string name="whats_new_core_downloads_desc">Натисніть стрілку на пісні, альбомі чи плейлисті, і вони гратимуть без з’єднання.</string>
     <string name="whats_new_core_lyrics_title"><annotation type="accent">Синхронізовані тексти</annotation> підсвічуються слово за словом</string>
     <string name="whats_new_core_lyrics_desc">З перекладом і романізацією, з вибраних вами джерел.</string>
-    <string name="whats_new_core_player_designs_title"><annotation type="accent">Шість дизайнів плеєра</annotation> на вибір</string>
-    <string name="whats_new_core_player_designs_desc">Класичний, Кільце, Уся обкладинка, Платівка, Касета й Відеоарт у кольорах пісні.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Сім дизайнів плеєра</annotation> на вибір</string>
+    <string name="whats_new_core_player_designs_desc">Класичний, Кільце, Уся обкладинка, Платівка, Касета, Радіо й Відеоарт у кольорах пісні.</string>
     <string name="whats_new_core_equalizer_title"><annotation type="accent">10-смуговий еквалайзер</annotation> з пресетами</string>
     <string name="whats_new_core_equalizer_desc">Перетягуйте кожну смугу, вибирайте пресет або імпортуйте профіль AutoEQ для своїх навушників.</string>
     <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Таймер сну</annotation> зупинить музику за вас</string>
@@ -1459,4 +1459,7 @@
     <string name="whats_new_core_video_art_desc">Власне відео пісні грає за плеєром, без звуку й синхронно.</string>
     <string name="whats_new_core_cast_title"><annotation type="accent">Транслюйте</annotation> на телевізор</string>
     <string name="whats_new_core_cast_desc">Надсилайте музику на Chromecast або Google TV прямо з плеєра.</string>
+    <string name="player_design_radio">Радіо</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">Вінтажне радіо</annotation> грає ваші пісні</string>
+    <string name="whats_new_radio_player_desc">Новий дизайн плеєра: обкладинка у віконці, стрілка шкали рухається разом із піснею. Перетягніть її, щоб перемотати.</string>
 </resources>

@@ -45,4 +45,9 @@
     <string name="download_in_progress_desc">دابەزاندن لە پرۆسەدایە</string>
     <string name="share_playlist_desc">ئەم لیستی لێدانە لەگەڵ کەسانی تر هاوبەشی پێبکە</string>
     <string name="delete_playlist_desc">ئەم لیستی لێدانە بە هەمیشەیی بسڕەوە</string>
+    <string name="player_design_radio">ڕادیۆ</string>
+    <string name="whats_new_radio_player_title"><annotation type="accent">ڕادیۆیەکی کۆن</annotation> گۆرانییەکانت لێدەدات</string>
+    <string name="whats_new_radio_player_desc">دیزاینێکی نوێی لێدەر: بەرگەکە لە پەنجەرەکەیدا، دەرزییەکی پێوەر کە شوێن گۆرانییەکە دەکەوێت. ڕایبکێشە بۆ گواستنەوە لە گۆرانییەکەدا.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">حەوت دیزاینی لێدەر</annotation> بۆ هەڵبژاردن</string>
+    <string name="whats_new_core_player_designs_desc">کلاسیک، ئەڵقە، بەرگی تەواو، قەوان، کاسێت، ڕادیۆ و Video Art، بە ڕەنگەکانی گۆرانییەکە.</string>
 </resources>
