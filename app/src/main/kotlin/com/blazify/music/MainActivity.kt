@@ -1134,15 +1134,24 @@ class MainActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(activePlayerConnection) {
-                    val player = runCatching { activePlayerConnection?.player }.getOrNull()
-                    if (player?.currentMediaItem == null) {
+                    // Not connected to the player yet. A change between light and dark, or a turn
+                    // of the phone, rebuilds this screen while a song plays on, and for a moment
+                    // there is no connection. Putting the mini player away then started a slide
+                    // down that was still running when the connection came back a moment later,
+                    // so the check below saw it "not dismissed", left it, and the slide finished:
+                    // music playing with no mini player. Nothing is known yet, so wait.
+                    val connection = activePlayerConnection ?: return@LaunchedEffect
+                    val player = runCatching { connection.player }.getOrNull() ?: return@LaunchedEffect
+                    if (player.currentMediaItem == null) {
                         if (!playerBottomSheetState.isDismissed) {
                             playerBottomSheetState.dismiss()
                         }
                         return@LaunchedEffect
                     }
 
-                    if (playerBottomSheetState.isDismissed) {
+                    // A song is loaded: the mini player belongs on screen, whether the sheet is
+                    // put away or still sliding there, unless the full player is open.
+                    if (!playerBottomSheetState.isExpanded && !playerBottomSheetState.isCollapsed) {
                         playerBottomSheetState.collapseSoft()
                     }
                 }
