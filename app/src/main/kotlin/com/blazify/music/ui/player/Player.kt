@@ -881,8 +881,13 @@ fun BottomSheetPlayer(
 
     val bottomSheetBackgroundColor =
         when (playerBackground) {
+            // The gradient and blur players are dark in either theme: their text, buttons and
+            // lyrics are white, and the status bar is light over them. What lies under them
+            // shows until the cover's colours arrive, or if they never do (no cover, a slow
+            // phone), so it has to be dark too: the light theme's pale grey left white lyrics
+            // white on white.
             PlayerBackgroundStyle.BLUR, PlayerBackgroundStyle.GRADIENT -> {
-                MaterialTheme.colorScheme.surfaceContainer
+                if (useBlackBackground) Color.Black else DarkPlayerBase
             }
 
             else -> {
@@ -4186,3 +4191,6 @@ private fun PlayerMoreMenuButton(
         )
     }
 }
+
+/** Under the gradient and blur players in both themes: the dark theme's own surface tone. */
+private val DarkPlayerBase = Color(0xFF1B1B1F)

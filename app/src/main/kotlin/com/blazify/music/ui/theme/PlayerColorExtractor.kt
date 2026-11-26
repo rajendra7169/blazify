@@ -7,6 +7,7 @@
 package com.blazify.music.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.Dispatchers
@@ -61,13 +62,19 @@ object PlayerColorExtractor {
             enhanceColorVividness(fallbackDominant, 1.1f)
         }
         
+        // Everything drawn over this gradient is white: titles, buttons, lyrics. A pale cover
+        // (white, yellow, sky blue) gave a top so light that white lyrics on it could not be
+        // read, worst in light mode. Darken such a colour, keeping its hue, until white stands
+        // out on it.
+        val readableColor = keepWhiteReadable(primaryColor)
+
         // Create sophisticated gradient with 3 color points
         listOf(
-            primaryColor, // Start: primary vibrant color
-            primaryColor.copy(
-                red = (primaryColor.red * 0.6f).coerceAtLeast(0f),
-                green = (primaryColor.green * 0.6f).coerceAtLeast(0f),
-                blue = (primaryColor.blue * 0.6f).coerceAtLeast(0f)
+            readableColor, // Start: primary vibrant color
+            readableColor.copy(
+                red = (readableColor.red * 0.6f).coerceAtLeast(0f),
+                green = (readableColor.green * 0.6f).coerceAtLeast(0f),
+                blue = (readableColor.blue * 0.6f).coerceAtLeast(0f)
             ), // Middle: darker version of primary color
             Color.Black // End: black
         )
@@ -98,6 +105,21 @@ object PlayerColorExtractor {
      * @param saturationFactor Factor to multiply saturation by (default 1.4)
      * @return Enhanced color with improved vividness
      */
+    /** The brightest a gradient may start for white text on it to keep about 3:1 contrast. */
+    private const val MAX_GRADIENT_LUMINANCE = 0.3f
+
+    private fun keepWhiteReadable(color: Color): Color {
+        if (color.luminance() <= MAX_GRADIENT_LUMINANCE) return color
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(color.toArgb(), hsv)
+        var result = color
+        while (result.luminance() > MAX_GRADIENT_LUMINANCE && hsv[2] > 0.05f) {
+            hsv[2] *= 0.9f
+            result = Color(android.graphics.Color.HSVToColor(hsv))
+        }
+        return result
+    }
+
     private fun enhanceColorVividness(color: Color, saturationFactor: Float = 1.4f): Color {
         val argb = color.toArgb()
         val hsv = FloatArray(3)
