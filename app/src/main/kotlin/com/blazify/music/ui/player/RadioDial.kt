@@ -47,7 +47,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -475,8 +474,12 @@ private fun CacheDrawScope.buildCabinet(
             size = Size(grR - grL, grB - grT),
             cornerRadius = grCorner,
         )
-        drawPoints(rims, PointMode.Points, Color.White.copy(alpha = 0.14f), strokeWidth = hole, cap = StrokeCap.Round)
-        drawPoints(holes, PointMode.Points, Recess.copy(alpha = 0.92f), strokeWidth = hole, cap = StrokeCap.Round)
+        // Plain circles rather than round-capped points: point sprites are where GPU drivers
+        // differ most, and this layer is recorded once anyway.
+        val rimColor = Color.White.copy(alpha = 0.14f)
+        val holeColor = Recess.copy(alpha = 0.92f)
+        for (p in rims) drawCircle(rimColor, radius = hole / 2f, center = p)
+        for (p in holes) drawCircle(holeColor, radius = hole / 2f, center = p)
         drawRoundRect(
             color = BrassLight.copy(alpha = 0.45f),
             topLeft = Offset(grL, grT),
