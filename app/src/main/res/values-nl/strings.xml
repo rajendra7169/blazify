@@ -276,4 +276,10 @@
     <string name="use_login_for_browse_desc">Dit kan invloed hebben op welke inhoud u ziet en laat bijvoorbeeld alleen premium albums zien als u bent ingelogd met een Premium account</string>
     <string name="use_login_for_browse">Gebruik login om inhoud te bekijken</string>
     <string name="action_login">Inloggen</string>
+    <string name="pause">Pauzeren</string>
+    <string name="theme_desc">Pas het thema van de app aan</string>
+    <string name="theme_colors">Thema &amp; kleuren</string>
+    <string name="theme_mode">Themamodus</string>
+    <string name="color_palette">Kleurenpalet</string>
+    <string name="use_system_colors">Systeemkleuren gebruiken</string>
 </resources>
