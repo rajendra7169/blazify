@@ -1362,4 +1362,77 @@
     <string name="star_prompt_title_short">Blazify hoşuna gidiyor mu?</string>
     <string name="star_prompt_body_short">GitHub’da bir yıldız, başkalarının onu bulmasına yardım eder. Ücretsiz ve reklamsız.</string>
     <string name="import_spotify_csv_tip">Listenin tamamı için onu CSV dosyası olarak dışa aktar (Exportify bunu kendi Spotify girişinle yapar), sonra Ayarlar › Yedekle ve geri yükle › CSV çalma listesi içe aktar\'ı kullan.</string>
+    <string name="festival_greeting_halloween">Mutlu Cadılar Bayramı</string>
+    <string name="star_prompt_already">Zaten yıldız verdim</string>
+    <string name="update_prompt_title">Blazify %s geldi</string>
+    <string name="update_prompt_body">Yeni özellikler ve düzeltmeler hazır. Müziklerin ve kitaplığın olduğu gibi kalır.</string>
+    <string name="update_prompt_update">Güncelle</string>
+    <string name="spatial_sound">3D ses</string>
+    <string name="spatial_sound_off">Kapalı</string>
+    <string name="spatial_sound_surround">Surround</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Kapalı. Surround şarkıyı etrafına yerleştirir; 8D onu başının etrafında döndürür. En iyisi kulaklıkla</string>
+    <string name="spatial_sound_desc_surround">Surround: şarkı etrafındaki hoparlörlerden gelir, genişliği ve arkasındaki odayla birlikte</string>
+    <string name="spatial_sound_desc_orbit">8D: şarkı yavaşça başının etrafında döner</string>
+    <string name="search_offline">Bu telefondaki şarkılarda ara…</string>
+    <string name="search_offline_notice">Bağlantı yok. Çevrimdışı çalan şarkılar gösteriliyor: indirilenler, önbellektekiler ve bu cihazdakiler.</string>
+    <string name="offline_home_group">Bağlantı yokken Ana Sayfa</string>
+    <string name="offline_home_cached">Önbellekteki şarkılar</string>
+    <string name="offline_home_cached_desc">Çaldıktan sonra şarkı önbelleğinde tamamı saklanan şarkılar</string>
+    <string name="offline_home_downloaded">İndirilen şarkılar</string>
+    <string name="offline_home_downloaded_desc">İndirdiğin şarkılar</string>
+    <string name="offline_home_device">Bu cihazdaki şarkılar</string>
+    <string name="offline_home_device_desc">Bu telefondaki kendi müzik dosyaların</string>
+    <string name="whats_new">Yenilikler</string>
+    <string name="hint_whats_new">Yeni özellikler, her biri kısa bir tanıtımla</string>
+    <string name="whats_new_title">%1$s sürümündeki yenilikler</string>
+    <string name="whats_new_section_new">Bu sürümde yeni</string>
+    <string name="whats_new_section_core">Blazify neler yapabilir</string>
+    <string name="whats_new_see_all">Tüm özellikleri gör</string>
+    <string name="whats_new_see_fewer">Daha az göster</string>
+    <string name="whats_new_release_notes">Tüm sürüm notları</string>
+    <string name="whats_new_skip">Atla</string>
+    <string name="whats_new_see_more">Daha fazlası</string>
+    <string name="whats_new_kind_new">Yeni</string>
+    <string name="whats_new_kind_improved">İyileştirildi</string>
+    <string name="whats_new_kind_fixed">Düzeltildi</string>
+    <string name="whats_new_card_position">%1$d. kart, toplam %2$d</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D ses</annotation> şarkıyı etrafında gezdirir</string>
+    <string name="whats_new_spatial_sound_desc">Surround onu etrafındaki hoparlörlere yerleştirir, 8D başının etrafında döner. Oynatıcı ayarlarında bulabilirsin.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">Arama</annotation> bağlantı olmadan da çalışır</string>
+    <string name="whats_new_offline_search_desc">İndirilen, önbellekteki ve yerel şarkılarını ada, sanatçıya veya albüme göre bulur.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">Trendler</annotation> ülkene göre değişir</string>
+    <string name="whats_new_trending_desc">Listeler ve Ana Sayfa\'daki yeni bir bölüm, yaşadığın yerde neyin popüler olduğunu gösterir.</string>
+    <string name="whats_new_keeps_playing_title">Bir liste bitince müzik <annotation type="accent">çalmaya devam eder</annotation></string>
+    <string name="whats_new_keeps_playing_desc">Bir albüm veya çalma listesi bittiğinde benzer şarkılar sıraya eklenir.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Video Art</annotation> gerçek müzik videosunu bulur</string>
+    <string name="whats_new_video_art_finder_desc">Şarkının kendi videosu varken artık cover, canlı veya sözlü yüklemeler yok.</string>
+    <string name="whats_new_accounts_title">Tek dokunuşla <annotation type="accent">hesap değiştir</annotation></string>
+    <string name="whats_new_accounts_desc">Giriş yaptığın Google hesapları saklanır, böylece aralarında geçiş yapabilirsin.</string>
+    <string name="whats_new_queue_swipe_title">Bir şarkıyı sıradaki yapmak için <annotation type="accent">sağa kaydır</annotation></string>
+    <string name="whats_new_queue_swipe_desc">Sırada artık kilit yok: sıralamak için sürükle, kaldırmak için sola kaydır.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">Şarkı tanıma</annotation> bir ses dalgasıyla dinler</string>
+    <string name="whats_new_recognition_wave_desc">Ne zaman dinlediğini ve aradığını gösterir, şarkı bulunamazsa ipuçları verir.</string>
+    <string name="whats_new_core_downloads_title">Şarkıları çevrimdışı çalmak için <annotation type="accent">indir</annotation></string>
+    <string name="whats_new_core_downloads_desc">Bir şarkı, albüm veya çalma listesindeki oka dokun, bağlantı olmadan da çalsın.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">Senkronize sözler</annotation> kelime kelime parlar</string>
+    <string name="whats_new_core_lyrics_desc">Çeviri ve Latinleştirme ile, seçtiğin kaynaklardan.</string>
+    <string name="whats_new_core_player_designs_title">Seçebileceğin <annotation type="accent">altı oynatıcı tasarımı</annotation></string>
+    <string name="whats_new_core_player_designs_desc">Klasik, Halka, Tam Kapak, Plak, Kaset ve Video Art, şarkının renkleriyle.</string>
+    <string name="whats_new_core_equalizer_title">Hazır ayarlı <annotation type="accent">10 bantlı ekolayzer</annotation></string>
+    <string name="whats_new_core_equalizer_desc">Her bandı sürükle, bir hazır ayar seç ya da kulaklığın için bir AutoEQ profili içe aktar.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">Uyku zamanlayıcısı</annotation> müziği senin için durdurur</string>
+    <string name="whats_new_core_sleep_timer_desc">Oynatıcıdaki aya dokun ve dakikayı seç ya da şarkının sonunda durdur.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> arkadaşlarınla eş zamanlı çalar</string>
+    <string name="whats_new_core_together_desc">Bir oda kodu paylaş, herkes aynı şarkıyı aynı anda duysun.</string>
+    <string name="whats_new_core_recognition_title">Etrafında çalan şarkıyı <annotation type="accent">tanımla</annotation></string>
+    <string name="whats_new_core_recognition_desc">Arama çubuğundaki ses dalgasına dokun, Blazify şarkının adını söylesin.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Kendi müziğin</annotation> akışla yan yana çalar</string>
+    <string name="whats_new_core_local_music_desc">Telefonundaki müzik dosyaları aynı kitaplığı, sırayı ve oynatıcıyı paylaşır.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Görünüm</annotation> uygulamanın tarzını değiştirir</string>
+    <string name="whats_new_core_look_and_feel_desc">Tema, oynatıcı, mini oynatıcı, şarkı sözleri ve Ana Sayfa, ayar yaparken canlı önizlemeyle.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Video Art</annotation> müzik videosunu oynatır</string>
+    <string name="whats_new_core_video_art_desc">Şarkının kendi videosu oynatıcının arkasında sessiz ve senkronize oynar.</string>
+    <string name="whats_new_core_cast_title">Televizyonuna <annotation type="accent">yayınla</annotation></string>
+    <string name="whats_new_core_cast_desc">Müziği oynatıcıdan bir Chromecast\'e veya Google TV\'ye gönder.</string>
 </resources>
