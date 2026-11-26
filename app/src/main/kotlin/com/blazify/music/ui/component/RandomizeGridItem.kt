@@ -110,8 +110,9 @@ fun RandomizeGridItem(
                     .background(dotColor),
         )
 
-        // Loading Indicator overlay
-        Box(modifier = Modifier.alpha(loadingAlpha)) {
+        // Loading indicator, only while it shows. Left in place at no opacity, its clock still
+        // ran every frame for as long as Speed dial was on screen, even with nothing loading.
+        if (isLoading || loadingAlpha > 0f) Box(modifier = Modifier.alpha(loadingAlpha)) {
             BlazeLoader(
                 modifier = Modifier.size(48.dp),
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
