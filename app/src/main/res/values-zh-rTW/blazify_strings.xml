@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">喜歡 Blazify 嗎？</string>
     <string name="star_prompt_body_short">在 GitHub 上給顆星，能幫更多人發現它。免費，無廣告。</string>
     <string name="import_spotify_csv_tip">要匯入完整清單，請先匯出為 CSV 檔（Exportify 可用你自己的 Spotify 登入完成），然後使用 設定 › 備份與還原 › 匯入 CSV 播放清單。</string>
+    <string name="festival_greeting_halloween">萬聖節快樂</string>
+    <string name="star_prompt_already">已經給過星星了</string>
+    <string name="update_prompt_title">Blazify %s 來了</string>
+    <string name="update_prompt_body">新功能和修正已準備就緒。你的音樂和媒體庫都會原封不動。</string>
+    <string name="update_prompt_update">更新</string>
+    <string name="spatial_sound">3D 音效</string>
+    <string name="spatial_sound_off">關</string>
+    <string name="spatial_sound_surround">環繞音效</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">已關閉。環繞音效讓歌曲圍繞在你四周；8D 讓它繞著你的頭旋轉。建議戴耳機聆聽</string>
+    <string name="spatial_sound_desc_surround">環繞音效：歌曲從你四周的喇叭傳來，保有聲場寬度和身後的空間感</string>
+    <string name="spatial_sound_desc_orbit">8D：歌曲緩緩繞著你的頭旋轉</string>
+    <string name="search_offline">搜尋這支手機上的歌曲…</string>
+    <string name="search_offline_notice">沒有網路連線。正在顯示可離線播放的歌曲：已下載、已快取和這部裝置上的歌曲。</string>
+    <string name="offline_home_group">沒有網路時的首頁</string>
+    <string name="offline_home_cached">已快取的歌曲</string>
+    <string name="offline_home_cached_desc">播放後已完整保存在歌曲快取中的歌曲</string>
+    <string name="offline_home_downloaded">已下載的歌曲</string>
+    <string name="offline_home_downloaded_desc">你下載的歌曲</string>
+    <string name="offline_home_device">這部裝置上的歌曲</string>
+    <string name="offline_home_device_desc">這支手機上你自己的音樂檔案</string>
+    <string name="whats_new">新功能</string>
+    <string name="hint_whats_new">新功能介紹，每項都附有簡短示範</string>
+    <string name="whats_new_title">%1$s 新功能</string>
+    <string name="whats_new_section_new">此版本新增</string>
+    <string name="whats_new_section_core">Blazify 能做什麼</string>
+    <string name="whats_new_see_all">查看所有功能</string>
+    <string name="whats_new_see_fewer">收合</string>
+    <string name="whats_new_release_notes">完整版本資訊</string>
+    <string name="whats_new_skip">略過</string>
+    <string name="whats_new_see_more">查看更多</string>
+    <string name="whats_new_kind_new">新增</string>
+    <string name="whats_new_kind_improved">改善</string>
+    <string name="whats_new_kind_fixed">修正</string>
+    <string name="whats_new_card_position">第 %1$d 項，共 %2$d 項</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D 音效</annotation>讓歌曲在你身邊移動</string>
+    <string name="whats_new_spatial_sound_desc">環繞音效把歌曲放在你四周的喇叭上，8D 繞著你的頭旋轉。可在播放器設定中找到。</string>
+    <string name="whats_new_offline_search_title">沒有網路也能<annotation type="accent">搜尋</annotation></string>
+    <string name="whats_new_offline_search_desc">依標題、演出者或專輯，找出你已下載、已快取和本機的歌曲。</string>
+    <string name="whats_new_trending_title"><annotation type="accent">發燒</annotation>依你所在的國家而定</string>
+    <string name="whats_new_trending_desc">排行榜和首頁的新區塊會顯示你所在地區的熱門內容。</string>
+    <string name="whats_new_keeps_playing_title">清單結束後音樂<annotation type="accent">繼續播放</annotation></string>
+    <string name="whats_new_keeps_playing_desc">專輯或播放清單播完時，相似的歌曲會加入播放佇列。</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">影片封面</annotation>會找到真正的音樂影片</string>
+    <string name="whats_new_video_art_finder_desc">只要歌曲有自己的官方影片，就不會再出現翻唱、現場或歌詞影片。</string>
+    <string name="whats_new_accounts_title">輕觸一下就能<annotation type="accent">切換帳號</annotation></string>
+    <string name="whats_new_accounts_desc">你登入過的 Google 帳號都會保留，方便在它們之間切換。</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">向右滑動</annotation>即可下一首播放</string>
+    <string name="whats_new_queue_swipe_desc">播放佇列不再上鎖：拖曳可調整順序，向左滑動可移除。</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">歌曲辨識</annotation>以聲波顯示聆聽狀態</string>
+    <string name="whats_new_recognition_wave_desc">會顯示正在聆聽和搜尋，找不到歌曲時還會提供提示。</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">下載</annotation>歌曲，離線播放</string>
+    <string name="whats_new_core_downloads_desc">輕觸歌曲、專輯或播放清單上的箭頭，沒有網路也能播放。</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">同步歌詞</annotation>逐字亮起</string>
+    <string name="whats_new_core_lyrics_desc">支援翻譯和羅馬化，歌詞來源由你選擇。</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">六種播放器樣式</annotation>任你挑選</string>
+    <string name="whats_new_core_player_designs_desc">經典、圓環、滿版封面、黑膠唱片、卡帶和影片封面，顏色隨歌曲變化。</string>
+    <string name="whats_new_core_equalizer_title">附預設組合的<annotation type="accent">十段等化器</annotation></string>
+    <string name="whats_new_core_equalizer_desc">拖曳每個頻段、選擇預設組合，或為你的耳機匯入 AutoEQ 設定檔。</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">睡眠定時器</annotation>幫你停止音樂</string>
+    <string name="whats_new_core_sleep_timer_desc">輕觸播放器中的月亮並選擇分鐘數，或在這首歌結束時停止。</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> 與好友同步播放</string>
+    <string name="whats_new_core_together_desc">分享房間邀請碼，大家都能在同一刻聽到同一首歌。</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">辨識</annotation>你身邊正在播放的歌曲</string>
+    <string name="whats_new_core_recognition_desc">輕觸搜尋列中的聲波，Blazify 就會告訴你歌名。</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">你自己的音樂</annotation>與串流一起播放</string>
+    <string name="whats_new_core_local_music_desc">手機上的音樂檔案共用同一個媒體庫、播放佇列和播放器。</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">外觀與風格</annotation>改變應用程式的樣貌</string>
+    <string name="whats_new_core_look_and_feel_desc">主題、播放器、迷你播放器、歌詞和首頁，調整時可即時預覽。</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">影片封面</annotation>播放音樂影片</string>
+    <string name="whats_new_core_video_art_desc">歌曲的官方影片在播放器後方靜音同步播放。</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">投放</annotation>到電視</string>
+    <string name="whats_new_core_cast_desc">從播放器將音樂傳送到 Chromecast 或 Google TV。</string>
 </resources>
