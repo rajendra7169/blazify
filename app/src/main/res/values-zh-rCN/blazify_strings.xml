@@ -1350,4 +1350,77 @@
     <string name="star_prompt_title_short">喜欢 Blazify 吗？</string>
     <string name="star_prompt_body_short">在 GitHub 上点个星，能帮更多人发现它。免费，无广告。</string>
     <string name="import_spotify_csv_tip">要导入完整列表，请先导出为 CSV 文件（Exportify 可用你自己的 Spotify 登录完成），然后使用 设置 › 备份与恢复 › 导入 CSV 播放列表。</string>
+    <string name="festival_greeting_halloween">万圣节快乐</string>
+    <string name="star_prompt_already">已经点过星了</string>
+    <string name="update_prompt_title">Blazify %s 来了</string>
+    <string name="update_prompt_body">新功能和修复已准备就绪。你的音乐和媒体库都会原样保留。</string>
+    <string name="update_prompt_update">更新</string>
+    <string name="spatial_sound">3D 音效</string>
+    <string name="spatial_sound_off">关</string>
+    <string name="spatial_sound_surround">环绕声</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">已关闭。环绕声让歌曲围绕在你四周；8D 让它绕着你的头旋转。建议佩戴耳机</string>
+    <string name="spatial_sound_desc_surround">环绕声：歌曲从你四周的音箱传来，保留声场宽度和身后的空间感</string>
+    <string name="spatial_sound_desc_orbit">8D：歌曲缓缓绕着你的头旋转</string>
+    <string name="search_offline">搜索这部手机上的歌曲…</string>
+    <string name="search_offline_notice">无网络连接。正在显示可离线播放的歌曲：已下载、已缓存和本机上的歌曲。</string>
+    <string name="offline_home_group">无网络时的首页</string>
+    <string name="offline_home_cached">已缓存的歌曲</string>
+    <string name="offline_home_cached_desc">播放后已完整保存在歌曲缓存中的歌曲</string>
+    <string name="offline_home_downloaded">已下载的歌曲</string>
+    <string name="offline_home_downloaded_desc">你下载的歌曲</string>
+    <string name="offline_home_device">本机上的歌曲</string>
+    <string name="offline_home_device_desc">这部手机上你自己的音乐文件</string>
+    <string name="whats_new">新功能</string>
+    <string name="hint_whats_new">新功能介绍，每项都附有简短演示</string>
+    <string name="whats_new_title">%1$s 新功能</string>
+    <string name="whats_new_section_new">此版本新增</string>
+    <string name="whats_new_section_core">Blazify 能做什么</string>
+    <string name="whats_new_see_all">查看全部功能</string>
+    <string name="whats_new_see_fewer">收起</string>
+    <string name="whats_new_release_notes">完整更新说明</string>
+    <string name="whats_new_skip">跳过</string>
+    <string name="whats_new_see_more">查看更多</string>
+    <string name="whats_new_kind_new">新增</string>
+    <string name="whats_new_kind_improved">改进</string>
+    <string name="whats_new_kind_fixed">修复</string>
+    <string name="whats_new_card_position">第 %1$d 项，共 %2$d 项</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">3D 音效</annotation>让歌曲在你身边流动</string>
+    <string name="whats_new_spatial_sound_desc">环绕声把歌曲放在你四周的音箱上，8D 绕着你的头旋转。可在播放器设置中找到。</string>
+    <string name="whats_new_offline_search_title">没有网络也能<annotation type="accent">搜索</annotation></string>
+    <string name="whats_new_offline_search_desc">按标题、艺人或专辑查找你已下载、已缓存和本地的歌曲。</string>
+    <string name="whats_new_trending_title"><annotation type="accent">热门</annotation>跟随你所在的国家</string>
+    <string name="whats_new_trending_desc">排行榜和首页的新栏目会显示你所在地区的流行内容。</string>
+    <string name="whats_new_keeps_playing_title">列表结束后音乐<annotation type="accent">继续播放</annotation></string>
+    <string name="whats_new_keeps_playing_desc">专辑或播放列表播完时，相似的歌曲会加入待播列表。</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">视频封面</annotation>会找到真正的音乐视频</string>
+    <string name="whats_new_video_art_finder_desc">只要歌曲有自己的官方视频，就不再出现翻唱、现场或歌词视频。</string>
+    <string name="whats_new_accounts_title">一键<annotation type="accent">切换账号</annotation></string>
+    <string name="whats_new_accounts_desc">你登录过的 Google 账号都会保留，方便在它们之间切换。</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">向右滑动</annotation>即可下一首播放</string>
+    <string name="whats_new_queue_swipe_desc">待播列表不再锁定：拖动可调整顺序，向左滑动可移除。</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">听歌识曲</annotation>用声波显示聆听状态</string>
+    <string name="whats_new_recognition_wave_desc">会显示正在聆听和搜索，找不到歌曲时还会给出提示。</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">下载</annotation>歌曲，离线播放</string>
+    <string name="whats_new_core_downloads_desc">点按歌曲、专辑或播放列表上的箭头，没有网络也能播放。</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">同步歌词</annotation>逐字点亮</string>
+    <string name="whats_new_core_lyrics_desc">支持翻译和罗马化，歌词来源由你选择。</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">六种播放器样式</annotation>任你选</string>
+    <string name="whats_new_core_player_designs_desc">经典、圆环、全幅封面、唱片、磁带和视频封面，颜色随歌曲变化。</string>
+    <string name="whats_new_core_equalizer_title">带预设的<annotation type="accent">十段均衡器</annotation></string>
+    <string name="whats_new_core_equalizer_desc">拖动每个频段、选择预设，或为你的耳机导入 AutoEQ 配置。</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">睡眠定时器</annotation>帮你停止音乐</string>
+    <string name="whats_new_core_sleep_timer_desc">点按播放器中的月亮并选择分钟数，或在本首歌结束时停止。</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> 与好友同步播放</string>
+    <string name="whats_new_core_together_desc">分享房间邀请码，所有人都能在同一时刻听到同一首歌。</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">识别</annotation>你身边正在播放的歌曲</string>
+    <string name="whats_new_core_recognition_desc">点按搜索栏中的声波，Blazify 就会告诉你歌名。</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">你自己的音乐</annotation>与在线音乐一起播放</string>
+    <string name="whats_new_core_local_music_desc">手机上的音乐文件共用同一个媒体库、待播列表和播放器。</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">外观与体验</annotation>重塑应用风格</string>
+    <string name="whats_new_core_look_and_feel_desc">主题、播放器、迷你播放器、歌词和首页，调整时可实时预览。</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">视频封面</annotation>播放音乐视频</string>
+    <string name="whats_new_core_video_art_desc">歌曲的官方视频在播放器背后静音同步播放。</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">投放</annotation>到电视</string>
+    <string name="whats_new_core_cast_desc">从播放器把音乐发送到 Chromecast 或 Google TV。</string>
 </resources>
