@@ -1401,6 +1401,7 @@
     <string name="player_design_record">Record</string>
     <string name="player_design_cassette">Cassette</string>
     <string name="player_design_video">Video Art</string>
+    <string name="player_design_radio">Radio</string>
     <string name="video_on_mobile_title">You are on mobile data</string>
     <string name="video_on_mobile_desc">Videos use far more data than artwork, so the artwork is showing instead. The song keeps playing either way.</string>
     <string name="video_on_mobile_switch">Play videos on mobile data</string>

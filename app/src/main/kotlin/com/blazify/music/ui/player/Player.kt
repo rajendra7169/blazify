@@ -1118,6 +1118,33 @@ fun BottomSheetPlayer(
             }
         }
 
+        // The Radio design's dial: the needle reads the position while drawing (no recomposition),
+        // dragging it previews the time like the seek bar's thumb, and letting go seeks there.
+        val radioProgress: () -> Float =
+            remember {
+                {
+                    val total = duration
+                    if (total > 0) ((sliderPosition ?: effectivePosition).toFloat() / total).coerceIn(0f, 1f) else 0f
+                }
+            }
+        val radioCanSeek = !isListenTogetherGuest && !isLive
+        val radioScrub: (Float) -> Unit = { f ->
+            if (duration > 0) sliderPosition = (f * duration).toLong()
+        }
+        val radioSeek: (Float) -> Unit = { f ->
+            if (duration > 0) {
+                val to = (f * duration).toLong()
+                if (isCasting) {
+                    castHandler?.seekTo(to)
+                    lastManualSeekTime = System.currentTimeMillis()
+                } else {
+                    playerConnection.player.seekTo(to)
+                }
+                position = to
+            }
+            sliderPosition = null
+        }
+
         val controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit = { mediaMetadata ->
             val playPauseRoundness by animateDpAsState(
                 targetValue = if (isPlaying) 24.dp else 36.dp,
@@ -1571,7 +1598,10 @@ fun BottomSheetPlayer(
                 isLandscape && !showInlineLyrics &&
                     playerDesign in setOf(PlayerDesign.RING, PlayerDesign.RECORD, PlayerDesign.CASSETTE)
 
-            if (!artCarriesProgress) {
+            // The radio's dial is its seek bar, so the bar goes; the times stay, under the title.
+            val dialCarriesBar = playerDesign == PlayerDesign.RADIO && !showInlineLyrics
+
+            if (!artCarriesProgress && !dialCarriesBar) {
                 playerSeekBar(
                     Modifier.padding(horizontal = PlayerHorizontalPadding),
                     // Dynamic album-colour progress bar for every design; style stays from Settings.
@@ -1586,7 +1616,7 @@ fun BottomSheetPlayer(
 
             // The capsule style already carries "elapsed / total" in its thumb, so
             // the separate end labels would just repeat it.
-            if (sliderStyle != SliderStyle.DEFAULT && !artCarriesProgress) {
+            if ((sliderStyle != SliderStyle.DEFAULT || dialCarriesBar) && !artCarriesProgress) {
                 Spacer(Modifier.height(4.dp))
 
                 Row(
@@ -1968,6 +1998,9 @@ fun BottomSheetPlayer(
                     sleepTimerTimeLeft = sleepTimerTimeLeft,
                     textBackgroundColor = TextBackgroundColor,
                     onPosition = { position = it },
+                    radioProgress = radioProgress,
+                    onRadioScrub = if (radioCanSeek) radioScrub else null,
+                    onRadioSeek = if (radioCanSeek) radioSeek else null,
                     onShowLyrics = { showInlineLyrics = true },
                     onToggleLyrics = { showInlineLyrics = !showInlineLyrics },
                     onSleepTimer = { showSleepTimerDialog = true },
@@ -2310,6 +2343,71 @@ fun BottomSheetPlayer(
                         // queue peek keeps free; this leaves the same gap under the transport
                         // as above it.
                         Spacer(Modifier.height(CassetteSpacerUnderTransport))
+                    }
+                } else if (playerDesign == PlayerDesign.RADIO && !showInlineLyrics) {
+                    // RADIO: a tabletop radio as the artwork, its dial the seek bar; classic controls below.
+                    val radioQueueTitle by playerConnection.queueTitle.collectAsStateWithLifecycle()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier =
+                            Modifier
+                                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                                .padding(bottom = bottomPadding)
+                                .animateContentSize(),
+                    ) {
+                        // "Now Playing" + source header, like the classic ThumbnailHeader.
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                                    .padding(top = 8.dp, start = 48.dp, end = 48.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.now_playing),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextBackgroundColor,
+                            )
+                            val radioPlayingFrom = radioQueueTitle ?: mediaMetadata?.album?.title
+                            if (!radioPlayingFrom.isNullOrBlank()) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = radioPlayingFrom,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextBackgroundColor.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    modifier = Modifier.titleMarquee(),
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .doubleTapToSeek(playerSeeker, isRtlLayout, enabled = !isListenTogetherGuest),
+                        ) {
+                            RadioDial(
+                                isPlaying = effectiveIsPlaying,
+                                progress = radioProgress,
+                                modifier = Modifier.padding(horizontal = PlayerHorizontalPadding),
+                                seed = MaterialTheme.colorScheme.primary,
+                                thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                onScrub = if (radioCanSeek) radioScrub else null,
+                                onSeek = if (radioCanSeek) radioSeek else null,
+                            )
+                            SeekMessage(playerSeeker)
+                        }
+
+                        mediaMetadata?.let {
+                            controlsContent(it)
+                        }
+
+                        Spacer(Modifier.height(30.dp))
                     }
                 } else {
                     Column(
@@ -2789,6 +2887,9 @@ private fun BoxScope.LandscapePlayer(
     sleepTimerTimeLeft: Long,
     textBackgroundColor: Color,
     onPosition: (Long) -> Unit,
+    radioProgress: () -> Float,
+    onRadioScrub: ((Float) -> Unit)?,
+    onRadioSeek: ((Float) -> Unit)?,
     onShowLyrics: () -> Unit,
     onToggleLyrics: () -> Unit,
     onSleepTimer: () -> Unit,
@@ -2962,6 +3063,29 @@ private fun BoxScope.LandscapePlayer(
                                             accent = MaterialTheme.colorScheme.primary,
                                             thumbnailUrl = mediaMetadata?.thumbnailUrl,
                                             label = mediaMetadata?.title,
+                                        )
+                                        SeekMessage(playerSeeker)
+                                    }
+
+                                PlayerDesign.RADIO ->
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp)
+                                            .doubleTapToSeek(
+                                                playerSeeker,
+                                                isRtlLayout,
+                                                enabled = !isListenTogetherGuest,
+                                            ),
+                                    ) {
+                                        RadioDial(
+                                            isPlaying = effectiveIsPlaying,
+                                            progress = radioProgress,
+                                            seed = MaterialTheme.colorScheme.primary,
+                                            thumbnailUrl = mediaMetadata?.thumbnailUrl,
+                                            onScrub = onRadioScrub,
+                                            onSeek = onRadioSeek,
                                         )
                                         SeekMessage(playerSeeker)
                                     }

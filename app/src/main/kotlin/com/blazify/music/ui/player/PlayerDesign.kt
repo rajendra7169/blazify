@@ -20,6 +20,7 @@ enum class PlayerDesign(
     FULL_ART("full_art", R.string.player_design_full_art),
     RECORD("record", R.string.player_design_record),
     CASSETTE("cassette", R.string.player_design_cassette),
+    RADIO("radio", R.string.player_design_radio),
     VIDEO("video", R.string.player_design_video),
     ;
 
