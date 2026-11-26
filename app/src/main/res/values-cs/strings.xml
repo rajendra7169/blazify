@@ -285,4 +285,10 @@
     <string name="use_login_for_browse">Použít účet pro procházení obsahu</string>
     <string name="use_login_for_browse_desc">Může ovlivnit obsah, který se vám zobrazí – při přihlášení například mohou být zobrazena například alba, která jsou dostupná pouze s Premium účtem</string>
     <string name="action_login">Přihlásit se</string>
+    <string name="pause">Pozastavit</string>
+    <string name="theme_desc">Přizpůsobte si motiv aplikace</string>
+    <string name="theme_colors">Motiv a barvy</string>
+    <string name="theme_mode">Režim motivu</string>
+    <string name="color_palette">Paleta barev</string>
+    <string name="use_system_colors">Použít systémové barvy</string>
 </resources>
