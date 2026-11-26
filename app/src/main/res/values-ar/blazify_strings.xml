@@ -1408,4 +1408,77 @@
     <string name="star_prompt_title_short">هل يعجبك Blazify؟</string>
     <string name="star_prompt_body_short">نجمة على GitHub تساعد الآخرين في العثور عليه. مجاني وبلا إعلانات.</string>
     <string name="import_spotify_csv_tip">للحصول على القائمة كاملة، صدّرها كملف CSV (يقوم Exportify بذلك عبر تسجيل دخولك إلى Spotify)، ثم استخدم الإعدادات › النسخ الاحتياطي والاستعادة › استيراد قائمة CSV.</string>
+    <string name="festival_greeting_halloween">هالوين سعيد</string>
+    <string name="star_prompt_already">أضفت نجمة بالفعل</string>
+    <string name="update_prompt_title">وصل Blazify %s</string>
+    <string name="update_prompt_body">الميزات الجديدة والإصلاحات جاهزة. تبقى موسيقاك ومكتبتك كما هي تمامًا.</string>
+    <string name="update_prompt_update">تحديث</string>
+    <string name="spatial_sound">صوت ثلاثي الأبعاد</string>
+    <string name="spatial_sound_off">متوقف</string>
+    <string name="spatial_sound_surround">محيطي</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">متوقف. الوضع المحيطي يضع الأغنية حولك، و8D يجعلها تدور حول رأسك. الأفضل مع سماعات الرأس</string>
+    <string name="spatial_sound_desc_surround">محيطي: تأتي الأغنية من مكبرات صوت حولك، باتساعها والغرفة من خلفها</string>
+    <string name="spatial_sound_desc_orbit">8D: تدور الأغنية ببطء حول رأسك</string>
+    <string name="search_offline">ابحث عن الأغاني على هذا الهاتف…</string>
+    <string name="search_offline_notice">لا يوجد اتصال. تُعرض الأغاني التي تعمل دون اتصال: التي تم تنزيلها والمخزنة مؤقتًا والموجودة على هذا الجهاز.</string>
+    <string name="offline_home_group">الرئيسية دون اتصال</string>
+    <string name="offline_home_cached">الأغاني المخزنة مؤقتًا</string>
+    <string name="offline_home_cached_desc">أغانٍ محفوظة كاملة في ذاكرة الأغاني المؤقتة بعد تشغيلها</string>
+    <string name="offline_home_downloaded">الأغاني التي تم تنزيلها</string>
+    <string name="offline_home_downloaded_desc">الأغاني التي نزّلتها</string>
+    <string name="offline_home_device">الأغاني على هذا الجهاز</string>
+    <string name="offline_home_device_desc">ملفات الموسيقى الخاصة بك على هذا الهاتف</string>
+    <string name="whats_new">ما الجديد</string>
+    <string name="hint_whats_new">الميزات الجديدة، ولكل منها عرض قصير</string>
+    <string name="whats_new_title">ما الجديد في %1$s</string>
+    <string name="whats_new_section_new">جديد في هذا الإصدار</string>
+    <string name="whats_new_section_core">ما يستطيع Blazify فعله</string>
+    <string name="whats_new_see_all">عرض كل الميزات</string>
+    <string name="whats_new_see_fewer">عرض أقل</string>
+    <string name="whats_new_release_notes">ملاحظات الإصدار كاملة</string>
+    <string name="whats_new_skip">تخطٍّ</string>
+    <string name="whats_new_see_more">عرض المزيد</string>
+    <string name="whats_new_kind_new">جديد</string>
+    <string name="whats_new_kind_improved">محسَّن</string>
+    <string name="whats_new_kind_fixed">تم الإصلاح</string>
+    <string name="whats_new_card_position">%1$d من %2$d</string>
+    <string name="whats_new_spatial_sound_title"><annotation type="accent">الصوت ثلاثي الأبعاد</annotation> يحرّك الأغنية حولك</string>
+    <string name="whats_new_spatial_sound_desc">الوضع المحيطي يوزّعها على مكبرات صوت حولك، و8D يدور حول رأسك. تجده في إعدادات المشغل.</string>
+    <string name="whats_new_offline_search_title"><annotation type="accent">البحث</annotation> يعمل دون اتصال</string>
+    <string name="whats_new_offline_search_desc">يجد أغانيك التي تم تنزيلها والمخزنة مؤقتًا والمحلية حسب العنوان أو الفنان أو الألبوم.</string>
+    <string name="whats_new_trending_title"><annotation type="accent">الأكثر رواجًا</annotation> يتبع بلدك</string>
+    <string name="whats_new_trending_desc">المخططات وقسم جديد في الرئيسية يعرضان ما هو رائج حيث تعيش.</string>
+    <string name="whats_new_keeps_playing_title"><annotation type="accent">تستمر الموسيقى</annotation> عند انتهاء القائمة</string>
+    <string name="whats_new_keeps_playing_desc">تنضم أغانٍ مشابهة إلى قائمة الانتظار عند انتهاء ألبوم أو قائمة تشغيل.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">غلاف الفيديو</annotation> يجد الفيديو الموسيقي الحقيقي</string>
+    <string name="whats_new_video_art_finder_desc">لا مزيد من النسخ المعادة أو الحية أو فيديوهات الكلمات عندما يتوفر فيديو الأغنية الأصلي.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">بدّل الحسابات</annotation> بلمسة واحدة</string>
+    <string name="whats_new_accounts_desc">تُحفظ حسابات Google التي تسجّل الدخول إليها، لتتنقل بينها بسهولة.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">اسحب لليمين</annotation> لتشغيل الأغنية تاليًا</string>
+    <string name="whats_new_queue_swipe_desc">لم تعد قائمة الانتظار مقفلة: اسحب لإعادة الترتيب، واسحب لليسار للإزالة.</string>
+    <string name="whats_new_recognition_wave_title"><annotation type="accent">التعرف على الأغاني</annotation> يستمع بموجة صوتية</string>
+    <string name="whats_new_recognition_wave_desc">يُظهر متى يستمع ومتى يبحث، مع نصائح عندما لا يجد الأغنية.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">نزّل</annotation> الأغاني لتشغيلها دون اتصال</string>
+    <string name="whats_new_core_downloads_desc">اضغط على السهم في أغنية أو ألبوم أو قائمة تشغيل، وستعمل دون اتصال.</string>
+    <string name="whats_new_core_lyrics_title"><annotation type="accent">الكلمات المتزامنة</annotation> تضيء كلمةً بكلمة</string>
+    <string name="whats_new_core_lyrics_desc">مع الترجمة والكتابة بالحروف اللاتينية، من المصادر التي تختارها.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">ستة تصاميم للمشغل</annotation> لتختار منها</string>
+    <string name="whats_new_core_player_designs_desc">كلاسيكي، حلقة، غلاف كامل، أسطوانة، كاسيت وغلاف فيديو، بألوان الأغنية.</string>
+    <string name="whats_new_core_equalizer_title"><annotation type="accent">موازن صوت بعشرة نطاقات</annotation> مع إعدادات مسبقة</string>
+    <string name="whats_new_core_equalizer_desc">اسحب كل نطاق، أو اختر إعدادًا مسبقًا، أو استورد ملف AutoEQ لسماعاتك.</string>
+    <string name="whats_new_core_sleep_timer_title"><annotation type="accent">مؤقت النوم</annotation> يوقف الموسيقى عنك</string>
+    <string name="whats_new_core_sleep_timer_desc">اضغط على القمر في المشغل واختر الدقائق، أو أوقفها عند نهاية الأغنية.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Together</annotation> يشغّل الموسيقى متزامنة مع أصدقائك</string>
+    <string name="whats_new_core_together_desc">شارك رمز الغرفة ليسمع الجميع الأغنية نفسها في اللحظة نفسها.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">تعرّف</annotation> على الأغنية التي تُعزف حولك</string>
+    <string name="whats_new_core_recognition_desc">اضغط على الموجة الصوتية في شريط البحث وسيخبرك Blazify باسم الأغنية.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">موسيقاك الخاصة</annotation> تعمل بجانب البث</string>
+    <string name="whats_new_core_local_music_desc">تشترك ملفات الموسيقى على هاتفك في المكتبة وقائمة الانتظار والمشغل نفسها.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">الشكل والمظهر</annotation> يغيّر أسلوب التطبيق</string>
+    <string name="whats_new_core_look_and_feel_desc">السمة والمشغل والمشغل المصغر والكلمات والرئيسية، مع معاينة مباشرة أثناء التعديل.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">غلاف الفيديو</annotation> يشغّل الفيديو الموسيقي</string>
+    <string name="whats_new_core_video_art_desc">يُعرض فيديو الأغنية الأصلي خلف المشغل، صامتًا ومتزامنًا معها.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">أرسل</annotation> إلى التلفاز</string>
+    <string name="whats_new_core_cast_desc">أرسل الموسيقى إلى Chromecast أو Google TV من المشغل.</string>
 </resources>
