@@ -1379,4 +1379,72 @@
     <string name="update_prompt_title">Blazify %s est arrivé</string>
     <string name="update_prompt_body">De nouvelles fonctionnalités et corrections sont disponibles. Votre musique et votre bibliothèque restent telles quelles.</string>
     <string name="update_prompt_update">Mettre à jour</string>
+    <string name="spatial_sound">Son 3D</string>
+    <string name="spatial_sound_off">Désactivé</string>
+    <string name="spatial_sound_surround">Surround</string>
+    <string name="spatial_sound_orbit">8D</string>
+    <string name="spatial_sound_desc_off">Désactivé. Surround place le titre autour de vous ; 8D le fait tourner autour de votre tête. Idéal avec un casque</string>
+    <string name="spatial_sound_desc_surround">Surround : le titre vient d\'enceintes placées autour de vous, avec sa largeur et la pièce derrière</string>
+    <string name="spatial_sound_desc_orbit">8D : le titre tourne lentement autour de votre tête</string>
+    <string name="search_offline">Rechercher des titres sur ce téléphone…</string>
+    <string name="search_offline_notice">Pas de connexion. Affichage des titres lisibles hors ligne : téléchargés, en cache et sur cet appareil.</string>
+    <string name="offline_home_group">Accueil sans connexion</string>
+    <string name="offline_home_cached">Titres en cache</string>
+    <string name="offline_home_cached_desc">Titres conservés en entier dans le cache après leur écoute</string>
+    <string name="offline_home_downloaded">Titres téléchargés</string>
+    <string name="offline_home_downloaded_desc">Les titres que vous avez téléchargés</string>
+    <string name="offline_home_device">Titres sur cet appareil</string>
+    <string name="offline_home_device_desc">Vos propres fichiers musicaux sur ce téléphone</string>
+    <string name="whats_new">Nouveautés</string>
+    <string name="hint_whats_new">Les nouvelles fonctionnalités, chacune avec une courte démo</string>
+    <string name="whats_new_title">Nouveautés de la version %1$s</string>
+    <string name="whats_new_section_new">Nouveau dans cette version</string>
+    <string name="whats_new_section_core">Ce que Blazify sait faire</string>
+    <string name="whats_new_see_all">Voir toutes les fonctionnalités</string>
+    <string name="whats_new_see_fewer">Afficher moins</string>
+    <string name="whats_new_release_notes">Notes de version complètes</string>
+    <string name="whats_new_skip">Passer</string>
+    <string name="whats_new_see_more">Voir plus</string>
+    <string name="whats_new_kind_new">Nouveau</string>
+    <string name="whats_new_kind_improved">Amélioré</string>
+    <string name="whats_new_kind_fixed">Corrigé</string>
+    <string name="whats_new_card_position">%1$d sur %2$d</string>
+    <string name="whats_new_spatial_sound_title">Le <annotation type="accent">son 3D</annotation> fait bouger le titre autour de vous</string>
+    <string name="whats_new_spatial_sound_desc">Surround le place sur des enceintes autour de vous, 8D tourne autour de votre tête. À retrouver dans les paramètres du lecteur.</string>
+    <string name="whats_new_offline_search_title">La <annotation type="accent">recherche</annotation> fonctionne sans connexion</string>
+    <string name="whats_new_offline_search_desc">Elle trouve vos titres téléchargés, en cache et locaux par titre, artiste ou album.</string>
+    <string name="whats_new_trending_title">Les <annotation type="accent">tendances</annotation> suivent votre pays</string>
+    <string name="whats_new_trending_desc">Les classements et une nouvelle section sur l\'Accueil montrent ce qui est populaire là où vous vivez.</string>
+    <string name="whats_new_keeps_playing_title">La musique <annotation type="accent">continue</annotation> quand une liste se termine</string>
+    <string name="whats_new_keeps_playing_desc">Des titres similaires rejoignent la file d\'attente quand un album ou une playlist se termine.</string>
+    <string name="whats_new_video_art_finder_title"><annotation type="accent">Pochette vidéo</annotation> trouve le vrai clip</string>
+    <string name="whats_new_video_art_finder_desc">Fini les reprises, les versions live ou les vidéos de paroles quand le clip officiel du titre existe.</string>
+    <string name="whats_new_accounts_title"><annotation type="accent">Changez de compte</annotation> en un geste</string>
+    <string name="whats_new_accounts_desc">Les comptes Google auxquels vous vous connectez sont conservés, pour passer de l\'un à l\'autre.</string>
+    <string name="whats_new_queue_swipe_title"><annotation type="accent">Balayez vers la droite</annotation> pour lire un titre ensuite</string>
+    <string name="whats_new_queue_swipe_desc">La file d\'attente n\'a plus de verrou : faites glisser pour réorganiser, balayez vers la gauche pour retirer.</string>
+    <string name="whats_new_recognition_wave_title">La <annotation type="accent">reconnaissance musicale</annotation> écoute avec une onde sonore</string>
+    <string name="whats_new_recognition_wave_desc">Elle indique quand elle écoute et cherche, avec des conseils quand un titre n\'est pas trouvé.</string>
+    <string name="whats_new_core_downloads_title"><annotation type="accent">Téléchargez</annotation> des titres pour les écouter hors ligne</string>
+    <string name="whats_new_core_downloads_desc">Touchez la flèche d\'un titre, d\'un album ou d\'une playlist, et il se lit sans connexion.</string>
+    <string name="whats_new_core_lyrics_title">Les <annotation type="accent">paroles synchronisées</annotation> s\'illuminent mot par mot</string>
+    <string name="whats_new_core_lyrics_desc">Avec traduction et romanisation, depuis les sources de votre choix.</string>
+    <string name="whats_new_core_player_designs_title"><annotation type="accent">Six designs de lecteur</annotation> au choix</string>
+    <string name="whats_new_core_player_designs_desc">Classique, Anneau, Pochette pleine, Vinyle, Cassette et Pochette vidéo, aux couleurs du titre.</string>
+    <string name="whats_new_core_equalizer_title">Un <annotation type="accent">égaliseur 10 bandes</annotation> avec préréglages</string>
+    <string name="whats_new_core_equalizer_desc">Faites glisser chaque bande, choisissez un préréglage ou importez un profil AutoEQ pour votre casque.</string>
+    <string name="whats_new_core_sleep_timer_title">La <annotation type="accent">minuterie de sommeil</annotation> arrête la musique pour vous</string>
+    <string name="whats_new_core_sleep_timer_desc">Touchez la lune dans le lecteur et choisissez les minutes, ou arrêtez à la fin du titre.</string>
+    <string name="whats_new_core_together_title"><annotation type="accent">Blaze Ensemble</annotation> joue en synchro avec vos amis</string>
+    <string name="whats_new_core_together_desc">Partagez un code de salon et tout le monde entend le même titre au même moment.</string>
+    <string name="whats_new_core_recognition_title"><annotation type="accent">Reconnaissez</annotation> le titre qui passe autour de vous</string>
+    <string name="whats_new_core_recognition_desc">Touchez l\'onde sonore dans la barre de recherche et Blazify nomme le titre.</string>
+    <string name="whats_new_core_local_music_title"><annotation type="accent">Votre propre musique</annotation> à côté du streaming</string>
+    <string name="whats_new_core_local_music_desc">Les fichiers musicaux de votre téléphone partagent la même bibliothèque, file d\'attente et lecteur.</string>
+    <string name="whats_new_core_look_and_feel_title"><annotation type="accent">Apparence</annotation> relooke l\'application</string>
+    <string name="whats_new_core_look_and_feel_desc">Thème, lecteur, mini-lecteur, paroles et Accueil, avec un aperçu en direct au fil des réglages.</string>
+    <string name="whats_new_core_video_art_title"><annotation type="accent">Pochette vidéo</annotation> lit le clip</string>
+    <string name="whats_new_core_video_art_desc">Le clip du titre défile derrière le lecteur, en sourdine et en rythme.</string>
+    <string name="whats_new_core_cast_title"><annotation type="accent">Castez</annotation> sur votre TV</string>
+    <string name="whats_new_core_cast_desc">Envoyez la musique vers un Chromecast ou une Google TV depuis le lecteur.</string>
 </resources>
